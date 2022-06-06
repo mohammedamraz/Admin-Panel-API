@@ -16,12 +16,23 @@ export declare class AdminService {
     serviceSid: string;
     client: any;
     salesPartnerAccountDetails: any[];
+    salesPartnerAccountData: any[];
     salesPartnerRequestDetails: any;
     salesPartnerDetails: any;
     salesParterEmail: any;
     fetchSalesPartnerAccountDetails(): import("rxjs").Observable<Promise<any[]>>;
     fetchUser(createSalesPartner: CreateSalesPartner[]): Promise<any[]>;
     fetchAccount(userDoc: User[], saleDoc: CreateSalesPartner): Promise<{
+        account_holder_name: string;
+        account_number: string;
+        ifsc_code: string;
+        bank: string;
+        sales_code: string;
+        commission_amount: number;
+    }>;
+    fetchSalesPartnerAccountDetailsBySalesCode(sales_code: string): import("rxjs").Observable<Promise<any[]>>;
+    fetchUserById(createSalesPartner: CreateSalesPartner[]): Promise<any[]>;
+    fetchAccountById(userDoc: User[], saleDoc: CreateSalesPartner): Promise<{
         account_holder_name: string;
         account_number: string;
         ifsc_code: string;

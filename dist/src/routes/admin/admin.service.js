@@ -34,6 +34,7 @@ let AdminService = class AdminService {
         this.serviceSid = constants_1.AKASH_SERVICEID;
         this.client = require('twilio')(this.accountSid, this.authToken);
         this.salesPartnerAccountDetails = [];
+        this.salesPartnerAccountData = [];
         this.onTwilioErrorResponse = async (err) => {
             common_1.Logger.debug('onTwilioErrorResponse(), ' + err, APP);
             if (err.status === 400)
@@ -81,7 +82,11 @@ let AdminService = class AdminService {
     }
     fetchSalesPartnerAccountDetails() {
         common_1.Logger.debug(`fetchSalesPartnerAccountDetails()`, APP);
-        return this.salesDb.find({ is_active: true }).pipe((0, rxjs_1.map)(salesDoc => this.fetchUser(salesDoc)), (0, rxjs_1.catchError)(err => { throw new common_1.BadRequestException(err.message); }));
+        return this.salesDb.find({ block_account: true, is_hsa_account: true }).pipe((0, rxjs_1.map)(salesDoc => {
+            if (salesDoc.length === 0)
+                throw new common_1.NotFoundException("sales partner not found");
+            return this.fetchUser(salesDoc);
+        }), (0, rxjs_1.catchError)(err => { throw new common_1.BadRequestException(err.message); }));
     }
     async fetchUser(createSalesPartner) {
         common_1.Logger.debug(`fetchUser() createSalesPartner: ${JSON.stringify(createSalesPartner)}`, APP);
@@ -93,6 +98,31 @@ let AdminService = class AdminService {
     async fetchAccount(userDoc, saleDoc) {
         common_1.Logger.debug(`fetchAccount() userDoc: ${JSON.stringify(userDoc)}  saleDoc: ${JSON.stringify(saleDoc)}`, APP);
         return (0, rxjs_1.lastValueFrom)((0, helper_1.fetchAccount)(userDoc[0].fedo_id, String(userDoc[0].account_id)))
+            .then(async (accountDoc) => {
+            const salesJunctionDoc = await (0, rxjs_1.lastValueFrom)(this.salesJunctionDb.find({ sales_code: saleDoc.sales_code })).catch(error => { throw new common_1.NotFoundException(error.message); });
+            return { "account_holder_name": accountDoc.name, "account_number": accountDoc.account_number, "ifsc_code": accountDoc.ifsc_code, "bank": accountDoc.bank_name, "sales_code": saleDoc.sales_code, "commission_amount": salesJunctionDoc.pop().dues };
+        });
+    }
+    fetchSalesPartnerAccountDetailsBySalesCode(sales_code) {
+        common_1.Logger.debug(`fetchSalesPartnerAccountDetailsBySalesCode()`, APP);
+        return this.salesDb.find({ sales_code: sales_code }).pipe((0, rxjs_1.map)(salesDoc => {
+            if (salesDoc.length === 0)
+                throw new common_1.NotFoundException("sales partner not found");
+            return this.fetchUserById(salesDoc);
+        }), (0, rxjs_1.catchError)(err => { throw new common_1.BadRequestException(err.message); }));
+    }
+    async fetchUserById(createSalesPartner) {
+        common_1.Logger.debug(`fetchUserById() createSalesPartner: ${JSON.stringify(createSalesPartner)}`, APP);
+        this.salesPartnerAccountData = [];
+        if (!createSalesPartner[0].user_id)
+            throw new common_1.NotFoundException("HSA account not found ");
+        return (0, rxjs_1.lastValueFrom)((0, rxjs_1.from)(createSalesPartner).pipe((0, rxjs_1.concatMap)(async (saleDoc) => await (0, rxjs_1.lastValueFrom)((0, helper_1.fetchUser)(saleDoc.user_id.toString()))
+            .then(userDoc => this.fetchAccountById(userDoc, saleDoc).then(result => { this.salesPartnerAccountData.push(result); }))
+            .catch(error => { throw new common_1.UnprocessableEntityException(error.message); })))).then(doc => this.salesPartnerAccountData);
+    }
+    async fetchAccountById(userDoc, saleDoc) {
+        common_1.Logger.debug(`fetchAccountById() userDoc: ${JSON.stringify(userDoc)}  saleDoc: ${JSON.stringify(saleDoc)}`, APP);
+        return (0, rxjs_1.lastValueFrom)((0, helper_1.fetchAccount)(userDoc[0].fedo_id, (userDoc[0].account_id).toString()))
             .then(async (accountDoc) => {
             const salesJunctionDoc = await (0, rxjs_1.lastValueFrom)(this.salesJunctionDb.find({ sales_code: saleDoc.sales_code })).catch(error => { throw new common_1.NotFoundException(error.message); });
             return { "account_holder_name": accountDoc.name, "account_number": accountDoc.account_number, "ifsc_code": accountDoc.ifsc_code, "bank": accountDoc.bank_name, "sales_code": saleDoc.sales_code, "commission_amount": salesJunctionDoc.pop().dues };
