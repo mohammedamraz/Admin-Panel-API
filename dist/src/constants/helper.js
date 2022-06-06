@@ -1,10 +1,11 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.imageFileFilter = exports.editFileName = exports.fetchAccountBySalesCode = exports.fetchUserByMobileNumber = exports.fetchAccount = exports.fetchUser = void 0;
+exports.encryptPassword = exports.imageFileFilter = exports.editFileName = exports.fetchAccountBySalesCode = exports.fetchUserByMobileNumber = exports.fetchAccount = exports.fetchUser = void 0;
 const axios_1 = require("@nestjs/axios");
 const rxjs_1 = require("rxjs");
 const path_1 = require("path");
 const common_1 = require("@nestjs/common");
+const index_1 = require("./index");
 const fetchUser = (userId) => {
     return new axios_1.HttpService().get(`http://0.0.0.0:35000/users/${userId}`).pipe((0, rxjs_1.catchError)(err => onHTTPErrorResponse(err)), (0, rxjs_1.map)((res) => res.data));
 };
@@ -49,4 +50,11 @@ const onHTTPErrorResponse = async (err) => {
         throw new common_1.NotFoundException(err.response.data.message);
     return (0, rxjs_1.throwError)(() => err);
 };
+const encryptPassword = (password) => {
+    const NodeRSA = require('node-rsa');
+    let key_public = new NodeRSA(index_1.PUBLIC_KEY);
+    var encryptedString = key_public.encrypt(password, 'base64');
+    return encryptedString;
+};
+exports.encryptPassword = encryptPassword;
 //# sourceMappingURL=helper.js.map

@@ -5,3 +5,4 @@ export declare const fetchUserByMobileNumber: (phoneNumber: string) => import("r
 export declare const fetchAccountBySalesCode: (salesCode: string) => import("rxjs").Observable<createAccount[]>;
 export declare const editFileName: (req: any, file: any, callback: any) => void;
 export declare const imageFileFilter: (req: any, file: any, callback: any) => any;
+export declare const encryptPassword: (password: any) => any;

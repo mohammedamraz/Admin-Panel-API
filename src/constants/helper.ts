@@ -4,28 +4,30 @@ import { AxiosResponse } from 'axios';
 import { catchError, map, throwError } from "rxjs";
 import { extname } from "path";
 import { BadRequestException, NotFoundException, UnauthorizedException, UnprocessableEntityException } from "@nestjs/common";
-export const fetchUser =(userId: string) => {
+import { PUBLIC_KEY } from "src/constants/index";
 
-    return new HttpService().get(`http://0.0.0.0:35000/users/${userId}`).pipe(
+export const fetchUser = (userId: string) => {
+
+	return new HttpService().get(`http://0.0.0.0:35000/users/${userId}`).pipe(
 		catchError(err => onHTTPErrorResponse(err)),
 		map((res: AxiosResponse) => <User[]>res.data))
 }
-export const fetchAccount =(userId: string, accountId: string) => {
+export const fetchAccount = (userId: string, accountId: string) => {
 
-    return new HttpService().get(`http://0.0.0.0:35000/users/${userId}/accounts/${accountId}`).pipe(
+	return new HttpService().get(`http://0.0.0.0:35000/users/${userId}/accounts/${accountId}`).pipe(
 		catchError(err => onHTTPErrorResponse(err)),
 		map((res: AxiosResponse) => <AccountZwitchResponseBody>res.data))
 }
-export const fetchUserByMobileNumber =(phoneNumber: string) => {
+export const fetchUserByMobileNumber = (phoneNumber: string) => {
 
-    return new HttpService().get(`http://0.0.0.0:35000/users/${phoneNumber}/phoneNumber`).pipe(
+	return new HttpService().get(`http://0.0.0.0:35000/users/${phoneNumber}/phoneNumber`).pipe(
 		catchError(err => onHTTPErrorResponse(err)),
 		map((res: AxiosResponse) => <User[]>res.data),
-		)
+	)
 }
-export const fetchAccountBySalesCode =(salesCode: string) => {
+export const fetchAccountBySalesCode = (salesCode: string) => {
 
-    return new HttpService().get(`http://0.0.0.0:35000/users/${salesCode}/accounts`).pipe(
+	return new HttpService().get(`http://0.0.0.0:35000/users/${salesCode}/accounts`).pipe(
 		catchError(err => onHTTPErrorResponse(err)),
 		map((res: AxiosResponse) => <createAccount[]>res.data))
 }
@@ -39,9 +41,9 @@ export const editFileName = (req, file, callback) => {
 	callback(null, `${name}-${randomName}${fileExtName}`);
 };
 export const imageFileFilter = (req, file, callback) => {
-	if (!file.originalname.match(/\.(jpg|jpeg|png)$/)) 
+	if (!file.originalname.match(/\.(jpg|jpeg|png)$/))
 		return callback(new Error('Only image files are allowed!'), false);
-	
+
 	callback(null, true);
 };
 const onHTTPErrorResponse = async (err) => {
@@ -53,3 +55,11 @@ const onHTTPErrorResponse = async (err) => {
 	return throwError(() => err);
 };
 
+
+export const encryptPassword = (password) => {
+
+	const NodeRSA = require('node-rsa');
+	let key_public = new NodeRSA(PUBLIC_KEY)
+	var encryptedString = key_public.encrypt(password, 'base64')
+	return encryptedString
+}
