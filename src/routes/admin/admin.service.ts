@@ -32,6 +32,7 @@ export class AdminService {
   serviceSid = AKASH_SERVICEID;
   client = require('twilio')(this.accountSid, this.authToken);
   salesPartnerAccountDetails = []
+  salesPartnerAccountData = []
   salesPartnerRequestDetails: any;
   salesPartnerDetails : any;
   salesParterEmail : any;
@@ -39,9 +40,13 @@ export class AdminService {
   fetchSalesPartnerAccountDetails() {
     Logger.debug(`fetchSalesPartnerAccountDetails()`, APP);
 
-    return this.salesDb.find({ is_active: true }).pipe(
-      map(salesDoc => this.fetchUser(salesDoc)),
-      catchError(err => { throw new BadRequestException(err.message) }))
+    return this.salesDb.find({ block_account: true, is_hsa_account:true }).pipe(
+      map(salesDoc =>{
+          if (salesDoc.length === 0) throw new NotFoundException("sales partner not found");
+        return this.fetchUser(salesDoc)
+      }),
+      catchError(err => { throw new BadRequestException(err.message) }),
+    )
   }
 
   async fetchUser(createSalesPartner: CreateSalesPartner[]) {
@@ -54,11 +59,48 @@ export class AdminService {
       .then(userDoc => this.fetchAccount(userDoc, saleDoc).then(result => {this.salesPartnerAccountDetails.push(result) }))
       .catch(error => { throw new UnprocessableEntityException(error.message) })))).then(doc => this.salesPartnerAccountDetails)
   }
+  
 
   async fetchAccount(userDoc: User[], saleDoc: CreateSalesPartner) {
     Logger.debug(`fetchAccount() userDoc: ${JSON.stringify(userDoc)}  saleDoc: ${JSON.stringify(saleDoc)}`, APP);
     return lastValueFrom(
       fetchAccount(userDoc[0].fedo_id, String(userDoc[0].account_id)))
+      .then(
+        async (accountDoc:AccountZwitchResponseBody) =>{
+          const salesJunctionDoc = await lastValueFrom(this.salesJunctionDb.find({ sales_code: saleDoc.sales_code })).catch(error=>{throw new NotFoundException(error.message)});
+          return { "account_holder_name": accountDoc.name, "account_number": accountDoc.account_number, "ifsc_code": accountDoc.ifsc_code, "bank": accountDoc.bank_name,"sales_code": saleDoc.sales_code, "commission_amount":salesJunctionDoc.pop().dues };
+        }
+      )
+  }
+
+  fetchSalesPartnerAccountDetailsBySalesCode(sales_code:string){
+    Logger.debug(`fetchSalesPartnerAccountDetailsBySalesCode()`, APP);
+
+    return this.salesDb.find({sales_code: sales_code}).pipe(
+      map(salesDoc =>{
+          if (salesDoc.length === 0) throw new NotFoundException("sales partner not found");
+        return this.fetchUserById(salesDoc)
+      }),
+      catchError(err => { throw new BadRequestException(err.message) }),
+    )
+  }
+
+  async fetchUserById(createSalesPartner: CreateSalesPartner[]) {
+
+    Logger.debug(`fetchUserById() createSalesPartner: ${JSON.stringify(createSalesPartner)}`, APP);
+    this.salesPartnerAccountData = []
+
+    if (!createSalesPartner[0].user_id) throw new NotFoundException("HSA account not found ")
+    return lastValueFrom(from(createSalesPartner).pipe(concatMap(async saleDoc => await lastValueFrom(fetchUser(saleDoc.user_id.toString()))
+      .then(userDoc => this.fetchAccountById(userDoc, saleDoc).then(result => {this.salesPartnerAccountData.push(result) }))
+      .catch(error => { throw new UnprocessableEntityException(error.message) })))).then(doc => this.salesPartnerAccountData)
+  }
+
+  async fetchAccountById(userDoc: User[], saleDoc: CreateSalesPartner) {
+
+    Logger.debug(`fetchAccountById() userDoc: ${JSON.stringify(userDoc)}  saleDoc: ${JSON.stringify(saleDoc)}`, APP);
+    return lastValueFrom(
+      fetchAccount(userDoc[0].fedo_id, (userDoc[0].account_id).toString()))
       .then(
         async (accountDoc:AccountZwitchResponseBody) =>{
           const salesJunctionDoc = await lastValueFrom(this.salesJunctionDb.find({ sales_code: saleDoc.sales_code })).catch(error=>{throw new NotFoundException(error.message)});
