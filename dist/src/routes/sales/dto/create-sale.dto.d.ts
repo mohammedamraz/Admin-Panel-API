@@ -20,6 +20,8 @@ export declare class CreateSalesPartner {
     is_active: boolean;
     created_date: Date;
     refered_by: string;
+    block_account: boolean;
+    profile_confirmation: boolean;
 }
 export declare class CreateSalesPartnerRequest {
     sales_code: string;
@@ -45,6 +47,8 @@ export declare class UpdateSalesPartner {
     user_image: string;
     user_id: string;
     sales_code: string;
+    block_account: boolean;
+    profile_confirmation: boolean;
 }
 export declare class ZQueryParamsDto {
     name?: string;

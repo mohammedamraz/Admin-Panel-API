@@ -28,6 +28,10 @@ __decorate([
     (0, class_validator_1.IsNotEmpty)(),
     __metadata("design:type", Number)
 ], CreateSalesPartner.prototype, "commission", void 0);
+__decorate([
+    (0, class_validator_1.IsNotEmpty)(),
+    __metadata("design:type", Boolean)
+], CreateSalesPartner.prototype, "profile_confirmation", void 0);
 exports.CreateSalesPartner = CreateSalesPartner;
 class CreateSalesPartnerRequest {
 }
