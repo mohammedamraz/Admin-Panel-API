@@ -20,6 +20,7 @@ export declare class CreateSalesPartner {
     is_active: boolean;
     created_date: Date;
     refered_by: string;
+    block_account: boolean;
 }
 export declare class CreateSalesPartnerRequest {
     sales_code: string;
@@ -46,11 +47,16 @@ export declare class UpdateSalesPartner {
     user_id: string;
     sales_code: string;
 }
+export declare enum Is_active {
+    TRUE = "true",
+    FALSE = "false"
+}
 export declare class ZQueryParamsDto {
     name?: string;
     date?: string;
     number_of_pages?: number;
     number_of_rows?: number;
+    is_active: Is_active;
 }
 export declare enum Periodicity {
     MONTHLY = "monthly",

@@ -20,8 +20,8 @@ export declare class DatabaseService<T> implements DatabaseInterface<T> {
     sortObject(obj: object): {};
     fetchAll(): Observable<any>;
     findByCondition(id: number, findbyConditionParams: findByConditionParams): Observable<any>;
+    findByAlphabet(findbyConditionParams: findByDateParams): Observable<T[]>;
     findByConditionSales(id: string, findbyConditionParams: findByDateParams): Observable<any>;
     findByDate(findbyConditionParams: findByDateParams): Observable<T[]>;
-    findByAlphabet(findbyConditionParams: findByDateParams): Observable<T[]>;
     findByPeriod(findByPeriodParams: findByPeriodParams): Observable<T[]>;
 }

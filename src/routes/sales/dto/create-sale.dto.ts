@@ -33,6 +33,7 @@ export class CreateSalesPartner {
     is_active: boolean;
     created_date: Date;
     refered_by: string;
+    block_account: boolean;
 
     }
 
@@ -75,6 +76,10 @@ export class UpdateSalesPartner {
     user_id: string;
     sales_code: string;
 }
+export enum Is_active {
+    TRUE = 'true',
+    FALSE = 'false'
+}
 
 export class ZQueryParamsDto {
     @IsOptional()
@@ -83,12 +88,16 @@ export class ZQueryParamsDto {
     @IsOptional()
     date?: string;
 
-    @IsNotEmpty()
+    @IsOptional()
     number_of_pages?: number;
 
-    @IsNotEmpty()
+    @IsOptional()
     number_of_rows?: number;
+
+    @IsEnum(Is_active)
+    is_active: Is_active;
 }
+
 
 export enum Periodicity {
     MONTHLY = 'monthly',

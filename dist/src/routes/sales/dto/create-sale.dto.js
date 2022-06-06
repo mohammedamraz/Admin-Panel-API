@@ -9,7 +9,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.makeEarningFormat = exports.Interval = exports.EarningResponse = exports.PERIOD = exports.Period = exports.UpdateImageDTO = exports.Periodicity = exports.ZQueryParamsDto = exports.UpdateSalesPartner = exports.CreateSalesInvitationJunction = exports.CreateWithdrawn = exports.CreateSalesPartnerRequest = exports.CreateSalesPartner = exports.CreateSalesJunction = void 0;
+exports.makeEarningFormat = exports.Interval = exports.EarningResponse = exports.PERIOD = exports.Period = exports.UpdateImageDTO = exports.Periodicity = exports.ZQueryParamsDto = exports.Is_active = exports.UpdateSalesPartner = exports.CreateSalesInvitationJunction = exports.CreateWithdrawn = exports.CreateSalesPartnerRequest = exports.CreateSalesPartner = exports.CreateSalesJunction = void 0;
 const class_validator_1 = require("class-validator");
 class CreateSalesJunction {
 }
@@ -65,6 +65,11 @@ exports.CreateSalesInvitationJunction = CreateSalesInvitationJunction;
 class UpdateSalesPartner {
 }
 exports.UpdateSalesPartner = UpdateSalesPartner;
+var Is_active;
+(function (Is_active) {
+    Is_active["TRUE"] = "true";
+    Is_active["FALSE"] = "false";
+})(Is_active = exports.Is_active || (exports.Is_active = {}));
 class ZQueryParamsDto {
 }
 __decorate([
@@ -76,13 +81,17 @@ __decorate([
     __metadata("design:type", String)
 ], ZQueryParamsDto.prototype, "date", void 0);
 __decorate([
-    (0, class_validator_1.IsNotEmpty)(),
+    (0, class_validator_1.IsOptional)(),
     __metadata("design:type", Number)
 ], ZQueryParamsDto.prototype, "number_of_pages", void 0);
 __decorate([
-    (0, class_validator_1.IsNotEmpty)(),
+    (0, class_validator_1.IsOptional)(),
     __metadata("design:type", Number)
 ], ZQueryParamsDto.prototype, "number_of_rows", void 0);
+__decorate([
+    (0, class_validator_1.IsEnum)(Is_active),
+    __metadata("design:type", String)
+], ZQueryParamsDto.prototype, "is_active", void 0);
 exports.ZQueryParamsDto = ZQueryParamsDto;
 var Periodicity;
 (function (Periodicity) {

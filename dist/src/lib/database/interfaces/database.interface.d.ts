@@ -50,6 +50,7 @@ export declare class findByDateParams {
     date?: string;
     number_of_pages?: number;
     number_of_rows?: number;
+    is_active: string;
 }
 export interface findByPeriodParams {
     columnName: string;

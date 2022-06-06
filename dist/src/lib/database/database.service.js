@@ -154,28 +154,6 @@ let DatabaseService = class DatabaseService {
         const query = `SELECT * FROM ${this.tableName} WHERE account_id=${id} AND created_date >= ${values[0]} AND created_date <= ${values[1]} ORDER BY ${values[2]} LIMIT  ${values[3]} OFFSET ${number} `;
         return this.runQuery(query, variables);
     }
-    findByConditionSales(id, findbyConditionParams) {
-        common_1.Logger.debug(`findByCondition(): params ${[JSON.stringify(findbyConditionParams)]}`, APP);
-        let params = findbyConditionParams;
-        let variables = [];
-        let values = [];
-        const number = params.number_of_rows * params.number_of_pages;
-        delete params.number_of_pages;
-        Object.values(params).map((params, index) => { variables.push(params), values.push((`$${index + 1}`)); });
-        const query = `SELECT * FROM ${this.tableName} WHERE refered_id='${id}' AND created_date > CURRENT_DATE - INTERVAL '${params.date}'  ORDER BY ${"created_date"} LIMIT  ${params.number_of_rows} OFFSET ${number}  `;
-        return this.runQuery(query);
-    }
-    findByDate(findbyConditionParams) {
-        common_1.Logger.debug(`find_by_alphabet(): params ${[JSON.stringify(findbyConditionParams)]}`, APP);
-        let variables = [];
-        let values = [];
-        let params = findbyConditionParams;
-        const number = params.number_of_rows * params.number_of_pages;
-        delete params.number_of_pages;
-        Object.values(params).map((params, index) => { variables.push(params), values.push((`$${index + 1}`)); });
-        const query = `SELECT * FROM ${this.tableName} WHERE (name like '${params.name}%' OR created_date > CURRENT_DATE - INTERVAL '${params.date}')  ORDER BY ${"created_date"} LIMIT  ${params.number_of_rows} OFFSET ${number}  `;
-        return this.runQuery(query);
-    }
     findByAlphabet(findbyConditionParams) {
         common_1.Logger.debug(`find_by_alphabet(): params ${[JSON.stringify(findbyConditionParams)]}`, APP);
         let variables = [];
@@ -184,6 +162,39 @@ let DatabaseService = class DatabaseService {
         Object.values(params).map((params, index) => { variables.push(params), values.push((`$${index + 1}`)); });
         const query = `SELECT * FROM ${this.tableName} WHERE name like '${params.name}%' `;
         return this.runQuery(query);
+    }
+    findByConditionSales(id, findbyConditionParams) {
+        common_1.Logger.debug(`findByCondition(): params ${[JSON.stringify(findbyConditionParams)]}`, APP);
+        let params = findbyConditionParams;
+        let variables = [];
+        let values = [];
+        const number = params.number_of_rows * params.number_of_pages;
+        delete params.number_of_pages;
+        delete params.name;
+        delete params.is_active;
+        Object.values(params).map((params, index) => { variables.push(params), values.push((`$${index + 1}`)); });
+        const query = `SELECT * FROM ${this.tableName} WHERE refered_id='${id}' AND created_date > CURRENT_DATE - (interval '1 day' * ${values[1]})  ORDER BY created_date LIMIT  ${values[0]} OFFSET ${number}`;
+        return this.runQuery(query, variables);
+    }
+    findByDate(findbyConditionParams) {
+        common_1.Logger.debug(`find_by_alphabet(): params ${[JSON.stringify(findbyConditionParams)]}`, APP);
+        let variables = [];
+        let values = [];
+        let params = findbyConditionParams;
+        const number = params.number_of_rows * params.number_of_pages;
+        delete params.number_of_pages;
+        delete params.name;
+        if (params.is_active) {
+            Object.values(params).map((params, index) => { variables.push(params), values.push((`$${index + 1}`)); });
+            const query = `SELECT * FROM ${this.tableName} WHERE is_active= ${values[2]} AND created_date > CURRENT_DATE - (interval '1 day' * ${values[1]})  ORDER BY created_date LIMIT  ${values[0]} OFFSET ${number}`;
+            return this.runQuery(query, variables);
+        }
+        else {
+            delete params.is_active;
+            Object.values(params).map((params, index) => { variables.push(params), values.push((`$${index + 1}`)); });
+            const query = `SELECT * FROM ${this.tableName} WHERE created_date > CURRENT_DATE - (interval '1 day' * ${values[1]})  ORDER BY created_date LIMIT  ${values[0]} OFFSET ${number}`;
+            return this.runQuery(query, variables);
+        }
     }
     findByPeriod(findByPeriodParams) {
         common_1.Logger.debug(`findByPeriod(): params ${[JSON.stringify(findByPeriodParams)]}`, APP);

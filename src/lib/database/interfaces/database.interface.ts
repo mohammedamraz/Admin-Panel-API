@@ -82,6 +82,8 @@ export class findByDateParams {
   number_of_pages?: number;
 
   number_of_rows?: number;
+
+  is_active:string;
 }
 
 export interface findByPeriodParams {
