@@ -1,0 +1,4 @@
+export declare const DATABASE_MODULE_OPTIONS = "DATABASE_MODULE_OPTIONS";
+export declare const DATABASE_FEATURE = "DATABASE_FEATURE";
+export declare const DATABASE_TEST_OPTIONS = "DATABASE_TEST_OPTIONS";
+export declare const DATABASE_POOL = "DATABASE_POOL";

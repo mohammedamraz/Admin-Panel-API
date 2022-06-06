@@ -1,0 +1,52 @@
+import { HttpService } from '@nestjs/axios';
+import { DatabaseService } from 'src/lib/database/database.service';
+import { CreateSalesJunction, CreateSalesPartner, CreateSalesPartnerRequest } from '../sales/dto/create-sale.dto';
+import { createPaid, MobileNumberAndOtpDtO, MobileNumberDtO, ParamDto, requestDto, User } from './dto/create-admin.dto';
+import { ConfirmForgotPasswordDTO, ForgotPasswordDTO, LoginDTO } from './dto/login.dto';
+import { TemplateService } from 'src/constants/template.service';
+export declare class AdminService {
+    private readonly salesJunctionDb;
+    private readonly salesDb;
+    private readonly salesPartnerRequestDb;
+    private readonly templateService;
+    private http;
+    constructor(salesJunctionDb: DatabaseService<CreateSalesJunction>, salesDb: DatabaseService<CreateSalesPartner>, salesPartnerRequestDb: DatabaseService<CreateSalesPartnerRequest>, templateService: TemplateService, http: HttpService);
+    accountSid: string;
+    authToken: string;
+    serviceSid: string;
+    client: any;
+    salesPartnerAccountDetails: any[];
+    salesPartnerRequestDetails: any;
+    salesPartnerDetails: any;
+    salesParterEmail: any;
+    fetchSalesPartnerAccountDetails(): import("rxjs").Observable<Promise<any[]>>;
+    fetchUser(createSalesPartner: CreateSalesPartner[]): Promise<any[]>;
+    fetchAccount(userDoc: User[], saleDoc: CreateSalesPartner): Promise<{
+        account_holder_name: string;
+        account_number: string;
+        ifsc_code: string;
+        bank: string;
+        sales_code: string;
+        commission_amount: number;
+    }>;
+    sentOtpToPhoneNumber(mobileNumberDtO: MobileNumberDtO): any;
+    verifyOtp(mobileNumberAndOtpDtO: MobileNumberAndOtpDtO): any;
+    sentFedoAppDownloadLinkToPhoneNumber(mobileNumberDtO: MobileNumberDtO): any;
+    sentFedoAppDownloadLinkToWhatsappNumber(mobileNumberDtO: MobileNumberDtO): any;
+    sentFedoAppDownloadLinkToMobileAndWhatsappNumber(mobileNumberDtO: MobileNumberDtO): import("rxjs").Observable<{
+        status: string;
+    }>;
+    sendEmailOnIncorrectBankDetails(body: requestDto, param: ParamDto): import("rxjs").Observable<unknown>;
+    private readonly onTwilioErrorResponse;
+    login(logindto: LoginDTO): import("rxjs").Observable<{
+        jwtToken: any;
+        refreshToken: any;
+        accessToken: any;
+    }>;
+    forgotPassword(forgotPasswordDTO: ForgotPasswordDTO): import("rxjs").Observable<any>;
+    confirmForgotPassword(confirmForgotPasswordDTO: ConfirmForgotPasswordDTO): import("rxjs").Observable<any[]>;
+    private readonly onAWSErrorResponse;
+    private readonly onHTTPErrorResponse;
+    encryptPassword(password: any): any;
+    updatingPaidAmount(updateAmountdto: createPaid): Promise<void>;
+}
