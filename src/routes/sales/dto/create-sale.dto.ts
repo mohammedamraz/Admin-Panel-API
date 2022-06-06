@@ -33,7 +33,10 @@ export class CreateSalesPartner {
     is_active: boolean;
     created_date: Date;
     refered_by: string;
+    block_account: boolean;
 
+    @IsNotEmpty()
+    profile_confirmation: boolean;
     }
 
 export class CreateSalesPartnerRequest {
@@ -74,6 +77,8 @@ export class UpdateSalesPartner {
     user_image: string;
     user_id: string;
     sales_code: string;
+    block_account: boolean;
+    profile_confirmation: boolean;
 }
 
 export class ZQueryParamsDto {
