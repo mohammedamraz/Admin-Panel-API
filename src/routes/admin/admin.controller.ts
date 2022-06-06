@@ -16,6 +16,13 @@ export class AdminController {
     return this.adminService.fetchSalesPartnerAccountDetails()
   }
 
+  @Get('sales/account-details/:sales_code')
+  fetchSalesPartnerAccountDetailsBySalesCode(@Param('sales_code') sales_code: string) {
+   Logger.debug(`fetchSalesPartnerAccountDetailsByID()`, APP);
+
+    return this.adminService.fetchSalesPartnerAccountDetailsBySalesCode(sales_code)
+  }
+
   @Post()
   sentOtpToPhoneNumber(@Body() mobileNumberDtO: MobileNumberDtO) {
    Logger.debug(`sentOtpToPhoneNumber() mobileNumberDtO: [${JSON.stringify(mobileNumberDtO)}]`, APP);
