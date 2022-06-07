@@ -2,7 +2,7 @@
 import { BadRequestException, Injectable, Logger, NotFoundException, UnprocessableEntityException } from '@nestjs/common';
 import { DatabaseTable } from 'src/lib/database/database.decorator';
 import { DatabaseService } from 'src/lib/database/database.service';
-import { CreateSalesInvitationJunction, CreateSalesJunction, CreateSalesPartner, CreateWithdrawn, Interval, makeEarningFormat, Period, UpdateImageDTO, UpdateSalesPartner, ZQueryParamsDto } from './dto/create-sale.dto';
+import { CreateSalesInvitationJunction, CreateSalesJunction, CreateSalesPartner, CreateWithdrawn, Interval, makeEarningFormat, Period, SalesUserJunction, UpdateImageDTO, UpdateSalesPartner, ZQueryParamsDto } from './dto/create-sale.dto';
 import { HttpService } from '@nestjs/axios';
 import { fetchAccountBySalesCode, fetchUserByMobileNumber } from 'src/constants/helper';
 import { catchError, from, lastValueFrom, map, of, switchMap } from 'rxjs';
@@ -18,6 +18,8 @@ export class SalesService {
     @DatabaseTable('sales_partner_invitation_junction') private readonly invitationJunctiondb: DatabaseService<CreateSalesInvitationJunction>,
     @DatabaseTable('sales_commission_junction') private readonly junctiondb: DatabaseService<CreateSalesJunction>,
     @DatabaseTable('sales_withdrawn_amount') private readonly withdrawndb: DatabaseService<CreateWithdrawn>,
+    @DatabaseTable('sales_user_junction') private readonly salesuser: DatabaseService<SalesUserJunction>,
+
     private http: HttpService) { }
 
 createSalesPartner(createSalesPartner: CreateSalesPartner) {
@@ -197,27 +199,7 @@ createSalesPartner(createSalesPartner: CreateSalesPartner) {
       }))
 
   }
-
-
-
-  paymentCalculation(salesCode: string) {
-    Logger.debug(`paymentCalculation salesCode: ${salesCode}`, APP);
-
-    let totalCommission
-    let remainingCommission
-
-    return this.fetchSalesBySalesCode(salesCode).pipe(
-      switchMap(doc => { return this.fetchCommisionBySalesCode(salesCode) }),
-      switchMap(doc => { totalCommission = doc.commission_amount; return this.fetchSalesBySalesCode(salesCode).pipe(map(doc => { return doc })) }),
-      switchMap(doc => this.withdrawndb.find({ 'sale_id': doc.id })),
-      switchMap(doc => { remainingCommission = totalCommission - doc[0].paid_amount; return this.junctiondb.save({ sales_code: salesCode, commission_amount: remainingCommission }) })
-
-
-    )
-
-
-  }
-
+  
   changeBankDetailsVerificationSatatus(id: number) {
     Logger.debug(`changeBankDetailsVerificationSatatus() id: [${id}] `, APP);
 
@@ -240,14 +222,29 @@ createSalesPartner(createSalesPartner: CreateSalesPartner) {
       }))
   }
 
-  fetchInvitationResponse(salesCode: string) {
+  fetchInvitationResponse(salesCode: string, period: Period) {
     Logger.debug(`fetchInvitationResponse() salesCode: ${salesCode}`, APP);
 
-    return fetchAccountBySalesCode(salesCode).pipe(
+    return this.salesuser.findByPeriod({ columnName: "sales_code", columnvalue: salesCode, period: Interval(period) }).pipe(
       catchError(error => { throw new BadRequestException(error.message) }),
-      map(accounts => {
-        if (accounts.length === 0) throw new NotFoundException("no Account found");
-        return { "signup": (accounts.filter(account => account.zwitch_id !== null)).length }
+      map(salesuser => {
+        if (salesuser.length === 0) throw new NotFoundException("no Account found");
+        return { "signup": salesuser.length }
       }))
   }
+
+  addCommission(salesCode: string){
+    Logger.debug(`addCommission() salesCode: ${salesCode}`, APP);
+
+    return this.fetchSalesBySalesCode(salesCode).pipe(
+      switchMap(salesCommission => 
+           lastValueFrom(this.junctiondb.find({ "sales_code": String(salesCode), }))
+          .then(res => [salesCommission, res[res.length - 1]])),
+      switchMap(([salesCommission, res]) =>  
+      this.junctiondb.save({ sales_code: salesCode, commission_amount: salesCommission["commission"], dues: (Number(res['dues']) + Number(salesCommission["commission"])) })
+
+      )
+
+  )
+}
 }

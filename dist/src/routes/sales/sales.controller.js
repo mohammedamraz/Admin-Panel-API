@@ -29,6 +29,10 @@ let SalesController = class SalesController {
         common_1.Logger.debug(`createSalesPartner() DTO:${JSON.stringify(createSalesPartner)}`, APP);
         return this.salesService.createSalesPartner(createSalesPartner);
     }
+    addCommission(salesCode) {
+        common_1.Logger.debug(`addCommission() salesCode: [${salesCode}] `, APP);
+        return this.salesService.addCommission(salesCode);
+    }
     deleteSalesPartner(id) {
         common_1.Logger.debug(`deleteSalesPartner() id: [${id}]`, APP);
         return this.salesService.deleteSalesPartner(id);
@@ -41,9 +45,9 @@ let SalesController = class SalesController {
         common_1.Logger.debug(`fetchEarnings()salesCode: [${salesCode}] `, APP);
         return this.salesService.fetchEarnings(salesCode, period);
     }
-    fetchInvitationResponse(salesCode) {
+    fetchInvitationResponse(salesCode, period) {
         common_1.Logger.debug(`fetchInvitationResponse()salesCode: [${salesCode}] `, APP);
-        return this.salesService.fetchInvitationResponse(salesCode);
+        return this.salesService.fetchInvitationResponse(salesCode, period);
     }
     fetchAllSalesPartnersByDate(params) {
         common_1.Logger.debug(`fetchAllSalesPartnersByDate() params:${JSON.stringify(params)}`, APP);
@@ -61,10 +65,6 @@ let SalesController = class SalesController {
         common_1.Logger.debug(`UploadImage: ${file}`, APP);
         return this.salesService.uploadImage(id, file.filename);
     }
-    paymentCalculation(salesCode) {
-        common_1.Logger.debug(`paymentCalculation()salesCode: [${salesCode}] `, APP);
-        return this.salesService.paymentCalculation(String(salesCode));
-    }
     updateSalesPartner(id, updateSalesPartnerDto) {
         common_1.Logger.debug(`updateSalesPartner() id: [${id}] DTO:${JSON.stringify(updateSalesPartnerDto)}`, APP);
         return this.salesService.updateSalesPartner(id, updateSalesPartnerDto);
@@ -81,6 +81,13 @@ __decorate([
     __metadata("design:paramtypes", [create_sale_dto_1.CreateSalesPartner]),
     __metadata("design:returntype", void 0)
 ], SalesController.prototype, "createSalesPartner", null);
+__decorate([
+    (0, common_1.Post)(':sales_code/addCommission'),
+    __param(0, (0, common_1.Param)('sales_code')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", void 0)
+], SalesController.prototype, "addCommission", null);
 __decorate([
     (0, common_1.Delete)(':id'),
     __param(0, (0, common_1.Param)('id')),
@@ -106,8 +113,9 @@ __decorate([
 __decorate([
     (0, common_1.Get)(':salesCode/invatationResponse'),
     __param(0, (0, common_1.Param)('salesCode')),
+    __param(1, (0, common_1.Query)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String]),
+    __metadata("design:paramtypes", [String, create_sale_dto_1.Period]),
     __metadata("design:returntype", void 0)
 ], SalesController.prototype, "fetchInvitationResponse", null);
 __decorate([
@@ -153,13 +161,6 @@ __decorate([
     __metadata("design:paramtypes", [String, Object]),
     __metadata("design:returntype", Promise)
 ], SalesController.prototype, "uploadImage", null);
-__decorate([
-    (0, common_1.Post)(':salesCode/need-to-pay-amount'),
-    __param(0, (0, common_1.Param)('salesCode')),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String]),
-    __metadata("design:returntype", void 0)
-], SalesController.prototype, "paymentCalculation", null);
 __decorate([
     (0, common_1.Patch)(':id'),
     __param(0, (0, common_1.Param)('id', common_1.ParseIntPipe)),

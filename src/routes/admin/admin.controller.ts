@@ -1,4 +1,5 @@
-import { Controller, Get, Post, Body, Param, Logger } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Logger, Query } from '@nestjs/common';
+import { Period } from '../sales/dto/create-sale.dto';
 import { AdminService } from './admin.service';
 import { createPaid, MobileNumberAndOtpDtO, MobileNumberDtO, ParamDto, requestDto } from './dto/create-admin.dto';
 import { ConfirmForgotPasswordDTO, ForgotPasswordDTO, LoginDTO } from './dto/login.dto';
@@ -14,6 +15,13 @@ export class AdminController {
    Logger.debug(`getSalesPartnerAccountDetails()`, APP);
 
     return this.adminService.fetchSalesPartnerAccountDetails()
+  }
+
+  @Get('earning')
+  fetchEarnings(@Param('salesCode') salesCode: string, @Query() period: Period) {
+      Logger.debug(`fetchEarnings()salesCode: [${salesCode}] `, APP);
+
+      return this.adminService.fetchEarnings(period);
   }
 
   @Get('sales/account-details/:sales_code')

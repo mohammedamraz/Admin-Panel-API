@@ -21,6 +21,7 @@ SalesModule = __decorate([
             database_module_1.DatabaseModule.forFeature({ tableName: 'sales_commission_junction' }),
             database_module_1.DatabaseModule.forFeature({ tableName: 'sales_partner_invitation_junction' }),
             database_module_1.DatabaseModule.forFeature({ tableName: 'sales_withdrawn_amount' }),
+            database_module_1.DatabaseModule.forFeature({ tableName: 'sales_user_junction' }),
             axios_1.HttpModule.register({
                 timeout: 10000,
                 maxRedirects: 5,

@@ -104,6 +104,8 @@ __decorate([
 exports.ZQueryParamsDto = ZQueryParamsDto;
 var Periodicity;
 (function (Periodicity) {
+    Periodicity["DAILY"] = "daily";
+    Periodicity["WEEKLY"] = "weekly";
     Periodicity["MONTHLY"] = "monthly";
     Periodicity["QUARTERLY"] = "quarterly";
     Periodicity["HALF_YEARLY"] = "halfyearly";
@@ -121,6 +123,8 @@ __decorate([
 ], Period.prototype, "period", void 0);
 exports.Period = Period;
 exports.PERIOD = {
+    daily: '1 day',
+    weekly: '1 week',
     monthly: '1 months',
     quarterly: '3 months',
     halfyearly: '6 months',

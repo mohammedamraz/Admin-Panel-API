@@ -36,6 +36,13 @@ export declare class CreateWithdrawn {
     sp_id: string;
     paid_amount: number;
 }
+export interface SalesUserJunction {
+    id: number;
+    sales_code: string;
+    users: number;
+    created_date: string;
+    updated_date: string;
+}
 export declare class CreateSalesInvitationJunction {
     refered_by: string;
     sp_id: string;
@@ -63,6 +70,8 @@ export declare class ZQueryParamsDto {
     is_active: Is_active;
 }
 export declare enum Periodicity {
+    DAILY = "daily",
+    WEEKLY = "weekly",
     MONTHLY = "monthly",
     QUARTERLY = "quarterly",
     HALF_YEARLY = "halfyearly",
@@ -75,6 +84,8 @@ export declare class Period {
     period: Periodicity;
 }
 export declare const PERIOD: {
+    daily: string;
+    weekly: string;
     monthly: string;
     quarterly: string;
     halfyearly: string;
