@@ -27,7 +27,7 @@ export declare class User {
     aadhaar_id: string;
     userreference_id: string;
     kycschedule: string;
-    phone_number: phoneNumber;
+    mobile: phoneNumber;
 }
 export declare class AccountZwitchResponseBody {
     id: string;

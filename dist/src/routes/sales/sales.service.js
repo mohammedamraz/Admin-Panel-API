@@ -39,9 +39,9 @@ let SalesService = class SalesService {
         todayDate = mm + dd;
         return this.fetchSalesPartnerByMobileNumber(createSalesPartner.mobile).pipe((0, rxjs_1.switchMap)(doc => (0, helper_1.fetchUserByMobileNumber)(createSalesPartner.mobile)), (0, rxjs_1.switchMap)(doc => {
             if (!doc[0])
-                return this.db.save(createSalesPartner);
+                return this.db.save({ name: createSalesPartner.name, location: createSalesPartner.location, commission: createSalesPartner.commission, mobile: createSalesPartner.mobile, email: createSalesPartner.email });
             else
-                return this.db.save({ name: createSalesPartner.name, location: createSalesPartner.location, commission: createSalesPartner.commission, phone_number: createSalesPartner.mobile, email: createSalesPartner.email, user_id: doc[0].fedo_id });
+                return this.db.save({ name: createSalesPartner.name, location: createSalesPartner.location, commission: createSalesPartner.commission, mobile: createSalesPartner.mobile, email: createSalesPartner.email, user_id: doc[0].fedo_id, is_hsa_account: true });
         }), (0, rxjs_1.switchMap)(doc => { salesId = doc[0].id; createSalesPartner.sales_code = "FEDSP" + todayDate + 500 + doc[0].id; createSalesPartner.id = doc[0].id; return this.junctiondb.save({ sales_code: "FEDSP" + todayDate + 500 + doc[0].id }).pipe((0, rxjs_1.catchError)(err => { throw new common_1.BadRequestException(err.message); }), (0, rxjs_1.map)(doc => doc)); }), (0, rxjs_1.switchMap)(doc => this.createInvitation(createSalesPartner, doc)), (0, rxjs_1.switchMap)(doc => this.updateSalesPartner(salesId, { sales_code: createSalesPartner.sales_code })), (0, rxjs_1.switchMap)(doc => this.fetchSalesPartnerById(createSalesPartner.id.toString())));
     }
     createInvitation(createSalesPartner, createSalesJunction) {
@@ -52,7 +52,7 @@ let SalesService = class SalesService {
     }
     fetchSalesPartnerByMobileNumber(mobile) {
         common_1.Logger.debug(`fetchSalesPartnerByUserId() id: [${JSON.stringify(mobile)}]`, APP);
-        return (0, rxjs_1.from)((0, rxjs_1.lastValueFrom)(this.db.find({ phone_number: mobile }).pipe((0, rxjs_1.catchError)(err => { throw new common_1.UnprocessableEntityException(err.message); }), (0, rxjs_1.map)((res) => {
+        return (0, rxjs_1.from)((0, rxjs_1.lastValueFrom)(this.db.find({ mobile: mobile }).pipe((0, rxjs_1.catchError)(err => { throw new common_1.UnprocessableEntityException(err.message); }), (0, rxjs_1.map)((res) => {
             if (res[0] != null)
                 throw new common_1.NotFoundException(`sales partner already present with same phone number`);
             return res;
@@ -69,7 +69,6 @@ let SalesService = class SalesService {
     fetchSalesPartnerById(id) {
         common_1.Logger.debug(`fetchSalesPartnerById() id: [${JSON.stringify(id)}]`, APP);
         return (0, rxjs_1.from)((0, rxjs_1.lastValueFrom)(this.db.find({ id: id }).pipe((0, rxjs_1.catchError)(err => { throw new common_1.UnprocessableEntityException(err.message); }), (0, rxjs_1.map)((res) => {
-            console.log('adfasdf', res);
             if (res[0] === null)
                 throw new common_1.NotFoundException(`Sales Partner Not Found`);
             if (res[0].is_active === false)
@@ -176,7 +175,7 @@ let SalesService = class SalesService {
         common_1.Logger.debug(`paymentCalculation salesCode: ${salesCode}`, APP);
         let totalCommission;
         let remainingCommission;
-        return this.fetchSalesBySalesCode(salesCode).pipe((0, rxjs_1.switchMap)(doc => { return this.fetchCommisionBySalesCode(salesCode); }), (0, rxjs_1.switchMap)(doc => { console.log(doc.commission_amount); totalCommission = doc.commission_amount; return this.fetchSalesBySalesCode(salesCode).pipe((0, rxjs_1.map)(doc => { return doc; })); }), (0, rxjs_1.switchMap)(doc => this.withdrawndb.find({ 'sale_id': doc.id })), (0, rxjs_1.switchMap)(doc => { console.log(doc[0].paid_amount, totalCommission); remainingCommission = totalCommission - doc[0].paid_amount; console.log(remainingCommission); return this.junctiondb.save({ sales_code: salesCode, commission_amount: remainingCommission }); }));
+        return this.fetchSalesBySalesCode(salesCode).pipe((0, rxjs_1.switchMap)(doc => { return this.fetchCommisionBySalesCode(salesCode); }), (0, rxjs_1.switchMap)(doc => { totalCommission = doc.commission_amount; return this.fetchSalesBySalesCode(salesCode).pipe((0, rxjs_1.map)(doc => { return doc; })); }), (0, rxjs_1.switchMap)(doc => this.withdrawndb.find({ 'sale_id': doc.id })), (0, rxjs_1.switchMap)(doc => { remainingCommission = totalCommission - doc[0].paid_amount; return this.junctiondb.save({ sales_code: salesCode, commission_amount: remainingCommission }); }));
     }
     changeBankDetailsVerificationSatatus(id) {
         common_1.Logger.debug(`changeBankDetailsVerificationSatatus() id: [${id}] quries:{'bank_details_verification':true}`, APP);

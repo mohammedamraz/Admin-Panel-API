@@ -35,8 +35,8 @@ export class SalesService {
     return this.fetchSalesPartnerByMobileNumber(createSalesPartner.mobile).pipe(
       switchMap(doc => fetchUserByMobileNumber(createSalesPartner.mobile)),
       switchMap(doc => {
-        if (!doc[0]) return this.db.save(createSalesPartner)
-        else return this.db.save({ name: createSalesPartner.name, location: createSalesPartner.location, commission: createSalesPartner.commission, phone_number: createSalesPartner.mobile, email: createSalesPartner.email, user_id: doc[0].fedo_id })
+        if (!doc[0]) return this.db.save({ name: createSalesPartner.name, location: createSalesPartner.location, commission: createSalesPartner.commission, mobile: createSalesPartner.mobile, email: createSalesPartner.email})
+        else return this.db.save({ name: createSalesPartner.name, location: createSalesPartner.location, commission: createSalesPartner.commission, mobile: createSalesPartner.mobile, email: createSalesPartner.email, user_id: doc[0].fedo_id,is_hsa_account:true })
       }),
       switchMap(doc => { salesId = doc[0].id; createSalesPartner.sales_code = "FEDSP" + todayDate + 500 + doc[0].id; createSalesPartner.id = doc[0].id; return this.junctiondb.save({ sales_code: "FEDSP" + todayDate + 500 + doc[0].id }).pipe(catchError(err => { throw new BadRequestException(err.message) }), map(doc => doc)) }),
       switchMap(doc => this.createInvitation(createSalesPartner, doc)),
@@ -58,7 +58,7 @@ export class SalesService {
   fetchSalesPartnerByMobileNumber(mobile: string) {
     Logger.debug(`fetchSalesPartnerByUserId() id: [${JSON.stringify(mobile)}]`, APP);
 
-    return from(lastValueFrom(this.db.find({ phone_number: mobile }).pipe(catchError(err => { throw new UnprocessableEntityException(err.message) }), map((res) => {
+    return from(lastValueFrom(this.db.find({ mobile: mobile }).pipe(catchError(err => { throw new UnprocessableEntityException(err.message) }), map((res) => {
       if (res[0] != null) throw new NotFoundException(`sales partner already present with same phone number`)
       return res
     }))));
@@ -80,7 +80,6 @@ export class SalesService {
     Logger.debug(`fetchSalesPartnerById() id: [${JSON.stringify(id)}]`, APP);
 
     return from(lastValueFrom(this.db.find({ id: id }).pipe(catchError(err => { throw new UnprocessableEntityException(err.message) }), map((res) => {
-      console.log('adfasdf', res)
       if (res[0] === null) throw new NotFoundException(`Sales Partner Not Found`)
       if (res[0].is_active === false) throw new NotFoundException(`Sales Partner Not Found`)
       return res
@@ -208,9 +207,9 @@ export class SalesService {
 
     return this.fetchSalesBySalesCode(salesCode).pipe(
       switchMap(doc => { return this.fetchCommisionBySalesCode(salesCode) }),
-      switchMap(doc => { console.log(doc.commission_amount); totalCommission = doc.commission_amount; return this.fetchSalesBySalesCode(salesCode).pipe(map(doc => { return doc })) }),
+      switchMap(doc => { totalCommission = doc.commission_amount; return this.fetchSalesBySalesCode(salesCode).pipe(map(doc => { return doc })) }),
       switchMap(doc => this.withdrawndb.find({ 'sale_id': doc.id })),
-      switchMap(doc => { console.log(doc[0].paid_amount, totalCommission); remainingCommission = totalCommission - doc[0].paid_amount; console.log(remainingCommission); return this.junctiondb.save({ sales_code: salesCode, commission_amount: remainingCommission }) })
+      switchMap(doc => { remainingCommission = totalCommission - doc[0].paid_amount; return this.junctiondb.save({ sales_code: salesCode, commission_amount: remainingCommission }) })
 
 
     )
