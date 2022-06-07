@@ -14,7 +14,7 @@ export declare class SalesService {
     fetchSalesPartnerByUserId(id: string): import("rxjs").Observable<CreateSalesPartner[]>;
     fetchSalesPartnerById(id: string): import("rxjs").Observable<CreateSalesPartner[]>;
     deleteSalesPartner(id: string): import("rxjs").Observable<Promise<CreateSalesPartner[]>>;
-    updateSalesPartner(id: string, updateSalesPartnerDto: UpdateSalesPartner): import("rxjs").Observable<Promise<CreateSalesPartner[]>>;
+    updateSalesPartner(id: number, updateSalesPartnerDto: UpdateSalesPartner): import("rxjs").Observable<Promise<CreateSalesPartner[]>>;
     fetchAllSalesPartnersByDate(params: ZQueryParamsDto): import("rxjs").Observable<any>;
     fetchCommissionFromJunctionDb(params: ZQueryParamsDto): any[] | import("rxjs").Observable<CreateSalesJunction[]>;
     fetchAllSalesPartnersFromJunctionByDate(id: string, params: ZQueryParamsDto): any[] | import("rxjs").Observable<any>;

@@ -20,8 +20,9 @@ import { AdminModule } from './routes/admin/admin.module';
       imports: [ConfigModule.Deferred],
       useClass: DatabaseModuleConfig,
     }),
-    AdminModule,
     SalesModule,
+    AdminModule,
+    
   ],
   controllers: [AppController],
   providers: [AppService],

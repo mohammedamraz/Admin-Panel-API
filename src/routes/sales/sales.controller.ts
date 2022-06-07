@@ -21,6 +21,7 @@ export class SalesController {
       return this.salesService.createSalesPartner(createSalesPartner)
   }
 
+ 
 
   @Delete(':id')
   deleteSalesPartner(@Param('id') id: string) {
@@ -28,6 +29,8 @@ export class SalesController {
 
       return this.salesService.deleteSalesPartner(id);
   }
+
+ 
 
   @Get(':id')
   fetchSalesPartnerById(@Param('id') id: string) {
@@ -51,12 +54,7 @@ export class SalesController {
 
   }
 
-  @Patch(':id')
-  updateSalesPartner(@Param('id') id: string, @Body() updateSalesPartnerDto: UpdateSalesPartner) {
-      Logger.debug(`updateSalesPartner() id: [${id}] DTO:${JSON.stringify(updateSalesPartnerDto,)}`, APP);
-
-      return this.salesService.updateSalesPartner(id, updateSalesPartnerDto);
-  }
+ 
 
   @Get()
   fetchAllSalesPartnersByDate(@Query() params: ZQueryParamsDto) {
@@ -105,18 +103,23 @@ export class SalesController {
 
       return this.salesService.paymentCalculation(String(salesCode))
   }
-  
 
+
+
+  @Patch(':id')
+  updateSalesPartner(@Param('id',ParseIntPipe) id: number, @Body() updateSalesPartnerDto: UpdateSalesPartner) {
+      Logger.debug(`updateSalesPartner() id: [${id}] DTO:${JSON.stringify(updateSalesPartnerDto,)}`, APP);
+
+      return this.salesService.updateSalesPartner(id, updateSalesPartnerDto);
+  }
 
   @Patch('bank-details-verification/:id')
   changeBankDetailsVerificationStatus(@Param('id', ParseIntPipe) id: number) {
-    Logger.debug(`changeBankDetailsVerificationSatatus() id:[${id}] quries:{'bank_details_verification':true}`, APP);
+    Logger.debug(`changeBankDetailsVerificationSatatus() id:[${id}] `, APP);
 
     return this.salesService.changeBankDetailsVerificationSatatus(id);
   }
-
-
-
+  
 }
 
 

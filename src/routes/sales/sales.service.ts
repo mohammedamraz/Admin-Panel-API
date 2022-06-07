@@ -97,13 +97,13 @@ export class SalesService {
     }))
   }
 
-  updateSalesPartner(id: string, updateSalesPartnerDto: UpdateSalesPartner) {
+  updateSalesPartner(id: number, updateSalesPartnerDto: UpdateSalesPartner) {
     Logger.debug(`updateSalesPartner() id: [${id}], body: [${JSON.stringify(updateSalesPartnerDto)}]`, APP,);
 
     return this.db.find({ id: id }).pipe(map(res => {
       if (res[0] === null) throw new NotFoundException(`Sales Partner Not Found`)
       if (res[0].is_active === false) throw new NotFoundException(`Sales Partner Not Found`)
-      return lastValueFrom(this.db.findByIdandUpdate({ id: id, quries: updateSalesPartnerDto }).pipe(catchError(err => { throw new BadRequestException() }), map(doc => { return doc })))
+      return lastValueFrom(this.db.findByIdandUpdate({ id: String(id), quries: updateSalesPartnerDto }).pipe(catchError(err => { throw new BadRequestException() }), map(doc => { return doc })))
     }))
 
   }
@@ -218,10 +218,10 @@ export class SalesService {
   }
 
   changeBankDetailsVerificationSatatus(id: number) {
-    Logger.debug(`changeBankDetailsVerificationSatatus() id: [${id}] quries:{'bank_details_verification':true}`, APP);
+    Logger.debug(`changeBankDetailsVerificationSatatus() id: [${id}] `, APP);
 
     return (this.db.find({ id: id })).pipe(
-      catchError(err => { (err); throw new UnprocessableEntityException() }),
+      catchError(err => { (err); throw new UnprocessableEntityException(err.message) }),
       map(res => {
         if (res.length === 0) throw new NotFoundException();
         return this.db.findByIdandUpdate({ id: String(id), quries: { 'bank_details_verification': true } });

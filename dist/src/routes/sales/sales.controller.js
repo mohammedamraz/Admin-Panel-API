@@ -45,10 +45,6 @@ let SalesController = class SalesController {
         common_1.Logger.debug(`fetchInvitationResponse()salesCode: [${salesCode}] `, APP);
         return this.salesService.fetchInvitationResponse(salesCode);
     }
-    updateSalesPartner(id, updateSalesPartnerDto) {
-        common_1.Logger.debug(`updateSalesPartner() id: [${id}] DTO:${JSON.stringify(updateSalesPartnerDto)}`, APP);
-        return this.salesService.updateSalesPartner(id, updateSalesPartnerDto);
-    }
     fetchAllSalesPartnersByDate(params) {
         common_1.Logger.debug(`fetchAllSalesPartnersByDate() params:${JSON.stringify(params)}`, APP);
         return this.salesService.fetchAllSalesPartnersByDate(params);
@@ -69,8 +65,12 @@ let SalesController = class SalesController {
         common_1.Logger.debug(`paymentCalculation()salesCode: [${salesCode}] `, APP);
         return this.salesService.paymentCalculation(String(salesCode));
     }
+    updateSalesPartner(id, updateSalesPartnerDto) {
+        common_1.Logger.debug(`updateSalesPartner() id: [${id}] DTO:${JSON.stringify(updateSalesPartnerDto)}`, APP);
+        return this.salesService.updateSalesPartner(id, updateSalesPartnerDto);
+    }
     changeBankDetailsVerificationStatus(id) {
-        common_1.Logger.debug(`changeBankDetailsVerificationSatatus() id:[${id}] quries:{'bank_details_verification':true}`, APP);
+        common_1.Logger.debug(`changeBankDetailsVerificationSatatus() id:[${id}] `, APP);
         return this.salesService.changeBankDetailsVerificationSatatus(id);
     }
 };
@@ -110,14 +110,6 @@ __decorate([
     __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", void 0)
 ], SalesController.prototype, "fetchInvitationResponse", null);
-__decorate([
-    (0, common_1.Patch)(':id'),
-    __param(0, (0, common_1.Param)('id')),
-    __param(1, (0, common_1.Body)()),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String, create_sale_dto_1.UpdateSalesPartner]),
-    __metadata("design:returntype", void 0)
-], SalesController.prototype, "updateSalesPartner", null);
 __decorate([
     (0, common_1.Get)(),
     __param(0, (0, common_1.Query)()),
@@ -168,6 +160,14 @@ __decorate([
     __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", void 0)
 ], SalesController.prototype, "paymentCalculation", null);
+__decorate([
+    (0, common_1.Patch)(':id'),
+    __param(0, (0, common_1.Param)('id', common_1.ParseIntPipe)),
+    __param(1, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Number, create_sale_dto_1.UpdateSalesPartner]),
+    __metadata("design:returntype", void 0)
+], SalesController.prototype, "updateSalesPartner", null);
 __decorate([
     (0, common_1.Patch)('bank-details-verification/:id'),
     __param(0, (0, common_1.Param)('id', common_1.ParseIntPipe)),

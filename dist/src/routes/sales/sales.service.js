@@ -93,7 +93,7 @@ let SalesService = class SalesService {
                 throw new common_1.NotFoundException(`Sales Partner Not Found`);
             if (res[0].is_active === false)
                 throw new common_1.NotFoundException(`Sales Partner Not Found`);
-            return (0, rxjs_1.lastValueFrom)(this.db.findByIdandUpdate({ id: id, quries: updateSalesPartnerDto }).pipe((0, rxjs_1.catchError)(err => { throw new common_1.BadRequestException(); }), (0, rxjs_1.map)(doc => { return doc; })));
+            return (0, rxjs_1.lastValueFrom)(this.db.findByIdandUpdate({ id: String(id), quries: updateSalesPartnerDto }).pipe((0, rxjs_1.catchError)(err => { throw new common_1.BadRequestException(); }), (0, rxjs_1.map)(doc => { return doc; })));
         }));
     }
     fetchAllSalesPartnersByDate(params) {
@@ -178,8 +178,8 @@ let SalesService = class SalesService {
         return this.fetchSalesBySalesCode(salesCode).pipe((0, rxjs_1.switchMap)(doc => { return this.fetchCommisionBySalesCode(salesCode); }), (0, rxjs_1.switchMap)(doc => { totalCommission = doc.commission_amount; return this.fetchSalesBySalesCode(salesCode).pipe((0, rxjs_1.map)(doc => { return doc; })); }), (0, rxjs_1.switchMap)(doc => this.withdrawndb.find({ 'sale_id': doc.id })), (0, rxjs_1.switchMap)(doc => { remainingCommission = totalCommission - doc[0].paid_amount; return this.junctiondb.save({ sales_code: salesCode, commission_amount: remainingCommission }); }));
     }
     changeBankDetailsVerificationSatatus(id) {
-        common_1.Logger.debug(`changeBankDetailsVerificationSatatus() id: [${id}] quries:{'bank_details_verification':true}`, APP);
-        return (this.db.find({ id: id })).pipe((0, rxjs_1.catchError)(err => { (err); throw new common_1.UnprocessableEntityException(); }), (0, rxjs_1.map)(res => {
+        common_1.Logger.debug(`changeBankDetailsVerificationSatatus() id: [${id}] `, APP);
+        return (this.db.find({ id: id })).pipe((0, rxjs_1.catchError)(err => { (err); throw new common_1.UnprocessableEntityException(err.message); }), (0, rxjs_1.map)(res => {
             if (res.length === 0)
                 throw new common_1.NotFoundException();
             return this.db.findByIdandUpdate({ id: String(id), quries: { 'bank_details_verification': true } });
