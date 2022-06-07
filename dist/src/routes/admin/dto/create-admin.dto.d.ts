@@ -1,6 +1,7 @@
 import { phoneNumber } from 'aws-sdk/clients/importexport';
 export declare class MobileNumberDtO {
     phoneNumber: phoneNumber;
+    commission: number;
 }
 export declare class MobileNumberAndOtpDtO {
     phoneNumber: phoneNumber;

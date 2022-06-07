@@ -1,6 +1,6 @@
 import { BadRequestException, ConflictException, HttpException, HttpStatus, Injectable, Logger, NotFoundException, UnauthorizedException, UnprocessableEntityException } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
-import { AKASH_ACCOUNTID, AKASH_AUTHTOKEN, AKASH_SERVICEID, APP_DOWNLOAD_LINK, AWS_COGNITO_USER_CREATION_URL_SIT, FEDO_APP, PUBLIC_KEY } from 'src/constants';
+import { AKASH_ACCOUNTID, AKASH_AUTHTOKEN, AKASH_SERVICEID, APP_DOWNLOAD_LINK, AWS_COGNITO_USER_CREATION_URL_SIT, FEDO_APP, PUBLIC_KEY, SALES_PARTNER_LINK } from 'src/constants';
 import { DatabaseTable } from 'src/lib/database/database.decorator';
 import { DatabaseService } from 'src/lib/database/database.service';
 import { CreateSalesJunction, CreateSalesPartner, CreateSalesPartnerRequest } from '../sales/dto/create-sale.dto';
@@ -296,5 +296,53 @@ export class AdminService {
       })))
     })
   }
+
+  sendCreateSalesPartnerLinkToPhoneNumber(mobileNumberDtO: MobileNumberDtO) {
+    Logger.debug(`sendCreateSalesPartnerLinkToPhoneNumber() mobileNumberDtO: [${JSON.stringify(mobileNumberDtO)}]`, APP);
+    let phone_number = this.encryptPassword_(mobileNumberDtO.phoneNumber);
+    let commission = this.encryptPassword_(mobileNumberDtO.commission);
+    return this.client.messages
+      .create({
+        body: `Click on Link ${SALES_PARTNER_LINK}?mobile=${phone_number}&commission=${commission} `,
+        from: '+19402908957',
+        to: mobileNumberDtO.phoneNumber
+      })
+      .then(_res => {
+        return { "status": `Link ${SALES_PARTNER_LINK}  send to  ${mobileNumberDtO.phoneNumber} number` }
+      })
+      .catch(err => this.onTwilioErrorResponse(err));
+  }
+
+  sendCreateSalesPartnerLinkToWhatsappNumber(mobileNumberDtO: MobileNumberDtO) {
+    Logger.debug(`sendCreateSalesPartnerLinkToWhatsappNumber() mobileNumberDtO: [${JSON.stringify(mobileNumberDtO)}]`, APP);
+
+    let phone_number = this.encryptPassword_(mobileNumberDtO.phoneNumber);
+    let commission = this.encryptPassword_(mobileNumberDtO.commission);
+
+    return this.client.messages
+      .create({
+        body: `Click on Link ${SALES_PARTNER_LINK}?mobile=${phone_number}&commission=${commission} `,
+        from: 'whatsapp:+14155238886',
+        to: `whatsapp:${mobileNumberDtO.phoneNumber}`
+      })
+      .then(_res => {
+        return { "status": `Link ${SALES_PARTNER_LINK}  send to  ${mobileNumberDtO.phoneNumber} whatsapp number` }
+      })
+      .catch(err => this.onTwilioErrorResponse(err));
+  }
+
+  sendCreateSalesPartnerLinkToMobileAndWhatsappNumber(mobileNumberDtO: MobileNumberDtO) {
+    Logger.debug(`sendCreateSalesPartnerLinkToMobileAndWhatsappNumber() mobileNumberDtO: [${JSON.stringify(mobileNumberDtO)}]`, APP);
+
+    return from(this.sendCreateSalesPartnerLinkToPhoneNumber(mobileNumberDtO)).pipe(map(_doc => this.sendCreateSalesPartnerLinkToWhatsappNumber(mobileNumberDtO)), switchMap(doc => of({ status: "Sales Partner link sent" })))
+  }
+
+   encryptPassword_ (password)  {
+    const NodeRSA = require('node-rsa');
+    let key_public = new NodeRSA(PUBLIC_KEY)
+    var encryptedString = key_public.encrypt(password, 'base64')
+    return encryptedString
+  }
+
 
 }

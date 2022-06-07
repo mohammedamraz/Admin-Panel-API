@@ -10,6 +10,7 @@ export declare const AKASH_ACCOUNTID: string;
 export declare const AKASH_AUTHTOKEN: string;
 export declare const AKASH_SERVICEID: string;
 export declare const APP_DOWNLOAD_LINK: string;
+export declare const SALES_PARTNER_LINK: string;
 export declare const AWS_ACCESS_KEY_ID: string;
 export declare const AWS_SECRET_ACCESS_KEY: string;
 export declare const SES_SOURCE_EMAIL: string;

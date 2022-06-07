@@ -77,6 +77,13 @@ export class AdminController {
     Logger.debug(`updatePaidAmount() updateAmountdto: [${JSON.stringify(updateAmountdto)}]`, APP);
 
     return this.adminService.updatingPaidAmount(updateAmountdto)
+  }
 
-}
+  @Post('/sales-link')
+  sendCreateSalesPartnerLinkToMobileAndWhatsappNumber(@Body() mobileNumberDtO: MobileNumberDtO) {
+    Logger.debug(`sendCreateSalesPartnerLinkToMobileAndWhatsappNumber() mobileNumberDtO: [${JSON.stringify(mobileNumberDtO)}]`, APP);
+
+    return this.adminService.sendCreateSalesPartnerLinkToMobileAndWhatsappNumber(mobileNumberDtO);
+  }
+
 }

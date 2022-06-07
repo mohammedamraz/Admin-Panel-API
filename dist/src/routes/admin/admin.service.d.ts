@@ -60,4 +60,10 @@ export declare class AdminService {
     private readonly onHTTPErrorResponse;
     encryptPassword(password: any): any;
     updatingPaidAmount(updateAmountdto: createPaid): Promise<void>;
+    sendCreateSalesPartnerLinkToPhoneNumber(mobileNumberDtO: MobileNumberDtO): any;
+    sendCreateSalesPartnerLinkToWhatsappNumber(mobileNumberDtO: MobileNumberDtO): any;
+    sendCreateSalesPartnerLinkToMobileAndWhatsappNumber(mobileNumberDtO: MobileNumberDtO): import("rxjs").Observable<{
+        status: string;
+    }>;
+    encryptPassword_(password: any): any;
 }

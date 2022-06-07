@@ -5,6 +5,7 @@ export declare class AdminController {
     private readonly adminService;
     constructor(adminService: AdminService);
     fetchSalesPartnerAccountDetails(): import("rxjs").Observable<Promise<any[]>>;
+    fetchSalesPartnerAccountDetailsBySalesCode(sales_code: string): import("rxjs").Observable<Promise<any[]>>;
     sentOtpToPhoneNumber(mobileNumberDtO: MobileNumberDtO): any;
     verifyOtp(mobileNumberAndOtpDtO: MobileNumberAndOtpDtO): any;
     sentFedoAppDownloadLinkToMobileAndWhatsappNumber(mobileNumberDtO: MobileNumberDtO): import("rxjs").Observable<{
@@ -19,4 +20,7 @@ export declare class AdminController {
     confirmForgotPassword(confirmForgotPasswordDTO: ConfirmForgotPasswordDTO): import("rxjs").Observable<any[]>;
     sendEmailOnIncorrectBankDetails(body: requestDto, param: ParamDto): import("rxjs").Observable<unknown>;
     updatingPaidAmount(updateAmountdto: createPaid): Promise<void>;
+    sendCreateSalesPartnerLinkToMobileAndWhatsappNumber(mobileNumberDtO: MobileNumberDtO): import("rxjs").Observable<{
+        status: string;
+    }>;
 }

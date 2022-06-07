@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.APP_ROUTES = exports.debugLevel = exports.ZwitchHttpBody = exports.PUBLIC_KEY = exports.AWS_COGNITO_USER_CREATION_URL_SIT = exports.STATIC_IMAGES_PROFILE = exports.STATIC_IMAGES = exports.SES_SOURCE_SUPPORT_EMAIL = exports.SES_SOURCE_EMAIL = exports.AWS_SECRET_ACCESS_KEY = exports.AWS_ACCESS_KEY_ID = exports.APP_DOWNLOAD_LINK = exports.AKASH_SERVICEID = exports.AKASH_AUTHTOKEN = exports.AKASH_ACCOUNTID = exports.POSTGRES_DB_URI_DB_URL = exports.APP_DOCUMENTATION = exports.DEBUG_LEVEL = exports.APP_VERSION = exports.PORT = exports.HOST = exports.FEDO_APP = void 0;
+exports.APP_ROUTES = exports.debugLevel = exports.ZwitchHttpBody = exports.PUBLIC_KEY = exports.AWS_COGNITO_USER_CREATION_URL_SIT = exports.STATIC_IMAGES_PROFILE = exports.STATIC_IMAGES = exports.SES_SOURCE_SUPPORT_EMAIL = exports.SES_SOURCE_EMAIL = exports.AWS_SECRET_ACCESS_KEY = exports.AWS_ACCESS_KEY_ID = exports.SALES_PARTNER_LINK = exports.APP_DOWNLOAD_LINK = exports.AKASH_SERVICEID = exports.AKASH_AUTHTOKEN = exports.AKASH_ACCOUNTID = exports.POSTGRES_DB_URI_DB_URL = exports.APP_DOCUMENTATION = exports.DEBUG_LEVEL = exports.APP_VERSION = exports.PORT = exports.HOST = exports.FEDO_APP = void 0;
 const package_json_1 = __importDefault(require("../../package.json"));
 exports.FEDO_APP = process.env.FEDO_APP || 'HSA';
 exports.HOST = process.env.FEDO_HSA_SERVER_HOST || '0.0.0.0';
@@ -16,6 +16,7 @@ exports.AKASH_ACCOUNTID = process.env.FEDO_HSA_TWILIO_ACCOUNTID || "ACff6fccefe4
 exports.AKASH_AUTHTOKEN = process.env.FEDO_HSA_TWILIO_AUTHTOKEN || "73b826f040ca14bdde6aaa8f4ea4fb44";
 exports.AKASH_SERVICEID = process.env.FEDO_HSA_TWILIO_SERVICEID || "VA3b831c8b177fb8226f87f1c6f4b0dae5";
 exports.APP_DOWNLOAD_LINK = process.env.FEDO_HSA_APP_DOWNLOAD_LINK || "https://play.google.com/store/apps/details?id=com.fedo.auth";
+exports.SALES_PARTNER_LINK = process.env.FEDO_HSA_SALES_PARTNER_LINK || "http://0.0.0.0:35000/sales-partner";
 exports.AWS_ACCESS_KEY_ID = process.env.FEDO_HSA_AWS_ACCESS_KEY_ID || 'AKIAWVJICQ3FDBOB6CGC';
 exports.AWS_SECRET_ACCESS_KEY = process.env.FEDO_HSA_AWS_SECRET_ACCESS_KEY || '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';
 exports.SES_SOURCE_EMAIL = process.env.FEDO_COMM_SERVER_AWS_SES_SOURCE_EMAIL || "FEDO HSA <hsa@fedo.ai>";

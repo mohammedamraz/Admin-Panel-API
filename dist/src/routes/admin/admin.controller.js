@@ -26,6 +26,10 @@ let AdminController = class AdminController {
         common_1.Logger.debug(`getSalesPartnerAccountDetails()`, APP);
         return this.adminService.fetchSalesPartnerAccountDetails();
     }
+    fetchSalesPartnerAccountDetailsBySalesCode(sales_code) {
+        common_1.Logger.debug(`fetchSalesPartnerAccountDetailsByID()`, APP);
+        return this.adminService.fetchSalesPartnerAccountDetailsBySalesCode(sales_code);
+    }
     sentOtpToPhoneNumber(mobileNumberDtO) {
         common_1.Logger.debug(`sentOtpToPhoneNumber() mobileNumberDtO: [${JSON.stringify(mobileNumberDtO)}]`, APP);
         return this.adminService.sentOtpToPhoneNumber(mobileNumberDtO);
@@ -58,6 +62,10 @@ let AdminController = class AdminController {
         common_1.Logger.debug(`updatePaidAmount() updateAmountdto: [${JSON.stringify(updateAmountdto)}]`, APP);
         return this.adminService.updatingPaidAmount(updateAmountdto);
     }
+    sendCreateSalesPartnerLinkToMobileAndWhatsappNumber(mobileNumberDtO) {
+        common_1.Logger.debug(`sendCreateSalesPartnerLinkToMobileAndWhatsappNumber() mobileNumberDtO: [${JSON.stringify(mobileNumberDtO)}]`, APP);
+        return this.adminService.sendCreateSalesPartnerLinkToMobileAndWhatsappNumber(mobileNumberDtO);
+    }
 };
 __decorate([
     (0, common_1.Get)('sales/account-details'),
@@ -65,6 +73,13 @@ __decorate([
     __metadata("design:paramtypes", []),
     __metadata("design:returntype", void 0)
 ], AdminController.prototype, "fetchSalesPartnerAccountDetails", null);
+__decorate([
+    (0, common_1.Get)('sales/account-details/:sales_code'),
+    __param(0, (0, common_1.Param)('sales_code')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", void 0)
+], AdminController.prototype, "fetchSalesPartnerAccountDetailsBySalesCode", null);
 __decorate([
     (0, common_1.Post)(),
     __param(0, (0, common_1.Body)()),
@@ -122,6 +137,13 @@ __decorate([
     __metadata("design:paramtypes", [create_admin_dto_1.createPaid]),
     __metadata("design:returntype", void 0)
 ], AdminController.prototype, "updatingPaidAmount", null);
+__decorate([
+    (0, common_1.Post)('/sales-link'),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [create_admin_dto_1.MobileNumberDtO]),
+    __metadata("design:returntype", void 0)
+], AdminController.prototype, "sendCreateSalesPartnerLinkToMobileAndWhatsappNumber", null);
 AdminController = __decorate([
     (0, common_1.Controller)(),
     __metadata("design:paramtypes", [admin_service_1.AdminService])
