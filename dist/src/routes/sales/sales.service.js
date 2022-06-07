@@ -31,7 +31,6 @@ let SalesService = class SalesService {
     }
     createSalesPartner(createSalesPartner) {
         common_1.Logger.debug(`createSalesPartner() DTO:${JSON.stringify(createSalesPartner)}`, APP);
-        let userId;
         let salesId;
         var todayDate;
         var today = new Date();
@@ -40,9 +39,15 @@ let SalesService = class SalesService {
         todayDate = mm + dd;
         return this.fetchSalesPartnerByMobileNumber(createSalesPartner.mobile).pipe((0, rxjs_1.switchMap)(doc => (0, helper_1.fetchUserByMobileNumber)(createSalesPartner.mobile)), (0, rxjs_1.switchMap)(doc => {
             if (!doc[0])
+<<<<<<< HEAD
                 return this.db.save({ name: createSalesPartner.name, location: createSalesPartner.location, commission: createSalesPartner.commission, mobile: createSalesPartner.mobile, email: createSalesPartner.email });
             else
                 return this.db.save({ name: createSalesPartner.name, location: createSalesPartner.location, commission: createSalesPartner.commission, mobile: createSalesPartner.mobile, email: createSalesPartner.email, user_id: doc[0].fedo_id });
+=======
+                return this.db.save(createSalesPartner);
+            else
+                return this.db.save({ name: createSalesPartner.name, location: createSalesPartner.location, commission: createSalesPartner.commission, phone_number: createSalesPartner.mobile, email: createSalesPartner.email, user_id: doc[0].fedo_id });
+>>>>>>> ed74993ff017d3475c581c82039b3b05c597ab9c
         }), (0, rxjs_1.switchMap)(doc => { salesId = doc[0].id; createSalesPartner.sales_code = "FEDSP" + todayDate + 500 + doc[0].id; createSalesPartner.id = doc[0].id; return this.junctiondb.save({ sales_code: "FEDSP" + todayDate + 500 + doc[0].id }).pipe((0, rxjs_1.catchError)(err => { throw new common_1.BadRequestException(err.message); }), (0, rxjs_1.map)(doc => doc)); }), (0, rxjs_1.switchMap)(doc => this.createInvitation(createSalesPartner, doc)), (0, rxjs_1.switchMap)(doc => this.updateSalesPartner(salesId, { sales_code: createSalesPartner.sales_code })), (0, rxjs_1.switchMap)(doc => this.fetchSalesPartnerById(createSalesPartner.id.toString())));
     }
     createInvitation(createSalesPartner, createSalesJunction) {
@@ -100,10 +105,25 @@ let SalesService = class SalesService {
     }
     fetchAllSalesPartnersByDate(params) {
         common_1.Logger.debug(`fetchAllSalesPartnersByDate() params:[${JSON.stringify(params)}] `, APP);
+        if (Object.keys(params).length == 0)
+            return this.db.fetchAll();
+        else {
+            if (params.date === undefined)
+                return this.db.findByAlphabet(params).pipe((0, rxjs_1.map)(doc => { return doc; }));
+            else
+                return this.db.findByDate(this.makeDateFormat(params)).pipe((0, rxjs_1.map)(doc => { return doc; }));
+        }
+    }
+    fetchCommissionFromJunctionDb(params) {
+        common_1.Logger.debug(`fetchCommissionFromJunctionDb() params:[${JSON.stringify(params)}] `, APP);
         if (params.date === undefined)
-            return this.db.findByAlphabet(params).pipe((0, rxjs_1.map)(doc => { return doc; }));
+            return [];
         else
-            return this.db.findByDate(this.makeDateFormat(params)).pipe((0, rxjs_1.map)(doc => { return doc; }));
+            return this.junctiondb.findByDate(this.makeDateFormat(params)).pipe((0, rxjs_1.map)(doc => {
+                doc.forEach(doc => {
+                    return doc;
+                });
+            }));
     }
     fetchAllSalesPartnersFromJunctionByDate(id, params) {
         common_1.Logger.debug(`fetchAllSalesPartnersByDate() id: [${id}] params:[${JSON.stringify(params)}] `, APP);
@@ -116,20 +136,21 @@ let SalesService = class SalesService {
         common_1.Logger.debug(`makeDateFormat() params:[${JSON.stringify(params)}] `, APP);
         let date = '';
         if (params.date === 'monthly')
-            date = '1 months';
+            date = '30';
         else if (params.date === 'quarterly')
-            date = '3 months';
+            date = '90';
         else if (params.date === 'weekly')
-            date = '7 days';
+            date = '7';
         else if (params.date === 'yearly')
-            date = '12 months';
+            date = '365';
         else if (params.date === 'daily')
-            date = '1 day';
+            date = '1';
         const modifiedParams = {
             number_of_rows: params.number_of_rows,
             number_of_pages: params.number_of_pages,
             name: params.name,
-            date: date
+            date: date,
+            is_active: params.is_active
         };
         return modifiedParams;
     }

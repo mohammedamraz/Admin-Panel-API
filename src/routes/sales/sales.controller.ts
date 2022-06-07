@@ -64,6 +64,13 @@ export class SalesController {
       return this.salesService.fetchAllSalesPartnersByDate(params)
   }
 
+
+  @Get('id/id/id')
+  fetchCommissionFromJunctionDb(@Query() params: ZQueryParamsDto) {
+      Logger.debug(`fetchCommissionFromJunctionDb() params:${JSON.stringify(params)}`, APP);
+      return this.salesService.fetchCommissionFromJunctionDb(params)
+  }
+
   @Get(':id/sales_junction')
   fetchAllSalesPartnersFromJunctionByDate(@Param('id') id: string,@Query() params: ZQueryParamsDto) {
       Logger.debug(`fetchAllSalesPartnersFromJunctionByDate() id: [${id}] params:${JSON.stringify(params)}`, APP);
