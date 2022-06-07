@@ -113,7 +113,11 @@ let SalesService = class SalesService {
         if (params.date === undefined)
             return [];
         else
-            return this.junctiondb.findByDate(this.makeDateFormat(params)).pipe((0, rxjs_1.map)(doc => { return doc; }));
+            return this.junctiondb.findByDate(this.makeDateFormat(params)).pipe((0, rxjs_1.map)(doc => {
+                doc.forEach(doc => {
+                    return doc;
+                });
+            }));
     }
     fetchAllSalesPartnersFromJunctionByDate(id, params) {
         common_1.Logger.debug(`fetchAllSalesPartnersByDate() id: [${id}] params:[${JSON.stringify(params)}] `, APP);

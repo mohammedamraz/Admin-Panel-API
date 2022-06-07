@@ -123,7 +123,11 @@ export class SalesService {
     Logger.debug(`fetchCommissionFromJunctionDb() params:[${JSON.stringify(params)}] `, APP);
     
       if (params.date === undefined) return []
-      else return this.junctiondb.findByDate(this.makeDateFormat(params)).pipe(map(doc => { return doc }))
+      else return this.junctiondb.findByDate(this.makeDateFormat(params)).pipe(map(doc => { 
+       doc.forEach(doc=>{
+         return doc
+       })
+       }))
     
   }
 
