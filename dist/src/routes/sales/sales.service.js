@@ -71,9 +71,9 @@ let SalesService = class SalesService {
         common_1.Logger.debug(`fetchSalesPartnerById() id: [${JSON.stringify(id)}]`, APP);
         return (0, rxjs_1.from)((0, rxjs_1.lastValueFrom)(this.db.find({ id: id }).pipe((0, rxjs_1.catchError)(err => { throw new common_1.UnprocessableEntityException(err.message); }), (0, rxjs_1.map)((res) => {
             console.log('adfasdf', res);
-            if (res[0] === null)
+            if (res[0] == null)
                 throw new common_1.NotFoundException(`Sales Partner Not Found`);
-            if (res[0].is_active === false)
+            if (res[0].is_active == false)
                 throw new common_1.NotFoundException(`Sales Partner Not Found`);
             return res;
         }))));

@@ -81,8 +81,8 @@ fetchSalesPartnerById(id: string) {
 
   return from(lastValueFrom(this.db.find({ id: id }).pipe(catchError(err => { throw new UnprocessableEntityException(err.message) }), map((res) => {
     console.log('adfasdf', res)
-    if (res[0] === null) throw new NotFoundException(`Sales Partner Not Found`)
-    if (res[0].is_active === false) throw new NotFoundException(`Sales Partner Not Found`)
+    if (res[0] == null) throw new NotFoundException(`Sales Partner Not Found`)
+    if (res[0].is_active == false) throw new NotFoundException(`Sales Partner Not Found`)
     return res
   }))));
 }

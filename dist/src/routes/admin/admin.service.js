@@ -217,7 +217,7 @@ let AdminService = class AdminService {
     forgotPassword(forgotPasswordDTO) {
         common_1.Logger.debug(`admin-console forgotPassword() forgotPasswordDTO:[${JSON.stringify(forgotPasswordDTO)}]`);
         forgotPasswordDTO.fedoApp = constants_1.FEDO_APP;
-        return this.http.post(`${constants_1.AWS_COGNITO_USER_CREATION_URL_SIT}/password/otp/`, forgotPasswordDTO).pipe((0, rxjs_1.catchError)(err => { return this.onAWSErrorResponse(err); }), (0, rxjs_1.map)((res) => res.data));
+        return this.http.post(`${constants_1.AWS_COGNITO_USER_CREATION_URL_SIT}/password/otp/`, forgotPasswordDTO).pipe((0, rxjs_1.catchError)(err => { console.log(err); return this.onAWSErrorResponse(err); }), (0, rxjs_1.map)((res) => res.data));
     }
     confirmForgotPassword(confirmForgotPasswordDTO) {
         common_1.Logger.debug(`admin-console confirmForgotPassword() confirmForgotPasswordDTO:[${JSON.stringify(confirmForgotPasswordDTO)}]`);

@@ -1,7 +1,7 @@
 import { LogLevel } from '@nestjs/common';
 import packageJson from 'package.json';
 
-export const FEDO_APP = process.env.FEDO_APP || 'HSA';
+export const FEDO_APP = process.env.FEDO_APP || 'HSA_DEV';
 export const HOST = process.env.FEDO_HSA_SERVER_HOST || '0.0.0.0';
 export const PORT = parseInt(process.env.FEDO_HSA_SERVER_PORT, 10) || 36000;
 export const APP_VERSION = packageJson.version;
