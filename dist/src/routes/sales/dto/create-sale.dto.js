@@ -89,6 +89,7 @@ __decorate([
     __metadata("design:type", Number)
 ], ZQueryParamsDto.prototype, "number_of_rows", void 0);
 __decorate([
+    (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.IsEnum)(Is_active),
     __metadata("design:type", String)
 ], ZQueryParamsDto.prototype, "is_active", void 0);

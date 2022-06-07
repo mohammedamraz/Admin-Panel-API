@@ -119,6 +119,16 @@ export class SalesService {
     }
   }
 
+  fetchCommissionFromJunctionDb(params: ZQueryParamsDto) {
+    Logger.debug(`fetchCommissionFromJunctionDb() params:[${JSON.stringify(params)}] `, APP);
+    
+      if (params.date === undefined) return []
+      else return this.junctiondb.findByDate(this.makeDateFormat(params)).pipe(map(doc => { return doc }))
+    
+  }
+
+  
+
   fetchAllSalesPartnersFromJunctionByDate(id: string, params: ZQueryParamsDto) {
     Logger.debug(`fetchAllSalesPartnersByDate() id: [${id}] params:[${JSON.stringify(params)}] `, APP);
 
@@ -130,11 +140,11 @@ export class SalesService {
     Logger.debug(`makeDateFormat() params:[${JSON.stringify(params)}] `, APP);
 
     let date = '';
-    if (params.date === 'monthly') date = '1 months';
-    else if (params.date === 'quarterly') date = '3 months';
-    else if (params.date === 'weekly') date = '7 days';
-    else if (params.date === 'yearly') date = '12 months';
-    else if (params.date === 'daily') date = '1 day';
+    if (params.date === 'monthly') date = '30';
+    else if (params.date === 'quarterly') date = '90';
+    else if (params.date === 'weekly') date = '7';
+    else if (params.date === 'yearly') date = '365';
+    else if (params.date === 'daily') date = '1';
 
     const modifiedParams = {
       number_of_rows: params.number_of_rows,

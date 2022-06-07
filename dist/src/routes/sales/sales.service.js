@@ -108,6 +108,13 @@ let SalesService = class SalesService {
                 return this.db.findByDate(this.makeDateFormat(params)).pipe((0, rxjs_1.map)(doc => { return doc; }));
         }
     }
+    fetchCommissionFromJunctionDb(params) {
+        common_1.Logger.debug(`fetchCommissionFromJunctionDb() params:[${JSON.stringify(params)}] `, APP);
+        if (params.date === undefined)
+            return [];
+        else
+            return this.junctiondb.findByDate(this.makeDateFormat(params)).pipe((0, rxjs_1.map)(doc => { return doc; }));
+    }
     fetchAllSalesPartnersFromJunctionByDate(id, params) {
         common_1.Logger.debug(`fetchAllSalesPartnersByDate() id: [${id}] params:[${JSON.stringify(params)}] `, APP);
         if (params.date == undefined)
@@ -119,15 +126,15 @@ let SalesService = class SalesService {
         common_1.Logger.debug(`makeDateFormat() params:[${JSON.stringify(params)}] `, APP);
         let date = '';
         if (params.date === 'monthly')
-            date = '1 months';
+            date = '30';
         else if (params.date === 'quarterly')
-            date = '3 months';
+            date = '90';
         else if (params.date === 'weekly')
-            date = '7 days';
+            date = '7';
         else if (params.date === 'yearly')
-            date = '12 months';
+            date = '365';
         else if (params.date === 'daily')
-            date = '1 day';
+            date = '1';
         const modifiedParams = {
             number_of_rows: params.number_of_rows,
             number_of_pages: params.number_of_pages,

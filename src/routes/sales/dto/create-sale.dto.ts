@@ -93,6 +93,7 @@ export class ZQueryParamsDto {
 
     @IsOptional()
     number_of_rows?: number;
+    @IsOptional()
 
     @IsEnum(Is_active)
     is_active: Is_active;
