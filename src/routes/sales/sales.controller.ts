@@ -105,15 +105,6 @@ export class SalesController {
       return this.salesService.uploadImage(id, file.filename);
   }
 
-  @Post(':salesCode/need-to-pay-amount')
-  paymentCalculation(@Param('salesCode') salesCode: String){
-      Logger.debug(`paymentCalculation()salesCode: [${salesCode}] `, APP);
-
-      return this.salesService.paymentCalculation(String(salesCode))
-  }
-  
-
-
   @Patch('bank-details-verification/:id')
   changeBankDetailsVerificationStatus(@Param('id', ParseIntPipe) id: number) {
     Logger.debug(`changeBankDetailsVerificationSatatus() id:[${id}] quries:{'bank_details_verification':true}`, APP);

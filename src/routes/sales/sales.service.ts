@@ -199,27 +199,7 @@ export class SalesService {
       }))
 
   }
-
-
-
-  paymentCalculation(salesCode: string) {
-    Logger.debug(`paymentCalculation salesCode: ${salesCode}`, APP);
-
-    let totalCommission
-    let remainingCommission
-
-    return this.fetchSalesBySalesCode(salesCode).pipe(
-      switchMap(doc => { return this.fetchCommisionBySalesCode(salesCode) }),
-      switchMap(doc => { console.log(doc.commission_amount); totalCommission = doc.commission_amount; return this.fetchSalesBySalesCode(salesCode).pipe(map(doc => { return doc })) }),
-      switchMap(doc => this.withdrawndb.find({ 'sale_id': doc.id })),
-      switchMap(doc => { console.log(doc[0].paid_amount, totalCommission); remainingCommission = totalCommission - doc[0].paid_amount; console.log(remainingCommission); return this.junctiondb.save({ sales_code: salesCode, commission_amount: remainingCommission }) })
-
-
-    )
-
-
-  }
-
+  
   changeBankDetailsVerificationSatatus(id: number) {
     Logger.debug(`changeBankDetailsVerificationSatatus() id: [${id}] quries:{'bank_details_verification':true}`, APP);
 
@@ -259,7 +239,7 @@ export class SalesService {
     return this.fetchSalesBySalesCode(salesCode).pipe(
       switchMap(salesCommission => 
            lastValueFrom(this.junctiondb.find({ "sales_code": String(salesCode), }))
-          .then(res =>{ console.log('dds',res);return [salesCommission, res[res.length - 1]]})),
+          .then(res => [salesCommission, res[res.length - 1]])),
       switchMap(([salesCommission, res]) =>  
       this.junctiondb.save({ sales_code: salesCode, commission_amount: salesCommission["commission"], dues: (Number(res['dues']) + Number(salesCommission["commission"])) })
 

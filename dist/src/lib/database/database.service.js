@@ -201,6 +201,11 @@ let DatabaseService = class DatabaseService {
         const query = `SELECT * FROM ${this.tableName} WHERE ${findByPeriodParams.columnName} = '${findByPeriodParams.columnvalue}' AND created_date > CURRENT_DATE - INTERVAL '${findByPeriodParams.period}'  ORDER BY ${"created_date"} DESC`;
         return this.runQuery(query);
     }
+    fetchAllByPeriod(period) {
+        common_1.Logger.debug(`fetchAllByPeriod(): params ${[JSON.stringify(period)]}`, APP);
+        const query = `SELECT * FROM ${this.tableName} WHERE created_date > CURRENT_DATE - INTERVAL '${period}'`;
+        return this.runQuery(query);
+    }
 };
 DatabaseService = __decorate([
     (0, common_1.Injectable)(),
