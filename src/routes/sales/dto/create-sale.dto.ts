@@ -64,6 +64,14 @@ export class CreateWithdrawn {
     paid_amount: number;
 }
 
+export interface SalesUserJunction{
+    id: number;
+    sales_code: string;
+    users: number;
+    created_date: string;
+    updated_date: string;
+}
+
 export class CreateSalesInvitationJunction {
     refered_by: string;
     sp_id: string;
@@ -105,6 +113,8 @@ export class ZQueryParamsDto {
 
 
 export enum Periodicity {
+    DAILY = 'daily',
+    WEEKLY = 'weekly',
     MONTHLY = 'monthly',
     QUARTERLY = 'quarterly',
     HALF_YEARLY = 'halfyearly',
@@ -122,6 +132,8 @@ export class Period {
 }
 
 export const PERIOD = {
+    daily: '1 day',
+    weekly: '1 week',
     monthly: '1 months',
     quarterly: '3 months',
     halfyearly: '6 months',

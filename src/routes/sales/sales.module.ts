@@ -11,6 +11,8 @@ import { HttpModule } from '@nestjs/axios';
     DatabaseModule.forFeature({ tableName: 'sales_commission_junction' }),
     DatabaseModule.forFeature({ tableName: 'sales_partner_invitation_junction' }),
     DatabaseModule.forFeature({ tableName: 'sales_withdrawn_amount' }),
+    DatabaseModule.forFeature({ tableName: 'sales_user_junction' }),
+
     HttpModule.register({
       timeout: 10000,
       maxRedirects: 5,

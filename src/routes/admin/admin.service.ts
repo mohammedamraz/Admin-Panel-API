@@ -3,7 +3,7 @@ import { HttpService } from '@nestjs/axios';
 import { AKASH_ACCOUNTID, AKASH_AUTHTOKEN, AKASH_SERVICEID, APP_DOWNLOAD_LINK, AWS_COGNITO_USER_CREATION_URL_SIT, FEDO_APP, PUBLIC_KEY, SALES_PARTNER_LINK } from 'src/constants';
 import { DatabaseTable } from 'src/lib/database/database.decorator';
 import { DatabaseService } from 'src/lib/database/database.service';
-import { CreateSalesJunction, CreateSalesPartner, CreateSalesPartnerRequest } from '../sales/dto/create-sale.dto';
+import { CreateSalesJunction, CreateSalesPartner, CreateSalesPartnerRequest, Interval, makeEarningFormat, Period, SalesUserJunction } from '../sales/dto/create-sale.dto';
 import { AccountZwitchResponseBody,  createPaid,  MobileNumberAndOtpDtO, MobileNumberDtO, ParamDto, requestDto, sendEmailOnIncorrectBankDetailsDto, User } from './dto/create-admin.dto';
 import { AxiosResponse } from 'axios';
 import { catchError, concatMap, from, lastValueFrom, map, of, switchMap, throwError } from 'rxjs';
@@ -22,6 +22,7 @@ export class AdminService {
     @DatabaseTable('sales_commission_junction') private readonly salesJunctionDb: DatabaseService<CreateSalesJunction>,
     @DatabaseTable('sales_partner') private readonly salesDb: DatabaseService<CreateSalesPartner>,
     @DatabaseTable('sales_partner_requests') private readonly salesPartnerRequestDb: DatabaseService<CreateSalesPartnerRequest>,
+    @DatabaseTable('sales_user_junction') private readonly salesuser: DatabaseService<SalesUserJunction>,
     // private readonly accountService: AccountsService,
     // private readonly usersservice: UsersService,
     private readonly templateService: TemplateService,
@@ -47,6 +48,27 @@ export class AdminService {
       }),
       catchError(err => { throw new BadRequestException(err.message) }),
     )
+  }
+
+  fetchEarnings(period: Period){
+    Logger.debug(`fetchEarnings()  period: ${JSON.stringify(period)}`, APP);
+
+    return this.salesJunctionDb.fetchAllByPeriod(Interval(period)).pipe(
+      map(salesjuncdoc =>{
+        if(salesjuncdoc.length === 0) throw new NotFoundException("no Account found");
+        return makeEarningFormat(salesjuncdoc.reduce((acc, curr) => ([acc[0] += curr.commission_amount, acc[1] += curr.paid_amount]), [0, 0]))
+      }))
+  }
+
+  fetchInvitationResponse(salesCode: string, period: Period) {
+    Logger.debug(`fetchInvitationResponse() salesCode: ${salesCode}`, APP);
+
+    return this.salesuser.findByPeriod({ columnName: "sales_code", columnvalue: salesCode, period: Interval(period) }).pipe(
+      catchError(error => { throw new BadRequestException(error.message) }),
+      map(salesuser => {
+        if (salesuser.length === 0) throw new NotFoundException("no Account found");
+        return { "signup": salesuser.length }
+      }))
   }
 
   async fetchUser(createSalesPartner: CreateSalesPartner[]) {

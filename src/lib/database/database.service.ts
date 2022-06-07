@@ -250,10 +250,18 @@ export class DatabaseService<T> implements DatabaseInterface<T> {
       return this.runQuery(query, variables);
     }
   }
+
   findByPeriod(findByPeriodParams: findByPeriodParams): Observable<T[]> {
     Logger.debug(`findByPeriod(): params ${[JSON.stringify(findByPeriodParams)]}`, APP);
 
     const query = `SELECT * FROM ${this.tableName} WHERE ${findByPeriodParams.columnName} = '${findByPeriodParams.columnvalue}' AND created_date > CURRENT_DATE - INTERVAL '${findByPeriodParams.period}'  ORDER BY ${"created_date"} DESC`;
+    return this.runQuery(query);
+  }
+
+  fetchAllByPeriod(period: string): Observable<T[]> {
+    Logger.debug(`fetchAllByPeriod(): params ${[JSON.stringify(period)]}`, APP);
+
+    const query = `SELECT * FROM ${this.tableName} WHERE created_date > CURRENT_DATE - INTERVAL '${period}'`;
     return this.runQuery(query);
   }
 

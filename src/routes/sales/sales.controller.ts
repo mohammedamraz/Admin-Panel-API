@@ -21,6 +21,13 @@ export class SalesController {
       return this.salesService.createSalesPartner(createSalesPartner)
   }
 
+  @Post(':sales_code/addCommission')
+  addCommission(@Param('sales_code') salesCode: string) {
+      Logger.debug(`addCommission() salesCode: [${salesCode}] `, APP);
+
+      return this.salesService.addCommission(salesCode);
+  }
+
 
   @Delete(':id')
   deleteSalesPartner(@Param('id') id: string) {
@@ -44,11 +51,10 @@ export class SalesController {
   }
 
   @Get(':salesCode/invatationResponse')
-  fetchInvitationResponse(@Param('salesCode') salesCode: string) {
+  fetchInvitationResponse(@Param('salesCode') salesCode: string, @Query() period: Period) {
       Logger.debug(`fetchInvitationResponse()salesCode: [${salesCode}] `, APP);
 
-      return this.salesService.fetchInvitationResponse(salesCode);
-
+      return this.salesService.fetchInvitationResponse(salesCode, period);
   }
 
   @Patch(':id')
