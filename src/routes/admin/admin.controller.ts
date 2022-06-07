@@ -16,6 +16,13 @@ export class AdminController {
     return this.adminService.fetchSalesPartnerAccountDetails()
   }
 
+  @Get('sales/account-details/:sales_code')
+  fetchSalesPartnerAccountDetailsBySalesCode(@Param('sales_code') sales_code: string) {
+   Logger.debug(`fetchSalesPartnerAccountDetailsByID()`, APP);
+
+    return this.adminService.fetchSalesPartnerAccountDetailsBySalesCode(sales_code)
+  }
+
   @Post()
   sentOtpToPhoneNumber(@Body() mobileNumberDtO: MobileNumberDtO) {
    Logger.debug(`sentOtpToPhoneNumber() mobileNumberDtO: [${JSON.stringify(mobileNumberDtO)}]`, APP);
@@ -70,6 +77,13 @@ export class AdminController {
     Logger.debug(`updatePaidAmount() updateAmountdto: [${JSON.stringify(updateAmountdto)}]`, APP);
 
     return this.adminService.updatingPaidAmount(updateAmountdto)
+  }
 
-}
+  @Post('/sales-link')
+  sendCreateSalesPartnerLinkToMobileAndWhatsappNumber(@Body() mobileNumberDtO: MobileNumberDtO) {
+    Logger.debug(`sendCreateSalesPartnerLinkToMobileAndWhatsappNumber() mobileNumberDtO: [${JSON.stringify(mobileNumberDtO)}]`, APP);
+
+    return this.adminService.sendCreateSalesPartnerLinkToMobileAndWhatsappNumber(mobileNumberDtO);
+  }
+
 }

@@ -19,6 +19,10 @@ __decorate([
     (0, class_validator_1.IsPhoneNumber)(),
     __metadata("design:type", String)
 ], MobileNumberDtO.prototype, "phoneNumber", void 0);
+__decorate([
+    (0, class_validator_1.IsNotEmpty)(),
+    __metadata("design:type", Number)
+], MobileNumberDtO.prototype, "commission", void 0);
 exports.MobileNumberDtO = MobileNumberDtO;
 class MobileNumberAndOtpDtO {
 }

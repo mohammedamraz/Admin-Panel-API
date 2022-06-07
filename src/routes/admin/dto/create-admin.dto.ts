@@ -6,6 +6,9 @@ export class MobileNumberDtO {
   @IsNotEmpty()
   @IsPhoneNumber()
   phoneNumber: phoneNumber;
+  
+  @IsNotEmpty()
+  commission:number;
 }
 
 export class MobileNumberAndOtpDtO {

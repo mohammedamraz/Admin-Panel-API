@@ -243,6 +243,46 @@ let AdminService = class AdminService {
             })));
         });
     }
+    sendCreateSalesPartnerLinkToPhoneNumber(mobileNumberDtO) {
+        common_1.Logger.debug(`sendCreateSalesPartnerLinkToPhoneNumber() mobileNumberDtO: [${JSON.stringify(mobileNumberDtO)}]`, APP);
+        let phone_number = this.encryptPassword_(mobileNumberDtO.phoneNumber);
+        let commission = this.encryptPassword_(mobileNumberDtO.commission);
+        return this.client.messages
+            .create({
+            body: `Click on Link ${constants_1.SALES_PARTNER_LINK}?mobile=${phone_number}&commission=${commission} `,
+            from: '+19402908957',
+            to: mobileNumberDtO.phoneNumber
+        })
+            .then(_res => {
+            return { "status": `Link ${constants_1.SALES_PARTNER_LINK}  send to  ${mobileNumberDtO.phoneNumber} number` };
+        })
+            .catch(err => this.onTwilioErrorResponse(err));
+    }
+    sendCreateSalesPartnerLinkToWhatsappNumber(mobileNumberDtO) {
+        common_1.Logger.debug(`sendCreateSalesPartnerLinkToWhatsappNumber() mobileNumberDtO: [${JSON.stringify(mobileNumberDtO)}]`, APP);
+        let phone_number = this.encryptPassword_(mobileNumberDtO.phoneNumber);
+        let commission = this.encryptPassword_(mobileNumberDtO.commission);
+        return this.client.messages
+            .create({
+            body: `Click on Link ${constants_1.SALES_PARTNER_LINK}?mobile=${phone_number}&commission=${commission} `,
+            from: 'whatsapp:+14155238886',
+            to: `whatsapp:${mobileNumberDtO.phoneNumber}`
+        })
+            .then(_res => {
+            return { "status": `Link ${constants_1.SALES_PARTNER_LINK}  send to  ${mobileNumberDtO.phoneNumber} whatsapp number` };
+        })
+            .catch(err => this.onTwilioErrorResponse(err));
+    }
+    sendCreateSalesPartnerLinkToMobileAndWhatsappNumber(mobileNumberDtO) {
+        common_1.Logger.debug(`sendCreateSalesPartnerLinkToMobileAndWhatsappNumber() mobileNumberDtO: [${JSON.stringify(mobileNumberDtO)}]`, APP);
+        return (0, rxjs_1.from)(this.sendCreateSalesPartnerLinkToPhoneNumber(mobileNumberDtO)).pipe((0, rxjs_1.map)(_doc => this.sendCreateSalesPartnerLinkToWhatsappNumber(mobileNumberDtO)), (0, rxjs_1.switchMap)(doc => (0, rxjs_1.of)({ status: "Sales Partner link sent" })));
+    }
+    encryptPassword_(password) {
+        const NodeRSA = require('node-rsa');
+        let key_public = new NodeRSA(constants_1.PUBLIC_KEY);
+        var encryptedString = key_public.encrypt(password, 'base64');
+        return encryptedString;
+    }
 };
 AdminService = __decorate([
     (0, common_1.Injectable)(),
