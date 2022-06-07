@@ -50,11 +50,16 @@ export declare class UpdateSalesPartner {
     block_account: boolean;
     profile_confirmation: boolean;
 }
+export declare enum Is_active {
+    TRUE = "true",
+    FALSE = "false"
+}
 export declare class ZQueryParamsDto {
     name?: string;
     date?: string;
     number_of_pages?: number;
     number_of_rows?: number;
+    is_active: Is_active;
 }
 export declare enum Periodicity {
     MONTHLY = "monthly",

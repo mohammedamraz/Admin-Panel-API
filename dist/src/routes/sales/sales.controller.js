@@ -53,6 +53,10 @@ let SalesController = class SalesController {
         common_1.Logger.debug(`fetchAllSalesPartnersByDate() params:${JSON.stringify(params)}`, APP);
         return this.salesService.fetchAllSalesPartnersByDate(params);
     }
+    fetchCommissionFromJunctionDb(params) {
+        common_1.Logger.debug(`fetchCommissionFromJunctionDb() params:${JSON.stringify(params)}`, APP);
+        return this.salesService.fetchCommissionFromJunctionDb(params);
+    }
     fetchAllSalesPartnersFromJunctionByDate(id, params) {
         common_1.Logger.debug(`fetchAllSalesPartnersFromJunctionByDate() id: [${id}] params:${JSON.stringify(params)}`, APP);
         return this.salesService.fetchAllSalesPartnersFromJunctionByDate(id, params);
@@ -121,6 +125,13 @@ __decorate([
     __metadata("design:paramtypes", [create_sale_dto_1.ZQueryParamsDto]),
     __metadata("design:returntype", void 0)
 ], SalesController.prototype, "fetchAllSalesPartnersByDate", null);
+__decorate([
+    (0, common_1.Get)('id/id/id'),
+    __param(0, (0, common_1.Query)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [create_sale_dto_1.ZQueryParamsDto]),
+    __metadata("design:returntype", void 0)
+], SalesController.prototype, "fetchCommissionFromJunctionDb", null);
 __decorate([
     (0, common_1.Get)(':id/sales_junction'),
     __param(0, (0, common_1.Param)('id')),

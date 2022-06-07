@@ -15,13 +15,15 @@ export declare class SalesService {
     fetchSalesPartnerById(id: string): import("rxjs").Observable<CreateSalesPartner[]>;
     deleteSalesPartner(id: string): import("rxjs").Observable<Promise<CreateSalesPartner[]>>;
     updateSalesPartner(id: string, updateSalesPartnerDto: UpdateSalesPartner): import("rxjs").Observable<Promise<CreateSalesPartner[]>>;
-    fetchAllSalesPartnersByDate(params: ZQueryParamsDto): import("rxjs").Observable<CreateSalesPartner[]>;
+    fetchAllSalesPartnersByDate(params: ZQueryParamsDto): import("rxjs").Observable<any>;
+    fetchCommissionFromJunctionDb(params: ZQueryParamsDto): any[] | import("rxjs").Observable<CreateSalesJunction[]>;
     fetchAllSalesPartnersFromJunctionByDate(id: string, params: ZQueryParamsDto): any[] | import("rxjs").Observable<any>;
     makeDateFormat(params: any): {
         number_of_rows: any;
         number_of_pages: any;
         name: any;
         date: string;
+        is_active: any;
     };
     uploadImage(id: string, fileName: string): Promise<CreateSalesPartner[]>;
     updateImageById(id: string, updateSalesPartnerDto: object): Promise<CreateSalesPartner[]>;
