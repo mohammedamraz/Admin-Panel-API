@@ -21,6 +21,10 @@ __decorate([
     __metadata("design:type", String)
 ], CreateSalesPartner.prototype, "mobile", void 0);
 __decorate([
+    (0, class_validator_1.IsNotEmpty)(),
+    __metadata("design:type", String)
+], CreateSalesPartner.prototype, "location", void 0);
+__decorate([
     (0, class_validator_1.IsEmail)(),
     __metadata("design:type", String)
 ], CreateSalesPartner.prototype, "email", void 0);

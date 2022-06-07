@@ -21,6 +21,7 @@ export declare class CreateSalesPartner {
     created_date: Date;
     refered_by: string;
     block_account: boolean;
+    is_hsa_account: boolean;
     profile_confirmation: boolean;
 }
 export declare class CreateSalesPartnerRequest {
