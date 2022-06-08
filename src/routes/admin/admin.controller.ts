@@ -1,6 +1,6 @@
 import { Controller, Get, Post, Body, Param, Logger, ParseIntPipe } from '@nestjs/common';
 import { AdminService } from './admin.service';
-import { createPaid, MobileNumberAndOtpDtO, MobileNumberDtO, ParamDto, requestDto } from './dto/create-admin.dto';
+import { createPaid, MobileNumberAndOtpDtO, MobileNumberDtO, ParamDto, requestDto, YearMonthDto } from './dto/create-admin.dto';
 import { ConfirmForgotPasswordDTO, ForgotPasswordDTO, LoginDTO } from './dto/login.dto';
 
 const APP = 'AdminController';
@@ -10,10 +10,10 @@ export class AdminController {
   constructor(private readonly adminService: AdminService) {}
 
   @Get('commission-report/:year')
-  fetchCommissionReport(@Param('year',ParseIntPipe) year:number){
-    Logger.debug(`fetchCommissionReport() year: [${year}]`, APP);
+  fetchCommissionReport(@Param() yearMonthDto:YearMonthDto){
+    Logger.debug(`fetchCommissionReport() year: [${yearMonthDto.year}]`, APP);
 
-    return this.adminService.fetchCommissionReport(year);
+    return this.adminService.fetchCommissionReport(yearMonthDto);
   }
 
   @Get('sales/account-details')

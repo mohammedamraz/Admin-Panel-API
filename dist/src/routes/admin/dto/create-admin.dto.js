@@ -9,7 +9,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.fetchmonths = exports.createPaid = exports.createPaidAmountDto = exports.createAccount = exports.sendEmailOnIncorrectBankDetailsDto = exports.AccountZwitchResponseBody = exports.User = exports.ParamDto = exports.requestDto = exports.MobileNumberAndOtpDtO = exports.MobileNumberDtO = void 0;
+exports.fetchmonths = exports.YearMonthDto = exports.createPaid = exports.createPaidAmountDto = exports.createAccount = exports.sendEmailOnIncorrectBankDetailsDto = exports.AccountZwitchResponseBody = exports.User = exports.ParamDto = exports.requestDto = exports.MobileNumberAndOtpDtO = exports.MobileNumberDtO = void 0;
 const class_validator_1 = require("class-validator");
 const class_transformer_1 = require("class-transformer");
 const common_1 = require("@nestjs/common");
@@ -88,12 +88,22 @@ __decorate([
     __metadata("design:type", Array)
 ], createPaid.prototype, "data", void 0);
 exports.createPaid = createPaid;
+class YearMonthDto {
+}
+__decorate([
+    (0, class_validator_1.IsNotEmpty)(),
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.MinLength)(4, { message: 'Enter only 4 digit value of year, This is too short', }),
+    (0, class_validator_1.MaxLength)(4, { message: 'Enter only 4 digit value of year, This is too long', }),
+    __metadata("design:type", String)
+], YearMonthDto.prototype, "year", void 0);
+exports.YearMonthDto = YearMonthDto;
 const fetchmonths = (year) => {
     common_1.Logger.debug(`fetchmonths() year: [${year}]`);
     let month = [];
     let month1 = [];
     let i = 0;
-    if (new Date().getFullYear().toString() === year.toString()) {
+    if (new Date().getFullYear().toString() === year) {
         for (i = new Date().getMonth() + 1; i > 0; i--)
             month.push(i);
         return month;

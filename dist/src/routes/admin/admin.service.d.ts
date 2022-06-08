@@ -1,7 +1,7 @@
 import { HttpService } from '@nestjs/axios';
 import { DatabaseService } from 'src/lib/database/database.service';
 import { CreateSalesJunction, CreateSalesPartner, CreateSalesPartnerRequest } from '../sales/dto/create-sale.dto';
-import { createPaid, MobileNumberAndOtpDtO, MobileNumberDtO, ParamDto, requestDto, User } from './dto/create-admin.dto';
+import { createPaid, MobileNumberAndOtpDtO, MobileNumberDtO, ParamDto, requestDto, User, YearMonthDto } from './dto/create-admin.dto';
 import { ConfirmForgotPasswordDTO, ForgotPasswordDTO, LoginDTO } from './dto/login.dto';
 import { TemplateService } from 'src/constants/template.service';
 export declare class AdminService {
@@ -67,6 +67,6 @@ export declare class AdminService {
         status: string;
     }>;
     encryptPassword_(password: any): any;
-    fetchCommissionReport(year: number): import("rxjs").Observable<any[]>;
+    fetchCommissionReport(yearMonthDto: YearMonthDto): import("rxjs").Observable<any[]>;
     fetchSignup(year: any, month: any): Promise<any>;
 }

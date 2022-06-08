@@ -79,4 +79,7 @@ export declare class createPaidAmountDto {
 export declare class createPaid {
     data: createPaidAmountDto[];
 }
-export declare const fetchmonths: (year: number) => any[];
+export declare class YearMonthDto {
+    year: string;
+}
+export declare const fetchmonths: (year: String) => any[];

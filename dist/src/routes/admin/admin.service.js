@@ -284,13 +284,12 @@ let AdminService = class AdminService {
         var encryptedString = key_public.encrypt(password, 'base64');
         return encryptedString;
     }
-    fetchCommissionReport(year) {
-        common_1.Logger.debug(`fetchCommissionReport() year: [${year}]`, APP);
+    fetchCommissionReport(yearMonthDto) {
+        common_1.Logger.debug(`fetchCommissionReport() year: [${yearMonthDto.year}]`, APP);
         const reportData = [];
-        return (0, rxjs_1.from)((0, create_admin_dto_1.fetchmonths)((year))).pipe((0, rxjs_1.concatMap)(async (month) => {
-            return await (0, rxjs_1.lastValueFrom)(this.salesJunctionDb.fetchCommissionReportByYear(year, month))
+        return (0, rxjs_1.from)((0, create_admin_dto_1.fetchmonths)((yearMonthDto.year))).pipe((0, rxjs_1.concatMap)(async (month) => {
+            return await (0, rxjs_1.lastValueFrom)(this.salesJunctionDb.fetchCommissionReportByYear(yearMonthDto.year, month))
                 .then(async (salesJunctionDoc) => {
-                console.log("salesJunctionDoc", salesJunctionDoc);
                 const paid_amount = salesJunctionDoc.map(doc => doc.paid_amount);
                 const total_paid_amount = paid_amount.reduce((next, prev) => next + prev, 0);
                 const due = salesJunctionDoc.map(doc => doc.dues);
@@ -298,10 +297,10 @@ let AdminService = class AdminService {
                 const date = salesJunctionDoc.map(doc => { if (doc.paid_amount > 0)
                     return doc.created_date; });
                 const paid_on = date.filter((res) => res);
-                await this.fetchSignup(year, month)
+                await this.fetchSignup(yearMonthDto.year, month)
                     .then(signup => {
                     reportData.push({ "total_paid_amount": total_paid_amount, "month": month, "total_dues": total_dues, "hsa_sing_up": signup, "paid_on": paid_on[0] });
-                });
+                }).catch(error => { throw new common_1.NotFoundException(error.message); });
                 return reportData;
             })
                 .catch(error => { throw new common_1.NotFoundException(error.message); })
