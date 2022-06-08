@@ -67,6 +67,8 @@ export declare class createAccount {
     savings_beneficiary_id: string;
     partner_id: number;
     sales_code: string;
+    fedo_id: string;
+    userreference_id: string;
 }
 export declare class createPaidAmountDto {
     paid_amount: number;

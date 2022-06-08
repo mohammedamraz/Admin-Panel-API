@@ -31,6 +31,12 @@ export const fetchAccountBySalesCode = (salesCode: string) => {
 		catchError(err => onHTTPErrorResponse(err)),
 		map((res: AxiosResponse) => <createAccount[]>res.data))
 }
+export const findUserByCustomerId = (id: string) => {
+
+	return new HttpService().get(`http://0.0.0.0:35000/users/customer/${id}`).pipe(
+		catchError(err => onHTTPErrorResponse(err)),
+		map((res: AxiosResponse) => <createAccount[]>res.data))
+}
 export const editFileName = (req, file, callback) => {
 	const name = file.originalname.split('.')[0];
 	const fileExtName = extname(file.originalname);

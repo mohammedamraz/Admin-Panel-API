@@ -119,7 +119,12 @@ export class SalesController {
 
     return this.salesService.changeBankDetailsVerificationSatatus(id);
   }
-  
+  @Patch(':id/updateCustomer')
+  updateUserIdInSales(@Param('id') id: string, @Body() updateSalesPartnerDto: UpdateSalesPartner) {
+      Logger.debug(`updateCustomerIdInSales() id: [${id}] DTO:${JSON.stringify(updateSalesPartnerDto,)}`, APP);
+
+      return this.salesService.updateUserIdInSales(id, updateSalesPartnerDto);
+  }
 }
 
 

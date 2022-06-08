@@ -48,13 +48,6 @@ let SalesController = class SalesController {
     fetchInvitationResponse(salesCode, period) {
         common_1.Logger.debug(`fetchInvitationResponse()salesCode: [${salesCode}] `, APP);
         return this.salesService.fetchInvitationResponse(salesCode, period);
-<<<<<<< HEAD
-=======
-    }
-    updateSalesPartner(id, updateSalesPartnerDto) {
-        common_1.Logger.debug(`updateSalesPartner() id: [${id}] DTO:${JSON.stringify(updateSalesPartnerDto)}`, APP);
-        return this.salesService.updateSalesPartner(id, updateSalesPartnerDto);
->>>>>>> 639723cd511cff9cbc62617cec2565475574b182
     }
     fetchAllSalesPartnersByDate(params) {
         common_1.Logger.debug(`fetchAllSalesPartnersByDate() params:${JSON.stringify(params)}`, APP);
@@ -79,6 +72,10 @@ let SalesController = class SalesController {
     changeBankDetailsVerificationStatus(id) {
         common_1.Logger.debug(`changeBankDetailsVerificationSatatus() id:[${id}] `, APP);
         return this.salesService.changeBankDetailsVerificationSatatus(id);
+    }
+    updateUserIdInSales(id, updateSalesPartnerDto) {
+        common_1.Logger.debug(`updateCustomerIdInSales() id: [${id}] DTO:${JSON.stringify(updateSalesPartnerDto)}`, APP);
+        return this.salesService.updateUserIdInSales(id, updateSalesPartnerDto);
     }
 };
 __decorate([
@@ -183,6 +180,14 @@ __decorate([
     __metadata("design:paramtypes", [Number]),
     __metadata("design:returntype", void 0)
 ], SalesController.prototype, "changeBankDetailsVerificationStatus", null);
+__decorate([
+    (0, common_1.Patch)(':id/updateCustomer'),
+    __param(0, (0, common_1.Param)('id')),
+    __param(1, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, create_sale_dto_1.UpdateSalesPartner]),
+    __metadata("design:returntype", void 0)
+], SalesController.prototype, "updateUserIdInSales", null);
 SalesController = __decorate([
     (0, common_1.Controller)(),
     __metadata("design:paramtypes", [sales_service_1.SalesService])

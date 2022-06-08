@@ -200,7 +200,22 @@ let SalesService = class SalesService {
     addCommission(salesCode) {
         common_1.Logger.debug(`addCommission() salesCode: ${salesCode}`, APP);
         return this.fetchSalesBySalesCode(salesCode).pipe((0, rxjs_1.switchMap)(salesCommission => (0, rxjs_1.lastValueFrom)(this.junctiondb.find({ "sales_code": String(salesCode), }))
-            .then(res => [salesCommission, res[res.length - 1]])), (0, rxjs_1.switchMap)(([salesCommission, res]) => this.junctiondb.save({ sales_code: salesCode, commission_amount: salesCommission["commission"], dues: (Number(res['dues']) + Number(salesCommission["commission"])) })));
+            .then(res => { console.log('dds', res); return [salesCommission, res[res.length - 1]]; })), (0, rxjs_1.switchMap)(async ([salesCommission, res]) => { await this.salesuser.save({ sales_code: salesCode }); return [salesCommission, res]; }), (0, rxjs_1.switchMap)(([salesCommission, res]) => this.junctiondb.save({ sales_code: salesCode, commission_amount: salesCommission["commission"], dues: (Number(res['dues']) + Number(salesCommission["commission"])) })));
+    }
+    updateUserIdInSales(id, updateSalesPartnerDto) {
+        common_1.Logger.debug(`updateSalesPartner() id: [${id}], body: [${JSON.stringify(updateSalesPartnerDto)}]`, APP);
+        return this.db.find({ id: id }).pipe((0, rxjs_1.switchMap)(res => {
+            if (res.length == 0)
+                throw new common_1.NotFoundException(`Sales Partner Not Found`);
+            else
+                return (0, helper_1.findUserByCustomerId)(updateSalesPartnerDto.customer_id).pipe((0, rxjs_1.map)((userDoc) => {
+                    if (userDoc.length == 0)
+                        throw new common_1.NotFoundException("User not found");
+                    else if (userDoc[0].userreference_id === updateSalesPartnerDto.customer_id) {
+                        return (0, rxjs_1.lastValueFrom)(this.db.findByIdandUpdate({ id: id, quries: { user_id: userDoc[0].fedo_id } }).pipe((0, rxjs_1.catchError)(err => { throw new common_1.BadRequestException(err.message); }), (0, rxjs_1.map)(doc => { return doc; })));
+                    }
+                }));
+        }));
     }
 };
 SalesService = __decorate([

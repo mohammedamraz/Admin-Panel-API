@@ -17,4 +17,5 @@ export declare class SalesController {
     uploadImage(id: string, file: any): Promise<CreateSalesPartner[]>;
     updateSalesPartner(id: number, updateSalesPartnerDto: UpdateSalesPartner): import("rxjs").Observable<Promise<CreateSalesPartner[]>>;
     changeBankDetailsVerificationStatus(id: number): import("rxjs").Observable<import("rxjs").Observable<CreateSalesPartner[]>>;
+    updateUserIdInSales(id: string, updateSalesPartnerDto: UpdateSalesPartner): import("rxjs").Observable<Promise<CreateSalesPartner[]>>;
 }

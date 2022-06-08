@@ -36,4 +36,5 @@ export declare class SalesService {
         signup: number;
     }>;
     addCommission(salesCode: string): import("rxjs").Observable<CreateSalesJunction[]>;
+    updateUserIdInSales(id: string, updateSalesPartnerDto: UpdateSalesPartner): import("rxjs").Observable<Promise<CreateSalesPartner[]>>;
 }
