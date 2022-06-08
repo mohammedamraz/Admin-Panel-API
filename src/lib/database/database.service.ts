@@ -2,7 +2,7 @@
 import { Injectable, Logger, Type } from '@nestjs/common';
 import { Pool } from 'pg';
 import { from, Observable, of } from 'rxjs';
-import { DatabaseFeatureOptions, DatabaseInterface, findAllParamsandUpdate, findAndUpdateParams, findByConditionParams, findByConditionParamsAlign, findByDateParams, findByIDAndUpdateParams, findParams, InsertParams, QueryParams, findByPeriodParams } from './interfaces/database.interface';
+import { DatabaseFeatureOptions, DatabaseInterface, findAllParamsandUpdate, findAndUpdateParams, findByConditionParams, findByConditionParamsAlign, findByDateParams, findByIDAndUpdateParams, findParams, InsertParams, QueryParams, findByPeriodParams, DateRangeParams } from './interfaces/database.interface';
 
 const APP = "DatabaseService"
 @Injectable()
@@ -266,10 +266,10 @@ export class DatabaseService<T> implements DatabaseInterface<T> {
     return this.runQuery(query);
   }
 
-  fetchByMonth(month: string): Observable<T[]> {
-    Logger.debug(`fetchByMonth(): params ${[JSON.stringify(month)]}`, APP);
+  fetchBetweenRange(date: DateRangeParams): Observable<T[]> {
+    Logger.debug(`fetchByMonth(): date ${[JSON.stringify(date)]}`, APP);
 
-    const query = `SELECT * FROM ${this.tableName} WHERE date_part('month',created_date) =  '${month}'`;
+    const query = `SELECT * FROM ${this.tableName} WHERE ((created_date between '${date.from}' and '${date.to}'))`;
     return this.runQuery(query);
   }
 

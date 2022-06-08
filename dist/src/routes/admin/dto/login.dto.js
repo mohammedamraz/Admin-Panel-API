@@ -9,7 +9,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.ConfirmForgotPasswordDTO = exports.ForgotPasswordDTO = exports.LoginDTO = void 0;
+exports.fetchDAte = exports.formatDate = exports.PERIOD = exports.PeriodRange = exports.Periodicity = exports.ConfirmForgotPasswordDTO = exports.ForgotPasswordDTO = exports.LoginDTO = void 0;
 const class_validator_1 = require("class-validator");
 class LoginDTO {
 }
@@ -44,4 +44,40 @@ __decorate([
     __metadata("design:type", String)
 ], ConfirmForgotPasswordDTO.prototype, "password", void 0);
 exports.ConfirmForgotPasswordDTO = ConfirmForgotPasswordDTO;
+var Periodicity;
+(function (Periodicity) {
+    Periodicity["MONTH"] = "month";
+    Periodicity["QUARTER"] = "quarter";
+    Periodicity["YEARLY"] = "year";
+})(Periodicity = exports.Periodicity || (exports.Periodicity = {}));
+class PeriodRange {
+}
+__decorate([
+    (0, class_validator_1.IsNotEmpty)(),
+    (0, class_validator_1.IsEnum)(Periodicity),
+    __metadata("design:type", String)
+], PeriodRange.prototype, "period", void 0);
+exports.PeriodRange = PeriodRange;
+exports.PERIOD = {
+    month: 1,
+    quarter: 3,
+    year: 12
+};
+const formatDate = (date) => {
+    let d = new Date(date), month = '' + (d.getMonth() + 1), day = '' + d.getDate(), year = d.getFullYear();
+    if (month.length < 2)
+        month = '0' + month;
+    if (day.length < 2)
+        day = '0' + day;
+    return [year, month, day].join('-');
+};
+exports.formatDate = formatDate;
+const fetchDAte = (date, period) => {
+    let d = new Date(date);
+    return {
+        'from': (0, exports.formatDate)(date.setMonth((date.getMonth()) - period)),
+        'to': (0, exports.formatDate)(d)
+    };
+};
+exports.fetchDAte = fetchDAte;
 //# sourceMappingURL=login.dto.js.map

@@ -57,6 +57,10 @@ export interface findByPeriodParams {
     columnvalue: string;
     period: string;
 }
+export interface DateRangeParams {
+    from: string;
+    to: string;
+}
 export interface findByConditionParams {
     created_date: string;
     endcreated_date: string;

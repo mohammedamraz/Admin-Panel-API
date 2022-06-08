@@ -2,7 +2,7 @@ import { Controller, Get, Post, Body, Param, Logger, Query } from '@nestjs/commo
 import { Period } from '../sales/dto/create-sale.dto';
 import { AdminService } from './admin.service';
 import { createPaid, MobileNumberAndOtpDtO, MobileNumberDtO, ParamDto, requestDto } from './dto/create-admin.dto';
-import { ConfirmForgotPasswordDTO, ForgotPasswordDTO, LoginDTO } from './dto/login.dto';
+import { ConfirmForgotPasswordDTO, ForgotPasswordDTO, LoginDTO, PeriodRange } from './dto/login.dto';
 
 const APP = 'AdminController';
 
@@ -18,11 +18,18 @@ export class AdminController {
   }
 
   @Get('commissionDispersals')
-  fetchCommissionDispersals() {
-      Logger.debug(`fetchCommissionDispersals()`, APP);
+  fetchCommissionDispersals(@Query() period: PeriodRange) {
+      Logger.debug(`fetchCommissionDispersals() period: [${JSON.stringify(period.period)}]`, APP);
 
-      return this.adminService.fetchCommissionDispersals();
+      return this.adminService.fetchCommissionDispersals(period);
   }
+
+  // @Get('invitationResponses')
+  // fetchInvitationResponses(@Query() query: Period) {
+  //   Logger.debug(`fetchInvitationResponses() query: [${JSON.stringify(query)}]`, APP);
+
+  //   return this.adminService.fetchInvitationResponses(query);
+  // }
 
   @Get('sales/account-details/:sales_code')
   fetchSalesPartnerAccountDetailsBySalesCode(@Param('sales_code') sales_code: string) {

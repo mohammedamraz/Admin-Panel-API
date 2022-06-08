@@ -3,11 +3,11 @@ import { HttpService } from '@nestjs/axios';
 import { AKASH_ACCOUNTID, AKASH_AUTHTOKEN, AKASH_SERVICEID, APP_DOWNLOAD_LINK, AWS_COGNITO_USER_CREATION_URL_SIT, FEDO_APP, PUBLIC_KEY, SALES_PARTNER_LINK } from 'src/constants';
 import { DatabaseTable } from 'src/lib/database/database.decorator';
 import { DatabaseService } from 'src/lib/database/database.service';
-import { CreateSalesJunction, CreateSalesPartner, CreateSalesPartnerRequest, Interval, makeEarningFormat, Period, SalesUserJunction } from '../sales/dto/create-sale.dto';
+import { CreateSalesJunction, CreateSalesPartner, CreateSalesPartnerRequest, Interval, SalesUserJunction, Period } from '../sales/dto/create-sale.dto';
 import { AccountZwitchResponseBody,  createPaid,  MobileNumberAndOtpDtO, MobileNumberDtO, ParamDto, requestDto, sendEmailOnIncorrectBankDetailsDto, User } from './dto/create-admin.dto';
 import { AxiosResponse } from 'axios';
 import { catchError, concatMap, from, lastValueFrom, map, of, switchMap, throwError } from 'rxjs';
-import { ConfirmForgotPasswordDTO, ForgotPasswordDTO, LoginDTO } from './dto/login.dto';
+import { ConfirmForgotPasswordDTO, fetchDAte, ForgotPasswordDTO, LoginDTO, PERIOD, PeriodRange } from './dto/login.dto';
 import { fetchAccount, fetchUser, fetchUserByMobileNumber } from 'src/constants/helper';
 import { TemplateService } from 'src/constants/template.service';
 import { EmailDTO } from './dto/template.dto';
@@ -50,33 +50,36 @@ export class AdminService {
     )
   }
 
-  fetchCommissionDispersals(){
+  fetchCommissionDispersals(period: PeriodRange){
     Logger.debug(`fetchEarnings()  }`, APP);
 
-    return this.salesJunctionDb.fetchByMonth(new Date().getMonth().toString()).pipe(
-      switchMap(salesJunctionDoc => this.fetchPreviousMonthCommissionDispersal(salesJunctionDoc)))
+    return this.salesJunctionDb.fetchBetweenRange(fetchDAte(new Date(), PERIOD[period.period])).pipe(
+      switchMap(salesJunctionDoc => this.fetchPreviousMonthCommissionDispersal(salesJunctionDoc, period, new Date(fetchDAte(new Date(), PERIOD[period.period]).from))))
+    
+    // return this.salesJunctionDb.fetchByMonth(new Date().getMonth().toString()).pipe(
+    //   switchMap(salesJunctionDoc => this.fetchPreviousMonthCommissionDispersal(salesJunctionDoc)))
   }
 
-  fetchPreviousMonthCommissionDispersal(createSalesJunction: CreateSalesJunction[]){
+  fetchPreviousMonthCommissionDispersal(createSalesJunction: CreateSalesJunction[], period: PeriodRange, date: Date) {
     Logger.debug(`fetchPreviousMonthCommissionDispersal()`, APP);
 
-    return this.salesJunctionDb.fetchByMonth(((new Date().getMonth())-1).toString()).pipe(
+    return this.salesJunctionDb.fetchBetweenRange(fetchDAte(date, PERIOD[period.period])).pipe(
       map(salesJunctionDoc =>{
         return {'thisMonth': createSalesJunction.reduce((acc, curr) => acc += curr.paid_amount, 0),
                 'previousMonth': salesJunctionDoc.reduce((acc, curr) => acc += curr.paid_amount, 0)}
       }))
   }
 
-  fetchInvitationResponse(salesCode: string, period: Period) {
-    Logger.debug(`fetchInvitationResponse() salesCode: ${salesCode}`, APP);
+  // fetchInvitationResponse(salesCode: string, period: Period) {
+  //   Logger.debug(`fetchInvitationResponse() salesCode: ${salesCode}`, APP);
 
-    return this.salesuser.findByPeriod({ columnName: "sales_code", columnvalue: salesCode, period: Interval(period) }).pipe(
-      catchError(error => { throw new BadRequestException(error.message) }),
-      map(salesuser => {
-        if (salesuser.length === 0) throw new NotFoundException("no Account found");
-        return { "signup": salesuser.length }
-      }))
-  }
+  //   return this.salesuser.findByPeriod({ columnName: "sales_code", columnvalue: salesCode, period: Interval(period) }).pipe(
+  //     catchError(error => { throw new BadRequestException(error.message) }),
+  //     map(salesuser => {
+  //       if (salesuser.length === 0) throw new NotFoundException("no Account found");
+  //       return { "signup": salesuser.length }
+  //     }))
+  // }
 
   async fetchUser(createSalesPartner: CreateSalesPartner[]) {
     Logger.debug(`fetchUser() createSalesPartner: ${JSON.stringify(createSalesPartner)}`, APP);

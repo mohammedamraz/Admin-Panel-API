@@ -1,8 +1,8 @@
 import { HttpService } from '@nestjs/axios';
 import { DatabaseService } from 'src/lib/database/database.service';
-import { CreateSalesJunction, CreateSalesPartner, CreateSalesPartnerRequest, Period, SalesUserJunction } from '../sales/dto/create-sale.dto';
+import { CreateSalesJunction, CreateSalesPartner, CreateSalesPartnerRequest, SalesUserJunction } from '../sales/dto/create-sale.dto';
 import { createPaid, MobileNumberAndOtpDtO, MobileNumberDtO, ParamDto, requestDto, User } from './dto/create-admin.dto';
-import { ConfirmForgotPasswordDTO, ForgotPasswordDTO, LoginDTO } from './dto/login.dto';
+import { ConfirmForgotPasswordDTO, ForgotPasswordDTO, LoginDTO, PeriodRange } from './dto/login.dto';
 import { TemplateService } from 'src/constants/template.service';
 export declare class AdminService {
     private readonly salesJunctionDb;
@@ -22,16 +22,13 @@ export declare class AdminService {
     salesPartnerDetails: any;
     salesParterEmail: any;
     fetchSalesPartnerAccountDetails(): import("rxjs").Observable<Promise<any[]>>;
-    fetchCommissionDispersals(): import("rxjs").Observable<{
+    fetchCommissionDispersals(period: PeriodRange): import("rxjs").Observable<{
         thisMonth: number;
         previousMonth: number;
     }>;
-    fetchPreviousMonthCommissionDispersal(createSalesJunction: CreateSalesJunction[]): import("rxjs").Observable<{
+    fetchPreviousMonthCommissionDispersal(createSalesJunction: CreateSalesJunction[], period: PeriodRange, date: Date): import("rxjs").Observable<{
         thisMonth: number;
         previousMonth: number;
-    }>;
-    fetchInvitationResponse(salesCode: string, period: Period): import("rxjs").Observable<{
-        signup: number;
     }>;
     fetchUser(createSalesPartner: CreateSalesPartner[]): Promise<any[]>;
     fetchAccount(userDoc: User[], saleDoc: CreateSalesPartner): Promise<{

@@ -18,8 +18,8 @@ const axios_1 = require("@nestjs/axios");
 const constants_1 = require("../../constants");
 const database_decorator_1 = require("../../lib/database/database.decorator");
 const database_service_1 = require("../../lib/database/database.service");
-const create_sale_dto_1 = require("../sales/dto/create-sale.dto");
 const rxjs_1 = require("rxjs");
+const login_dto_1 = require("./dto/login.dto");
 const helper_1 = require("../../constants/helper");
 const template_service_1 = require("../../constants/template.service");
 const APP = "AdminService";
@@ -90,23 +90,15 @@ let AdminService = class AdminService {
             return this.fetchUser(salesDoc);
         }), (0, rxjs_1.catchError)(err => { throw new common_1.BadRequestException(err.message); }));
     }
-    fetchCommissionDispersals() {
+    fetchCommissionDispersals(period) {
         common_1.Logger.debug(`fetchEarnings()  }`, APP);
-        return this.salesJunctionDb.fetchByMonth(new Date().getMonth().toString()).pipe((0, rxjs_1.switchMap)(salesJunctionDoc => this.fetchPreviousMonthCommissionDispersal(salesJunctionDoc)));
+        return this.salesJunctionDb.fetchBetweenRange((0, login_dto_1.fetchDAte)(new Date(), login_dto_1.PERIOD[period.period])).pipe((0, rxjs_1.switchMap)(salesJunctionDoc => this.fetchPreviousMonthCommissionDispersal(salesJunctionDoc, period, new Date((0, login_dto_1.fetchDAte)(new Date(), login_dto_1.PERIOD[period.period]).from))));
     }
-    fetchPreviousMonthCommissionDispersal(createSalesJunction) {
+    fetchPreviousMonthCommissionDispersal(createSalesJunction, period, date) {
         common_1.Logger.debug(`fetchPreviousMonthCommissionDispersal()`, APP);
-        return this.salesJunctionDb.fetchByMonth(((new Date().getMonth()) - 1).toString()).pipe((0, rxjs_1.map)(salesJunctionDoc => {
+        return this.salesJunctionDb.fetchBetweenRange((0, login_dto_1.fetchDAte)(date, login_dto_1.PERIOD[period.period])).pipe((0, rxjs_1.map)(salesJunctionDoc => {
             return { 'thisMonth': createSalesJunction.reduce((acc, curr) => acc += curr.paid_amount, 0),
                 'previousMonth': salesJunctionDoc.reduce((acc, curr) => acc += curr.paid_amount, 0) };
-        }));
-    }
-    fetchInvitationResponse(salesCode, period) {
-        common_1.Logger.debug(`fetchInvitationResponse() salesCode: ${salesCode}`, APP);
-        return this.salesuser.findByPeriod({ columnName: "sales_code", columnvalue: salesCode, period: (0, create_sale_dto_1.Interval)(period) }).pipe((0, rxjs_1.catchError)(error => { throw new common_1.BadRequestException(error.message); }), (0, rxjs_1.map)(salesuser => {
-            if (salesuser.length === 0)
-                throw new common_1.NotFoundException("no Account found");
-            return { "signup": salesuser.length };
         }));
     }
     async fetchUser(createSalesPartner) {

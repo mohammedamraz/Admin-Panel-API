@@ -206,9 +206,9 @@ let DatabaseService = class DatabaseService {
         const query = `SELECT * FROM ${this.tableName} WHERE created_date > CURRENT_DATE - INTERVAL '${period}'`;
         return this.runQuery(query);
     }
-    fetchByMonth(month) {
-        common_1.Logger.debug(`fetchByMonth(): params ${[JSON.stringify(month)]}`, APP);
-        const query = `SELECT * FROM ${this.tableName} WHERE date_part('month',created_date) =  '${month}'`;
+    fetchBetweenRange(date) {
+        common_1.Logger.debug(`fetchByMonth(): date ${[JSON.stringify(date)]}`, APP);
+        const query = `SELECT * FROM ${this.tableName} WHERE ((created_date between '${date.from}' and '${date.to}'))`;
         return this.runQuery(query);
     }
 };

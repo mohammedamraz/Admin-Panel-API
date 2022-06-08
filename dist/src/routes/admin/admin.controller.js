@@ -26,9 +26,9 @@ let AdminController = class AdminController {
         common_1.Logger.debug(`getSalesPartnerAccountDetails()`, APP);
         return this.adminService.fetchSalesPartnerAccountDetails();
     }
-    fetchCommissionDispersals() {
-        common_1.Logger.debug(`fetchCommissionDispersals()`, APP);
-        return this.adminService.fetchCommissionDispersals();
+    fetchCommissionDispersals(period) {
+        common_1.Logger.debug(`fetchCommissionDispersals() period: [${JSON.stringify(period.period)}]`, APP);
+        return this.adminService.fetchCommissionDispersals(period);
     }
     fetchSalesPartnerAccountDetailsBySalesCode(sales_code) {
         common_1.Logger.debug(`fetchSalesPartnerAccountDetailsByID()`, APP);
@@ -79,8 +79,9 @@ __decorate([
 ], AdminController.prototype, "fetchSalesPartnerAccountDetails", null);
 __decorate([
     (0, common_1.Get)('commissionDispersals'),
+    __param(0, (0, common_1.Query)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", []),
+    __metadata("design:paramtypes", [login_dto_1.PeriodRange]),
     __metadata("design:returntype", void 0)
 ], AdminController.prototype, "fetchCommissionDispersals", null);
 __decorate([
