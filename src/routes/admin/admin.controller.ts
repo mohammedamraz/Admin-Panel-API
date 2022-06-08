@@ -9,6 +9,13 @@ const APP = 'AdminController';
 export class AdminController {
   constructor(private readonly adminService: AdminService) {}
 
+  @Get('commission-report/:sales_code/:year')
+  fetchCommissionReport(@Param('sales_code') sales_code:string, @Param('year') year:number){
+    Logger.debug(`fetchCommissionReport() year: [${year}] sales_code: [${sales_code}]`, APP);
+
+    return this.adminService.fetchCommissionReport(sales_code, year);
+  }
+
   @Get('sales/account-details')
   fetchSalesPartnerAccountDetails() {
    Logger.debug(`getSalesPartnerAccountDetails()`, APP);
@@ -85,5 +92,7 @@ export class AdminController {
 
     return this.adminService.sendCreateSalesPartnerLinkToMobileAndWhatsappNumber(mobileNumberDtO);
   }
+
+ 
 
 }

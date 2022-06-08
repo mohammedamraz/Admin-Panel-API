@@ -66,4 +66,6 @@ export declare class AdminService {
         status: string;
     }>;
     encryptPassword_(password: any): any;
+    fetchCommissionReport(sales_code: string, year: number): import("rxjs").Observable<any[]>;
+    fetchmonths(year: number): any;
 }

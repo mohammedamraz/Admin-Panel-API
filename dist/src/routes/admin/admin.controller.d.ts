@@ -4,6 +4,7 @@ import { ConfirmForgotPasswordDTO, ForgotPasswordDTO, LoginDTO } from './dto/log
 export declare class AdminController {
     private readonly adminService;
     constructor(adminService: AdminService);
+    fetchCommissionReport(sales_code: string, year: number): import("rxjs").Observable<any[]>;
     fetchSalesPartnerAccountDetails(): import("rxjs").Observable<Promise<any[]>>;
     fetchSalesPartnerAccountDetailsBySalesCode(sales_code: string): import("rxjs").Observable<Promise<any[]>>;
     sentOtpToPhoneNumber(mobileNumberDtO: MobileNumberDtO): any;

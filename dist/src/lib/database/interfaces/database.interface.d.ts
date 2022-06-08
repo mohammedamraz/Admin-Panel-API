@@ -65,6 +65,11 @@ export interface findByConditionParams {
     numberOfRows: number;
 }
 export declare const findByConditionParamsAlign: (findbyConditionParams: findByConditionParams) => findByConditionParams;
+export interface MONTHYEAR {
+    year: number;
+    month: number;
+}
+export declare const fetchMonthYear: (MONTHYEAR: MONTHYEAR) => MONTHYEAR;
 export interface DatabaseInterface<T> {
     tableName: string;
     save(queryRequest: object): Observable<T[]>;

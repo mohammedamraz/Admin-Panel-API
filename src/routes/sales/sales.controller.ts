@@ -119,6 +119,7 @@ export class SalesController {
 
     return this.salesService.changeBankDetailsVerificationSatatus(id);
   }
+
   
 }
 

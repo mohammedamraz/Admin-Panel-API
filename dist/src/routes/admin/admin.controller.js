@@ -22,6 +22,10 @@ let AdminController = class AdminController {
     constructor(adminService) {
         this.adminService = adminService;
     }
+    fetchCommissionReport(sales_code, year) {
+        common_1.Logger.debug(`fetchCommissionReport() year: [${year}] sales_code: [${sales_code}]`, APP);
+        return this.adminService.fetchCommissionReport(sales_code, year);
+    }
     fetchSalesPartnerAccountDetails() {
         common_1.Logger.debug(`getSalesPartnerAccountDetails()`, APP);
         return this.adminService.fetchSalesPartnerAccountDetails();
@@ -67,6 +71,14 @@ let AdminController = class AdminController {
         return this.adminService.sendCreateSalesPartnerLinkToMobileAndWhatsappNumber(mobileNumberDtO);
     }
 };
+__decorate([
+    (0, common_1.Get)('commission-report/:sales_code/:year'),
+    __param(0, (0, common_1.Param)('sales_code')),
+    __param(1, (0, common_1.Param)('year')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, Number]),
+    __metadata("design:returntype", void 0)
+], AdminController.prototype, "fetchCommissionReport", null);
 __decorate([
     (0, common_1.Get)('sales/account-details'),
     __metadata("design:type", Function),

@@ -283,6 +283,42 @@ let AdminService = class AdminService {
         var encryptedString = key_public.encrypt(password, 'base64');
         return encryptedString;
     }
+    fetchCommissionReport(sales_code, year) {
+        common_1.Logger.debug(`fetchCommissionReport() year: [${year}] sales_code: [${sales_code}]`, APP);
+        const reportData = [];
+        return (0, rxjs_1.from)(this.fetchmonths((year))).pipe((0, rxjs_1.concatMap)(async (doc) => {
+            console.log('da', doc);
+            return await (0, rxjs_1.lastValueFrom)(this.salesJunctionDb.fetchCommissionReportByYear(year, doc))
+                .then(doc1 => {
+                const newDoc = doc1.filter(item => item['sales_code'] == sales_code);
+                const paid = newDoc.map(res => res.paid_amount);
+                const month = newDoc.map(res => res.created_date);
+                const paid_on = newDoc.map(res => res.update_date);
+                const paid1 = paid.pop();
+                const month1 = month.pop();
+                const paid_on1 = paid_on.pop();
+                console.log('newDoc', paid1, "month", month1, "paid_on", paid_on1);
+                reportData.push({ "paid_amount": paid1, "month": month1, "paid-on": paid_on1 });
+            })
+                .catch(error => { throw new common_1.NotFoundException("data not found"); })
+                .then(doc => reportData);
+        }));
+    }
+    fetchmonths(year) {
+        common_1.Logger.debug(`fetchmonths() year: [${year}]`, APP);
+        let a = [];
+        let i = 0;
+        if (new Date().getFullYear().toString() === year.toString()) {
+            for (i = new Date().getMonth() + 1; i > 0; i--)
+                a.push(i);
+            return a;
+        }
+        else {
+            for (i = 12; i > 0; i--)
+                a.push(i);
+            return a;
+        }
+    }
 };
 AdminService = __decorate([
     (0, common_1.Injectable)(),

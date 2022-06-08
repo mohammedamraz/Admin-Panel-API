@@ -201,6 +201,11 @@ let DatabaseService = class DatabaseService {
         const query = `SELECT * FROM ${this.tableName} WHERE ${findByPeriodParams.columnName} = '${findByPeriodParams.columnvalue}' AND created_date > CURRENT_DATE - INTERVAL '${findByPeriodParams.period}'  ORDER BY ${"created_date"} DESC`;
         return this.runQuery(query);
     }
+    fetchCommissionReportByYear(year, month) {
+        common_1.Logger.debug(`fetchCommissionReportByYear(): year ${year}`, APP);
+        const query = `SELECT * FROM ${this.tableName} WHERE date_part('year',created_date) = ${year} AND date_part('month',created_date) = ${month}`;
+        return this.runQuery(query);
+    }
 };
 DatabaseService = __decorate([
     (0, common_1.Injectable)(),

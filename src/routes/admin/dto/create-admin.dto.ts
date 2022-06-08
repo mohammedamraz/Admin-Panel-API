@@ -111,3 +111,21 @@ export class createPaid {
   @IsNotEmpty()
   data : createPaidAmountDto[];
 }
+
+// export const fetchmonths =(year: number) => {
+
+//   let a = [];
+//   let i = 0;
+
+//   if(new Date().getFullYear().toString() === year.toString()){
+//     for(i = new Date().getMonth(); i> 0 ; i-- )
+//      a.push(i)
+//    return console.log("aaaa",a)
+//   }
+//   else {
+//     for(i = 12; i> 0 ; i-- )
+//       a.push(i)
+//   return a
+//   }
+
+// }

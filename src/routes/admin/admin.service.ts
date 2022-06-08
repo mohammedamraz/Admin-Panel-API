@@ -4,7 +4,7 @@ import { AKASH_ACCOUNTID, AKASH_AUTHTOKEN, AKASH_SERVICEID, APP_DOWNLOAD_LINK, A
 import { DatabaseTable } from 'src/lib/database/database.decorator';
 import { DatabaseService } from 'src/lib/database/database.service';
 import { CreateSalesJunction, CreateSalesPartner, CreateSalesPartnerRequest } from '../sales/dto/create-sale.dto';
-import { AccountZwitchResponseBody,  createPaid,  MobileNumberAndOtpDtO, MobileNumberDtO, ParamDto, requestDto, sendEmailOnIncorrectBankDetailsDto, User } from './dto/create-admin.dto';
+import { AccountZwitchResponseBody,  createPaid, MobileNumberAndOtpDtO, MobileNumberDtO, ParamDto, requestDto, sendEmailOnIncorrectBankDetailsDto, User } from './dto/create-admin.dto';
 import { AxiosResponse } from 'axios';
 import { catchError, concatMap, from, lastValueFrom, map, of, switchMap, throwError } from 'rxjs';
 import { ConfirmForgotPasswordDTO, ForgotPasswordDTO, LoginDTO } from './dto/login.dto';
@@ -342,6 +342,51 @@ export class AdminService {
     let key_public = new NodeRSA(PUBLIC_KEY)
     var encryptedString = key_public.encrypt(password, 'base64')
     return encryptedString
+  }
+
+  fetchCommissionReport(sales_code:string,year:number){
+    Logger.debug(`fetchCommissionReport() year: [${year}] sales_code: [${sales_code}]`, APP);
+    const reportData=[]
+    return from(this.fetchmonths((year))).pipe(
+      concatMap(async( doc: number) => {
+        console.log('da', doc);
+        return await lastValueFrom(this.salesJunctionDb.fetchCommissionReportByYear(year,doc))
+        .then( doc1=> {
+        const newDoc =doc1.filter(item => item['sales_code'] == sales_code);
+        const paid  =newDoc.map(res=>res.paid_amount)
+        const month  =newDoc.map(res=>res.created_date)
+        const paid_on  =newDoc.map(res=>res.update_date)
+        const paid1 = paid.pop()
+        const month1 = month.pop()
+        const paid_on1 = paid_on.pop()
+          console.log('newDoc', paid1,"month",month1,"paid_on",paid_on1);
+          reportData.push({"paid_amount": paid1,"month":month1,"paid-on":paid_on1})
+        }
+        )
+      .catch(error=> {throw new NotFoundException("data not found")})
+      .then(doc => reportData)
+       })
+    )
+  }
+
+
+    fetchmonths(year: number):any {
+    Logger.debug(`fetchmonths() year: [${year}]`, APP);
+
+    let a = [];
+    let i = 0;
+  
+    if(new Date().getFullYear().toString() === year.toString()){
+      for(i = new Date().getMonth()+1; i> 0 ; i-- )
+       a.push(i)
+     return a
+    }
+    else {
+      for(i = 12; i> 0 ; i-- )
+        a.push(i)
+    return a
+    }
+  
   }
 
 
