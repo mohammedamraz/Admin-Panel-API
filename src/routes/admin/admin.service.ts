@@ -50,13 +50,20 @@ export class AdminService {
     )
   }
 
-  fetchEarnings(period: Period){
-    Logger.debug(`fetchEarnings()  period: ${JSON.stringify(period)}`, APP);
+  fetchCommissionDispersal(){
+    Logger.debug(`fetchEarnings()  }`, APP);
 
-    return this.salesJunctionDb.fetchAllByPeriod(Interval(period)).pipe(
-      map(salesjuncdoc =>{
-        if(salesjuncdoc.length === 0) throw new NotFoundException("no Account found");
-        return makeEarningFormat(salesjuncdoc.reduce((acc, curr) => ([acc[0] += curr.commission_amount, acc[1] += curr.paid_amount]), [0, 0]))
+    return this.salesJunctionDb.fetchByMonth(new Date().getMonth().toString()).pipe(
+      switchMap(salesJunctionDoc => this.fetchPreviousMonthCommissionDispersal(salesJunctionDoc)))
+  }
+
+  fetchPreviousMonthCommissionDispersal(createSalesJunction: CreateSalesJunction[]){
+    Logger.debug(`fetchPreviousMonthCommissionDispersal()`, APP);
+
+    return this.salesJunctionDb.fetchByMonth(((new Date().getMonth())-1).toString()).pipe(
+      map(salesJunctionDoc =>{
+        return {'thisMonth': createSalesJunction.reduce((acc, curr) => acc += curr.paid_amount, 0),
+                'previousMonth': salesJunctionDoc.reduce((acc, curr) => acc += curr.paid_amount, 0)}
       }))
   }
 

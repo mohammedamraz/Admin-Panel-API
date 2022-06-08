@@ -17,11 +17,11 @@ export class AdminController {
     return this.adminService.fetchSalesPartnerAccountDetails()
   }
 
-  @Get('earning')
-  fetchEarnings(@Param('salesCode') salesCode: string, @Query() period: Period) {
-      Logger.debug(`fetchEarnings()salesCode: [${salesCode}] `, APP);
+  @Get('commissionDispersal/')
+  fetchCommissionDispersal(@Param() month: number) {
+      Logger.debug(`fetchEarnings()salesCode: [${month}] `, APP);
 
-      return this.adminService.fetchEarnings(period);
+      return this.adminService.fetchCommissionDispersal();
   }
 
   @Get('sales/account-details/:sales_code')

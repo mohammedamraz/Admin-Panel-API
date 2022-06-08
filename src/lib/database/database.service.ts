@@ -1,3 +1,4 @@
+/* eslint-disable max-lines */
 import { Injectable, Logger, Type } from '@nestjs/common';
 import { Pool } from 'pg';
 import { from, Observable, of } from 'rxjs';
@@ -262,6 +263,13 @@ export class DatabaseService<T> implements DatabaseInterface<T> {
     Logger.debug(`fetchAllByPeriod(): params ${[JSON.stringify(period)]}`, APP);
 
     const query = `SELECT * FROM ${this.tableName} WHERE created_date > CURRENT_DATE - INTERVAL '${period}'`;
+    return this.runQuery(query);
+  }
+
+  fetchByMonth(month: string): Observable<T[]> {
+    Logger.debug(`fetchByMonth(): params ${[JSON.stringify(month)]}`, APP);
+
+    const query = `SELECT * FROM ${this.tableName} WHERE date_part('month',created_date) =  '${month}'`;
     return this.runQuery(query);
   }
 
