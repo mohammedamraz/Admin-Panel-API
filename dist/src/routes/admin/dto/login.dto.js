@@ -9,8 +9,9 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.fetchDAte = exports.formatDate = exports.PERIOD = exports.PeriodRange = exports.Periodicity = exports.ConfirmForgotPasswordDTO = exports.ForgotPasswordDTO = exports.LoginDTO = void 0;
+exports.makeStateFormat = exports.State = exports.STATE = exports.Stateness = exports.fetchDAte = exports.formatDate = exports.PERIODADMIN = exports.PeriodRange = exports.PeriodicityAdmin = exports.ConfirmForgotPasswordDTO = exports.ForgotPasswordDTO = exports.LoginDTO = void 0;
 const class_validator_1 = require("class-validator");
+const create_sale_dto_1 = require("../../sales/dto/create-sale.dto");
 class LoginDTO {
 }
 __decorate([
@@ -44,21 +45,21 @@ __decorate([
     __metadata("design:type", String)
 ], ConfirmForgotPasswordDTO.prototype, "password", void 0);
 exports.ConfirmForgotPasswordDTO = ConfirmForgotPasswordDTO;
-var Periodicity;
-(function (Periodicity) {
-    Periodicity["MONTH"] = "month";
-    Periodicity["QUARTER"] = "quarter";
-    Periodicity["YEARLY"] = "year";
-})(Periodicity = exports.Periodicity || (exports.Periodicity = {}));
+var PeriodicityAdmin;
+(function (PeriodicityAdmin) {
+    PeriodicityAdmin["MONTH"] = "month";
+    PeriodicityAdmin["QUARTER"] = "quarter";
+    PeriodicityAdmin["YEARLY"] = "year";
+})(PeriodicityAdmin = exports.PeriodicityAdmin || (exports.PeriodicityAdmin = {}));
 class PeriodRange {
 }
 __decorate([
     (0, class_validator_1.IsNotEmpty)(),
-    (0, class_validator_1.IsEnum)(Periodicity),
+    (0, class_validator_1.IsEnum)(PeriodicityAdmin),
     __metadata("design:type", String)
 ], PeriodRange.prototype, "period", void 0);
 exports.PeriodRange = PeriodRange;
-exports.PERIOD = {
+exports.PERIODADMIN = {
     month: 1,
     quarter: 3,
     year: 12
@@ -80,4 +81,30 @@ const fetchDAte = (date, period) => {
     };
 };
 exports.fetchDAte = fetchDAte;
+var Stateness;
+(function (Stateness) {
+    Stateness["ACTIVE"] = "active";
+    Stateness["INACTIVE"] = "inactive";
+    Stateness["ALL"] = "all";
+})(Stateness = exports.Stateness || (exports.Stateness = {}));
+exports.STATE = {
+    active: true,
+    inactive: false,
+    ALL: undefined
+};
+class State {
+}
+__decorate([
+    (0, class_validator_1.IsNotEmpty)(),
+    (0, class_validator_1.IsEnum)(Stateness),
+    __metadata("design:type", String)
+], State.prototype, "state", void 0);
+__decorate([
+    (0, class_validator_1.IsNotEmpty)(),
+    (0, class_validator_1.IsEnum)(create_sale_dto_1.Periodicity),
+    __metadata("design:type", String)
+], State.prototype, "period", void 0);
+exports.State = State;
+const makeStateFormat = (state) => exports.STATE[state.state];
+exports.makeStateFormat = makeStateFormat;
 //# sourceMappingURL=login.dto.js.map

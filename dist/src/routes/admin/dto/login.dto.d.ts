@@ -1,3 +1,4 @@
+import { Periodicity } from 'src/routes/sales/dto/create-sale.dto';
 export declare class LoginDTO {
     fedoApp: string;
     username: string;
@@ -13,15 +14,15 @@ export declare class ConfirmForgotPasswordDTO {
     username: string;
     password: string;
 }
-export declare enum Periodicity {
+export declare enum PeriodicityAdmin {
     MONTH = "month",
     QUARTER = "quarter",
     YEARLY = "year"
 }
 export declare class PeriodRange {
-    period: Periodicity;
+    period: PeriodicityAdmin;
 }
-export declare const PERIOD: {
+export declare const PERIODADMIN: {
     month: number;
     quarter: number;
     year: number;
@@ -31,3 +32,18 @@ export declare const fetchDAte: (date: Date, period: number) => {
     from: string;
     to: string;
 };
+export declare enum Stateness {
+    ACTIVE = "active",
+    INACTIVE = "inactive",
+    ALL = "all"
+}
+export declare const STATE: {
+    active: boolean;
+    inactive: boolean;
+    ALL: any;
+};
+export declare class State {
+    state: Stateness;
+    period: Periodicity;
+}
+export declare const makeStateFormat: (state: State) => any;

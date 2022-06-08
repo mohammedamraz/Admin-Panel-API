@@ -30,6 +30,10 @@ let AdminController = class AdminController {
         common_1.Logger.debug(`fetchCommissionDispersals() period: [${JSON.stringify(period.period)}]`, APP);
         return this.adminService.fetchCommissionDispersals(period);
     }
+    fetchInvitationResponses(state) {
+        common_1.Logger.debug(`fetchInvitationResponses() state: [${JSON.stringify(state)}]`, APP);
+        return this.adminService.fetchInvitationResponse(state);
+    }
     fetchSalesPartnerAccountDetailsBySalesCode(sales_code) {
         common_1.Logger.debug(`fetchSalesPartnerAccountDetailsByID()`, APP);
         return this.adminService.fetchSalesPartnerAccountDetailsBySalesCode(sales_code);
@@ -84,6 +88,13 @@ __decorate([
     __metadata("design:paramtypes", [login_dto_1.PeriodRange]),
     __metadata("design:returntype", void 0)
 ], AdminController.prototype, "fetchCommissionDispersals", null);
+__decorate([
+    (0, common_1.Get)('invitationResponses'),
+    __param(0, (0, common_1.Query)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [login_dto_1.State]),
+    __metadata("design:returntype", void 0)
+], AdminController.prototype, "fetchInvitationResponses", null);
 __decorate([
     (0, common_1.Get)('sales/account-details/:sales_code'),
     __param(0, (0, common_1.Param)('sales_code')),

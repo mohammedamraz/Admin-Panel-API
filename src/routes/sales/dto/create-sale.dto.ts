@@ -1,4 +1,4 @@
-import { Email } from "aws-sdk/clients/codecommit";
+    import { Email } from "aws-sdk/clients/codecommit";
 import { phoneNumber } from "aws-sdk/clients/importexport";
 import { IsEmail, IsEnum, IsNotEmpty, IsOptional } from "class-validator";
 

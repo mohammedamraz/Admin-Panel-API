@@ -1,6 +1,6 @@
 import { AdminService } from './admin.service';
 import { createPaid, MobileNumberAndOtpDtO, MobileNumberDtO, ParamDto, requestDto } from './dto/create-admin.dto';
-import { ConfirmForgotPasswordDTO, ForgotPasswordDTO, LoginDTO, PeriodRange } from './dto/login.dto';
+import { ConfirmForgotPasswordDTO, ForgotPasswordDTO, LoginDTO, PeriodRange, State } from './dto/login.dto';
 export declare class AdminController {
     private readonly adminService;
     constructor(adminService: AdminService);
@@ -9,6 +9,9 @@ export declare class AdminController {
         thisMonth: number;
         previousMonth: number;
     }>;
+    fetchInvitationResponses(state: State): import("rxjs").Observable<Promise<{
+        signups: any;
+    }>>;
     fetchSalesPartnerAccountDetailsBySalesCode(sales_code: string): import("rxjs").Observable<Promise<any[]>>;
     sentOtpToPhoneNumber(mobileNumberDtO: MobileNumberDtO): any;
     verifyOtp(mobileNumberAndOtpDtO: MobileNumberAndOtpDtO): any;

@@ -18,6 +18,7 @@ const axios_1 = require("@nestjs/axios");
 const constants_1 = require("../../constants");
 const database_decorator_1 = require("../../lib/database/database.decorator");
 const database_service_1 = require("../../lib/database/database.service");
+const create_sale_dto_1 = require("../sales/dto/create-sale.dto");
 const rxjs_1 = require("rxjs");
 const login_dto_1 = require("./dto/login.dto");
 const helper_1 = require("../../constants/helper");
@@ -92,14 +93,27 @@ let AdminService = class AdminService {
     }
     fetchCommissionDispersals(period) {
         common_1.Logger.debug(`fetchEarnings()  }`, APP);
-        return this.salesJunctionDb.fetchBetweenRange((0, login_dto_1.fetchDAte)(new Date(), login_dto_1.PERIOD[period.period])).pipe((0, rxjs_1.switchMap)(salesJunctionDoc => this.fetchPreviousMonthCommissionDispersal(salesJunctionDoc, period, new Date((0, login_dto_1.fetchDAte)(new Date(), login_dto_1.PERIOD[period.period]).from))));
+        return this.salesJunctionDb.fetchBetweenRange((0, login_dto_1.fetchDAte)(new Date(), login_dto_1.PERIODADMIN[period.period])).pipe((0, rxjs_1.switchMap)(salesJunctionDoc => this.fetchPreviousMonthCommissionDispersal(salesJunctionDoc, period, new Date((0, login_dto_1.fetchDAte)(new Date(), login_dto_1.PERIODADMIN[period.period]).from))));
     }
     fetchPreviousMonthCommissionDispersal(createSalesJunction, period, date) {
         common_1.Logger.debug(`fetchPreviousMonthCommissionDispersal()`, APP);
-        return this.salesJunctionDb.fetchBetweenRange((0, login_dto_1.fetchDAte)(date, login_dto_1.PERIOD[period.period])).pipe((0, rxjs_1.map)(salesJunctionDoc => {
+        return this.salesJunctionDb.fetchBetweenRange((0, login_dto_1.fetchDAte)(date, login_dto_1.PERIODADMIN[period.period])).pipe((0, rxjs_1.map)(salesJunctionDoc => {
             return { 'thisMonth': createSalesJunction.reduce((acc, curr) => acc += curr.paid_amount, 0),
                 'previousMonth': salesJunctionDoc.reduce((acc, curr) => acc += curr.paid_amount, 0) };
         }));
+    }
+    fetchInvitationResponse(state) {
+        common_1.Logger.debug(`fetchInvitationResponse() state: [${JSON.stringify(state)}]`, APP);
+        if (state.state !== 'all')
+            return this.salesDb.find({ is_active: (0, login_dto_1.makeStateFormat)(state) }).pipe((0, rxjs_1.map)(doc => this.fetchSignUps(doc, state)));
+        else
+            return this.salesDb.fetchAll().pipe((0, rxjs_1.map)(doc => this.fetchSignUps(doc, state)));
+    }
+    fetchSignUps(createSalesPartner, state) {
+        common_1.Logger.debug(`fetchSignUps() createSalesPartner: [${JSON.stringify(createSalesPartner)}]`, APP);
+        let signups = [];
+        return (0, rxjs_1.lastValueFrom)((0, rxjs_1.from)(createSalesPartner).pipe((0, rxjs_1.concatMap)(salesPartner => this.salesuser.findByPeriod({ columnName: "sales_code", columnvalue: salesPartner.sales_code, period: create_sale_dto_1.PERIOD[state.period] })), (0, rxjs_1.map)(salesuser => signups.push(salesuser.length))))
+            .then(() => { return { 'signups': signups.reduce((acc, curr) => acc += curr, 0) }; });
     }
     async fetchUser(createSalesPartner) {
         common_1.Logger.debug(`fetchUser() createSalesPartner: ${JSON.stringify(createSalesPartner)}`, APP);

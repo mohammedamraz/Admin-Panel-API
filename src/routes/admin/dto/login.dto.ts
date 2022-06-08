@@ -1,5 +1,6 @@
 
 import { IsEnum, IsNotEmpty, IsOptional } from 'class-validator';
+import { Periodicity } from 'src/routes/sales/dto/create-sale.dto';
 
 export class LoginDTO {
   fedoApp: string;
@@ -25,7 +26,7 @@ export class ConfirmForgotPasswordDTO {
   password: string;
 }
 
-export enum Periodicity {
+export enum PeriodicityAdmin {
   MONTH = 'month',
   QUARTER = 'quarter',
   YEARLY = 'year',
@@ -33,11 +34,11 @@ export enum Periodicity {
 
 export class PeriodRange {
   @IsNotEmpty()
-  @IsEnum(Periodicity)
-  period: Periodicity;
+  @IsEnum(PeriodicityAdmin)
+  period: PeriodicityAdmin;
 }
 
-export const PERIOD = {
+export const PERIODADMIN = {
   month: 1,
   quarter: 3,
   year: 12
@@ -59,3 +60,25 @@ export const fetchDAte = (date: Date, period: number) =>{
      'from': formatDate(date.setMonth((date.getMonth()) - period)), 
      'to': formatDate(d)}}
 
+export enum Stateness {
+  ACTIVE = 'active',
+  INACTIVE = 'inactive',
+  ALL = 'all',
+}
+
+export const STATE = {
+  active: true,
+  inactive: false,
+  ALL: undefined
+}
+export class State {
+  @IsNotEmpty()
+  @IsEnum(Stateness)
+  state: Stateness;
+
+  @IsNotEmpty()
+  @IsEnum(Periodicity)
+  period: Periodicity;
+}
+
+export const makeStateFormat = (state: State) => STATE[state.state]
