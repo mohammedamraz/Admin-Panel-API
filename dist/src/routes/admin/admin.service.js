@@ -90,12 +90,15 @@ let AdminService = class AdminService {
             return this.fetchUser(salesDoc);
         }), (0, rxjs_1.catchError)(err => { throw new common_1.BadRequestException(err.message); }));
     }
-    fetchEarnings(period) {
-        common_1.Logger.debug(`fetchEarnings()  period: ${JSON.stringify(period)}`, APP);
-        return this.salesJunctionDb.fetchAllByPeriod((0, create_sale_dto_1.Interval)(period)).pipe((0, rxjs_1.map)(salesjuncdoc => {
-            if (salesjuncdoc.length === 0)
-                throw new common_1.NotFoundException("no Account found");
-            return (0, create_sale_dto_1.makeEarningFormat)(salesjuncdoc.reduce((acc, curr) => ([acc[0] += curr.commission_amount, acc[1] += curr.paid_amount]), [0, 0]));
+    fetchCommissionDispersals() {
+        common_1.Logger.debug(`fetchEarnings()  }`, APP);
+        return this.salesJunctionDb.fetchByMonth(new Date().getMonth().toString()).pipe((0, rxjs_1.switchMap)(salesJunctionDoc => this.fetchPreviousMonthCommissionDispersal(salesJunctionDoc)));
+    }
+    fetchPreviousMonthCommissionDispersal(createSalesJunction) {
+        common_1.Logger.debug(`fetchPreviousMonthCommissionDispersal()`, APP);
+        return this.salesJunctionDb.fetchByMonth(((new Date().getMonth()) - 1).toString()).pipe((0, rxjs_1.map)(salesJunctionDoc => {
+            return { 'thisMonth': createSalesJunction.reduce((acc, curr) => acc += curr.paid_amount, 0),
+                'previousMonth': salesJunctionDoc.reduce((acc, curr) => acc += curr.paid_amount, 0) };
         }));
     }
     fetchInvitationResponse(salesCode, period) {

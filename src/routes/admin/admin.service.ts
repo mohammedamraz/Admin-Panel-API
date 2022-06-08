@@ -50,7 +50,7 @@ export class AdminService {
     )
   }
 
-  fetchCommissionDispersal(){
+  fetchCommissionDispersals(){
     Logger.debug(`fetchEarnings()  }`, APP);
 
     return this.salesJunctionDb.fetchByMonth(new Date().getMonth().toString()).pipe(

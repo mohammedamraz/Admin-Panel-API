@@ -22,7 +22,14 @@ export declare class AdminService {
     salesPartnerDetails: any;
     salesParterEmail: any;
     fetchSalesPartnerAccountDetails(): import("rxjs").Observable<Promise<any[]>>;
-    fetchEarnings(period: Period): import("rxjs").Observable<import("../sales/dto/create-sale.dto").EarningResponse>;
+    fetchCommissionDispersals(): import("rxjs").Observable<{
+        thisMonth: number;
+        previousMonth: number;
+    }>;
+    fetchPreviousMonthCommissionDispersal(createSalesJunction: CreateSalesJunction[]): import("rxjs").Observable<{
+        thisMonth: number;
+        previousMonth: number;
+    }>;
     fetchInvitationResponse(salesCode: string, period: Period): import("rxjs").Observable<{
         signup: number;
     }>;

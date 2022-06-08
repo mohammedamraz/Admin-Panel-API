@@ -206,6 +206,11 @@ let DatabaseService = class DatabaseService {
         const query = `SELECT * FROM ${this.tableName} WHERE created_date > CURRENT_DATE - INTERVAL '${period}'`;
         return this.runQuery(query);
     }
+    fetchByMonth(month) {
+        common_1.Logger.debug(`fetchByMonth(): params ${[JSON.stringify(month)]}`, APP);
+        const query = `SELECT * FROM ${this.tableName} WHERE date_part('month',created_date) =  '${month}'`;
+        return this.runQuery(query);
+    }
 };
 DatabaseService = __decorate([
     (0, common_1.Injectable)(),
