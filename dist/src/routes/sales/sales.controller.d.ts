@@ -4,10 +4,11 @@ export declare class SalesController {
     private readonly salesService;
     constructor(salesService: SalesService);
     createSalesPartner(createSalesPartner: CreateSalesPartner): import("rxjs").Observable<CreateSalesPartner[]>;
+    addCommission(salesCode: string): import("rxjs").Observable<import("./dto/create-sale.dto").CreateSalesJunction[]>;
     deleteSalesPartner(id: string): import("rxjs").Observable<Promise<CreateSalesPartner[]>>;
     fetchSalesPartnerById(id: string): import("rxjs").Observable<CreateSalesPartner[]>;
     fetchEarnings(salesCode: string, period: Period): import("rxjs").Observable<import("./dto/create-sale.dto").EarningResponse>;
-    fetchInvitationResponse(salesCode: string): import("rxjs").Observable<{
+    fetchInvitationResponse(salesCode: string, period: Period): import("rxjs").Observable<{
         signup: number;
     }>;
     updateSalesPartner(id: string, updateSalesPartnerDto: UpdateSalesPartner): import("rxjs").Observable<Promise<CreateSalesPartner[]>>;

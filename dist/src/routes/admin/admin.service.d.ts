@@ -1,6 +1,6 @@
 import { HttpService } from '@nestjs/axios';
 import { DatabaseService } from 'src/lib/database/database.service';
-import { CreateSalesJunction, CreateSalesPartner, CreateSalesPartnerRequest } from '../sales/dto/create-sale.dto';
+import { CreateSalesJunction, CreateSalesPartner, CreateSalesPartnerRequest, Period, SalesUserJunction } from '../sales/dto/create-sale.dto';
 import { createPaid, MobileNumberAndOtpDtO, MobileNumberDtO, ParamDto, requestDto, User } from './dto/create-admin.dto';
 import { ConfirmForgotPasswordDTO, ForgotPasswordDTO, LoginDTO } from './dto/login.dto';
 import { TemplateService } from 'src/constants/template.service';
@@ -8,9 +8,10 @@ export declare class AdminService {
     private readonly salesJunctionDb;
     private readonly salesDb;
     private readonly salesPartnerRequestDb;
+    private readonly salesuser;
     private readonly templateService;
     private http;
-    constructor(salesJunctionDb: DatabaseService<CreateSalesJunction>, salesDb: DatabaseService<CreateSalesPartner>, salesPartnerRequestDb: DatabaseService<CreateSalesPartnerRequest>, templateService: TemplateService, http: HttpService);
+    constructor(salesJunctionDb: DatabaseService<CreateSalesJunction>, salesDb: DatabaseService<CreateSalesPartner>, salesPartnerRequestDb: DatabaseService<CreateSalesPartnerRequest>, salesuser: DatabaseService<SalesUserJunction>, templateService: TemplateService, http: HttpService);
     accountSid: string;
     authToken: string;
     serviceSid: string;
@@ -21,6 +22,10 @@ export declare class AdminService {
     salesPartnerDetails: any;
     salesParterEmail: any;
     fetchSalesPartnerAccountDetails(): import("rxjs").Observable<Promise<any[]>>;
+    fetchEarnings(period: Period): import("rxjs").Observable<import("../sales/dto/create-sale.dto").EarningResponse>;
+    fetchInvitationResponse(salesCode: string, period: Period): import("rxjs").Observable<{
+        signup: number;
+    }>;
     fetchUser(createSalesPartner: CreateSalesPartner[]): Promise<any[]>;
     fetchAccount(userDoc: User[], saleDoc: CreateSalesPartner): Promise<{
         account_holder_name: string;

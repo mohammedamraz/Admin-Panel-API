@@ -18,15 +18,17 @@ const axios_1 = require("@nestjs/axios");
 const constants_1 = require("../../constants");
 const database_decorator_1 = require("../../lib/database/database.decorator");
 const database_service_1 = require("../../lib/database/database.service");
+const create_sale_dto_1 = require("../sales/dto/create-sale.dto");
 const rxjs_1 = require("rxjs");
 const helper_1 = require("../../constants/helper");
 const template_service_1 = require("../../constants/template.service");
 const APP = "AdminService";
 let AdminService = class AdminService {
-    constructor(salesJunctionDb, salesDb, salesPartnerRequestDb, templateService, http) {
+    constructor(salesJunctionDb, salesDb, salesPartnerRequestDb, salesuser, templateService, http) {
         this.salesJunctionDb = salesJunctionDb;
         this.salesDb = salesDb;
         this.salesPartnerRequestDb = salesPartnerRequestDb;
+        this.salesuser = salesuser;
         this.templateService = templateService;
         this.http = http;
         this.accountSid = constants_1.AKASH_ACCOUNTID;
@@ -87,6 +89,22 @@ let AdminService = class AdminService {
                 throw new common_1.NotFoundException("sales partner not found");
             return this.fetchUser(salesDoc);
         }), (0, rxjs_1.catchError)(err => { throw new common_1.BadRequestException(err.message); }));
+    }
+    fetchEarnings(period) {
+        common_1.Logger.debug(`fetchEarnings()  period: ${JSON.stringify(period)}`, APP);
+        return this.salesJunctionDb.fetchAllByPeriod((0, create_sale_dto_1.Interval)(period)).pipe((0, rxjs_1.map)(salesjuncdoc => {
+            if (salesjuncdoc.length === 0)
+                throw new common_1.NotFoundException("no Account found");
+            return (0, create_sale_dto_1.makeEarningFormat)(salesjuncdoc.reduce((acc, curr) => ([acc[0] += curr.commission_amount, acc[1] += curr.paid_amount]), [0, 0]));
+        }));
+    }
+    fetchInvitationResponse(salesCode, period) {
+        common_1.Logger.debug(`fetchInvitationResponse() salesCode: ${salesCode}`, APP);
+        return this.salesuser.findByPeriod({ columnName: "sales_code", columnvalue: salesCode, period: (0, create_sale_dto_1.Interval)(period) }).pipe((0, rxjs_1.catchError)(error => { throw new common_1.BadRequestException(error.message); }), (0, rxjs_1.map)(salesuser => {
+            if (salesuser.length === 0)
+                throw new common_1.NotFoundException("no Account found");
+            return { "signup": salesuser.length };
+        }));
     }
     async fetchUser(createSalesPartner) {
         common_1.Logger.debug(`fetchUser() createSalesPartner: ${JSON.stringify(createSalesPartner)}`, APP);
@@ -289,7 +307,9 @@ AdminService = __decorate([
     __param(0, (0, database_decorator_1.DatabaseTable)('sales_commission_junction')),
     __param(1, (0, database_decorator_1.DatabaseTable)('sales_partner')),
     __param(2, (0, database_decorator_1.DatabaseTable)('sales_partner_requests')),
+    __param(3, (0, database_decorator_1.DatabaseTable)('sales_user_junction')),
     __metadata("design:paramtypes", [database_service_1.DatabaseService,
+        database_service_1.DatabaseService,
         database_service_1.DatabaseService,
         database_service_1.DatabaseService,
         template_service_1.TemplateService,

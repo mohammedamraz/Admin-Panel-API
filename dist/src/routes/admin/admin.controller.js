@@ -14,6 +14,7 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.AdminController = void 0;
 const common_1 = require("@nestjs/common");
+const create_sale_dto_1 = require("../sales/dto/create-sale.dto");
 const admin_service_1 = require("./admin.service");
 const create_admin_dto_1 = require("./dto/create-admin.dto");
 const login_dto_1 = require("./dto/login.dto");
@@ -25,6 +26,10 @@ let AdminController = class AdminController {
     fetchSalesPartnerAccountDetails() {
         common_1.Logger.debug(`getSalesPartnerAccountDetails()`, APP);
         return this.adminService.fetchSalesPartnerAccountDetails();
+    }
+    fetchEarnings(salesCode, period) {
+        common_1.Logger.debug(`fetchEarnings()salesCode: [${salesCode}] `, APP);
+        return this.adminService.fetchEarnings(period);
     }
     fetchSalesPartnerAccountDetailsBySalesCode(sales_code) {
         common_1.Logger.debug(`fetchSalesPartnerAccountDetailsByID()`, APP);
@@ -73,6 +78,14 @@ __decorate([
     __metadata("design:paramtypes", []),
     __metadata("design:returntype", void 0)
 ], AdminController.prototype, "fetchSalesPartnerAccountDetails", null);
+__decorate([
+    (0, common_1.Get)('earning'),
+    __param(0, (0, common_1.Param)('salesCode')),
+    __param(1, (0, common_1.Query)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, create_sale_dto_1.Period]),
+    __metadata("design:returntype", void 0)
+], AdminController.prototype, "fetchEarnings", null);
 __decorate([
     (0, common_1.Get)('sales/account-details/:sales_code'),
     __param(0, (0, common_1.Param)('sales_code')),

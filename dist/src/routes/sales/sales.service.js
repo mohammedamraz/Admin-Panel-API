@@ -22,11 +22,12 @@ const helper_1 = require("../../constants/helper");
 const rxjs_1 = require("rxjs");
 const APP = 'SalesService';
 let SalesService = class SalesService {
-    constructor(db, invitationJunctiondb, junctiondb, withdrawndb, http) {
+    constructor(db, invitationJunctiondb, junctiondb, withdrawndb, salesuser, http) {
         this.db = db;
         this.invitationJunctiondb = invitationJunctiondb;
         this.junctiondb = junctiondb;
         this.withdrawndb = withdrawndb;
+        this.salesuser = salesuser;
         this.http = http;
     }
     createSalesPartner(createSalesPartner) {
@@ -194,13 +195,18 @@ let SalesService = class SalesService {
             return (0, create_sale_dto_1.makeEarningFormat)(salesjuncdoc.reduce((acc, curr) => ([acc[0] += curr.commission_amount, acc[1] += curr.paid_amount]), [0, 0]));
         }));
     }
-    fetchInvitationResponse(salesCode) {
+    fetchInvitationResponse(salesCode, period) {
         common_1.Logger.debug(`fetchInvitationResponse() salesCode: ${salesCode}`, APP);
-        return (0, helper_1.fetchAccountBySalesCode)(salesCode).pipe((0, rxjs_1.catchError)(error => { throw new common_1.BadRequestException(error.message); }), (0, rxjs_1.map)(accounts => {
-            if (accounts.length === 0)
+        return this.salesuser.findByPeriod({ columnName: "sales_code", columnvalue: salesCode, period: (0, create_sale_dto_1.Interval)(period) }).pipe((0, rxjs_1.catchError)(error => { throw new common_1.BadRequestException(error.message); }), (0, rxjs_1.map)(salesuser => {
+            if (salesuser.length === 0)
                 throw new common_1.NotFoundException("no Account found");
-            return { "signup": (accounts.filter(account => account.zwitch_id !== null)).length };
+            return { "signup": salesuser.length };
         }));
+    }
+    addCommission(salesCode) {
+        common_1.Logger.debug(`addCommission() salesCode: ${salesCode}`, APP);
+        return this.fetchSalesBySalesCode(salesCode).pipe((0, rxjs_1.switchMap)(salesCommission => (0, rxjs_1.lastValueFrom)(this.junctiondb.find({ "sales_code": String(salesCode), }))
+            .then(res => { console.log('dds', res); return [salesCommission, res[res.length - 1]]; })), (0, rxjs_1.switchMap)(async ([salesCommission, res]) => { await this.salesuser.save({ sales_code: salesCode }); return [salesCommission, res]; }), (0, rxjs_1.switchMap)(([salesCommission, res]) => this.junctiondb.save({ sales_code: salesCode, commission_amount: salesCommission["commission"], dues: (Number(res['dues']) + Number(salesCommission["commission"])) })));
     }
 };
 SalesService = __decorate([
@@ -209,7 +215,9 @@ SalesService = __decorate([
     __param(1, (0, database_decorator_1.DatabaseTable)('sales_partner_invitation_junction')),
     __param(2, (0, database_decorator_1.DatabaseTable)('sales_commission_junction')),
     __param(3, (0, database_decorator_1.DatabaseTable)('sales_withdrawn_amount')),
+    __param(4, (0, database_decorator_1.DatabaseTable)('sales_user_junction')),
     __metadata("design:paramtypes", [database_service_1.DatabaseService,
+        database_service_1.DatabaseService,
         database_service_1.DatabaseService,
         database_service_1.DatabaseService,
         database_service_1.DatabaseService,

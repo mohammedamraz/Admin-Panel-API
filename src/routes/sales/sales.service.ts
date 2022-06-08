@@ -260,7 +260,8 @@ export class SalesService {
       switchMap(salesCommission => 
            lastValueFrom(this.junctiondb.find({ "sales_code": String(salesCode), }))
           .then(res =>{ console.log('dds',res);return [salesCommission, res[res.length - 1]]})),
-      switchMap(([salesCommission, res]) =>  
+      switchMap(async ([salesCommission, res]) =>{ await this.salesuser.save({sales_code: salesCode}); return [salesCommission, res]}), 
+      switchMap(([salesCommission, res]) =>
       this.junctiondb.save({ sales_code: salesCode, commission_amount: salesCommission["commission"], dues: (Number(res['dues']) + Number(salesCommission["commission"])) })
 
       )
