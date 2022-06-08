@@ -18,15 +18,17 @@ const axios_1 = require("@nestjs/axios");
 const constants_1 = require("../../constants");
 const database_decorator_1 = require("../../lib/database/database.decorator");
 const database_service_1 = require("../../lib/database/database.service");
+const create_admin_dto_1 = require("./dto/create-admin.dto");
 const rxjs_1 = require("rxjs");
 const helper_1 = require("../../constants/helper");
 const template_service_1 = require("../../constants/template.service");
 const APP = "AdminService";
 let AdminService = class AdminService {
-    constructor(salesJunctionDb, salesDb, salesPartnerRequestDb, templateService, http) {
+    constructor(salesJunctionDb, salesDb, salesPartnerRequestDb, salesUserJunctionDb, templateService, http) {
         this.salesJunctionDb = salesJunctionDb;
         this.salesDb = salesDb;
         this.salesPartnerRequestDb = salesPartnerRequestDb;
+        this.salesUserJunctionDb = salesUserJunctionDb;
         this.templateService = templateService;
         this.http = http;
         this.accountSid = constants_1.AKASH_ACCOUNTID;
@@ -82,7 +84,7 @@ let AdminService = class AdminService {
     }
     fetchSalesPartnerAccountDetails() {
         common_1.Logger.debug(`fetchSalesPartnerAccountDetails()`, APP);
-        return this.salesDb.find({ block_account: true, is_hsa_account: true }).pipe((0, rxjs_1.map)(salesDoc => {
+        return this.salesDb.find({ block_account: false, is_hsa_account: true }).pipe((0, rxjs_1.map)(salesDoc => {
             if (salesDoc.length === 0)
                 throw new common_1.NotFoundException("sales partner not found");
             return this.fetchUser(salesDoc);
@@ -232,7 +234,6 @@ let AdminService = class AdminService {
     }
     async updatingPaidAmount(updateAmountdto) {
         common_1.Logger.debug(`updatePaidAmount() updateAmountdto: [${JSON.stringify(updateAmountdto)}]`, APP);
-        console.log(updateAmountdto['data']);
         updateAmountdto['data'].map(res => {
             return (0, rxjs_1.lastValueFrom)(this.salesJunctionDb.find({ "sales_code": res.salesCode }).pipe((0, rxjs_1.map)(doc => {
                 const sort_doc = Math.max(...doc.map(user => parseInt(user['id'].toString())));
@@ -283,41 +284,35 @@ let AdminService = class AdminService {
         var encryptedString = key_public.encrypt(password, 'base64');
         return encryptedString;
     }
-    fetchCommissionReport(sales_code, year) {
-        common_1.Logger.debug(`fetchCommissionReport() year: [${year}] sales_code: [${sales_code}]`, APP);
+    fetchCommissionReport(year) {
+        common_1.Logger.debug(`fetchCommissionReport() year: [${year}]`, APP);
         const reportData = [];
-        return (0, rxjs_1.from)(this.fetchmonths((year))).pipe((0, rxjs_1.concatMap)(async (doc) => {
-            console.log('da', doc);
-            return await (0, rxjs_1.lastValueFrom)(this.salesJunctionDb.fetchCommissionReportByYear(year, doc))
-                .then(doc1 => {
-                const newDoc = doc1.filter(item => item['sales_code'] == sales_code);
-                const paid = newDoc.map(res => res.paid_amount);
-                const month = newDoc.map(res => res.created_date);
-                const paid_on = newDoc.map(res => res.update_date);
-                const paid1 = paid.pop();
-                const month1 = month.pop();
-                const paid_on1 = paid_on.pop();
-                console.log('newDoc', paid1, "month", month1, "paid_on", paid_on1);
-                reportData.push({ "paid_amount": paid1, "month": month1, "paid-on": paid_on1 });
+        return (0, rxjs_1.from)((0, create_admin_dto_1.fetchmonths)((year))).pipe((0, rxjs_1.concatMap)(async (month) => {
+            return await (0, rxjs_1.lastValueFrom)(this.salesJunctionDb.fetchCommissionReportByYear(year, month))
+                .then(async (salesJunctionDoc) => {
+                console.log("salesJunctionDoc", salesJunctionDoc);
+                const paid_amount = salesJunctionDoc.map(doc => doc.paid_amount);
+                const total_paid_amount = paid_amount.reduce((next, prev) => next + prev, 0);
+                const due = salesJunctionDoc.map(doc => doc.dues);
+                const total_dues = due.reduce((next, prev) => Number(next) + Number(prev), 0);
+                const date = salesJunctionDoc.map(doc => { if (doc.paid_amount > 0)
+                    return doc.created_date; });
+                const paid_on = date.filter((res) => res);
+                await this.fetchSignup(year, month)
+                    .then(signup => {
+                    reportData.push({ "total_paid_amount": total_paid_amount, "month": month, "total_dues": total_dues, "hsa_sing_up": signup, "paid_on": paid_on[0] });
+                });
+                return reportData;
             })
-                .catch(error => { throw new common_1.NotFoundException("data not found"); })
+                .catch(error => { throw new common_1.NotFoundException(error.message); })
                 .then(doc => reportData);
         }));
     }
-    fetchmonths(year) {
-        common_1.Logger.debug(`fetchmonths() year: [${year}]`, APP);
-        let a = [];
-        let i = 0;
-        if (new Date().getFullYear().toString() === year.toString()) {
-            for (i = new Date().getMonth() + 1; i > 0; i--)
-                a.push(i);
-            return a;
-        }
-        else {
-            for (i = 12; i > 0; i--)
-                a.push(i);
-            return a;
-        }
+    async fetchSignup(year, month) {
+        common_1.Logger.debug(`fetchSignup() year: [${year}] month: [${month}]`, APP);
+        return await (0, rxjs_1.lastValueFrom)(this.salesUserJunctionDb.fetchCommissionReportByYear(year, month))
+            .then(userJunctionDoc => { return userJunctionDoc.length; })
+            .catch(error => { throw new common_1.UnprocessableEntityException(error.message); });
     }
 };
 AdminService = __decorate([
@@ -325,7 +320,9 @@ AdminService = __decorate([
     __param(0, (0, database_decorator_1.DatabaseTable)('sales_commission_junction')),
     __param(1, (0, database_decorator_1.DatabaseTable)('sales_partner')),
     __param(2, (0, database_decorator_1.DatabaseTable)('sales_partner_requests')),
+    __param(3, (0, database_decorator_1.DatabaseTable)('sales_user_junction')),
     __metadata("design:paramtypes", [database_service_1.DatabaseService,
+        database_service_1.DatabaseService,
         database_service_1.DatabaseService,
         database_service_1.DatabaseService,
         template_service_1.TemplateService,

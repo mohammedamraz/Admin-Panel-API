@@ -9,9 +9,10 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.createPaid = exports.createPaidAmountDto = exports.createAccount = exports.sendEmailOnIncorrectBankDetailsDto = exports.AccountZwitchResponseBody = exports.User = exports.ParamDto = exports.requestDto = exports.MobileNumberAndOtpDtO = exports.MobileNumberDtO = void 0;
+exports.fetchmonths = exports.createPaid = exports.createPaidAmountDto = exports.createAccount = exports.sendEmailOnIncorrectBankDetailsDto = exports.AccountZwitchResponseBody = exports.User = exports.ParamDto = exports.requestDto = exports.MobileNumberAndOtpDtO = exports.MobileNumberDtO = void 0;
 const class_validator_1 = require("class-validator");
 const class_transformer_1 = require("class-transformer");
+const common_1 = require("@nestjs/common");
 class MobileNumberDtO {
 }
 __decorate([
@@ -87,4 +88,22 @@ __decorate([
     __metadata("design:type", Array)
 ], createPaid.prototype, "data", void 0);
 exports.createPaid = createPaid;
+const fetchmonths = (year) => {
+    common_1.Logger.debug(`fetchmonths() year: [${year}]`);
+    let month = [];
+    let month1 = [];
+    let i = 0;
+    if (new Date().getFullYear().toString() === year.toString()) {
+        for (i = new Date().getMonth() + 1; i > 0; i--)
+            month.push(i);
+        return month;
+    }
+    else {
+        for (i = 12; i > 0; i--)
+            month1.push(i);
+        console.log("month1", month1);
+        return month1;
+    }
+};
+exports.fetchmonths = fetchmonths;
 //# sourceMappingURL=create-admin.dto.js.map

@@ -4,7 +4,7 @@ import { AKASH_ACCOUNTID, AKASH_AUTHTOKEN, AKASH_SERVICEID, APP_DOWNLOAD_LINK, A
 import { DatabaseTable } from 'src/lib/database/database.decorator';
 import { DatabaseService } from 'src/lib/database/database.service';
 import { CreateSalesJunction, CreateSalesPartner, CreateSalesPartnerRequest } from '../sales/dto/create-sale.dto';
-import { AccountZwitchResponseBody,  createPaid, MobileNumberAndOtpDtO, MobileNumberDtO, ParamDto, requestDto, sendEmailOnIncorrectBankDetailsDto, User } from './dto/create-admin.dto';
+import { AccountZwitchResponseBody,  createPaid, fetchmonths, MobileNumberAndOtpDtO, MobileNumberDtO, ParamDto, requestDto, sendEmailOnIncorrectBankDetailsDto, User } from './dto/create-admin.dto';
 import { AxiosResponse } from 'axios';
 import { catchError, concatMap, from, lastValueFrom, map, of, switchMap, throwError } from 'rxjs';
 import { ConfirmForgotPasswordDTO, ForgotPasswordDTO, LoginDTO } from './dto/login.dto';
@@ -22,6 +22,8 @@ export class AdminService {
     @DatabaseTable('sales_commission_junction') private readonly salesJunctionDb: DatabaseService<CreateSalesJunction>,
     @DatabaseTable('sales_partner') private readonly salesDb: DatabaseService<CreateSalesPartner>,
     @DatabaseTable('sales_partner_requests') private readonly salesPartnerRequestDb: DatabaseService<CreateSalesPartnerRequest>,
+    @DatabaseTable('sales_user_junction') private readonly salesUserJunctionDb: DatabaseService<CreateSalesJunction>,
+
     // private readonly accountService: AccountsService,
     // private readonly usersservice: UsersService,
     private readonly templateService: TemplateService,
@@ -40,7 +42,7 @@ export class AdminService {
   fetchSalesPartnerAccountDetails() {
     Logger.debug(`fetchSalesPartnerAccountDetails()`, APP);
 
-    return this.salesDb.find({ block_account: true, is_hsa_account:true }).pipe(
+    return this.salesDb.find({ block_account: false, is_hsa_account:true }).pipe(
       map(salesDoc =>{
           if (salesDoc.length === 0) throw new NotFoundException("sales partner not found");
         return this.fetchUser(salesDoc)
@@ -282,7 +284,7 @@ export class AdminService {
   async updatingPaidAmount(updateAmountdto: createPaid) {
 
     Logger.debug(`updatePaidAmount() updateAmountdto: [${JSON.stringify(updateAmountdto)}]`, APP);
-    console.log(updateAmountdto['data']);
+    
     updateAmountdto['data'].map(res => {
       
       return lastValueFrom(this.salesJunctionDb.find({ "sales_code": res.salesCode }).pipe(map(doc => {
@@ -344,50 +346,55 @@ export class AdminService {
     return encryptedString
   }
 
-  fetchCommissionReport(sales_code:string,year:number){
-    Logger.debug(`fetchCommissionReport() year: [${year}] sales_code: [${sales_code}]`, APP);
+  fetchCommissionReport(year:number){
+    Logger.debug(`fetchCommissionReport() year: [${year}]`, APP);
+
     const reportData=[]
-    return from(this.fetchmonths((year))).pipe(
-      concatMap(async( doc: number) => {
-        console.log('da', doc);
-        return await lastValueFrom(this.salesJunctionDb.fetchCommissionReportByYear(year,doc))
-        .then( doc1=> {
-        const newDoc =doc1.filter(item => item['sales_code'] == sales_code);
-        const paid  =newDoc.map(res=>res.paid_amount)
-        const month  =newDoc.map(res=>res.created_date)
-        const paid_on  =newDoc.map(res=>res.update_date)
-        const paid1 = paid.pop()
-        const month1 = month.pop()
-        const paid_on1 = paid_on.pop()
-          console.log('newDoc', paid1,"month",month1,"paid_on",paid_on1);
-          reportData.push({"paid_amount": paid1,"month":month1,"paid-on":paid_on1})
-        }
-        )
-      .catch(error=> {throw new NotFoundException("data not found")})
-      .then(doc => reportData)
-       })
+    return from(fetchmonths((year))).pipe(
+      concatMap(async( month: number) => {
+        return await lastValueFrom(this.salesJunctionDb.fetchCommissionReportByYear(year,month))
+        .then(async salesJunctionDoc=> {
+          console.log("salesJunctionDoc",salesJunctionDoc)
+         const paid_amount=salesJunctionDoc.map(doc=>doc.paid_amount)
+         const total_paid_amount=paid_amount.reduce((next,prev)=> next + prev,0)
+         const due=salesJunctionDoc.map(doc=>doc.dues)
+         const total_dues = due.reduce((next, prev) => Number(next)+Number(prev), 0);
+         const date = salesJunctionDoc.map(doc=>{if(doc.paid_amount > 0) return doc.created_date})
+         const paid_on = date.filter((res) => res)
+         await this.fetchSignup(year,month)
+         .then(signup => {
+           reportData.push({"total_paid_amount":total_paid_amount,"month": month, "total_dues":total_dues,"hsa_sing_up": signup, "paid_on": paid_on[0] })
+          })
+         return reportData
+        })
+        .catch(error=> {throw new NotFoundException(error.message)})
+        .then(doc => reportData)
+      })
     )
   }
 
+  // fetchmonths(year: number):any {
+  //   Logger.debug(`fetchmonths() year: [${year}]`, APP);
 
-    fetchmonths(year: number):any {
-    Logger.debug(`fetchmonths() year: [${year}]`, APP);
+  //   let month = [];
+  //   let i = 0;
+  //   if(new Date().getFullYear().toString() === year.toString()){
+  //     for(i = new Date().getMonth()+1; i> 0 ; i-- )
+  //     month.push(i)
+  //     return month
+  //   }
+  //   else {
+  //     for(i = 12; i> 0 ; i-- )
+  //      month.push(i)
+  //     return console.log("month",month)
+  //   }
+  // }
 
-    let a = [];
-    let i = 0;
-  
-    if(new Date().getFullYear().toString() === year.toString()){
-      for(i = new Date().getMonth()+1; i> 0 ; i-- )
-       a.push(i)
-     return a
-    }
-    else {
-      for(i = 12; i> 0 ; i-- )
-        a.push(i)
-    return a
-    }
-  
-  }
+  async fetchSignup(year,month){
+    Logger.debug(`fetchSignup() year: [${year}] month: [${month}]`, APP);
 
-
+     return await lastValueFrom(this.salesUserJunctionDb.fetchCommissionReportByYear(year,month))
+     .then(userJunctionDoc=> { return userJunctionDoc.length})
+     .catch(error=>{throw new UnprocessableEntityException(error.message)})
+   }
 }

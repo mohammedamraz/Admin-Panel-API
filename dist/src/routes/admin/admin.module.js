@@ -21,6 +21,7 @@ AdminModule = __decorate([
             database_module_1.DatabaseModule.forFeature({ tableName: 'sales_commission_junction' }),
             database_module_1.DatabaseModule.forFeature({ tableName: 'sales_partner' }),
             database_module_1.DatabaseModule.forFeature({ tableName: 'sales_partner_requests' }),
+            database_module_1.DatabaseModule.forFeature({ tableName: 'sales_user_junction' }),
             axios_1.HttpModule.register({
                 timeout: 10000,
                 maxRedirects: 5

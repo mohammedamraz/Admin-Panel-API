@@ -8,9 +8,10 @@ export declare class AdminService {
     private readonly salesJunctionDb;
     private readonly salesDb;
     private readonly salesPartnerRequestDb;
+    private readonly salesUserJunctionDb;
     private readonly templateService;
     private http;
-    constructor(salesJunctionDb: DatabaseService<CreateSalesJunction>, salesDb: DatabaseService<CreateSalesPartner>, salesPartnerRequestDb: DatabaseService<CreateSalesPartnerRequest>, templateService: TemplateService, http: HttpService);
+    constructor(salesJunctionDb: DatabaseService<CreateSalesJunction>, salesDb: DatabaseService<CreateSalesPartner>, salesPartnerRequestDb: DatabaseService<CreateSalesPartnerRequest>, salesUserJunctionDb: DatabaseService<CreateSalesJunction>, templateService: TemplateService, http: HttpService);
     accountSid: string;
     authToken: string;
     serviceSid: string;
@@ -66,6 +67,6 @@ export declare class AdminService {
         status: string;
     }>;
     encryptPassword_(password: any): any;
-    fetchCommissionReport(sales_code: string, year: number): import("rxjs").Observable<any[]>;
-    fetchmonths(year: number): any;
+    fetchCommissionReport(year: number): import("rxjs").Observable<any[]>;
+    fetchSignup(year: any, month: any): Promise<any>;
 }
