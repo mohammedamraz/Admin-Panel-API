@@ -9,6 +9,7 @@ export class CreateSalesJunction {
     created_date: string;
     updated_date: Date;
     dues:number;
+    total_count:number;
 
 }
 
@@ -79,6 +80,7 @@ export class UpdateSalesPartner {
     sales_code: string;
     block_account: boolean;
     profile_confirmation: boolean;
+    customer_id:string;
 }
 export enum Is_active {
     TRUE = 'true',

@@ -7,6 +7,7 @@ export declare class CreateSalesJunction {
     created_date: string;
     updated_date: Date;
     dues: number;
+    total_count: number;
 }
 export declare class CreateSalesPartner {
     id: number;
@@ -21,10 +22,7 @@ export declare class CreateSalesPartner {
     created_date: Date;
     refered_by: string;
     block_account: boolean;
-<<<<<<< HEAD
     profile_confirmation: boolean;
-=======
->>>>>>> ed74993ff017d3475c581c82039b3b05c597ab9c
 }
 export declare class CreateSalesPartnerRequest {
     sales_code: string;

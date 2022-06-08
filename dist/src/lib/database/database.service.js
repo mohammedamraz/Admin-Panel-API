@@ -173,7 +173,7 @@ let DatabaseService = class DatabaseService {
         delete params.name;
         delete params.is_active;
         Object.values(params).map((params, index) => { variables.push(params), values.push((`$${index + 1}`)); });
-        const query = `SELECT * FROM ${this.tableName} WHERE refered_id='${id}' AND created_date > CURRENT_DATE - (interval '1 day' * ${values[1]})  ORDER BY created_date LIMIT  ${values[0]} OFFSET ${number}`;
+        const query = `SELECT * FROM ${this.tableName} WHERE refered_by='${id}' AND created_date > CURRENT_DATE - (interval '1 day' * ${values[1]})  ORDER BY created_date LIMIT  ${values[0]} OFFSET ${number}`;
         return this.runQuery(query, variables);
     }
     findByDate(findbyConditionParams) {
