@@ -48,6 +48,13 @@ let SalesController = class SalesController {
     fetchInvitationResponse(salesCode, period) {
         common_1.Logger.debug(`fetchInvitationResponse()salesCode: [${salesCode}] `, APP);
         return this.salesService.fetchInvitationResponse(salesCode, period);
+<<<<<<< HEAD
+=======
+    }
+    updateSalesPartner(id, updateSalesPartnerDto) {
+        common_1.Logger.debug(`updateSalesPartner() id: [${id}] DTO:${JSON.stringify(updateSalesPartnerDto)}`, APP);
+        return this.salesService.updateSalesPartner(id, updateSalesPartnerDto);
+>>>>>>> 639723cd511cff9cbc62617cec2565475574b182
     }
     fetchAllSalesPartnersByDate(params) {
         common_1.Logger.debug(`fetchAllSalesPartnersByDate() params:${JSON.stringify(params)}`, APP);

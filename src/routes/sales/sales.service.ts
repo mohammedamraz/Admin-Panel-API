@@ -239,8 +239,14 @@ createSalesPartner(createSalesPartner: CreateSalesPartner) {
     return this.fetchSalesBySalesCode(salesCode).pipe(
       switchMap(salesCommission => 
            lastValueFrom(this.junctiondb.find({ "sales_code": String(salesCode), }))
+<<<<<<< HEAD
           .then(res => [salesCommission, res[res.length - 1]])),
       switchMap(([salesCommission, res]) =>  
+=======
+          .then(res =>{ console.log('dds',res);return [salesCommission, res[res.length - 1]]})),
+      switchMap(async ([salesCommission, res]) =>{ await this.salesuser.save({sales_code: salesCode}); return [salesCommission, res]}), 
+      switchMap(([salesCommission, res]) =>
+>>>>>>> 639723cd511cff9cbc62617cec2565475574b182
       this.junctiondb.save({ sales_code: salesCode, commission_amount: salesCommission["commission"], dues: (Number(res['dues']) + Number(salesCommission["commission"])) })
 
       )
