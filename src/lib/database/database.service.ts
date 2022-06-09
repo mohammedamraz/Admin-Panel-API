@@ -186,7 +186,7 @@ export class DatabaseService<T> implements DatabaseInterface<T> {
     return this.runQuery(query)
   }
 
-  findByCondition(id:number,findbyConditionParams: findByConditionParams) {
+  findByCondition(id: number, findbyConditionParams: findByConditionParams) {
     Logger.debug(`findByCondition(): params ${[JSON.stringify(findbyConditionParams)]}`, APP);
 
     let params = findByConditionParamsAlign(findbyConditionParams);

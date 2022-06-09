@@ -12,108 +12,108 @@ const APP = 'SalesController';
 
 @Controller()
 export class SalesController {
-  constructor(private readonly salesService: SalesService) {}
+    constructor(private readonly salesService: SalesService) { }
 
-  @Post()
-  createSalesPartner(@Body() createSalesPartner: CreateSalesPartner) {
-      Logger.debug(`createSalesPartner() DTO:${JSON.stringify(createSalesPartner,)}`, APP);
+    @Post()
+    createSalesPartner(@Body() createSalesPartner: CreateSalesPartner) {
+        Logger.debug(`createSalesPartner() DTO:${JSON.stringify(createSalesPartner,)}`, APP);
 
-      return this.salesService.createSalesPartner(createSalesPartner)
-  }
-
-
-  @Delete(':id')
-  deleteSalesPartner(@Param('id') id: string) {
-      Logger.debug(`deleteSalesPartner() id: [${id}]`, APP);
-
-      return this.salesService.deleteSalesPartner(id);
-  }
-
-  @Get(':id')
-  fetchSalesPartnerById(@Param('id') id: string) {
-      Logger.debug(`fetchSalesPartnerById() id: [${id}]`, APP);
-
-      return this.salesService.fetchSalesPartnerById(id);
-  }
-
-  @Get(':salesCode/earning')
-  fetchEarnings(@Param('salesCode') salesCode: string, @Query() period: Period) {
-      Logger.debug(`fetchEarnings()salesCode: [${salesCode}] `, APP);
-
-      return this.salesService.fetchEarnings(salesCode, period);
-  }
-
-  @Get(':salesCode/invatationResponse')
-  fetchInvitationResponse(@Param('salesCode') salesCode: string) {
-      Logger.debug(`fetchInvitationResponse()salesCode: [${salesCode}] `, APP);
-
-      return this.salesService.fetchInvitationResponse(salesCode);
-
-  }
-
-  @Patch(':id')
-  updateSalesPartner(@Param('id') id: string, @Body() updateSalesPartnerDto: UpdateSalesPartner) {
-      Logger.debug(`updateSalesPartner() id: [${id}] DTO:${JSON.stringify(updateSalesPartnerDto,)}`, APP);
-
-      return this.salesService.updateSalesPartner(id, updateSalesPartnerDto);
-  }
-
-//   @Patch(':id/updateCustomer')
-//     updateCustomerIdInSales(@Param('id') id: string, @Body() updateSalesPartnerDto: UpdateSalesPartner) {
-//         Logger.debug(`updateCustomerIdInSales() id: [${id}] DTO:${JSON.stringify(updateSalesPartnerDto,)}`, APP);
-
-//         return this.salesService.updateCustomerIdInSales(id, updateSalesPartnerDto);
-//     }
-
-  @Get()
-  fetchAllSalesPartnersByDate(@Query() params: ZQueryParamsDto) {
-      Logger.debug(`fetchAllSalesPartnersByDate() params:${JSON.stringify(params)}`, APP);
-      return this.salesService.fetchAllSalesPartnersByDate(params)
-  }
-
-  @Get(':id/sales_junction')
-  fetchAllSalesPartnersFromJunctionByDate(@Param('id') id: string,@Query() params: ZQueryParamsDto) {
-      Logger.debug(`fetchAllSalesPartnersFromJunctionByDate() id: [${id}] params:${JSON.stringify(params)}`, APP);
-
-      return this.salesService.fetchAllSalesPartnersFromJunctionByDate(id,params)
-  }
-
-  @Patch(':id/image')
-  @UseInterceptors(FileInterceptor('file', {
-      storage: diskStorage({
-        _destination: STATIC_IMAGES_PROFILE,
-        get destination() {
-          return this._destination;
-        },
-        set destination(value) {
-          this._destination = value;
-        },
-          filename: editFileName,
-      }),
-      fileFilter: imageFileFilter,
-  }),
-  )
-  async uploadImage(@Param('id') id: string, @UploadedFile() file) {
-      Logger.debug(`UploadImage: ${file}`, APP);
-
-      return this.salesService.uploadImage(id, file.filename);
-  }
-
-  @Post(':salesCode/need-to-pay-amount')
-  paymentCalculation(@Param('salesCode') salesCode: String){
-      Logger.debug(`paymentCalculation()salesCode: [${salesCode}] `, APP);
-
-      return this.salesService.paymentCalculation(String(salesCode))
-  }
-  
+        return this.salesService.createSalesPartner(createSalesPartner)
+    }
 
 
-  @Patch('bank-details-verification/:id')
-  changeBankDetailsVerificationStatus(@Param('id', ParseIntPipe) id: number) {
-    Logger.debug(`changeBankDetailsVerificationSatatus() id:[${id}] quries:{'bank_details_verification':true}`, APP);
+    @Delete(':id')
+    deleteSalesPartner(@Param('id') id: string) {
+        Logger.debug(`deleteSalesPartner() id: [${id}]`, APP);
 
-    return this.salesService.changeBankDetailsVerificationSatatus(id);
-  }
+        return this.salesService.deleteSalesPartner(id);
+    }
+
+    @Get(':id')
+    fetchSalesPartnerById(@Param('id') id: string) {
+        Logger.debug(`fetchSalesPartnerById() id: [${id}]`, APP);
+
+        return this.salesService.fetchSalesPartnerById(id);
+    }
+
+    @Get(':salesCode/earning')
+    fetchEarnings(@Param('salesCode') salesCode: string, @Query() period: Period) {
+        Logger.debug(`fetchEarnings()salesCode: [${salesCode}] `, APP);
+
+        return this.salesService.fetchEarnings(salesCode, period);
+    }
+
+    @Get(':salesCode/invatationResponse')
+    fetchInvitationResponse(@Param('salesCode') salesCode: string) {
+        Logger.debug(`fetchInvitationResponse()salesCode: [${salesCode}] `, APP);
+
+        return this.salesService.fetchInvitationResponse(salesCode);
+
+    }
+
+    @Patch(':id')
+    updateSalesPartner(@Param('id') id: string, @Body() updateSalesPartnerDto: UpdateSalesPartner) {
+        Logger.debug(`updateSalesPartner() id: [${id}] DTO:${JSON.stringify(updateSalesPartnerDto,)}`, APP);
+
+        return this.salesService.updateSalesPartner(id, updateSalesPartnerDto);
+    }
+
+    //   @Patch(':id/updateCustomer')
+    //     updateCustomerIdInSales(@Param('id') id: string, @Body() updateSalesPartnerDto: UpdateSalesPartner) {
+    //         Logger.debug(`updateCustomerIdInSales() id: [${id}] DTO:${JSON.stringify(updateSalesPartnerDto,)}`, APP);
+
+    //         return this.salesService.updateCustomerIdInSales(id, updateSalesPartnerDto);
+    //     }
+
+    @Get()
+    fetchAllSalesPartnersByDate(@Query() params: ZQueryParamsDto) {
+        Logger.debug(`fetchAllSalesPartnersByDate() params:${JSON.stringify(params)}`, APP);
+        return this.salesService.fetchAllSalesPartnersByDate(params)
+    }
+
+    @Get(':id/sales_junction')
+    fetchAllSalesPartnersFromJunctionByDate(@Param('id') id: string, @Query() params: ZQueryParamsDto) {
+        Logger.debug(`fetchAllSalesPartnersFromJunctionByDate() id: [${id}] params:${JSON.stringify(params)}`, APP);
+
+        return this.salesService.fetchAllSalesPartnersFromJunctionByDate(id, params)
+    }
+
+    @Patch(':id/image')
+    @UseInterceptors(FileInterceptor('file', {
+        storage: diskStorage({
+            _destination: STATIC_IMAGES_PROFILE,
+            get destination() {
+                return this._destination;
+            },
+            set destination(value) {
+                this._destination = value;
+            },
+            filename: editFileName,
+        }),
+        fileFilter: imageFileFilter,
+    }),
+    )
+    async uploadImage(@Param('id') id: string, @UploadedFile() file) {
+        Logger.debug(`UploadImage: ${file}`, APP);
+
+        return this.salesService.uploadImage(id, file.filename);
+    }
+
+    @Post(':salesCode/need-to-pay-amount')
+    paymentCalculation(@Param('salesCode') salesCode: String) {
+        Logger.debug(`paymentCalculation()salesCode: [${salesCode}] `, APP);
+
+        return this.salesService.paymentCalculation(String(salesCode))
+    }
+
+
+
+    @Patch('bank-details-verification/:id')
+    changeBankDetailsVerificationStatus(@Param('id', ParseIntPipe) id: number) {
+        Logger.debug(`changeBankDetailsVerificationSatatus() id:[${id}] quries:{'bank_details_verification':true}`, APP);
+
+        return this.salesService.changeBankDetailsVerificationSatatus(id);
+    }
 
 
 

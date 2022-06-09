@@ -188,21 +188,7 @@ export class SalesService {
         for (let i = 0; i <= doc.length - 1; i++) {
           await lastValueFrom(this.db.find({ sales_code: doc[i].sp_id }).pipe(map(res => { contents.push(res[0]) })))
         }
-        // contents.filter(function(val) {console.log("adsd",val); return val !== null; }).join(", ")
-        
-        // const a  =contents.filter(val => { return !!val }).join(', ')
-        // contents.forEach(contents=>{
-        //   console.log(contents);
-        //   a = contents
-        //   // return contents
-
-        // })
-        // console.log("szddz",a);
-        
         return contents
-
-        
-        
       }))
     else if (params.date == undefined) return []
     else return this.fetchCommissionFromJunctionDb(params).pipe(switchMap(doc => {
