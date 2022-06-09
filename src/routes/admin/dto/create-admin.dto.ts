@@ -1,6 +1,7 @@
-import { ArrayMinSize, IsNotEmpty, IsPhoneNumber, ValidateNested } from 'class-validator';
+import { ArrayMinSize, IsNotEmpty, IsPhoneNumber, IsString, MaxLength, MinLength, ValidateNested } from 'class-validator';
 import { phoneNumber } from 'aws-sdk/clients/importexport';
 import { Type } from 'class-transformer';
+import { Logger } from '@nestjs/common';
 
 export class MobileNumberDtO {
   @IsNotEmpty()
@@ -112,4 +113,36 @@ export class createPaid {
   @ArrayMinSize(1)
   @IsNotEmpty()
   data : createPaidAmountDto[];
+}
+
+export class YearMonthDto{
+
+  @IsNotEmpty()
+   @IsString()
+   @MinLength(4, {message: 'Enter only 4 digit value of year, This is too short',})
+   @MaxLength(4, {message: 'Enter only 4 digit value of year, This is too long',}) 
+  year: string;
+ 
+}
+
+export const fetchmonths =(year: String) => {
+  Logger.debug(`fetchmonths() year: [${year}]`);
+  let month = [];
+  let month1=[];
+  let i = 0;
+
+  if(new Date().getFullYear().toString() === year){
+    for(i = new Date().getMonth()+1; i> 0 ; i-- )
+    month.push(i)
+   return month
+  }
+  else {
+    for(i = 12; i> 0 ; i-- )
+    month1.push(i)
+    console.log("month1",month1)
+  return month1
+  }
+
+  
+
 }

@@ -125,6 +125,8 @@ export class SalesController {
 
       return this.salesService.updateUserIdInSales(id, updateSalesPartnerDto);
   }
+
+  
 }
 
 

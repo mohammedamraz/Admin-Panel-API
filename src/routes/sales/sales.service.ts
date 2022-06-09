@@ -52,7 +52,7 @@ export class SalesService {
   createInvitation(createSalesPartner: CreateSalesPartner, createSalesJunction: CreateSalesJunction[]) {
 
     if (createSalesPartner.refered_by) return this.invitationJunctiondb.save({ sp_id: createSalesPartner.sales_code, refered_by: createSalesPartner.refered_by }).pipe(
-      switchMap(_doc => this.invitationJunctiondb.find({ refered_id: createSalesPartner.refered_by })),
+      switchMap(_doc => this.invitationJunctiondb.find({ refered_by: createSalesPartner.refered_by })),
       switchMap(doc => this.db.findandUpdate({ columnName: 'sales_code', columnvalue: createSalesPartner.refered_by, quries: { sales_invitation_count: doc.length } })))
     else return createSalesJunction;
 
@@ -262,4 +262,5 @@ export class SalesService {
       }))
     }))
   }
+  
 }
