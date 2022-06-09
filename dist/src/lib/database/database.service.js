@@ -177,7 +177,7 @@ let DatabaseService = class DatabaseService {
         return this.runQuery(query, variables);
     }
     findByDate(findbyConditionParams) {
-        common_1.Logger.debug(`find_by_alphabet(): params ${[JSON.stringify(findbyConditionParams)]}`, APP);
+        common_1.Logger.debug(`find_by_date(): params ${[JSON.stringify(findbyConditionParams)]}`, APP);
         let variables = [];
         let values = [];
         let params = findbyConditionParams;

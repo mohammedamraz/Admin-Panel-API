@@ -58,17 +58,17 @@ export class SalesController {
       return this.salesService.updateSalesPartner(id, updateSalesPartnerDto);
   }
 
+//   @Patch(':id/updateCustomer')
+//     updateCustomerIdInSales(@Param('id') id: string, @Body() updateSalesPartnerDto: UpdateSalesPartner) {
+//         Logger.debug(`updateCustomerIdInSales() id: [${id}] DTO:${JSON.stringify(updateSalesPartnerDto,)}`, APP);
+
+//         return this.salesService.updateCustomerIdInSales(id, updateSalesPartnerDto);
+//     }
+
   @Get()
   fetchAllSalesPartnersByDate(@Query() params: ZQueryParamsDto) {
       Logger.debug(`fetchAllSalesPartnersByDate() params:${JSON.stringify(params)}`, APP);
       return this.salesService.fetchAllSalesPartnersByDate(params)
-  }
-
-
-  @Get('id/id/id')
-  fetchCommissionFromJunctionDb(@Query() params: ZQueryParamsDto) {
-      Logger.debug(`fetchCommissionFromJunctionDb() params:${JSON.stringify(params)}`, APP);
-      return this.salesService.fetchCommissionFromJunctionDb(params)
   }
 
   @Get(':id/sales_junction')

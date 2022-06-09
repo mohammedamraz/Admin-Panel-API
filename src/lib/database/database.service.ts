@@ -230,7 +230,7 @@ export class DatabaseService<T> implements DatabaseInterface<T> {
   }
 
   findByDate(findbyConditionParams: findByDateParams): Observable<T[]> {
-    Logger.debug(`find_by_alphabet(): params ${[JSON.stringify(findbyConditionParams)]}`, APP);
+    Logger.debug(`find_by_date(): params ${[JSON.stringify(findbyConditionParams)]}`, APP);
 
     let variables = [];
     let values = []

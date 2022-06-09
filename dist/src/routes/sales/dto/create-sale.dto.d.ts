@@ -50,6 +50,7 @@ export declare class UpdateSalesPartner {
     sales_code: string;
     block_account: boolean;
     profile_confirmation: boolean;
+    customer_id: string;
 }
 export declare enum Is_active {
     TRUE = "true",
