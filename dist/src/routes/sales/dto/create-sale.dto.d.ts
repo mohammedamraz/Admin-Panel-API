@@ -7,6 +7,7 @@ export declare class CreateSalesJunction {
     created_date: string;
     updated_date: Date;
     dues: number;
+    total_count: number;
 }
 export declare class CreateSalesPartner {
     id: number;

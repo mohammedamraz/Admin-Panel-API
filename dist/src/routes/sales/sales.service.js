@@ -44,7 +44,7 @@ let SalesService = class SalesService {
                 return this.db.save({ name: createSalesPartner.name, location: createSalesPartner.location, commission: createSalesPartner.commission, mobile: createSalesPartner.mobile, email: createSalesPartner.email });
             else
                 return this.db.save({ name: createSalesPartner.name, location: createSalesPartner.location, commission: createSalesPartner.commission, mobile: createSalesPartner.mobile, email: createSalesPartner.email, user_id: doc[0].fedo_id });
-        }), (0, rxjs_1.switchMap)(doc => { salesId = doc[0].id; createSalesPartner.sales_code = "FEDSP" + todayDate + 500 + doc[0].id; createSalesPartner.id = doc[0].id; return this.junctiondb.save({ sales_code: "FEDSP" + todayDate + 500 + doc[0].id }).pipe((0, rxjs_1.catchError)(err => { throw new common_1.BadRequestException(err.message); }), (0, rxjs_1.map)(doc => doc)); }), (0, rxjs_1.switchMap)(doc => this.createInvitation(createSalesPartner, doc)), (0, rxjs_1.switchMap)(doc => this.updateSalesPartner(salesId, { sales_code: createSalesPartner.sales_code })), (0, rxjs_1.switchMap)(doc => this.fetchSalesPartnerById(createSalesPartner.id.toString())));
+        }), (0, rxjs_1.switchMap)(doc => { salesId = doc[0].id; createSalesPartner.sales_code = "FEDSP" + todayDate + 500 + doc[0].id; createSalesPartner.id = doc[0].id; return this.junctiondb.save({ sales_code: createSalesPartner.sales_code }).pipe((0, rxjs_1.catchError)(err => { throw new common_1.BadRequestException(err.message); }), (0, rxjs_1.map)(doc => doc)); }), (0, rxjs_1.switchMap)(doc => this.createInvitation(createSalesPartner, doc)), (0, rxjs_1.switchMap)(doc => this.updateSalesPartner(salesId, { sales_code: createSalesPartner.sales_code })), (0, rxjs_1.switchMap)(doc => this.fetchSalesPartnerById(createSalesPartner.id.toString())));
     }
     createInvitation(createSalesPartner, createSalesJunction) {
         if (createSalesPartner.refered_by)
@@ -71,6 +71,16 @@ let SalesService = class SalesService {
     fetchSalesPartnerById(id) {
         common_1.Logger.debug(`fetchSalesPartnerById() id: [${JSON.stringify(id)}]`, APP);
         return (0, rxjs_1.from)((0, rxjs_1.lastValueFrom)(this.db.find({ id: id }).pipe((0, rxjs_1.catchError)(err => { throw new common_1.UnprocessableEntityException(err.message); }), (0, rxjs_1.map)((res) => {
+            if (res[0] == null)
+                throw new common_1.NotFoundException(`Sales Partner Not Found`);
+            if (res[0].is_active == false)
+                throw new common_1.NotFoundException(`Sales Partner Not Found`);
+            return res;
+        }))));
+    }
+    fetchSalesPartnerBySalesCode(id) {
+        common_1.Logger.debug(`fetchSalesPartnerById() id: [${JSON.stringify(id)}]`, APP);
+        return (0, rxjs_1.from)((0, rxjs_1.lastValueFrom)(this.db.find({ sales_code: id }).pipe((0, rxjs_1.catchError)(err => { throw new common_1.UnprocessableEntityException(err.message); }), (0, rxjs_1.map)((res) => {
             if (res[0] == null)
                 throw new common_1.NotFoundException(`Sales Partner Not Found`);
             if (res[0].is_active == false)
@@ -106,22 +116,63 @@ let SalesService = class SalesService {
             if (params.date === undefined)
                 return this.db.findByAlphabet(params).pipe((0, rxjs_1.map)(doc => { return doc; }));
             else
-                return this.db.findByDate(this.makeDateFormat(params)).pipe((0, rxjs_1.map)(doc => { return doc; }));
+                return this.fetchCommissionFromJunctionDb(params).pipe((0, rxjs_1.switchMap)(doc => { return this.db.findByDate(this.makeDateFormat(params)); }));
         }
     }
-    fetchCommissionFromJunctionDb(params) {
-        common_1.Logger.debug(`fetchCommissionFromJunctionDb() params:[${JSON.stringify(params)}] `, APP);
-        if (params.date === undefined)
-            return [];
-        else
-            return this.junctiondb.findByDate(this.makeDateFormat(params)).pipe((0, rxjs_1.map)(doc => { return doc; }));
+    fetchCommissionFromJunctionDb(ZQueryParamsDto) {
+        common_1.Logger.debug(`fetchCommissionFromJunctionDb() params:[${JSON.stringify(ZQueryParamsDto)}] `, APP);
+        let arrays = [];
+        return this.junctiondb.findByDate(this.makeDateFormatJunction(ZQueryParamsDto)).pipe((0, rxjs_1.switchMap)(async (doc) => {
+            var _a, _b;
+            let salesceode = [];
+            for (let j = 0; j <= doc.length - 1; j++) {
+                for (let i = 0; i <= arrays.length; i++) {
+                    if (arrays.length == 0) {
+                        arrays.push({ commission_amount: doc[j].commission_amount, sales_code: doc[j].sales_code, total_signups: 1 });
+                        break;
+                    }
+                    if (doc[j].sales_code == ((_a = arrays[i]) === null || _a === void 0 ? void 0 : _a.sales_code)) {
+                        arrays[i].commission_amount = arrays[i].commission_amount + doc[j].commission_amount;
+                        arrays[i].total_signups = arrays[i].total_signups + 1;
+                        break;
+                    }
+                }
+                for (let i = 0; i <= arrays.length - 1; i++) {
+                    salesceode.push((_b = arrays[i]) === null || _b === void 0 ? void 0 : _b.sales_code);
+                }
+                if (!salesceode.includes(doc[j].sales_code)) {
+                    arrays.push({ commission_amount: doc[j].commission_amount, sales_code: doc[j].sales_code, total_signups: 1 });
+                }
+                else {
+                }
+            }
+            for (var k = 0; k <= arrays.length - 1; k++) {
+                await (0, rxjs_1.lastValueFrom)(this.db.findandUpdate({ columnName: 'sales_code', columnvalue: arrays[k].sales_code, quries: { total_commission: arrays[k].commission_amount, total_signups: arrays[k].total_signups } }));
+            }
+        }));
     }
     fetchAllSalesPartnersFromJunctionByDate(id, params) {
         common_1.Logger.debug(`fetchAllSalesPartnersByDate() id: [${id}] params:[${JSON.stringify(params)}] `, APP);
-        if (params.date == undefined)
+        let contents = [];
+        let contentsParams = [];
+        if (Object.keys(params).length == 0)
+            return this.invitationJunctiondb.fetchAll().pipe((0, rxjs_1.map)(async (doc, index) => {
+                for (let i = 0; i <= doc.length - 1; i++) {
+                    await (0, rxjs_1.lastValueFrom)(this.db.find({ sales_code: doc[i].sp_id }).pipe((0, rxjs_1.map)(res => { contents.push(res[0]); })));
+                }
+                return contents;
+            }));
+        else if (params.date == undefined)
             return [];
         else
-            return this.invitationJunctiondb.findByConditionSales(id, this.makeDateFormat(params)).pipe((0, rxjs_1.map)(doc => { return doc; }));
+            return this.fetchCommissionFromJunctionDb(params).pipe((0, rxjs_1.switchMap)(doc => {
+                return this.invitationJunctiondb.findByConditionSales(id, this.makeDateFormat(params)).pipe((0, rxjs_1.map)(async (doc, index) => {
+                    for (let i = 0; i <= doc.length - 1; i++) {
+                        await (0, rxjs_1.lastValueFrom)(this.db.find({ sales_code: doc[i].sp_id }).pipe((0, rxjs_1.map)(res => { contentsParams.push(res[0]); })));
+                    }
+                    return contentsParams;
+                }));
+            }));
     }
     makeDateFormat(params) {
         common_1.Logger.debug(`makeDateFormat() params:[${JSON.stringify(params)}] `, APP);
@@ -143,6 +194,29 @@ let SalesService = class SalesService {
             date: date,
             is_active: params.is_active
         };
+        return modifiedParams;
+    }
+    makeDateFormatJunction(params) {
+        common_1.Logger.debug(`makeDateFormatJunction() params:[${JSON.stringify(params)}] `, APP);
+        let date = '';
+        if (params.date === 'monthly')
+            date = '30';
+        else if (params.date === 'quarterly')
+            date = '90';
+        else if (params.date === 'weekly')
+            date = '7';
+        else if (params.date === 'yearly')
+            date = '365';
+        else if (params.date === 'daily')
+            date = '1';
+        const modifiedParams = {
+            number_of_rows: params.number_of_rows,
+            number_of_pages: params.number_of_pages,
+            name: params.name,
+            date: date,
+            is_active: params.is_active
+        };
+        delete modifiedParams.is_active;
         return modifiedParams;
     }
     uploadImage(id, fileName) {

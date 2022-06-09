@@ -9,6 +9,7 @@ export class CreateSalesJunction {
     created_date: string;
     updated_date: Date;
     dues:number;
+    total_count:number;
 
 }
 
