@@ -1,6 +1,6 @@
 import { HttpService } from '@nestjs/axios';
 import { DatabaseService } from 'src/lib/database/database.service';
-import { CreateSalesJunction, CreateSalesPartner, CreateSalesPartnerRequest, SalesUserJunction } from '../sales/dto/create-sale.dto';
+import { CreateSalesJunction, CreateSalesPartner, CreateSalesPartnerRequest, SalesUserJunction, Period } from '../sales/dto/create-sale.dto';
 import { createPaid, MobileNumberAndOtpDtO, MobileNumberDtO, ParamDto, requestDto, User } from './dto/create-admin.dto';
 import { ConfirmForgotPasswordDTO, ForgotPasswordDTO, LoginDTO, PeriodRange, State } from './dto/login.dto';
 import { TemplateService } from 'src/constants/template.service';
@@ -35,6 +35,18 @@ export declare class AdminService {
     }>>;
     fetchSignUps(createSalesPartner: CreateSalesPartner[], state: State): Promise<{
         signups: any;
+    }>;
+    fetchSalesPartner(period: Period): import("rxjs").Observable<Promise<any>>;
+    fetchSalesPartnerCommission(createSalesPartner: CreateSalesPartner[], period: Period): Promise<any>;
+    fetchTotalCommission(createSalesPartner: CreateSalesPartner, period: Period): import("rxjs").Observable<{
+        totalCommission: number;
+        name: string;
+        signups: number;
+    }>;
+    fetchSalesPartnerSignups(createSalesJunction: CreateSalesJunction[], createSalesPartner: CreateSalesPartner, period: Period): import("rxjs").Observable<{
+        totalCommission: number;
+        name: string;
+        signups: number;
     }>;
     fetchUser(createSalesPartner: CreateSalesPartner[]): Promise<any[]>;
     fetchAccount(userDoc: User[], saleDoc: CreateSalesPartner): Promise<{

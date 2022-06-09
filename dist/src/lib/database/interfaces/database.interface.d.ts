@@ -57,6 +57,10 @@ export interface findByPeriodParams {
     columnvalue: string;
     period: string;
 }
+export interface findBycolumnParams {
+    columnName: string;
+    columnvalue: string;
+}
 export interface DateRangeParams {
     from: string;
     to: string;

@@ -10,6 +10,13 @@ const APP = 'AdminController';
 export class AdminController {
   constructor(private readonly adminService: AdminService) {}
 
+  @Get('salesPartner')
+  fetchSalesPartner(@Query() period: Period) {
+    Logger.debug(`fetchSalesPartner() period: [${JSON.stringify(period)}]`, APP);
+
+    return this.adminService.fetchSalesPartner(period);
+  }
+
   @Get('sales/account-details')
   fetchSalesPartnerAccountDetails() {
    Logger.debug(`getSalesPartnerAccountDetails()`, APP);
@@ -31,7 +38,7 @@ export class AdminController {
     return this.adminService.fetchInvitationResponse(state);
   }
 
-  @Get('sales/account-details/:sales_code')
+   @Get('sales/account-details/:sales_code')
   fetchSalesPartnerAccountDetailsBySalesCode(@Param('sales_code') sales_code: string) {
    Logger.debug(`fetchSalesPartnerAccountDetailsByID()`, APP);
 

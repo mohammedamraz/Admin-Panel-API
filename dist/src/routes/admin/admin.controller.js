@@ -14,6 +14,7 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.AdminController = void 0;
 const common_1 = require("@nestjs/common");
+const create_sale_dto_1 = require("../sales/dto/create-sale.dto");
 const admin_service_1 = require("./admin.service");
 const create_admin_dto_1 = require("./dto/create-admin.dto");
 const login_dto_1 = require("./dto/login.dto");
@@ -21,6 +22,10 @@ const APP = 'AdminController';
 let AdminController = class AdminController {
     constructor(adminService) {
         this.adminService = adminService;
+    }
+    fetchSalesPartner(period) {
+        common_1.Logger.debug(`fetchSalesPartner() period: [${JSON.stringify(period)}]`, APP);
+        return this.adminService.fetchSalesPartner(period);
     }
     fetchSalesPartnerAccountDetails() {
         common_1.Logger.debug(`getSalesPartnerAccountDetails()`, APP);
@@ -75,6 +80,13 @@ let AdminController = class AdminController {
         return this.adminService.sendCreateSalesPartnerLinkToMobileAndWhatsappNumber(mobileNumberDtO);
     }
 };
+__decorate([
+    (0, common_1.Get)('salesPartner'),
+    __param(0, (0, common_1.Query)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [create_sale_dto_1.Period]),
+    __metadata("design:returntype", void 0)
+], AdminController.prototype, "fetchSalesPartner", null);
 __decorate([
     (0, common_1.Get)('sales/account-details'),
     __metadata("design:type", Function),

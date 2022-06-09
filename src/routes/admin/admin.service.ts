@@ -3,7 +3,7 @@ import { HttpService } from '@nestjs/axios';
 import { AKASH_ACCOUNTID, AKASH_AUTHTOKEN, AKASH_SERVICEID, APP_DOWNLOAD_LINK, AWS_COGNITO_USER_CREATION_URL_SIT, FEDO_APP, PUBLIC_KEY, SALES_PARTNER_LINK } from 'src/constants';
 import { DatabaseTable } from 'src/lib/database/database.decorator';
 import { DatabaseService } from 'src/lib/database/database.service';
-import { CreateSalesJunction, CreateSalesPartner, CreateSalesPartnerRequest, Interval, SalesUserJunction, Period, Periodicity, PERIOD } from '../sales/dto/create-sale.dto';
+import { CreateSalesJunction, CreateSalesPartner, CreateSalesPartnerRequest, Interval, SalesUserJunction, Period, PERIOD } from '../sales/dto/create-sale.dto';
 import { AccountZwitchResponseBody,  createPaid,  MobileNumberAndOtpDtO, MobileNumberDtO, ParamDto, requestDto, sendEmailOnIncorrectBankDetailsDto, User } from './dto/create-admin.dto';
 import { AxiosResponse } from 'axios';
 import { catchError, concatMap, from, lastValueFrom, map, of, switchMap, throwError } from 'rxjs';
@@ -85,6 +85,44 @@ export class AdminService {
       concatMap(salesPartner => this.salesuser.findByPeriod({columnName: "sales_code", columnvalue: salesPartner.sales_code, period: PERIOD[state.period] })),
       map(salesuser => signups.push(salesuser.length))))
       .then(() =>{return {'signups': signups.reduce((acc, curr) => acc += curr, 0)}})
+  }
+
+  fetchSalesPartner(period: Period) {
+    Logger.debug(`fetchSalesPartner() period: [${JSON.stringify(period)}]`, APP);
+
+    return this.salesDb.fetchAllByPeriod(Interval(period)).pipe(
+      
+      catchError(err => { throw new BadRequestException(err.message) }),
+      map( doc =>{
+        if (doc.length === 0) throw new NotFoundException("sales partner not found");
+        return this.fetchSalesPartnerCommission(doc, period)}))
+  }
+
+  fetchSalesPartnerCommission(createSalesPartner: CreateSalesPartner[], period: Period){
+    Logger.debug(`fetchSalesPartnerCommission() createSalesPartner: [${JSON.stringify(createSalesPartner)}]`, APP);
+
+    let commission =[]
+    return lastValueFrom(from(createSalesPartner).pipe(
+      switchMap(salesPartner => lastValueFrom( this.fetchTotalCommission(salesPartner, period)).then(doc => {commission.push(doc)}))
+    )).then(doc => ({...commission.reduce((prev, current) => current.totalCommission > prev.totalCommission ? current:prev), 'count': createSalesPartner.length}))
+  }
+
+  fetchTotalCommission(createSalesPartner: CreateSalesPartner, period: Period) {
+    Logger.debug(`fetchTotalCommission() CreateSalesPartner: [${JSON.stringify(createSalesPartner)}] , period: [${JSON.stringify(period)}]`, APP);
+
+    return this.salesJunctionDb.find({sales_code: createSalesPartner.sales_code}).pipe(
+      concatMap(doc => this.fetchSalesPartnerSignups(doc, createSalesPartner,period)),
+      map(doc => doc))
+  }
+
+  fetchSalesPartnerSignups(createSalesJunction: CreateSalesJunction[],createSalesPartner: CreateSalesPartner, period: Period)  {
+    Logger.debug(`fetchSalesPartnerSignups() createSalesJunction: [${JSON.stringify(createSalesJunction)}],  CreateSalesPartner: [${JSON.stringify(createSalesPartner)}], period: [${JSON.stringify(period)}]`, APP);
+
+   return this.salesuser.find({sales_code: createSalesPartner.sales_code}).pipe(
+      map(doc => { 
+        return {'totalCommission': createSalesJunction.reduce((acc, curr) => acc += curr.commission_amount, 0),
+                'name': createSalesPartner.name,
+                'signups': doc.length }}))
   }
 
   async fetchUser(createSalesPartner: CreateSalesPartner[]) {

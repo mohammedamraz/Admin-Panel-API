@@ -115,6 +115,31 @@ let AdminService = class AdminService {
         return (0, rxjs_1.lastValueFrom)((0, rxjs_1.from)(createSalesPartner).pipe((0, rxjs_1.concatMap)(salesPartner => this.salesuser.findByPeriod({ columnName: "sales_code", columnvalue: salesPartner.sales_code, period: create_sale_dto_1.PERIOD[state.period] })), (0, rxjs_1.map)(salesuser => signups.push(salesuser.length))))
             .then(() => { return { 'signups': signups.reduce((acc, curr) => acc += curr, 0) }; });
     }
+    fetchSalesPartner(period) {
+        common_1.Logger.debug(`fetchSalesPartner() period: [${JSON.stringify(period)}]`, APP);
+        return this.salesDb.fetchAllByPeriod((0, create_sale_dto_1.Interval)(period)).pipe((0, rxjs_1.catchError)(err => { throw new common_1.BadRequestException(err.message); }), (0, rxjs_1.map)(doc => {
+            if (doc.length === 0)
+                throw new common_1.NotFoundException("sales partner not found");
+            return this.fetchSalesPartnerCommission(doc, period);
+        }));
+    }
+    fetchSalesPartnerCommission(createSalesPartner, period) {
+        common_1.Logger.debug(`fetchSalesPartnerCommission() createSalesPartner: [${JSON.stringify(createSalesPartner)}]`, APP);
+        let commission = [];
+        return (0, rxjs_1.lastValueFrom)((0, rxjs_1.from)(createSalesPartner).pipe((0, rxjs_1.switchMap)(salesPartner => (0, rxjs_1.lastValueFrom)(this.fetchTotalCommission(salesPartner, period)).then(doc => { commission.push(doc); })))).then(doc => (Object.assign(Object.assign({}, commission.reduce((prev, current) => current.totalCommission > prev.totalCommission ? current : prev)), { 'count': createSalesPartner.length })));
+    }
+    fetchTotalCommission(createSalesPartner, period) {
+        common_1.Logger.debug(`fetchTotalCommission() CreateSalesPartner: [${JSON.stringify(createSalesPartner)}] , period: [${JSON.stringify(period)}]`, APP);
+        return this.salesJunctionDb.find({ sales_code: createSalesPartner.sales_code }).pipe((0, rxjs_1.concatMap)(doc => this.fetchSalesPartnerSignups(doc, createSalesPartner, period)), (0, rxjs_1.map)(doc => doc));
+    }
+    fetchSalesPartnerSignups(createSalesJunction, createSalesPartner, period) {
+        common_1.Logger.debug(`fetchSalesPartnerSignups() createSalesJunction: [${JSON.stringify(createSalesJunction)}],  CreateSalesPartner: [${JSON.stringify(createSalesPartner)}], period: [${JSON.stringify(period)}]`, APP);
+        return this.salesuser.find({ sales_code: createSalesPartner.sales_code }).pipe((0, rxjs_1.map)(doc => {
+            return { 'totalCommission': createSalesJunction.reduce((acc, curr) => acc += curr.commission_amount, 0),
+                'name': createSalesPartner.name,
+                'signups': doc.length };
+        }));
+    }
     async fetchUser(createSalesPartner) {
         common_1.Logger.debug(`fetchUser() createSalesPartner: ${JSON.stringify(createSalesPartner)}`, APP);
         this.salesPartnerAccountDetails = [];

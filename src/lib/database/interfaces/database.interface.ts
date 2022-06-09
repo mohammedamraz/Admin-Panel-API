@@ -92,6 +92,11 @@ export interface findByPeriodParams {
   period: string;
 }
 
+export interface findBycolumnParams {
+  columnName: string;
+  columnvalue: string;
+}
+
 export interface DateRangeParams {
   from: string;
   to: string;
