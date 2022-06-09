@@ -1,4 +1,4 @@
-import { CreateSalesPartner, Period, UpdateSalesPartner, ZQueryParamsDto } from './dto/create-sale.dto';
+import { CreateSalesPartner, Period, UpdateSalesPartner, YearMonthDto, ZQueryParamsDto } from './dto/create-sale.dto';
 import { SalesService } from './sales.service';
 export declare class SalesController {
     private readonly salesService;
@@ -18,4 +18,5 @@ export declare class SalesController {
     updateSalesPartner(id: number, updateSalesPartnerDto: UpdateSalesPartner): import("rxjs").Observable<Promise<CreateSalesPartner[]>>;
     changeBankDetailsVerificationStatus(id: number): import("rxjs").Observable<import("rxjs").Observable<CreateSalesPartner[]>>;
     updateUserIdInSales(id: string, updateSalesPartnerDto: UpdateSalesPartner): import("rxjs").Observable<Promise<CreateSalesPartner[]>>;
+    fetchEarnigReport(yearMonthDto: YearMonthDto): import("rxjs").Observable<any[]>;
 }

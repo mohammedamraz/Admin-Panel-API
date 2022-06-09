@@ -77,6 +77,10 @@ let SalesController = class SalesController {
         common_1.Logger.debug(`updateCustomerIdInSales() id: [${id}] DTO:${JSON.stringify(updateSalesPartnerDto)}`, APP);
         return this.salesService.updateUserIdInSales(id, updateSalesPartnerDto);
     }
+    fetchEarnigReport(yearMonthDto) {
+        common_1.Logger.debug(`fetchEarnigReport() year: [${yearMonthDto.year}`, APP);
+        return this.salesService.fetchEarnigReport(yearMonthDto);
+    }
 };
 __decorate([
     (0, common_1.Post)(),
@@ -188,6 +192,13 @@ __decorate([
     __metadata("design:paramtypes", [String, create_sale_dto_1.UpdateSalesPartner]),
     __metadata("design:returntype", void 0)
 ], SalesController.prototype, "updateUserIdInSales", null);
+__decorate([
+    (0, common_1.Get)(':salesCode/earning-report/:year'),
+    __param(0, (0, common_1.Param)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [create_sale_dto_1.YearMonthDto]),
+    __metadata("design:returntype", void 0)
+], SalesController.prototype, "fetchEarnigReport", null);
 SalesController = __decorate([
     (0, common_1.Controller)(),
     __metadata("design:paramtypes", [sales_service_1.SalesService])

@@ -2,10 +2,11 @@
 import { BadRequestException, Injectable, Logger, NotFoundException, UnprocessableEntityException } from '@nestjs/common';
 import { DatabaseTable } from 'src/lib/database/database.decorator';
 import { DatabaseService } from 'src/lib/database/database.service';
-import { CreateSalesInvitationJunction, CreateSalesJunction, CreateSalesPartner, CreateWithdrawn, Interval, makeEarningFormat, Period, SalesUserJunction, UpdateImageDTO, UpdateSalesPartner, ZQueryParamsDto } from './dto/create-sale.dto';
+import { CreateSalesInvitationJunction, CreateSalesJunction, CreateSalesPartner, CreateWithdrawn, Interval, makeEarningFormat, Period, SalesUserJunction, UpdateImageDTO, UpdateSalesPartner, YearMonthDto, ZQueryParamsDto } from './dto/create-sale.dto';
 import { HttpService } from '@nestjs/axios';
 import { fetchAccountBySalesCode, fetchUserByMobileNumber, findUserByCustomerId } from 'src/constants/helper';
-import { catchError, from, lastValueFrom, map, of, switchMap } from 'rxjs';
+import { catchError, concatMap, from, lastValueFrom, map, of, switchMap } from 'rxjs';
+import { fetchmonths } from '../admin/dto/create-admin.dto';
 
 const APP = 'SalesService';
 
@@ -19,6 +20,7 @@ export class SalesService {
     @DatabaseTable('sales_commission_junction') private readonly junctiondb: DatabaseService<CreateSalesJunction>,
     @DatabaseTable('sales_withdrawn_amount') private readonly withdrawndb: DatabaseService<CreateWithdrawn>,
     @DatabaseTable('sales_user_junction') private readonly salesuser: DatabaseService<SalesUserJunction>,
+     @DatabaseTable('sales_user_junction') private readonly salesUserJunctionDb: DatabaseService<CreateSalesJunction>,
 
     private http: HttpService) { }
 
@@ -262,5 +264,38 @@ export class SalesService {
       }))
     }))
   }
-  
+fetchEarnigReport(yearMonthDto: YearMonthDto){
+  Logger.debug(`fetchCommissionReport() year: [${yearMonthDto.year}]`)
+
+  const reportData=[]
+  return from(fetchmonths((yearMonthDto.year))).pipe(
+    concatMap(async( month: number) => {
+      return await lastValueFrom(this.junctiondb.fetchByYear({columnName: 'sales_code', columnvalue: yearMonthDto.salesCode, year: yearMonthDto.year, month: month.toString() }))
+      .then(async salesJunctionDoc=> {
+       const paid_amount=salesJunctionDoc.map(doc=>doc.paid_amount)
+       const total_paid_amount=paid_amount.reduce((next,prev)=> next + prev,0)
+       const date = salesJunctionDoc.map(doc=>{if(doc.paid_amount > 0) return doc.created_date})
+       const paid_on = date.filter((res) => res) 
+       await this.fetchSignup(yearMonthDto.year,month,yearMonthDto)
+       .then(signup => {
+         reportData.push({"total_paid_amount":total_paid_amount,"month": month,"hsa_sing_up": signup, "paid_on": paid_on[0],'total_dues': Number(salesJunctionDoc[salesJunctionDoc.length-1]?.dues)})
+        }).catch(error=> {throw new NotFoundException(error.message)})
+       return reportData
+      })
+      .catch(error=> {throw new NotFoundException(error.message)})
+      
+    })
+  )
+
 }
+
+async fetchSignup(year,month,yearMonthDto: YearMonthDto){
+  Logger.debug(`fetchSignup() year: [${year}] month: [${month}] salesCode:[${yearMonthDto.salesCode}]`, APP);
+
+   return await lastValueFrom(this.salesUserJunctionDb.fetchSignUp({columnName: 'sales_code', columnvalue: yearMonthDto.salesCode, year: yearMonthDto.year, month: month.toString() }))
+   .then(userJunctionDoc=> { console.log("junct",userJunctionDoc);console.log("junct",userJunctionDoc.length);
+    return userJunctionDoc.length})
+   .catch(error=>{throw new UnprocessableEntityException(error.message)})
+ }
+}
+  

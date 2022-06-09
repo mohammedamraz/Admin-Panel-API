@@ -1,6 +1,6 @@
 import { Pool } from 'pg';
 import { Observable } from 'rxjs';
-import { DatabaseFeatureOptions, DatabaseInterface, findAllParamsandUpdate, findAndUpdateParams, findByConditionParams, findByDateParams, findByIDAndUpdateParams, findParams, QueryParams, findByPeriodParams } from './interfaces/database.interface';
+import { DatabaseFeatureOptions, DatabaseInterface, findAllParamsandUpdate, findAndUpdateParams, findByConditionParams, findByDateParams, findByIDAndUpdateParams, findParams, QueryParams, findByPeriodParams, fetchByYearAndMonthParams } from './interfaces/database.interface';
 export declare class DatabaseService<T> implements DatabaseInterface<T> {
     private readonly pool;
     readonly feature: DatabaseFeatureOptions;
@@ -26,4 +26,6 @@ export declare class DatabaseService<T> implements DatabaseInterface<T> {
     findByPeriod(findByPeriodParams: findByPeriodParams): Observable<T[]>;
     fetchAllByPeriod(period: string): Observable<T[]>;
     fetchCommissionReportByYear(year: string, month: number): Observable<any>;
+    fetchByYear(obj: fetchByYearAndMonthParams): Observable<T[]>;
+    fetchSignUp(obj: fetchByYearAndMonthParams): Observable<T[]>;
 }

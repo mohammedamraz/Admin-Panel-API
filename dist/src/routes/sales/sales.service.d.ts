@@ -1,5 +1,5 @@
 import { DatabaseService } from 'src/lib/database/database.service';
-import { CreateSalesInvitationJunction, CreateSalesJunction, CreateSalesPartner, CreateWithdrawn, Period, SalesUserJunction, UpdateSalesPartner, ZQueryParamsDto } from './dto/create-sale.dto';
+import { CreateSalesInvitationJunction, CreateSalesJunction, CreateSalesPartner, CreateWithdrawn, Period, SalesUserJunction, UpdateSalesPartner, YearMonthDto, ZQueryParamsDto } from './dto/create-sale.dto';
 import { HttpService } from '@nestjs/axios';
 export declare class SalesService {
     private readonly db;
@@ -7,8 +7,9 @@ export declare class SalesService {
     private readonly junctiondb;
     private readonly withdrawndb;
     private readonly salesuser;
+    private readonly salesUserJunctionDb;
     private http;
-    constructor(db: DatabaseService<CreateSalesPartner>, invitationJunctiondb: DatabaseService<CreateSalesInvitationJunction>, junctiondb: DatabaseService<CreateSalesJunction>, withdrawndb: DatabaseService<CreateWithdrawn>, salesuser: DatabaseService<SalesUserJunction>, http: HttpService);
+    constructor(db: DatabaseService<CreateSalesPartner>, invitationJunctiondb: DatabaseService<CreateSalesInvitationJunction>, junctiondb: DatabaseService<CreateSalesJunction>, withdrawndb: DatabaseService<CreateWithdrawn>, salesuser: DatabaseService<SalesUserJunction>, salesUserJunctionDb: DatabaseService<CreateSalesJunction>, http: HttpService);
     createSalesPartner(createSalesPartner: CreateSalesPartner): import("rxjs").Observable<CreateSalesPartner[]>;
     createInvitation(createSalesPartner: CreateSalesPartner, createSalesJunction: CreateSalesJunction[]): import("rxjs").Observable<CreateSalesPartner[]> | CreateSalesJunction[];
     fetchSalesPartnerByMobileNumber(mobile: string): import("rxjs").Observable<CreateSalesPartner[]>;
@@ -37,4 +38,6 @@ export declare class SalesService {
     }>;
     addCommission(salesCode: string): import("rxjs").Observable<CreateSalesJunction[]>;
     updateUserIdInSales(id: string, updateSalesPartnerDto: UpdateSalesPartner): import("rxjs").Observable<Promise<CreateSalesPartner[]>>;
+    fetchEarnigReport(yearMonthDto: YearMonthDto): import("rxjs").Observable<any[]>;
+    fetchSignup(year: any, month: any, yearMonthDto: YearMonthDto): Promise<number>;
 }

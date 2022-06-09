@@ -20,14 +20,16 @@ const create_sale_dto_1 = require("./dto/create-sale.dto");
 const axios_1 = require("@nestjs/axios");
 const helper_1 = require("../../constants/helper");
 const rxjs_1 = require("rxjs");
+const create_admin_dto_1 = require("../admin/dto/create-admin.dto");
 const APP = 'SalesService';
 let SalesService = class SalesService {
-    constructor(db, invitationJunctiondb, junctiondb, withdrawndb, salesuser, http) {
+    constructor(db, invitationJunctiondb, junctiondb, withdrawndb, salesuser, salesUserJunctionDb, http) {
         this.db = db;
         this.invitationJunctiondb = invitationJunctiondb;
         this.junctiondb = junctiondb;
         this.withdrawndb = withdrawndb;
         this.salesuser = salesuser;
+        this.salesUserJunctionDb = salesUserJunctionDb;
         this.http = http;
     }
     createSalesPartner(createSalesPartner) {
@@ -217,6 +219,37 @@ let SalesService = class SalesService {
                 }));
         }));
     }
+    fetchEarnigReport(yearMonthDto) {
+        common_1.Logger.debug(`fetchCommissionReport() year: [${yearMonthDto.year}]`);
+        const reportData = [];
+        return (0, rxjs_1.from)((0, create_admin_dto_1.fetchmonths)((yearMonthDto.year))).pipe((0, rxjs_1.concatMap)(async (month) => {
+            return await (0, rxjs_1.lastValueFrom)(this.junctiondb.fetchByYear({ columnName: 'sales_code', columnvalue: yearMonthDto.salesCode, year: yearMonthDto.year, month: month.toString() }))
+                .then(async (salesJunctionDoc) => {
+                const paid_amount = salesJunctionDoc.map(doc => doc.paid_amount);
+                const total_paid_amount = paid_amount.reduce((next, prev) => next + prev, 0);
+                const date = salesJunctionDoc.map(doc => { if (doc.paid_amount > 0)
+                    return doc.created_date; });
+                const paid_on = date.filter((res) => res);
+                await this.fetchSignup(yearMonthDto.year, month, yearMonthDto)
+                    .then(signup => {
+                    var _a;
+                    reportData.push({ "total_paid_amount": total_paid_amount, "month": month, "hsa_sing_up": signup, "paid_on": paid_on[0], 'total_dues': Number((_a = salesJunctionDoc[salesJunctionDoc.length - 1]) === null || _a === void 0 ? void 0 : _a.dues) });
+                }).catch(error => { throw new common_1.NotFoundException(error.message); });
+                return reportData;
+            })
+                .catch(error => { throw new common_1.NotFoundException(error.message); });
+        }));
+    }
+    async fetchSignup(year, month, yearMonthDto) {
+        common_1.Logger.debug(`fetchSignup() year: [${year}] month: [${month}] salesCode:[${yearMonthDto.salesCode}]`, APP);
+        return await (0, rxjs_1.lastValueFrom)(this.salesUserJunctionDb.fetchSignUp({ columnName: 'sales_code', columnvalue: yearMonthDto.salesCode, year: yearMonthDto.year, month: month.toString() }))
+            .then(userJunctionDoc => {
+            console.log("junct", userJunctionDoc);
+            console.log("junct", userJunctionDoc.length);
+            return userJunctionDoc.length;
+        })
+            .catch(error => { throw new common_1.UnprocessableEntityException(error.message); });
+    }
 };
 SalesService = __decorate([
     (0, common_1.Injectable)(),
@@ -225,7 +258,9 @@ SalesService = __decorate([
     __param(2, (0, database_decorator_1.DatabaseTable)('sales_commission_junction')),
     __param(3, (0, database_decorator_1.DatabaseTable)('sales_withdrawn_amount')),
     __param(4, (0, database_decorator_1.DatabaseTable)('sales_user_junction')),
+    __param(5, (0, database_decorator_1.DatabaseTable)('sales_user_junction')),
     __metadata("design:paramtypes", [database_service_1.DatabaseService,
+        database_service_1.DatabaseService,
         database_service_1.DatabaseService,
         database_service_1.DatabaseService,
         database_service_1.DatabaseService,
