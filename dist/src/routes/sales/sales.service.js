@@ -32,6 +32,7 @@ let SalesService = class SalesService {
     }
     createSalesPartner(createSalesPartner) {
         common_1.Logger.debug(`createSalesPartner() DTO:${JSON.stringify(createSalesPartner)}`, APP);
+        let userId;
         let salesId;
         var todayDate;
         var today = new Date();
@@ -40,20 +41,20 @@ let SalesService = class SalesService {
         todayDate = mm + dd;
         return this.fetchSalesPartnerByMobileNumber(createSalesPartner.mobile).pipe((0, rxjs_1.switchMap)(doc => (0, helper_1.fetchUserByMobileNumber)(createSalesPartner.mobile)), (0, rxjs_1.switchMap)(doc => {
             if (!doc[0])
-                return this.db.save(createSalesPartner);
+                return this.db.save({ name: createSalesPartner.name, location: createSalesPartner.location, commission: createSalesPartner.commission, mobile: createSalesPartner.mobile, email: createSalesPartner.email });
             else
-                return this.db.save({ name: createSalesPartner.name, location: createSalesPartner.location, commission: createSalesPartner.commission, phone_number: createSalesPartner.mobile, email: createSalesPartner.email, user_id: doc[0].fedo_id });
+                return this.db.save({ name: createSalesPartner.name, location: createSalesPartner.location, commission: createSalesPartner.commission, mobile: createSalesPartner.mobile, email: createSalesPartner.email, user_id: doc[0].fedo_id });
         }), (0, rxjs_1.switchMap)(doc => { salesId = doc[0].id; createSalesPartner.sales_code = "FEDSP" + todayDate + 500 + doc[0].id; createSalesPartner.id = doc[0].id; return this.junctiondb.save({ sales_code: "FEDSP" + todayDate + 500 + doc[0].id }).pipe((0, rxjs_1.catchError)(err => { throw new common_1.BadRequestException(err.message); }), (0, rxjs_1.map)(doc => doc)); }), (0, rxjs_1.switchMap)(doc => this.createInvitation(createSalesPartner, doc)), (0, rxjs_1.switchMap)(doc => this.updateSalesPartner(salesId, { sales_code: createSalesPartner.sales_code })), (0, rxjs_1.switchMap)(doc => this.fetchSalesPartnerById(createSalesPartner.id.toString())));
     }
     createInvitation(createSalesPartner, createSalesJunction) {
         if (createSalesPartner.refered_by)
-            return this.invitationJunctiondb.save({ sp_id: createSalesPartner.sales_code, refered_by: createSalesPartner.refered_by }).pipe((0, rxjs_1.switchMap)(_doc => this.invitationJunctiondb.find({ refered_id: createSalesPartner.refered_by })), (0, rxjs_1.switchMap)(doc => this.db.findandUpdate({ columnName: 'sales_code', columnvalue: createSalesPartner.refered_by, quries: { sales_invitation_count: doc.length } })));
+            return this.invitationJunctiondb.save({ sp_id: createSalesPartner.sales_code, refered_by: createSalesPartner.refered_by }).pipe((0, rxjs_1.switchMap)(_doc => this.invitationJunctiondb.find({ refered_by: createSalesPartner.refered_by })), (0, rxjs_1.switchMap)(doc => this.db.findandUpdate({ columnName: 'sales_code', columnvalue: createSalesPartner.refered_by, quries: { sales_invitation_count: doc.length } })));
         else
             return createSalesJunction;
     }
     fetchSalesPartnerByMobileNumber(mobile) {
         common_1.Logger.debug(`fetchSalesPartnerByUserId() id: [${JSON.stringify(mobile)}]`, APP);
-        return (0, rxjs_1.from)((0, rxjs_1.lastValueFrom)(this.db.find({ phone_number: mobile }).pipe((0, rxjs_1.catchError)(err => { throw new common_1.UnprocessableEntityException(err.message); }), (0, rxjs_1.map)((res) => {
+        return (0, rxjs_1.from)((0, rxjs_1.lastValueFrom)(this.db.find({ mobile: mobile }).pipe((0, rxjs_1.catchError)(err => { throw new common_1.UnprocessableEntityException(err.message); }), (0, rxjs_1.map)((res) => {
             if (res[0] != null)
                 throw new common_1.NotFoundException(`sales partner already present with same phone number`);
             return res;
@@ -70,10 +71,9 @@ let SalesService = class SalesService {
     fetchSalesPartnerById(id) {
         common_1.Logger.debug(`fetchSalesPartnerById() id: [${JSON.stringify(id)}]`, APP);
         return (0, rxjs_1.from)((0, rxjs_1.lastValueFrom)(this.db.find({ id: id }).pipe((0, rxjs_1.catchError)(err => { throw new common_1.UnprocessableEntityException(err.message); }), (0, rxjs_1.map)((res) => {
-            console.log('adfasdf', res);
-            if (res[0] === null)
+            if (res[0] == null)
                 throw new common_1.NotFoundException(`Sales Partner Not Found`);
-            if (res[0].is_active === false)
+            if (res[0].is_active == false)
                 throw new common_1.NotFoundException(`Sales Partner Not Found`);
             return res;
         }))));
@@ -95,7 +95,7 @@ let SalesService = class SalesService {
                 throw new common_1.NotFoundException(`Sales Partner Not Found`);
             if (res[0].is_active === false)
                 throw new common_1.NotFoundException(`Sales Partner Not Found`);
-            return (0, rxjs_1.lastValueFrom)(this.db.findByIdandUpdate({ id: id, quries: updateSalesPartnerDto }).pipe((0, rxjs_1.catchError)(err => { throw new common_1.BadRequestException(); }), (0, rxjs_1.map)(doc => { return doc; })));
+            return (0, rxjs_1.lastValueFrom)(this.db.findByIdandUpdate({ id: String(id), quries: updateSalesPartnerDto }).pipe((0, rxjs_1.catchError)(err => { throw new common_1.BadRequestException(); }), (0, rxjs_1.map)(doc => { return doc; })));
         }));
     }
     fetchAllSalesPartnersByDate(params) {
@@ -173,15 +173,9 @@ let SalesService = class SalesService {
             return res[res.length - 1];
         }));
     }
-    paymentCalculation(salesCode) {
-        common_1.Logger.debug(`paymentCalculation salesCode: ${salesCode}`, APP);
-        let totalCommission;
-        let remainingCommission;
-        return this.fetchSalesBySalesCode(salesCode).pipe((0, rxjs_1.switchMap)(doc => { return this.fetchCommisionBySalesCode(salesCode); }), (0, rxjs_1.switchMap)(doc => { console.log(doc.commission_amount); totalCommission = doc.commission_amount; return this.fetchSalesBySalesCode(salesCode).pipe((0, rxjs_1.map)(doc => { return doc; })); }), (0, rxjs_1.switchMap)(doc => this.withdrawndb.find({ 'sale_id': doc.id })), (0, rxjs_1.switchMap)(doc => { console.log(doc[0].paid_amount, totalCommission); remainingCommission = totalCommission - doc[0].paid_amount; console.log(remainingCommission); return this.junctiondb.save({ sales_code: salesCode, commission_amount: remainingCommission }); }));
-    }
     changeBankDetailsVerificationSatatus(id) {
-        common_1.Logger.debug(`changeBankDetailsVerificationSatatus() id: [${id}] quries:{'bank_details_verification':true}`, APP);
-        return (this.db.find({ id: id })).pipe((0, rxjs_1.catchError)(err => { (err); throw new common_1.UnprocessableEntityException(); }), (0, rxjs_1.map)(res => {
+        common_1.Logger.debug(`changeBankDetailsVerificationSatatus() id: [${id}] `, APP);
+        return (this.db.find({ id: id })).pipe((0, rxjs_1.catchError)(err => { (err); throw new common_1.UnprocessableEntityException(err.message); }), (0, rxjs_1.map)(res => {
             if (res.length === 0)
                 throw new common_1.NotFoundException();
             return this.db.findByIdandUpdate({ id: String(id), quries: { 'bank_details_verification': true } });
@@ -207,6 +201,21 @@ let SalesService = class SalesService {
         common_1.Logger.debug(`addCommission() salesCode: ${salesCode}`, APP);
         return this.fetchSalesBySalesCode(salesCode).pipe((0, rxjs_1.switchMap)(salesCommission => (0, rxjs_1.lastValueFrom)(this.junctiondb.find({ "sales_code": String(salesCode), }))
             .then(res => { console.log('dds', res); return [salesCommission, res[res.length - 1]]; })), (0, rxjs_1.switchMap)(async ([salesCommission, res]) => { await this.salesuser.save({ sales_code: salesCode }); return [salesCommission, res]; }), (0, rxjs_1.switchMap)(([salesCommission, res]) => this.junctiondb.save({ sales_code: salesCode, commission_amount: salesCommission["commission"], dues: (Number(res['dues']) + Number(salesCommission["commission"])) })));
+    }
+    updateUserIdInSales(id, updateSalesPartnerDto) {
+        common_1.Logger.debug(`updateSalesPartner() id: [${id}], body: [${JSON.stringify(updateSalesPartnerDto)}]`, APP);
+        return this.db.find({ id: id }).pipe((0, rxjs_1.switchMap)(res => {
+            if (res.length == 0)
+                throw new common_1.NotFoundException(`Sales Partner Not Found`);
+            else
+                return (0, helper_1.findUserByCustomerId)(updateSalesPartnerDto.customer_id).pipe((0, rxjs_1.map)((userDoc) => {
+                    if (userDoc.length == 0)
+                        throw new common_1.NotFoundException("User not found");
+                    else if (userDoc[0].userreference_id === updateSalesPartnerDto.customer_id) {
+                        return (0, rxjs_1.lastValueFrom)(this.db.findByIdandUpdate({ id: id, quries: { user_id: userDoc[0].fedo_id } }).pipe((0, rxjs_1.catchError)(err => { throw new common_1.BadRequestException(err.message); }), (0, rxjs_1.map)(doc => { return doc; })));
+                    }
+                }));
+        }));
     }
 };
 SalesService = __decorate([

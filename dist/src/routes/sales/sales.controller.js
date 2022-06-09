@@ -49,10 +49,6 @@ let SalesController = class SalesController {
         common_1.Logger.debug(`fetchInvitationResponse()salesCode: [${salesCode}] `, APP);
         return this.salesService.fetchInvitationResponse(salesCode, period);
     }
-    updateSalesPartner(id, updateSalesPartnerDto) {
-        common_1.Logger.debug(`updateSalesPartner() id: [${id}] DTO:${JSON.stringify(updateSalesPartnerDto)}`, APP);
-        return this.salesService.updateSalesPartner(id, updateSalesPartnerDto);
-    }
     fetchAllSalesPartnersByDate(params) {
         common_1.Logger.debug(`fetchAllSalesPartnersByDate() params:${JSON.stringify(params)}`, APP);
         return this.salesService.fetchAllSalesPartnersByDate(params);
@@ -69,13 +65,17 @@ let SalesController = class SalesController {
         common_1.Logger.debug(`UploadImage: ${file}`, APP);
         return this.salesService.uploadImage(id, file.filename);
     }
-    paymentCalculation(salesCode) {
-        common_1.Logger.debug(`paymentCalculation()salesCode: [${salesCode}] `, APP);
-        return this.salesService.paymentCalculation(String(salesCode));
+    updateSalesPartner(id, updateSalesPartnerDto) {
+        common_1.Logger.debug(`updateSalesPartner() id: [${id}] DTO:${JSON.stringify(updateSalesPartnerDto)}`, APP);
+        return this.salesService.updateSalesPartner(id, updateSalesPartnerDto);
     }
     changeBankDetailsVerificationStatus(id) {
-        common_1.Logger.debug(`changeBankDetailsVerificationSatatus() id:[${id}] quries:{'bank_details_verification':true}`, APP);
+        common_1.Logger.debug(`changeBankDetailsVerificationSatatus() id:[${id}] `, APP);
         return this.salesService.changeBankDetailsVerificationSatatus(id);
+    }
+    updateUserIdInSales(id, updateSalesPartnerDto) {
+        common_1.Logger.debug(`updateCustomerIdInSales() id: [${id}] DTO:${JSON.stringify(updateSalesPartnerDto)}`, APP);
+        return this.salesService.updateUserIdInSales(id, updateSalesPartnerDto);
     }
 };
 __decorate([
@@ -123,14 +123,6 @@ __decorate([
     __metadata("design:returntype", void 0)
 ], SalesController.prototype, "fetchInvitationResponse", null);
 __decorate([
-    (0, common_1.Patch)(':id'),
-    __param(0, (0, common_1.Param)('id')),
-    __param(1, (0, common_1.Body)()),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String, create_sale_dto_1.UpdateSalesPartner]),
-    __metadata("design:returntype", void 0)
-], SalesController.prototype, "updateSalesPartner", null);
-__decorate([
     (0, common_1.Get)(),
     __param(0, (0, common_1.Query)()),
     __metadata("design:type", Function),
@@ -174,12 +166,13 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], SalesController.prototype, "uploadImage", null);
 __decorate([
-    (0, common_1.Post)(':salesCode/need-to-pay-amount'),
-    __param(0, (0, common_1.Param)('salesCode')),
+    (0, common_1.Patch)(':id'),
+    __param(0, (0, common_1.Param)('id', common_1.ParseIntPipe)),
+    __param(1, (0, common_1.Body)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String]),
+    __metadata("design:paramtypes", [Number, create_sale_dto_1.UpdateSalesPartner]),
     __metadata("design:returntype", void 0)
-], SalesController.prototype, "paymentCalculation", null);
+], SalesController.prototype, "updateSalesPartner", null);
 __decorate([
     (0, common_1.Patch)('bank-details-verification/:id'),
     __param(0, (0, common_1.Param)('id', common_1.ParseIntPipe)),
@@ -187,6 +180,14 @@ __decorate([
     __metadata("design:paramtypes", [Number]),
     __metadata("design:returntype", void 0)
 ], SalesController.prototype, "changeBankDetailsVerificationStatus", null);
+__decorate([
+    (0, common_1.Patch)(':id/updateCustomer'),
+    __param(0, (0, common_1.Param)('id')),
+    __param(1, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, create_sale_dto_1.UpdateSalesPartner]),
+    __metadata("design:returntype", void 0)
+], SalesController.prototype, "updateUserIdInSales", null);
 SalesController = __decorate([
     (0, common_1.Controller)(),
     __metadata("design:paramtypes", [sales_service_1.SalesService])

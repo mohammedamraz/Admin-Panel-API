@@ -1,7 +1,7 @@
 import { HttpService } from '@nestjs/axios';
 import { DatabaseService } from 'src/lib/database/database.service';
-import { CreateSalesJunction, CreateSalesPartner, CreateSalesPartnerRequest, SalesUserJunction, Period } from '../sales/dto/create-sale.dto';
-import { createPaid, MobileNumberAndOtpDtO, MobileNumberDtO, ParamDto, requestDto, User } from './dto/create-admin.dto';
+import { CreateSalesJunction, CreateSalesPartner, CreateSalesPartnerRequest, Period, SalesUserJunction } from '../sales/dto/create-sale.dto';
+import { createPaid, MobileNumberAndOtpDtO, MobileNumberDtO, ParamDto, requestDto, User, YearMonthDto } from './dto/create-admin.dto';
 import { ConfirmForgotPasswordDTO, ForgotPasswordDTO, LoginDTO, PeriodRange, State } from './dto/login.dto';
 import { TemplateService } from 'src/constants/template.service';
 export declare class AdminService {
@@ -9,9 +9,10 @@ export declare class AdminService {
     private readonly salesDb;
     private readonly salesPartnerRequestDb;
     private readonly salesuser;
+    private readonly salesUserJunctionDb;
     private readonly templateService;
     private http;
-    constructor(salesJunctionDb: DatabaseService<CreateSalesJunction>, salesDb: DatabaseService<CreateSalesPartner>, salesPartnerRequestDb: DatabaseService<CreateSalesPartnerRequest>, salesuser: DatabaseService<SalesUserJunction>, templateService: TemplateService, http: HttpService);
+    constructor(salesJunctionDb: DatabaseService<CreateSalesJunction>, salesDb: DatabaseService<CreateSalesPartner>, salesPartnerRequestDb: DatabaseService<CreateSalesPartnerRequest>, salesuser: DatabaseService<SalesUserJunction>, salesUserJunctionDb: DatabaseService<CreateSalesJunction>, templateService: TemplateService, http: HttpService);
     accountSid: string;
     authToken: string;
     serviceSid: string;
@@ -93,4 +94,6 @@ export declare class AdminService {
         status: string;
     }>;
     encryptPassword_(password: any): any;
+    fetchCommissionReport(yearMonthDto: YearMonthDto): import("rxjs").Observable<any[]>;
+    fetchSignup(year: any, month: any): Promise<any>;
 }

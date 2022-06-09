@@ -15,7 +15,7 @@ export declare class SalesService {
     fetchSalesPartnerByUserId(id: string): import("rxjs").Observable<CreateSalesPartner[]>;
     fetchSalesPartnerById(id: string): import("rxjs").Observable<CreateSalesPartner[]>;
     deleteSalesPartner(id: string): import("rxjs").Observable<Promise<CreateSalesPartner[]>>;
-    updateSalesPartner(id: string, updateSalesPartnerDto: UpdateSalesPartner): import("rxjs").Observable<Promise<CreateSalesPartner[]>>;
+    updateSalesPartner(id: number, updateSalesPartnerDto: UpdateSalesPartner): import("rxjs").Observable<Promise<CreateSalesPartner[]>>;
     fetchAllSalesPartnersByDate(params: ZQueryParamsDto): import("rxjs").Observable<any>;
     fetchCommissionFromJunctionDb(params: ZQueryParamsDto): any[] | import("rxjs").Observable<CreateSalesJunction[]>;
     fetchAllSalesPartnersFromJunctionByDate(id: string, params: ZQueryParamsDto): any[] | import("rxjs").Observable<any>;
@@ -30,11 +30,11 @@ export declare class SalesService {
     updateImageById(id: string, updateSalesPartnerDto: object): Promise<CreateSalesPartner[]>;
     fetchSalesBySalesCode(sales_code: string): import("rxjs").Observable<CreateSalesPartner>;
     fetchCommisionBySalesCode(salesCode: string): import("rxjs").Observable<CreateSalesJunction>;
-    paymentCalculation(salesCode: string): import("rxjs").Observable<CreateSalesJunction[]>;
     changeBankDetailsVerificationSatatus(id: number): import("rxjs").Observable<import("rxjs").Observable<CreateSalesPartner[]>>;
     fetchEarnings(salesCode: string, period: Period): import("rxjs").Observable<import("./dto/create-sale.dto").EarningResponse>;
     fetchInvitationResponse(salesCode: string, period: Period): import("rxjs").Observable<{
         signup: number;
     }>;
     addCommission(salesCode: string): import("rxjs").Observable<CreateSalesJunction[]>;
+    updateUserIdInSales(id: string, updateSalesPartnerDto: UpdateSalesPartner): import("rxjs").Observable<Promise<CreateSalesPartner[]>>;
 }

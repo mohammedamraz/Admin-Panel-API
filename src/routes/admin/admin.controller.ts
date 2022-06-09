@@ -1,7 +1,7 @@
 import { Controller, Get, Post, Body, Param, Logger, Query } from '@nestjs/common';
 import { Period } from '../sales/dto/create-sale.dto';
 import { AdminService } from './admin.service';
-import { createPaid, MobileNumberAndOtpDtO, MobileNumberDtO, ParamDto, requestDto } from './dto/create-admin.dto';
+import { createPaid, MobileNumberAndOtpDtO, MobileNumberDtO, ParamDto, requestDto, YearMonthDto } from './dto/create-admin.dto';
 import { ConfirmForgotPasswordDTO, ForgotPasswordDTO, LoginDTO, PeriodRange, State } from './dto/login.dto';
 
 const APP = 'AdminController';
@@ -15,6 +15,13 @@ export class AdminController {
     Logger.debug(`fetchSalesPartner() period: [${JSON.stringify(period)}]`, APP);
 
     return this.adminService.fetchSalesPartner(period);
+  }
+
+  @Get('commission-report/:year')
+  fetchCommissionReport(@Param() yearMonthDto:YearMonthDto){
+    Logger.debug(`fetchCommissionReport() year: [${yearMonthDto.year}]`, APP);
+
+    return this.adminService.fetchCommissionReport(yearMonthDto);
   }
 
   @Get('sales/account-details')
@@ -107,5 +114,7 @@ export class AdminController {
 
     return this.adminService.sendCreateSalesPartnerLinkToMobileAndWhatsappNumber(mobileNumberDtO);
   }
+
+ 
 
 }

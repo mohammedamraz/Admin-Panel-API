@@ -25,5 +25,6 @@ export declare class DatabaseService<T> implements DatabaseInterface<T> {
     findByDate(findbyConditionParams: findByDateParams): Observable<T[]>;
     findByPeriod(findByPeriodParams: findByPeriodParams): Observable<T[]>;
     fetchAllByPeriod(period: string): Observable<T[]>;
+    fetchCommissionReportByYear(year: string, month: number): Observable<any>;
     fetchBetweenRange(date: DateRangeParams): Observable<T[]>;
 }

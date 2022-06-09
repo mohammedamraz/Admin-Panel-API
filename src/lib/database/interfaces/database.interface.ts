@@ -118,6 +118,21 @@ const params:findByConditionParams={
 }
 return params
 }
+
+export interface MONTHYEAR {
+  year: number;
+  month: number;
+}
+
+export const fetchMonthYear=(MONTHYEAR:MONTHYEAR) =>{
+  const params:MONTHYEAR={
+    year: MONTHYEAR.year,
+    month: MONTHYEAR.month
+  }
+  return params
+  }
+
+
 export interface DatabaseInterface<T> {
   tableName: string;
 
@@ -172,5 +187,6 @@ Method used to creat nw row in table
    * Updated the table by given condition
    */
   findandUpdate(findAndupdateparams: findAndUpdateParams): Observable<T[]>;
+  
 
 }

@@ -36,6 +36,8 @@ export class SalesController {
       return this.salesService.deleteSalesPartner(id);
   }
 
+ 
+
   @Get(':id')
   fetchSalesPartnerById(@Param('id') id: string) {
       Logger.debug(`fetchSalesPartnerById() id: [${id}]`, APP);
@@ -57,12 +59,7 @@ export class SalesController {
       return this.salesService.fetchInvitationResponse(salesCode, period);
   }
 
-  @Patch(':id')
-  updateSalesPartner(@Param('id') id: string, @Body() updateSalesPartnerDto: UpdateSalesPartner) {
-      Logger.debug(`updateSalesPartner() id: [${id}] DTO:${JSON.stringify(updateSalesPartnerDto,)}`, APP);
-
-      return this.salesService.updateSalesPartner(id, updateSalesPartnerDto);
-  }
+ 
 
   @Get()
   fetchAllSalesPartnersByDate(@Query() params: ZQueryParamsDto) {
@@ -105,24 +102,31 @@ export class SalesController {
       return this.salesService.uploadImage(id, file.filename);
   }
 
-  @Post(':salesCode/need-to-pay-amount')
-  paymentCalculation(@Param('salesCode') salesCode: String){
-      Logger.debug(`paymentCalculation()salesCode: [${salesCode}] `, APP);
 
-      return this.salesService.paymentCalculation(String(salesCode))
+
+
+
+  @Patch(':id')
+  updateSalesPartner(@Param('id',ParseIntPipe) id: number, @Body() updateSalesPartnerDto: UpdateSalesPartner) {
+      Logger.debug(`updateSalesPartner() id: [${id}] DTO:${JSON.stringify(updateSalesPartnerDto,)}`, APP);
+
+      return this.salesService.updateSalesPartner(id, updateSalesPartnerDto);
   }
-  
-
 
   @Patch('bank-details-verification/:id')
   changeBankDetailsVerificationStatus(@Param('id', ParseIntPipe) id: number) {
-    Logger.debug(`changeBankDetailsVerificationSatatus() id:[${id}] quries:{'bank_details_verification':true}`, APP);
+    Logger.debug(`changeBankDetailsVerificationSatatus() id:[${id}] `, APP);
 
     return this.salesService.changeBankDetailsVerificationSatatus(id);
   }
+  @Patch(':id/updateCustomer')
+  updateUserIdInSales(@Param('id') id: string, @Body() updateSalesPartnerDto: UpdateSalesPartner) {
+      Logger.debug(`updateCustomerIdInSales() id: [${id}] DTO:${JSON.stringify(updateSalesPartnerDto,)}`, APP);
 
+      return this.salesService.updateUserIdInSales(id, updateSalesPartnerDto);
+  }
 
-
+  
 }
 
 

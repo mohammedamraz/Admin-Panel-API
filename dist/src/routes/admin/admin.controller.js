@@ -27,6 +27,10 @@ let AdminController = class AdminController {
         common_1.Logger.debug(`fetchSalesPartner() period: [${JSON.stringify(period)}]`, APP);
         return this.adminService.fetchSalesPartner(period);
     }
+    fetchCommissionReport(yearMonthDto) {
+        common_1.Logger.debug(`fetchCommissionReport() year: [${yearMonthDto.year}]`, APP);
+        return this.adminService.fetchCommissionReport(yearMonthDto);
+    }
     fetchSalesPartnerAccountDetails() {
         common_1.Logger.debug(`getSalesPartnerAccountDetails()`, APP);
         return this.adminService.fetchSalesPartnerAccountDetails();
@@ -87,6 +91,13 @@ __decorate([
     __metadata("design:paramtypes", [create_sale_dto_1.Period]),
     __metadata("design:returntype", void 0)
 ], AdminController.prototype, "fetchSalesPartner", null);
+__decorate([
+    (0, common_1.Get)('commission-report/:year'),
+    __param(0, (0, common_1.Param)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [create_admin_dto_1.YearMonthDto]),
+    __metadata("design:returntype", void 0)
+], AdminController.prototype, "fetchCommissionReport", null);
 __decorate([
     (0, common_1.Get)('sales/account-details'),
     __metadata("design:type", Function),

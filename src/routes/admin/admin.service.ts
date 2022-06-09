@@ -3,8 +3,8 @@ import { HttpService } from '@nestjs/axios';
 import { AKASH_ACCOUNTID, AKASH_AUTHTOKEN, AKASH_SERVICEID, APP_DOWNLOAD_LINK, AWS_COGNITO_USER_CREATION_URL_SIT, FEDO_APP, PUBLIC_KEY, SALES_PARTNER_LINK } from 'src/constants';
 import { DatabaseTable } from 'src/lib/database/database.decorator';
 import { DatabaseService } from 'src/lib/database/database.service';
-import { CreateSalesJunction, CreateSalesPartner, CreateSalesPartnerRequest, Interval, SalesUserJunction, Period, PERIOD } from '../sales/dto/create-sale.dto';
-import { AccountZwitchResponseBody,  createPaid,  MobileNumberAndOtpDtO, MobileNumberDtO, ParamDto, requestDto, sendEmailOnIncorrectBankDetailsDto, User } from './dto/create-admin.dto';
+import { CreateSalesJunction, CreateSalesPartner, CreateSalesPartnerRequest, Interval, makeEarningFormat, PERIOD, Period, SalesUserJunction } from '../sales/dto/create-sale.dto';
+import { AccountZwitchResponseBody,  createPaid,  fetchmonths,  MobileNumberAndOtpDtO, MobileNumberDtO, ParamDto, requestDto, sendEmailOnIncorrectBankDetailsDto, User, YearMonthDto } from './dto/create-admin.dto';
 import { AxiosResponse } from 'axios';
 import { catchError, concatMap, from, lastValueFrom, map, of, switchMap, throwError } from 'rxjs';
 import { ConfirmForgotPasswordDTO, fetchDAte, ForgotPasswordDTO, LoginDTO, makeStateFormat, PERIODADMIN, PeriodRange, State } from './dto/login.dto';
@@ -23,6 +23,8 @@ export class AdminService {
     @DatabaseTable('sales_partner') private readonly salesDb: DatabaseService<CreateSalesPartner>,
     @DatabaseTable('sales_partner_requests') private readonly salesPartnerRequestDb: DatabaseService<CreateSalesPartnerRequest>,
     @DatabaseTable('sales_user_junction') private readonly salesuser: DatabaseService<SalesUserJunction>,
+    @DatabaseTable('sales_user_junction') private readonly salesUserJunctionDb: DatabaseService<CreateSalesJunction>,
+
     // private readonly accountService: AccountsService,
     // private readonly usersservice: UsersService,
     private readonly templateService: TemplateService,
@@ -41,7 +43,7 @@ export class AdminService {
   fetchSalesPartnerAccountDetails() {
     Logger.debug(`fetchSalesPartnerAccountDetails()`, APP);
 
-    return this.salesDb.find({ block_account: true, is_hsa_account:true }).pipe(
+    return this.salesDb.find({ block_account: false, is_hsa_account:true }).pipe(
       map(salesDoc =>{
           if (salesDoc.length === 0) throw new NotFoundException("sales partner not found");
         return this.fetchUser(salesDoc)
@@ -358,7 +360,7 @@ export class AdminService {
   async updatingPaidAmount(updateAmountdto: createPaid) {
 
     Logger.debug(`updatePaidAmount() updateAmountdto: [${JSON.stringify(updateAmountdto)}]`, APP);
-    console.log(updateAmountdto['data']);
+    
     updateAmountdto['data'].map(res => {
       
       return lastValueFrom(this.salesJunctionDb.find({ "sales_code": res.salesCode }).pipe(map(doc => {
@@ -420,5 +422,37 @@ export class AdminService {
     return encryptedString
   }
 
+  fetchCommissionReport(yearMonthDto:YearMonthDto){
+    Logger.debug(`fetchCommissionReport() year: [${yearMonthDto.year}]`, APP);
 
+    const reportData=[]
+    return from(fetchmonths((yearMonthDto.year))).pipe(
+      concatMap(async( month: number) => {
+        return await lastValueFrom(this.salesJunctionDb.fetchCommissionReportByYear(yearMonthDto.year,month))
+        .then(async salesJunctionDoc=> {
+         const paid_amount=salesJunctionDoc.map(doc=>doc.paid_amount)
+         const total_paid_amount=paid_amount.reduce((next,prev)=> next + prev,0)
+         const due=salesJunctionDoc.map(doc=>doc.dues)
+         const total_dues = due.reduce((next, prev) => Number(next)+Number(prev), 0);
+         const date = salesJunctionDoc.map(doc=>{if(doc.paid_amount > 0) return doc.created_date})
+         const paid_on = date.filter((res) => res)
+         await this.fetchSignup(yearMonthDto.year,month)
+         .then(signup => {
+           reportData.push({"total_paid_amount":total_paid_amount,"month": month, "total_dues":total_dues,"hsa_sing_up": signup, "paid_on": paid_on[0] })
+          }).catch(error=> {throw new NotFoundException(error.message)})
+         return reportData
+        })
+        .catch(error=> {throw new NotFoundException(error.message)})
+        .then(doc => reportData)
+      })
+    )
+  }
+
+  async fetchSignup(year,month){
+    Logger.debug(`fetchSignup() year: [${year}] month: [${month}]`, APP);
+
+     return await lastValueFrom(this.salesUserJunctionDb.fetchCommissionReportByYear(year,month))
+     .then(userJunctionDoc=> { return userJunctionDoc.length})
+     .catch(error=>{throw new UnprocessableEntityException(error.message)})
+   }
 }
