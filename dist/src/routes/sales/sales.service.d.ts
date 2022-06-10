@@ -10,7 +10,7 @@ export declare class SalesService {
     private http;
     constructor(db: DatabaseService<CreateSalesPartner>, invitationJunctiondb: DatabaseService<CreateSalesInvitationJunction>, junctiondb: DatabaseService<CreateSalesJunction>, withdrawndb: DatabaseService<CreateWithdrawn>, salesuser: DatabaseService<SalesUserJunction>, http: HttpService);
     createSalesPartner(createSalesPartner: CreateSalesPartner): import("rxjs").Observable<CreateSalesPartner[]>;
-    createInvitation(createSalesPartner: CreateSalesPartner, createSalesJunction: CreateSalesJunction[]): import("rxjs").Observable<CreateSalesPartner[]> | CreateSalesJunction[];
+    createInvitation(createSalesPartner: CreateSalesPartner, createSalesJunction: CreateSalesJunction[]): CreateSalesJunction[] | import("rxjs").Observable<CreateSalesPartner[]>;
     fetchSalesPartnerByMobileNumber(mobile: string): import("rxjs").Observable<CreateSalesPartner[]>;
     fetchSalesPartnerByUserId(id: string): import("rxjs").Observable<CreateSalesPartner[]>;
     fetchSalesPartnerById(id: string): import("rxjs").Observable<CreateSalesPartner[]>;

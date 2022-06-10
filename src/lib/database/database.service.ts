@@ -267,7 +267,7 @@ export class DatabaseService<T> implements DatabaseInterface<T> {
 
   }
 
-  fetchCommissionReportByYear(year: string, month: number ){
+  fetchCommissionReportByYear(year: string, month: number ): Observable<T[]>{
     Logger.debug(`fetchCommissionReportByYear(): year ${year}`, APP);
 
     const query = `SELECT * FROM ${this.tableName} WHERE date_part('year',created_date) = ${year} AND date_part('month',created_date) = ${month}`;

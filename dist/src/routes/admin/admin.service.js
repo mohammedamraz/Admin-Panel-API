@@ -351,7 +351,7 @@ let AdminService = class AdminService {
                 const paid_on = date.filter((res) => res);
                 await this.fetchSignup(yearMonthDto.year, month)
                     .then(signup => {
-                    reportData.push({ "total_paid_amount": total_paid_amount, "month": month, "total_dues": total_dues, "hsa_sing_up": signup, "paid_on": paid_on[0] });
+                    reportData.push({ "total_paid_amount": total_paid_amount, "month": month, "total_dues": (0, create_admin_dto_1.fetchDues)(salesJunctionDoc), "hsa_sing_up": signup, "paid_on": paid_on[0] });
                 }).catch(error => { throw new common_1.NotFoundException(error.message); });
                 return reportData;
             })
@@ -375,7 +375,7 @@ let AdminService = class AdminService {
     fetchSignUpsforPerformance(createSalesPartner, createSalesJunction, dateDTO) {
         common_1.Logger.debug(`fetchSignUpsforPerformance() createSalesJunction: [${JSON.stringify(createSalesJunction)}]`, APP);
         console.log('don', createSalesJunction[createSalesJunction.length - 1]);
-        return this.salesuser.fetchByYear({ columnName: "sales_code", columnvalue: createSalesPartner.sales_code, year: dateDTO.year, month: dateDTO.month }).pipe((0, rxjs_1.map)(doc => (0, login_dto_1.makeEarningDuesFormat)(createSalesPartner.name, createSalesJunction.reduce((acc, curr) => acc += curr.commission_amount, 0), !createSalesJunction[createSalesJunction.length - 1] ? 0 : createSalesJunction[createSalesJunction.length - 1].dues, doc.length)));
+        return this.salesuser.fetchByYear({ columnName: "sales_code", columnvalue: createSalesPartner.sales_code, year: dateDTO.year, month: dateDTO.month }).pipe((0, rxjs_1.map)(doc => (0, login_dto_1.makeEarningDuesFormat)(createSalesPartner.name, createSalesJunction.reduce((acc, curr) => acc += curr.commission_amount, 0), !!createSalesJunction[createSalesJunction.length - 1] ? 0 : createSalesJunction[createSalesJunction.length - 1].dues, doc.length)));
     }
     async fetchSignup(year, month) {
         common_1.Logger.debug(`fetchSignup() year: [${year}] month: [${month}]`, APP);

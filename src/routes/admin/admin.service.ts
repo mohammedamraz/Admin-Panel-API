@@ -5,7 +5,7 @@ import { AKASH_ACCOUNTID, AKASH_AUTHTOKEN, AKASH_SERVICEID, APP_DOWNLOAD_LINK, A
 import { DatabaseTable } from 'src/lib/database/database.decorator';
 import { DatabaseService } from 'src/lib/database/database.service';
 import { CreateSalesJunction, CreateSalesPartner, CreateSalesPartnerRequest, Interval, makeEarningFormat, PERIOD, Period, SalesUserJunction } from '../sales/dto/create-sale.dto';
-import { AccountZwitchResponseBody,  createPaid,  DateDTO,  fetchmonths,  MobileNumberAndOtpDtO, MobileNumberDtO, ParamDto, requestDto, sendEmailOnIncorrectBankDetailsDto, User, YearMonthDto } from './dto/create-admin.dto';
+import { AccountZwitchResponseBody,  createPaid,  DateDTO,  fetchDues,  fetchmonths,  MobileNumberAndOtpDtO, MobileNumberDtO, ParamDto, requestDto, sendEmailOnIncorrectBankDetailsDto, User, YearMonthDto } from './dto/create-admin.dto';
 import { AxiosResponse } from 'axios';
 import { catchError, concatMap, from, lastValueFrom, map, of, switchMap, throwError } from 'rxjs';
 import { applyPerformance, averageSignup, ConfirmForgotPasswordDTO, fetchDAte, ForgotPasswordDTO, LoginDTO, makeEarningDuesFormat, makeStateFormat, PERIODADMIN, PeriodRange, State } from './dto/login.dto';
@@ -439,7 +439,7 @@ export class AdminService {
          const paid_on = date.filter((res) => res)
          await this.fetchSignup(yearMonthDto.year,month)
          .then(signup => {
-           reportData.push({"total_paid_amount":total_paid_amount,"month": month, "total_dues":total_dues,"hsa_sing_up": signup, "paid_on": paid_on[0] })
+           reportData.push({"total_paid_amount":total_paid_amount,"month": month, "total_dues":fetchDues(salesJunctionDoc),"hsa_sing_up": signup, "paid_on": paid_on[0] })
           }).catch(error=> {throw new NotFoundException(error.message)})
          return reportData
         })
@@ -479,7 +479,7 @@ export class AdminService {
     Logger.debug(`fetchSignUpsforPerformance() createSalesJunction: [${JSON.stringify(createSalesJunction)}]`, APP);
     console.log('don', createSalesJunction[createSalesJunction.length-1]);
     return this.salesuser.fetchByYear({columnName: "sales_code", columnvalue: createSalesPartner.sales_code, year: dateDTO.year, month: dateDTO.month}).pipe(
-      map(doc => makeEarningDuesFormat(createSalesPartner.name, createSalesJunction.reduce((acc, curr) => acc += curr.commission_amount, 0), !createSalesJunction[createSalesJunction.length-1] ? 0 : createSalesJunction[createSalesJunction.length-1].dues  , doc.length)) )
+      map(doc => makeEarningDuesFormat(createSalesPartner.name, createSalesJunction.reduce((acc, curr) => acc += curr.commission_amount, 0), !!createSalesJunction[createSalesJunction.length-1] ? 0 : createSalesJunction[createSalesJunction.length-1].dues  , doc.length)) )
     
   }
 

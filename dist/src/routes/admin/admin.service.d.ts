@@ -109,5 +109,5 @@ export declare class AdminService {
         dues: number;
         signups: number;
     }>;
-    fetchSignup(year: any, month: any): Promise<any>;
+    fetchSignup(year: any, month: any): Promise<number>;
 }
