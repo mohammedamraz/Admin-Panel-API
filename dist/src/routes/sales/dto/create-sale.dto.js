@@ -135,11 +135,9 @@ class EarningResponse {
 exports.EarningResponse = EarningResponse;
 const Interval = (period) => exports.PERIOD[period.period];
 exports.Interval = Interval;
-const makeEarningFormat = (earning) => {
-    return {
-        earnedAmount: earning[0],
-        paidAmount: earning[1]
-    };
-};
+const makeEarningFormat = (earning) => ({
+    earnedAmount: earning[0],
+    paidAmount: earning[1]
+});
 exports.makeEarningFormat = makeEarningFormat;
 //# sourceMappingURL=create-sale.dto.js.map

@@ -11,7 +11,7 @@ export declare class SalesController {
     fetchInvitationResponse(salesCode: string, period: Period): import("rxjs").Observable<{
         signup: number;
     }>;
-    fetchAllSalesPartnersByDate(params: ZQueryParamsDto): import("rxjs").Observable<any>;
+    fetchAllSalesPartnersByDate(params: ZQueryParamsDto): import("rxjs").Observable<CreateSalesPartner[]>;
     fetchCommissionFromJunctionDb(params: ZQueryParamsDto): any[] | import("rxjs").Observable<import("./dto/create-sale.dto").CreateSalesJunction[]>;
     fetchAllSalesPartnersFromJunctionByDate(id: string, params: ZQueryParamsDto): any[] | import("rxjs").Observable<any>;
     uploadImage(id: string, file: any): Promise<CreateSalesPartner[]>;

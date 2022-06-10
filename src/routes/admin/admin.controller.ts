@@ -1,7 +1,7 @@
 import { Controller, Get, Post, Body, Param, Logger, Query } from '@nestjs/common';
 import { Period } from '../sales/dto/create-sale.dto';
 import { AdminService } from './admin.service';
-import { createPaid, MobileNumberAndOtpDtO, MobileNumberDtO, ParamDto, requestDto, YearMonthDto } from './dto/create-admin.dto';
+import { createPaid, DateDTO, MobileNumberAndOtpDtO, MobileNumberDtO, ParamDto, requestDto, YearMonthDto } from './dto/create-admin.dto';
 import { ConfirmForgotPasswordDTO, ForgotPasswordDTO, LoginDTO, PeriodRange, State } from './dto/login.dto';
 
 const APP = 'AdminController';
@@ -22,6 +22,14 @@ export class AdminController {
     Logger.debug(`fetchCommissionReport() year: [${yearMonthDto.year}]`, APP);
 
     return this.adminService.fetchCommissionReport(yearMonthDto);
+  }
+
+  @Get('monthlyreport/:year/:month')
+  fetchMonthlyReport(@Param() dateDTO: DateDTO){
+    Logger.debug(`fetchMonthlyReport() dateDTO: [${JSON.stringify(dateDTO)}]`, APP);
+
+    return this.adminService.fetchMonthlyReport(dateDTO);
+
   }
 
   @Get('sales/account-details')

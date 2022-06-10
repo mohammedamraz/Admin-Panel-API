@@ -1,5 +1,6 @@
 
 import { IsEnum, IsNotEmpty, IsOptional } from 'class-validator';
+import { time } from 'console';
 import { Periodicity } from 'src/routes/sales/dto/create-sale.dto';
 
 export class LoginDTO {
@@ -82,3 +83,16 @@ export class State {
 }
 
 export const makeStateFormat = (state: State) => STATE[state.state]
+
+export const makeEarningDuesFormat = (name: string, earning: number, dues: number, signup: number) => ({
+  name: name,
+  earnings: earning,
+  dues: dues,
+  signups: signup
+})
+
+export const averageSignup = (totalSalesPartner: number, totalSignups: number) => (totalSignups / totalSalesPartner);
+
+export const applyPerformance =(salesPartner: any[], signups: number) => salesPartner.map(salesPartner => ({...salesPartner, 
+  performance: 
+  salesPartner.signups < (signups/100)*25 ? -1 : salesPartner.signups > (signups/100)*75 ? 2 : 1 }));

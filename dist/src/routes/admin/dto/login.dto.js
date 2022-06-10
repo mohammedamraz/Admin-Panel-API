@@ -9,7 +9,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.makeStateFormat = exports.State = exports.STATE = exports.Stateness = exports.fetchDAte = exports.formatDate = exports.PERIODADMIN = exports.PeriodRange = exports.PeriodicityAdmin = exports.ConfirmForgotPasswordDTO = exports.ForgotPasswordDTO = exports.LoginDTO = void 0;
+exports.applyPerformance = exports.averageSignup = exports.makeEarningDuesFormat = exports.makeStateFormat = exports.State = exports.STATE = exports.Stateness = exports.fetchDAte = exports.formatDate = exports.PERIODADMIN = exports.PeriodRange = exports.PeriodicityAdmin = exports.ConfirmForgotPasswordDTO = exports.ForgotPasswordDTO = exports.LoginDTO = void 0;
 const class_validator_1 = require("class-validator");
 const create_sale_dto_1 = require("../../sales/dto/create-sale.dto");
 class LoginDTO {
@@ -107,4 +107,15 @@ __decorate([
 exports.State = State;
 const makeStateFormat = (state) => exports.STATE[state.state];
 exports.makeStateFormat = makeStateFormat;
+const makeEarningDuesFormat = (name, earning, dues, signup) => ({
+    name: name,
+    earnings: earning,
+    dues: dues,
+    signups: signup
+});
+exports.makeEarningDuesFormat = makeEarningDuesFormat;
+const averageSignup = (totalSalesPartner, totalSignups) => (totalSignups / totalSalesPartner);
+exports.averageSignup = averageSignup;
+const applyPerformance = (salesPartner, signups) => salesPartner.map(salesPartner => (Object.assign(Object.assign({}, salesPartner), { performance: salesPartner.signups < (signups / 100) * 25 ? -1 : salesPartner.signups > (signups / 100) * 75 ? 2 : 1 })));
+exports.applyPerformance = applyPerformance;
 //# sourceMappingURL=login.dto.js.map

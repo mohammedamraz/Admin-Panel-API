@@ -211,6 +211,11 @@ let DatabaseService = class DatabaseService {
         const query = `SELECT * FROM ${this.tableName} WHERE date_part('year',created_date) = ${year} AND date_part('month',created_date) = ${month}`;
         return this.runQuery(query);
     }
+    fetchByYear(obj) {
+        common_1.Logger.debug(`fetchByYear(): params ${[JSON.stringify(obj)]}`, APP);
+        const query = `SELECT * FROM ${this.tableName} WHERE  ${obj.columnName} = '${obj.columnvalue}' AND date_part('year',created_date) = ${obj.year} AND date_part('month',created_date) = ${obj.month} `;
+        return this.runQuery(query);
+    }
     fetchBetweenRange(date) {
         common_1.Logger.debug(`fetchByMonth(): date ${[JSON.stringify(date)]}`, APP);
         const query = `SELECT * FROM ${this.tableName} WHERE ((created_date between '${date.from}' and '${date.to}'))`;

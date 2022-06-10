@@ -47,3 +47,11 @@ export declare class State {
     period: Periodicity;
 }
 export declare const makeStateFormat: (state: State) => any;
+export declare const makeEarningDuesFormat: (name: string, earning: number, dues: number, signup: number) => {
+    name: string;
+    earnings: number;
+    dues: number;
+    signups: number;
+};
+export declare const averageSignup: (totalSalesPartner: number, totalSignups: number) => number;
+export declare const applyPerformance: (salesPartner: any[], signups: number) => any[];

@@ -119,10 +119,19 @@ export class YearMonthDto{
 
   @IsNotEmpty()
    @IsString()
-   @MinLength(4, {message: 'Enter only 4 digit value of year, This is too short',})
-   @MaxLength(4, {message: 'Enter only 4 digit value of year, This is too long',}) 
+   @MinLength(4, {message: 'Enter only 4 digit value of year, This is too short'})
+   @MaxLength(4, {message: 'Enter only 4 digit value of year, This is too long'}) 
   year: string;
  
+}
+
+export class DateDTO extends YearMonthDto{
+
+  @IsNotEmpty()
+  @IsString()
+  @MinLength(2, {message: 'Enter only 4 digit value of year, This is too short'})
+  @MaxLength(2, {message: 'Enter only 4 digit value of year, This is too long'}) 
+  month: string;
 }
 
 export const fetchmonths =(year: String) => {

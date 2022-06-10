@@ -1,13 +1,14 @@
+/* eslint-disable max-lines */
 import { BadRequestException, ConflictException, HttpException, HttpStatus, Injectable, Logger, NotFoundException, UnauthorizedException, UnprocessableEntityException } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
 import { AKASH_ACCOUNTID, AKASH_AUTHTOKEN, AKASH_SERVICEID, APP_DOWNLOAD_LINK, AWS_COGNITO_USER_CREATION_URL_SIT, FEDO_APP, PUBLIC_KEY, SALES_PARTNER_LINK } from 'src/constants';
 import { DatabaseTable } from 'src/lib/database/database.decorator';
 import { DatabaseService } from 'src/lib/database/database.service';
 import { CreateSalesJunction, CreateSalesPartner, CreateSalesPartnerRequest, Interval, makeEarningFormat, PERIOD, Period, SalesUserJunction } from '../sales/dto/create-sale.dto';
-import { AccountZwitchResponseBody,  createPaid,  fetchmonths,  MobileNumberAndOtpDtO, MobileNumberDtO, ParamDto, requestDto, sendEmailOnIncorrectBankDetailsDto, User, YearMonthDto } from './dto/create-admin.dto';
+import { AccountZwitchResponseBody,  createPaid,  DateDTO,  fetchmonths,  MobileNumberAndOtpDtO, MobileNumberDtO, ParamDto, requestDto, sendEmailOnIncorrectBankDetailsDto, User, YearMonthDto } from './dto/create-admin.dto';
 import { AxiosResponse } from 'axios';
 import { catchError, concatMap, from, lastValueFrom, map, of, switchMap, throwError } from 'rxjs';
-import { ConfirmForgotPasswordDTO, fetchDAte, ForgotPasswordDTO, LoginDTO, makeStateFormat, PERIODADMIN, PeriodRange, State } from './dto/login.dto';
+import { applyPerformance, averageSignup, ConfirmForgotPasswordDTO, fetchDAte, ForgotPasswordDTO, LoginDTO, makeEarningDuesFormat, makeStateFormat, PERIODADMIN, PeriodRange, State } from './dto/login.dto';
 import { fetchAccount, fetchUser, fetchUserByMobileNumber } from 'src/constants/helper';
 import { TemplateService } from 'src/constants/template.service';
 import { EmailDTO } from './dto/template.dto';
@@ -446,6 +447,40 @@ export class AdminService {
         .then(doc => reportData)
       })
     )
+  }
+
+  fetchMonthlyReport(dateDTO: DateDTO){
+    Logger.debug(`fetchMonthlyReport() date: [${JSON.stringify(dateDTO)}]`, APP);
+
+    return this.salesDb.fetchAll().pipe(
+      map(salesDb => this.fetchCommissionReportforSalesPartner(salesDb, dateDTO))
+    )
+  }
+
+  fetchCommissionReportforSalesPartner(createSalesPartner:CreateSalesPartner[], dateDTO: DateDTO){
+    Logger.debug(`fetchCommissionReportforSalesPartner() createSalesPartner: [${JSON.stringify(createSalesPartner)}]`, APP);
+    
+    let performance =[]
+    return lastValueFrom(from(createSalesPartner).pipe(
+      switchMap(salesDoc => lastValueFrom(this.fetchSignupforPerformace(salesDoc, dateDTO)).then(doc => performance.push(doc)))
+    )).then(doc => applyPerformance(performance, averageSignup(createSalesPartner.length, performance.reduce((acc, curr) => acc += curr.signups, 0))) )
+
+  }
+
+  fetchSignupforPerformace(createSalesPartner: CreateSalesPartner, dateDTO: DateDTO){
+    Logger.debug(`fetchSignupAndPerformace() createSalesPartner: [${JSON.stringify(createSalesPartner)}]`, APP);
+
+    return this.salesJunctionDb.fetchByYear({columnName: "sales_code", columnvalue: createSalesPartner.sales_code, year: dateDTO.year, month: dateDTO.month}).pipe(
+      switchMap(salesJunctionDoc => this.fetchSignUpsforPerformance(createSalesPartner, salesJunctionDoc, dateDTO))
+    )
+  }
+
+  fetchSignUpsforPerformance(createSalesPartner: CreateSalesPartner, createSalesJunction: CreateSalesJunction[],  dateDTO: DateDTO) {
+    Logger.debug(`fetchSignUpsforPerformance() createSalesJunction: [${JSON.stringify(createSalesJunction)}]`, APP);
+    console.log('don', createSalesJunction[createSalesJunction.length-1]);
+    return this.salesuser.fetchByYear({columnName: "sales_code", columnvalue: createSalesPartner.sales_code, year: dateDTO.year, month: dateDTO.month}).pipe(
+      map(doc => makeEarningDuesFormat(createSalesPartner.name, createSalesJunction.reduce((acc, curr) => acc += curr.commission_amount, 0), !createSalesJunction[createSalesJunction.length-1] ? 0 : createSalesJunction[createSalesJunction.length-1].dues  , doc.length)) )
+    
   }
 
   async fetchSignup(year,month){

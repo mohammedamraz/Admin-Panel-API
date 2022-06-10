@@ -1,7 +1,7 @@
 import { HttpService } from '@nestjs/axios';
 import { DatabaseService } from 'src/lib/database/database.service';
 import { CreateSalesJunction, CreateSalesPartner, CreateSalesPartnerRequest, Period, SalesUserJunction } from '../sales/dto/create-sale.dto';
-import { createPaid, MobileNumberAndOtpDtO, MobileNumberDtO, ParamDto, requestDto, User, YearMonthDto } from './dto/create-admin.dto';
+import { createPaid, DateDTO, MobileNumberAndOtpDtO, MobileNumberDtO, ParamDto, requestDto, User, YearMonthDto } from './dto/create-admin.dto';
 import { ConfirmForgotPasswordDTO, ForgotPasswordDTO, LoginDTO, PeriodRange, State } from './dto/login.dto';
 import { TemplateService } from 'src/constants/template.service';
 export declare class AdminService {
@@ -95,5 +95,19 @@ export declare class AdminService {
     }>;
     encryptPassword_(password: any): any;
     fetchCommissionReport(yearMonthDto: YearMonthDto): import("rxjs").Observable<any[]>;
+    fetchMonthlyReport(dateDTO: DateDTO): import("rxjs").Observable<Promise<any[]>>;
+    fetchCommissionReportforSalesPartner(createSalesPartner: CreateSalesPartner[], dateDTO: DateDTO): Promise<any[]>;
+    fetchSignupforPerformace(createSalesPartner: CreateSalesPartner, dateDTO: DateDTO): import("rxjs").Observable<{
+        name: string;
+        earnings: number;
+        dues: number;
+        signups: number;
+    }>;
+    fetchSignUpsforPerformance(createSalesPartner: CreateSalesPartner, createSalesJunction: CreateSalesJunction[], dateDTO: DateDTO): import("rxjs").Observable<{
+        name: string;
+        earnings: number;
+        dues: number;
+        signups: number;
+    }>;
     fetchSignup(year: any, month: any): Promise<any>;
 }

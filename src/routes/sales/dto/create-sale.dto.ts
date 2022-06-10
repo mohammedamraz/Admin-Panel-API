@@ -149,9 +149,8 @@ export class EarningResponse {
 }
 
 export const Interval = (period: Period) => PERIOD[period.period]
-export const makeEarningFormat =(earning:number[]): EarningResponse=>{
-    return {
+export const makeEarningFormat =(earning:number[]): EarningResponse=>
+    ( {
         earnedAmount: earning[0],
         paidAmount: earning[1]
-    }
-}
+    })
