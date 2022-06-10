@@ -44,7 +44,7 @@ export class SalesService {
       switchMap(doc => fetchUserByMobileNumber(createSalesPartner.mobile)),
       switchMap(doc => {
         if (!doc[0]) return this.db.save({ name: createSalesPartner.name, location: createSalesPartner.location, commission: createSalesPartner.commission, mobile: createSalesPartner.mobile, email: createSalesPartner.email })
-        else return this.db.save({ name: createSalesPartner.name, location: createSalesPartner.location, commission: createSalesPartner.commission, mobile: createSalesPartner.mobile, email: createSalesPartner.email, user_id: doc[0].fedo_id })
+        else return this.db.save({ name: createSalesPartner.name, location: createSalesPartner.location, commission: createSalesPartner.commission, mobile: createSalesPartner.mobile, email: createSalesPartner.email, user_id: doc[0].fedo_id,is_hsa_account:true })
       }),
       switchMap(doc => { salesId = doc[0].id; createSalesPartner.sales_code = "FEDSP" + todayDate + 500 + doc[0].id; createSalesPartner.id = doc[0].id; return this.junctiondb.save({ sales_code: createSalesPartner.sales_code }).pipe(catchError(err => { throw new BadRequestException(err.message) }), map(doc => doc)) }),
       switchMap(doc => this.createInvitation(createSalesPartner, doc)),

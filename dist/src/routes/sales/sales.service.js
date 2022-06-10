@@ -45,7 +45,7 @@ let SalesService = class SalesService {
             if (!doc[0])
                 return this.db.save({ name: createSalesPartner.name, location: createSalesPartner.location, commission: createSalesPartner.commission, mobile: createSalesPartner.mobile, email: createSalesPartner.email });
             else
-                return this.db.save({ name: createSalesPartner.name, location: createSalesPartner.location, commission: createSalesPartner.commission, mobile: createSalesPartner.mobile, email: createSalesPartner.email, user_id: doc[0].fedo_id });
+                return this.db.save({ name: createSalesPartner.name, location: createSalesPartner.location, commission: createSalesPartner.commission, mobile: createSalesPartner.mobile, email: createSalesPartner.email, user_id: doc[0].fedo_id, is_hsa_account: true });
         }), (0, rxjs_1.switchMap)(doc => { salesId = doc[0].id; createSalesPartner.sales_code = "FEDSP" + todayDate + 500 + doc[0].id; createSalesPartner.id = doc[0].id; return this.junctiondb.save({ sales_code: createSalesPartner.sales_code }).pipe((0, rxjs_1.catchError)(err => { throw new common_1.BadRequestException(err.message); }), (0, rxjs_1.map)(doc => doc)); }), (0, rxjs_1.switchMap)(doc => this.createInvitation(createSalesPartner, doc)), (0, rxjs_1.switchMap)(doc => this.updateSalesPartner(salesId, { sales_code: createSalesPartner.sales_code })), (0, rxjs_1.switchMap)(doc => this.fetchSalesPartnerById(createSalesPartner.id.toString())));
     }
     createInvitation(createSalesPartner, createSalesJunction) {
