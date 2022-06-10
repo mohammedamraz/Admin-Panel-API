@@ -92,6 +92,22 @@ export interface findByPeriodParams {
   period: string;
 }
 
+export interface findBycolumnParams {
+  columnName: string;
+  columnvalue: string;
+}
+
+export interface DateRangeParams {
+  from: string;
+  to: string;
+}
+
+export interface fetchByYearAndMonthParams {
+  year: string;
+  month: string;
+  columnName: string;
+  columnvalue: string;
+}
 export interface findByConditionParams {
   created_date: string;
   endcreated_date: string;

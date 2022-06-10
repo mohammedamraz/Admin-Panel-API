@@ -189,10 +189,10 @@ export class SalesService {
     let contentsParams = []
 
     if (Object.keys(params).length == 0) return this.invitationJunctiondb.fetchAll().pipe(
-      map(async (doc: InvitationJunctionModel[], index: Number) => {
-        for (let i = 0; i <= doc.length - 1; i++) {
+      map(async (doc, index: Number) => {
+        for (let i = 0; i <= doc.length - 1; i++) 
           await lastValueFrom(this.db.find({ sales_code: doc[i].sp_id }).pipe(map(res => { contents.push(res[0]) })))
-        }
+        
         return contents
       }))
     else if (params.date == undefined) return []
@@ -380,7 +380,7 @@ fetchEarnigReport(yearMonthDto: YearMonthDto){
 async fetchSignup(year,month,yearMonthDto: YearMonthDto){
   Logger.debug(`fetchSignup() year: [${year}] month: [${month}] salesCode:[${yearMonthDto.salesCode}]`, APP);
 
-   return await lastValueFrom(this.salesUserJunctionDb.fetchSignUp({columnName: 'sales_code', columnvalue: yearMonthDto.salesCode, year: yearMonthDto.year, month: month.toString() }))
+   return await lastValueFrom(this.salesUserJunctionDb.fetchByYear({columnName: 'sales_code', columnvalue: yearMonthDto.salesCode, year: yearMonthDto.year, month: month.toString() }))
    .then(userJunctionDoc=> { console.log("junct",userJunctionDoc);console.log("junct",userJunctionDoc.length);
     return userJunctionDoc.length})
    .catch(error=>{throw new UnprocessableEntityException(error.message)})

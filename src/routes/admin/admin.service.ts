@@ -1,13 +1,14 @@
+/* eslint-disable max-lines */
 import { BadRequestException, ConflictException, HttpException, HttpStatus, Injectable, Logger, NotFoundException, UnauthorizedException, UnprocessableEntityException } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
 import { AKASH_ACCOUNTID, AKASH_AUTHTOKEN, AKASH_SERVICEID, APP_DOWNLOAD_LINK, AWS_COGNITO_USER_CREATION_URL_SIT, FEDO_APP, PUBLIC_KEY, SALES_PARTNER_LINK } from 'src/constants';
 import { DatabaseTable } from 'src/lib/database/database.decorator';
 import { DatabaseService } from 'src/lib/database/database.service';
-import { CreateSalesJunction, CreateSalesPartner, CreateSalesPartnerRequest, Interval, makeEarningFormat, Period, SalesUserJunction } from '../sales/dto/create-sale.dto';
-import { AccountZwitchResponseBody,  createPaid,  fetchmonths,  MobileNumberAndOtpDtO, MobileNumberDtO, ParamDto, requestDto, sendEmailOnIncorrectBankDetailsDto, User, YearMonthDto } from './dto/create-admin.dto';
+import { CreateSalesJunction, CreateSalesPartner, CreateSalesPartnerRequest, Interval, makeEarningFormat, PERIOD, Period, SalesUserJunction } from '../sales/dto/create-sale.dto';
+import { AccountZwitchResponseBody,  createPaid,  DateDTO,  fetchDues,  fetchmonths,  MobileNumberAndOtpDtO, MobileNumberDtO, ParamDto, requestDto, sendEmailOnIncorrectBankDetailsDto, User, YearMonthDto } from './dto/create-admin.dto';
 import { AxiosResponse } from 'axios';
 import { catchError, concatMap, from, lastValueFrom, map, of, switchMap, throwError } from 'rxjs';
-import { ConfirmForgotPasswordDTO, ForgotPasswordDTO, LoginDTO } from './dto/login.dto';
+import { applyPerformance, averageSignup, ConfirmForgotPasswordDTO, fetchDAte, ForgotPasswordDTO, LoginDTO, makeEarningDuesFormat, makeStateFormat, PERIODADMIN, PeriodRange, State } from './dto/login.dto';
 import { fetchAccount, fetchUser, fetchUserByMobileNumber } from 'src/constants/helper';
 import { TemplateService } from 'src/constants/template.service';
 import { EmailDTO } from './dto/template.dto';
@@ -52,25 +53,79 @@ export class AdminService {
     )
   }
 
-  fetchEarnings(period: Period){
-    Logger.debug(`fetchEarnings()  period: ${JSON.stringify(period)}`, APP);
+  fetchCommissionDispersals(period: PeriodRange){
+    Logger.debug(`fetchEarnings()  }`, APP);
 
-    return this.salesJunctionDb.fetchAllByPeriod(Interval(period)).pipe(
-      map(salesjuncdoc =>{
-        if(salesjuncdoc.length === 0) throw new NotFoundException("no Account found");
-        return makeEarningFormat(salesjuncdoc.reduce((acc, curr) => ([acc[0] += curr.commission_amount, acc[1] += curr.paid_amount]), [0, 0]))
+    return this.salesJunctionDb.fetchBetweenRange(fetchDAte(new Date(), PERIODADMIN[period.period])).pipe(
+      switchMap(salesJunctionDoc => this.fetchPreviousMonthCommissionDispersal(salesJunctionDoc, period, new Date(fetchDAte(new Date(), PERIODADMIN[period.period]).from))))
+  }
+
+  fetchPreviousMonthCommissionDispersal(createSalesJunction: CreateSalesJunction[], period: PeriodRange, date: Date) {
+    Logger.debug(`fetchPreviousMonthCommissionDispersal()`, APP);
+
+    return this.salesJunctionDb.fetchBetweenRange(fetchDAte(date, PERIODADMIN[period.period])).pipe(
+      map(salesJunctionDoc =>{
+        return {'thisMonth': createSalesJunction.reduce((acc, curr) => acc += curr.paid_amount, 0),
+                'previousMonth': salesJunctionDoc.reduce((acc, curr) => acc += curr.paid_amount, 0)}
       }))
   }
 
-  fetchInvitationResponse(salesCode: string, period: Period) {
-    Logger.debug(`fetchInvitationResponse() salesCode: ${salesCode}`, APP);
+  fetchInvitationResponse(state: State) {
+    Logger.debug(`fetchInvitationResponse() state: [${JSON.stringify(state)}]`, APP);
 
-    return this.salesuser.findByPeriod({ columnName: "sales_code", columnvalue: salesCode, period: Interval(period) }).pipe(
-      catchError(error => { throw new BadRequestException(error.message) }),
-      map(salesuser => {
-        if (salesuser.length === 0) throw new NotFoundException("no Account found");
-        return { "signup": salesuser.length }
-      }))
+    if(state.state !== 'all')
+    return this.salesDb.find({ is_active: makeStateFormat(state) }).pipe(
+      map(doc => this.fetchSignUps(doc, state)))    
+    else 
+    return this.salesDb.fetchAll().pipe(
+      map(doc => this.fetchSignUps(doc, state)))}
+
+  fetchSignUps(createSalesPartner: CreateSalesPartner[], state: State) {
+    Logger.debug(`fetchSignUps() createSalesPartner: [${JSON.stringify(createSalesPartner)}]`, APP);
+
+    let signups =[]
+    return lastValueFrom(from(createSalesPartner).pipe(
+      concatMap(salesPartner => this.salesuser.findByPeriod({columnName: "sales_code", columnvalue: salesPartner.sales_code, period: PERIOD[state.period] })),
+      map(salesuser => signups.push(salesuser.length))))
+      .then(() =>{return {'signups': signups.reduce((acc, curr) => acc += curr, 0)}})
+  }
+
+  fetchSalesPartner(period: Period) {
+    Logger.debug(`fetchSalesPartner() period: [${JSON.stringify(period)}]`, APP);
+
+    return this.salesDb.fetchAllByPeriod(Interval(period)).pipe(
+      
+      catchError(err => { throw new BadRequestException(err.message) }),
+      map( doc =>{
+        if (doc.length === 0) throw new NotFoundException("sales partner not found");
+        return this.fetchSalesPartnerCommission(doc, period)}))
+  }
+
+  fetchSalesPartnerCommission(createSalesPartner: CreateSalesPartner[], period: Period){
+    Logger.debug(`fetchSalesPartnerCommission() createSalesPartner: [${JSON.stringify(createSalesPartner)}]`, APP);
+
+    let commission =[]
+    return lastValueFrom(from(createSalesPartner).pipe(
+      switchMap(salesPartner => lastValueFrom( this.fetchTotalCommission(salesPartner, period)).then(doc => {commission.push(doc)}))
+    )).then(doc => ({...commission.reduce((prev, current) => current.totalCommission > prev.totalCommission ? current:prev), 'count': createSalesPartner.length}))
+  }
+
+  fetchTotalCommission(createSalesPartner: CreateSalesPartner, period: Period) {
+    Logger.debug(`fetchTotalCommission() CreateSalesPartner: [${JSON.stringify(createSalesPartner)}] , period: [${JSON.stringify(period)}]`, APP);
+
+    return this.salesJunctionDb.find({sales_code: createSalesPartner.sales_code}).pipe(
+      concatMap(doc => this.fetchSalesPartnerSignups(doc, createSalesPartner,period)),
+      map(doc => doc))
+  }
+
+  fetchSalesPartnerSignups(createSalesJunction: CreateSalesJunction[],createSalesPartner: CreateSalesPartner, period: Period)  {
+    Logger.debug(`fetchSalesPartnerSignups() createSalesJunction: [${JSON.stringify(createSalesJunction)}],  CreateSalesPartner: [${JSON.stringify(createSalesPartner)}], period: [${JSON.stringify(period)}]`, APP);
+
+   return this.salesuser.find({sales_code: createSalesPartner.sales_code}).pipe(
+      map(doc => { 
+        return {'totalCommission': createSalesJunction.reduce((acc, curr) => acc += curr.commission_amount, 0),
+                'name': createSalesPartner.name,
+                'signups': doc.length }}))
   }
 
   async fetchUser(createSalesPartner: CreateSalesPartner[]) {
@@ -385,7 +440,7 @@ export class AdminService {
          const paid_on = date.filter((res) => res)
          await this.fetchSignup(yearMonthDto.year,month)
          .then(signup => {
-           reportData.push({"total_paid_amount":total_paid_amount,"month": month, "total_dues":total_dues,"hsa_sing_up": signup, "paid_on": paid_on[0] })
+           reportData.push({"total_paid_amount":total_paid_amount,"month": month, "total_dues":fetchDues(salesJunctionDoc),"hsa_sing_up": signup, "paid_on": paid_on[0] })
           }).catch(error=> {throw new NotFoundException(error.message)})
          return reportData
         })
@@ -393,6 +448,40 @@ export class AdminService {
         .then(doc => reportData)
       })
     )
+  }
+
+  fetchMonthlyReport(dateDTO: DateDTO){
+    Logger.debug(`fetchMonthlyReport() date: [${JSON.stringify(dateDTO)}]`, APP);
+
+    return this.salesDb.fetchAll().pipe(
+      map(salesDb => this.fetchCommissionReportforSalesPartner(salesDb, dateDTO))
+    )
+  }
+
+  fetchCommissionReportforSalesPartner(createSalesPartner:CreateSalesPartner[], dateDTO: DateDTO){
+    Logger.debug(`fetchCommissionReportforSalesPartner() createSalesPartner: [${JSON.stringify(createSalesPartner)}]`, APP);
+    
+    let performance =[]
+    return lastValueFrom(from(createSalesPartner).pipe(
+      switchMap(salesDoc => lastValueFrom(this.fetchSignupforPerformace(salesDoc, dateDTO)).then(doc => performance.push(doc)))
+    )).then(doc => applyPerformance(performance, averageSignup(createSalesPartner.length, performance.reduce((acc, curr) => acc += curr.signups, 0))) )
+
+  }
+
+  fetchSignupforPerformace(createSalesPartner: CreateSalesPartner, dateDTO: DateDTO){
+    Logger.debug(`fetchSignupAndPerformace() createSalesPartner: [${JSON.stringify(createSalesPartner)}]`, APP);
+
+    return this.salesJunctionDb.fetchByYear({columnName: "sales_code", columnvalue: createSalesPartner.sales_code, year: dateDTO.year, month: dateDTO.month}).pipe(
+      switchMap(salesJunctionDoc => this.fetchSignUpsforPerformance(createSalesPartner, salesJunctionDoc, dateDTO))
+    )
+  }
+
+  fetchSignUpsforPerformance(createSalesPartner: CreateSalesPartner, createSalesJunction: CreateSalesJunction[],  dateDTO: DateDTO) {
+    Logger.debug(`fetchSignUpsforPerformance() createSalesJunction: [${JSON.stringify(createSalesJunction)}]`, APP);
+    
+    return this.salesuser.fetchByYear({columnName: "sales_code", columnvalue: createSalesPartner.sales_code, year: dateDTO.year, month: dateDTO.month}).pipe(
+      map(doc => makeEarningDuesFormat(createSalesPartner.name, createSalesJunction.reduce((acc, curr) => acc += curr.commission_amount, 0), !createSalesJunction[createSalesJunction.length-1] ? 0 : createSalesJunction[createSalesJunction.length-1].dues , doc.length)) )
+    
   }
 
   async fetchSignup(year,month){

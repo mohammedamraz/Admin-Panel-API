@@ -159,9 +159,8 @@ let SalesService = class SalesService {
         let contentsParams = [];
         if (Object.keys(params).length == 0)
             return this.invitationJunctiondb.fetchAll().pipe((0, rxjs_1.map)(async (doc, index) => {
-                for (let i = 0; i <= doc.length - 1; i++) {
+                for (let i = 0; i <= doc.length - 1; i++)
                     await (0, rxjs_1.lastValueFrom)(this.db.find({ sales_code: doc[i].sp_id }).pipe((0, rxjs_1.map)(res => { contents.push(res[0]); })));
-                }
                 return contents;
             }));
         else if (params.date == undefined)
@@ -316,7 +315,7 @@ let SalesService = class SalesService {
     }
     async fetchSignup(year, month, yearMonthDto) {
         common_1.Logger.debug(`fetchSignup() year: [${year}] month: [${month}] salesCode:[${yearMonthDto.salesCode}]`, APP);
-        return await (0, rxjs_1.lastValueFrom)(this.salesUserJunctionDb.fetchSignUp({ columnName: 'sales_code', columnvalue: yearMonthDto.salesCode, year: yearMonthDto.year, month: month.toString() }))
+        return await (0, rxjs_1.lastValueFrom)(this.salesUserJunctionDb.fetchByYear({ columnName: 'sales_code', columnvalue: yearMonthDto.salesCode, year: yearMonthDto.year, month: month.toString() }))
             .then(userJunctionDoc => {
             console.log("junct", userJunctionDoc);
             console.log("junct", userJunctionDoc.length);

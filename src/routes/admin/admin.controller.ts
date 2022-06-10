@@ -1,8 +1,8 @@
 import { Controller, Get, Post, Body, Param, Logger, Query } from '@nestjs/common';
 import { Period } from '../sales/dto/create-sale.dto';
 import { AdminService } from './admin.service';
-import { createPaid, MobileNumberAndOtpDtO, MobileNumberDtO, ParamDto, requestDto, YearMonthDto } from './dto/create-admin.dto';
-import { ConfirmForgotPasswordDTO, ForgotPasswordDTO, LoginDTO } from './dto/login.dto';
+import { createPaid, DateDTO, MobileNumberAndOtpDtO, MobileNumberDtO, ParamDto, requestDto, YearMonthDto } from './dto/create-admin.dto';
+import { ConfirmForgotPasswordDTO, ForgotPasswordDTO, LoginDTO, PeriodRange, State } from './dto/login.dto';
 
 const APP = 'AdminController';
 
@@ -10,11 +10,26 @@ const APP = 'AdminController';
 export class AdminController {
   constructor(private readonly adminService: AdminService) {}
 
+  @Get('salesPartner')
+  fetchSalesPartner(@Query() period: Period) {
+    Logger.debug(`fetchSalesPartner() period: [${JSON.stringify(period)}]`, APP);
+
+    return this.adminService.fetchSalesPartner(period);
+  }
+
   @Get('commission-report/:year')
   fetchCommissionReport(@Param() yearMonthDto:YearMonthDto){
     Logger.debug(`fetchCommissionReport() year: [${yearMonthDto.year}]`, APP);
 
     return this.adminService.fetchCommissionReport(yearMonthDto);
+  }
+
+  @Get('monthlyreport/:year/:month')
+  fetchMonthlyReport(@Param() dateDTO: DateDTO){
+    Logger.debug(`fetchMonthlyReport() dateDTO: [${JSON.stringify(dateDTO)}]`, APP);
+
+    return this.adminService.fetchMonthlyReport(dateDTO);
+
   }
 
   @Get('sales/account-details')
@@ -24,14 +39,21 @@ export class AdminController {
     return this.adminService.fetchSalesPartnerAccountDetails()
   }
 
-  @Get('earning')
-  fetchEarnings(@Param('salesCode') salesCode: string, @Query() period: Period) {
-      Logger.debug(`fetchEarnings()salesCode: [${salesCode}] `, APP);
+  @Get('commissionDispersals')
+  fetchCommissionDispersals(@Query() period: PeriodRange) {
+      Logger.debug(`fetchCommissionDispersals() period: [${JSON.stringify(period.period)}]`, APP);
 
-      return this.adminService.fetchEarnings(period);
+      return this.adminService.fetchCommissionDispersals(period);
   }
 
-  @Get('sales/account-details/:sales_code')
+  @Get('invitationResponses')
+  fetchInvitationResponses(@Query() state: State) {
+    Logger.debug(`fetchInvitationResponses() state: [${JSON.stringify(state)}]`, APP);
+
+    return this.adminService.fetchInvitationResponse(state);
+  }
+
+   @Get('sales/account-details/:sales_code')
   fetchSalesPartnerAccountDetailsBySalesCode(@Param('sales_code') sales_code: string) {
    Logger.debug(`fetchSalesPartnerAccountDetailsByID()`, APP);
 

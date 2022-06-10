@@ -23,17 +23,29 @@ let AdminController = class AdminController {
     constructor(adminService) {
         this.adminService = adminService;
     }
+    fetchSalesPartner(period) {
+        common_1.Logger.debug(`fetchSalesPartner() period: [${JSON.stringify(period)}]`, APP);
+        return this.adminService.fetchSalesPartner(period);
+    }
     fetchCommissionReport(yearMonthDto) {
         common_1.Logger.debug(`fetchCommissionReport() year: [${yearMonthDto.year}]`, APP);
         return this.adminService.fetchCommissionReport(yearMonthDto);
+    }
+    fetchMonthlyReport(dateDTO) {
+        common_1.Logger.debug(`fetchMonthlyReport() dateDTO: [${JSON.stringify(dateDTO)}]`, APP);
+        return this.adminService.fetchMonthlyReport(dateDTO);
     }
     fetchSalesPartnerAccountDetails() {
         common_1.Logger.debug(`getSalesPartnerAccountDetails()`, APP);
         return this.adminService.fetchSalesPartnerAccountDetails();
     }
-    fetchEarnings(salesCode, period) {
-        common_1.Logger.debug(`fetchEarnings()salesCode: [${salesCode}] `, APP);
-        return this.adminService.fetchEarnings(period);
+    fetchCommissionDispersals(period) {
+        common_1.Logger.debug(`fetchCommissionDispersals() period: [${JSON.stringify(period.period)}]`, APP);
+        return this.adminService.fetchCommissionDispersals(period);
+    }
+    fetchInvitationResponses(state) {
+        common_1.Logger.debug(`fetchInvitationResponses() state: [${JSON.stringify(state)}]`, APP);
+        return this.adminService.fetchInvitationResponse(state);
     }
     fetchSalesPartnerAccountDetailsBySalesCode(sales_code) {
         common_1.Logger.debug(`fetchSalesPartnerAccountDetailsByID()`, APP);
@@ -77,6 +89,13 @@ let AdminController = class AdminController {
     }
 };
 __decorate([
+    (0, common_1.Get)('salesPartner'),
+    __param(0, (0, common_1.Query)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [create_sale_dto_1.Period]),
+    __metadata("design:returntype", void 0)
+], AdminController.prototype, "fetchSalesPartner", null);
+__decorate([
     (0, common_1.Get)('commission-report/:year'),
     __param(0, (0, common_1.Param)()),
     __metadata("design:type", Function),
@@ -84,19 +103,32 @@ __decorate([
     __metadata("design:returntype", void 0)
 ], AdminController.prototype, "fetchCommissionReport", null);
 __decorate([
+    (0, common_1.Get)('monthlyreport/:year/:month'),
+    __param(0, (0, common_1.Param)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [create_admin_dto_1.DateDTO]),
+    __metadata("design:returntype", void 0)
+], AdminController.prototype, "fetchMonthlyReport", null);
+__decorate([
     (0, common_1.Get)('sales/account-details'),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", []),
     __metadata("design:returntype", void 0)
 ], AdminController.prototype, "fetchSalesPartnerAccountDetails", null);
 __decorate([
-    (0, common_1.Get)('earning'),
-    __param(0, (0, common_1.Param)('salesCode')),
-    __param(1, (0, common_1.Query)()),
+    (0, common_1.Get)('commissionDispersals'),
+    __param(0, (0, common_1.Query)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String, create_sale_dto_1.Period]),
+    __metadata("design:paramtypes", [login_dto_1.PeriodRange]),
     __metadata("design:returntype", void 0)
-], AdminController.prototype, "fetchEarnings", null);
+], AdminController.prototype, "fetchCommissionDispersals", null);
+__decorate([
+    (0, common_1.Get)('invitationResponses'),
+    __param(0, (0, common_1.Query)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [login_dto_1.State]),
+    __metadata("design:returntype", void 0)
+], AdminController.prototype, "fetchInvitationResponses", null);
 __decorate([
     (0, common_1.Get)('sales/account-details/:sales_code'),
     __param(0, (0, common_1.Param)('sales_code')),

@@ -2,6 +2,7 @@ import { ArrayMinSize, IsNotEmpty, IsPhoneNumber, IsString, MaxLength, MinLength
 import { phoneNumber } from 'aws-sdk/clients/importexport';
 import { Type } from 'class-transformer';
 import { Logger } from '@nestjs/common';
+import { CreateSalesJunction } from 'src/routes/sales/dto/create-sale.dto';
 
 export class MobileNumberDtO {
   @IsNotEmpty()
@@ -119,10 +120,20 @@ export class YearMonthDto{
 
   @IsNotEmpty()
    @IsString()
-   @MinLength(4, {message: 'Enter only 4 digit value of year, This is too short',})
-   @MaxLength(4, {message: 'Enter only 4 digit value of year, This is too long',}) 
+   @MinLength(4, {message: 'Enter only 4 digit value of year, This is too short'})
+   @MaxLength(4, {message: 'Enter only 4 digit value of year, This is too long'}) 
   year: string;
+  
  
+}
+
+export class DateDTO extends YearMonthDto{
+
+  @IsNotEmpty()
+  @IsString()
+  @MinLength(2, {message: 'Enter only 4 digit value of year, This is too short'})
+  @MaxLength(2, {message: 'Enter only 4 digit value of year, This is too long'}) 
+  month: string;
 }
 
 export const fetchmonths =(year: String) => {
@@ -142,7 +153,15 @@ export const fetchmonths =(year: String) => {
     console.log("month1",month1)
   return month1
   }
+}
+export const fetchDues = (createSalesJunction: CreateSalesJunction[]) => {
+  Logger.debug(`fetchDues() createSalesJunction: [${createSalesJunction}]`);
 
+  const don = createSalesJunction.reduce((acc, curr) => {
+    const index = acc.findIndex(x => x.sales_code === curr.sales_code);
+    index === -1 ? acc.push({sales_code: curr.sales_code, dues: [curr.dues]}) : acc[index].dues.push(curr.dues);
+    return acc
+  },[]).map(salesCode => ({sales_code: salesCode.sales_code, dues: Math.max(...salesCode.dues)}));
   
-
+  return don.reduce((acc, curr) => acc+=curr.dues, 0)
 }

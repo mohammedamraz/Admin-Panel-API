@@ -9,7 +9,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.fetchmonths = exports.YearMonthDto = exports.createPaid = exports.createPaidAmountDto = exports.createAccount = exports.sendEmailOnIncorrectBankDetailsDto = exports.AccountZwitchResponseBody = exports.User = exports.ParamDto = exports.requestDto = exports.MobileNumberAndOtpDtO = exports.MobileNumberDtO = void 0;
+exports.fetchDues = exports.fetchmonths = exports.DateDTO = exports.YearMonthDto = exports.createPaid = exports.createPaidAmountDto = exports.createAccount = exports.sendEmailOnIncorrectBankDetailsDto = exports.AccountZwitchResponseBody = exports.User = exports.ParamDto = exports.requestDto = exports.MobileNumberAndOtpDtO = exports.MobileNumberDtO = void 0;
 const class_validator_1 = require("class-validator");
 const class_transformer_1 = require("class-transformer");
 const common_1 = require("@nestjs/common");
@@ -93,11 +93,21 @@ class YearMonthDto {
 __decorate([
     (0, class_validator_1.IsNotEmpty)(),
     (0, class_validator_1.IsString)(),
-    (0, class_validator_1.MinLength)(4, { message: 'Enter only 4 digit value of year, This is too short', }),
-    (0, class_validator_1.MaxLength)(4, { message: 'Enter only 4 digit value of year, This is too long', }),
+    (0, class_validator_1.MinLength)(4, { message: 'Enter only 4 digit value of year, This is too short' }),
+    (0, class_validator_1.MaxLength)(4, { message: 'Enter only 4 digit value of year, This is too long' }),
     __metadata("design:type", String)
 ], YearMonthDto.prototype, "year", void 0);
 exports.YearMonthDto = YearMonthDto;
+class DateDTO extends YearMonthDto {
+}
+__decorate([
+    (0, class_validator_1.IsNotEmpty)(),
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.MinLength)(2, { message: 'Enter only 4 digit value of year, This is too short' }),
+    (0, class_validator_1.MaxLength)(2, { message: 'Enter only 4 digit value of year, This is too long' }),
+    __metadata("design:type", String)
+], DateDTO.prototype, "month", void 0);
+exports.DateDTO = DateDTO;
 const fetchmonths = (year) => {
     common_1.Logger.debug(`fetchmonths() year: [${year}]`);
     let month = [];
@@ -116,4 +126,14 @@ const fetchmonths = (year) => {
     }
 };
 exports.fetchmonths = fetchmonths;
+const fetchDues = (createSalesJunction) => {
+    common_1.Logger.debug(`fetchDues() createSalesJunction: [${createSalesJunction}]`);
+    const don = createSalesJunction.reduce((acc, curr) => {
+        const index = acc.findIndex(x => x.sales_code === curr.sales_code);
+        index === -1 ? acc.push({ sales_code: curr.sales_code, dues: [curr.dues] }) : acc[index].dues.push(curr.dues);
+        return acc;
+    }, []).map(salesCode => ({ sales_code: salesCode.sales_code, dues: Math.max(...salesCode.dues) }));
+    return don.reduce((acc, curr) => acc += curr.dues, 0);
+};
+exports.fetchDues = fetchDues;
 //# sourceMappingURL=create-admin.dto.js.map

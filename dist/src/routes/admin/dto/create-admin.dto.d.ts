@@ -1,4 +1,5 @@
 import { phoneNumber } from 'aws-sdk/clients/importexport';
+import { CreateSalesJunction } from 'src/routes/sales/dto/create-sale.dto';
 export declare class MobileNumberDtO {
     phoneNumber: phoneNumber;
     commission: number;
@@ -84,4 +85,8 @@ export declare class createPaid {
 export declare class YearMonthDto {
     year: string;
 }
+export declare class DateDTO extends YearMonthDto {
+    month: string;
+}
 export declare const fetchmonths: (year: String) => any[];
+export declare const fetchDues: (createSalesJunction: CreateSalesJunction[]) => number;

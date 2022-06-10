@@ -1,4 +1,4 @@
-import { Email } from "aws-sdk/clients/codecommit";
+    import { Email } from "aws-sdk/clients/codecommit";
 import { phoneNumber } from "aws-sdk/clients/importexport";
 import { IsEmail, IsEnum, IsNotEmpty, IsOptional, IsString, MaxLength, MinLength } from "class-validator";
 
@@ -150,12 +150,12 @@ export class EarningResponse {
 }
 
 export const Interval = (period: Period) => PERIOD[period.period]
-export const makeEarningFormat =(earning:number[]): EarningResponse=>{
-    return {
+export const makeEarningFormat =(earning:number[]): EarningResponse=>
+    ( {
         earnedAmount: earning[0],
         paidAmount: earning[1]
     }
-}
+    )
 
 export class YearMonthDto{
 

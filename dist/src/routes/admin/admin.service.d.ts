@@ -1,8 +1,8 @@
 import { HttpService } from '@nestjs/axios';
 import { DatabaseService } from 'src/lib/database/database.service';
 import { CreateSalesJunction, CreateSalesPartner, CreateSalesPartnerRequest, Period, SalesUserJunction } from '../sales/dto/create-sale.dto';
-import { createPaid, MobileNumberAndOtpDtO, MobileNumberDtO, ParamDto, requestDto, User, YearMonthDto } from './dto/create-admin.dto';
-import { ConfirmForgotPasswordDTO, ForgotPasswordDTO, LoginDTO } from './dto/login.dto';
+import { createPaid, DateDTO, MobileNumberAndOtpDtO, MobileNumberDtO, ParamDto, requestDto, User, YearMonthDto } from './dto/create-admin.dto';
+import { ConfirmForgotPasswordDTO, ForgotPasswordDTO, LoginDTO, PeriodRange, State } from './dto/login.dto';
 import { TemplateService } from 'src/constants/template.service';
 export declare class AdminService {
     private readonly salesJunctionDb;
@@ -23,9 +23,31 @@ export declare class AdminService {
     salesPartnerDetails: any;
     salesParterEmail: any;
     fetchSalesPartnerAccountDetails(): import("rxjs").Observable<Promise<any[]>>;
-    fetchEarnings(period: Period): import("rxjs").Observable<import("../sales/dto/create-sale.dto").EarningResponse>;
-    fetchInvitationResponse(salesCode: string, period: Period): import("rxjs").Observable<{
-        signup: number;
+    fetchCommissionDispersals(period: PeriodRange): import("rxjs").Observable<{
+        thisMonth: number;
+        previousMonth: number;
+    }>;
+    fetchPreviousMonthCommissionDispersal(createSalesJunction: CreateSalesJunction[], period: PeriodRange, date: Date): import("rxjs").Observable<{
+        thisMonth: number;
+        previousMonth: number;
+    }>;
+    fetchInvitationResponse(state: State): import("rxjs").Observable<Promise<{
+        signups: any;
+    }>>;
+    fetchSignUps(createSalesPartner: CreateSalesPartner[], state: State): Promise<{
+        signups: any;
+    }>;
+    fetchSalesPartner(period: Period): import("rxjs").Observable<Promise<any>>;
+    fetchSalesPartnerCommission(createSalesPartner: CreateSalesPartner[], period: Period): Promise<any>;
+    fetchTotalCommission(createSalesPartner: CreateSalesPartner, period: Period): import("rxjs").Observable<{
+        totalCommission: number;
+        name: string;
+        signups: number;
+    }>;
+    fetchSalesPartnerSignups(createSalesJunction: CreateSalesJunction[], createSalesPartner: CreateSalesPartner, period: Period): import("rxjs").Observable<{
+        totalCommission: number;
+        name: string;
+        signups: number;
     }>;
     fetchUser(createSalesPartner: CreateSalesPartner[]): Promise<any[]>;
     fetchAccount(userDoc: User[], saleDoc: CreateSalesPartner): Promise<{
@@ -73,5 +95,19 @@ export declare class AdminService {
     }>;
     encryptPassword_(password: any): any;
     fetchCommissionReport(yearMonthDto: YearMonthDto): import("rxjs").Observable<any[]>;
-    fetchSignup(year: any, month: any): Promise<any>;
+    fetchMonthlyReport(dateDTO: DateDTO): import("rxjs").Observable<Promise<any[]>>;
+    fetchCommissionReportforSalesPartner(createSalesPartner: CreateSalesPartner[], dateDTO: DateDTO): Promise<any[]>;
+    fetchSignupforPerformace(createSalesPartner: CreateSalesPartner, dateDTO: DateDTO): import("rxjs").Observable<{
+        name: string;
+        earnings: number;
+        dues: number;
+        signups: number;
+    }>;
+    fetchSignUpsforPerformance(createSalesPartner: CreateSalesPartner, createSalesJunction: CreateSalesJunction[], dateDTO: DateDTO): import("rxjs").Observable<{
+        name: string;
+        earnings: number;
+        dues: number;
+        signups: number;
+    }>;
+    fetchSignup(year: any, month: any): Promise<number>;
 }

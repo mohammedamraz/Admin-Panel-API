@@ -21,6 +21,7 @@ const database_service_1 = require("../../lib/database/database.service");
 const create_sale_dto_1 = require("../sales/dto/create-sale.dto");
 const create_admin_dto_1 = require("./dto/create-admin.dto");
 const rxjs_1 = require("rxjs");
+const login_dto_1 = require("./dto/login.dto");
 const helper_1 = require("../../constants/helper");
 const template_service_1 = require("../../constants/template.service");
 const APP = "AdminService";
@@ -92,20 +93,53 @@ let AdminService = class AdminService {
             return this.fetchUser(salesDoc);
         }), (0, rxjs_1.catchError)(err => { throw new common_1.BadRequestException(err.message); }));
     }
-    fetchEarnings(period) {
-        common_1.Logger.debug(`fetchEarnings()  period: ${JSON.stringify(period)}`, APP);
-        return this.salesJunctionDb.fetchAllByPeriod((0, create_sale_dto_1.Interval)(period)).pipe((0, rxjs_1.map)(salesjuncdoc => {
-            if (salesjuncdoc.length === 0)
-                throw new common_1.NotFoundException("no Account found");
-            return (0, create_sale_dto_1.makeEarningFormat)(salesjuncdoc.reduce((acc, curr) => ([acc[0] += curr.commission_amount, acc[1] += curr.paid_amount]), [0, 0]));
+    fetchCommissionDispersals(period) {
+        common_1.Logger.debug(`fetchEarnings()  }`, APP);
+        return this.salesJunctionDb.fetchBetweenRange((0, login_dto_1.fetchDAte)(new Date(), login_dto_1.PERIODADMIN[period.period])).pipe((0, rxjs_1.switchMap)(salesJunctionDoc => this.fetchPreviousMonthCommissionDispersal(salesJunctionDoc, period, new Date((0, login_dto_1.fetchDAte)(new Date(), login_dto_1.PERIODADMIN[period.period]).from))));
+    }
+    fetchPreviousMonthCommissionDispersal(createSalesJunction, period, date) {
+        common_1.Logger.debug(`fetchPreviousMonthCommissionDispersal()`, APP);
+        return this.salesJunctionDb.fetchBetweenRange((0, login_dto_1.fetchDAte)(date, login_dto_1.PERIODADMIN[period.period])).pipe((0, rxjs_1.map)(salesJunctionDoc => {
+            return { 'thisMonth': createSalesJunction.reduce((acc, curr) => acc += curr.paid_amount, 0),
+                'previousMonth': salesJunctionDoc.reduce((acc, curr) => acc += curr.paid_amount, 0) };
         }));
     }
-    fetchInvitationResponse(salesCode, period) {
-        common_1.Logger.debug(`fetchInvitationResponse() salesCode: ${salesCode}`, APP);
-        return this.salesuser.findByPeriod({ columnName: "sales_code", columnvalue: salesCode, period: (0, create_sale_dto_1.Interval)(period) }).pipe((0, rxjs_1.catchError)(error => { throw new common_1.BadRequestException(error.message); }), (0, rxjs_1.map)(salesuser => {
-            if (salesuser.length === 0)
-                throw new common_1.NotFoundException("no Account found");
-            return { "signup": salesuser.length };
+    fetchInvitationResponse(state) {
+        common_1.Logger.debug(`fetchInvitationResponse() state: [${JSON.stringify(state)}]`, APP);
+        if (state.state !== 'all')
+            return this.salesDb.find({ is_active: (0, login_dto_1.makeStateFormat)(state) }).pipe((0, rxjs_1.map)(doc => this.fetchSignUps(doc, state)));
+        else
+            return this.salesDb.fetchAll().pipe((0, rxjs_1.map)(doc => this.fetchSignUps(doc, state)));
+    }
+    fetchSignUps(createSalesPartner, state) {
+        common_1.Logger.debug(`fetchSignUps() createSalesPartner: [${JSON.stringify(createSalesPartner)}]`, APP);
+        let signups = [];
+        return (0, rxjs_1.lastValueFrom)((0, rxjs_1.from)(createSalesPartner).pipe((0, rxjs_1.concatMap)(salesPartner => this.salesuser.findByPeriod({ columnName: "sales_code", columnvalue: salesPartner.sales_code, period: create_sale_dto_1.PERIOD[state.period] })), (0, rxjs_1.map)(salesuser => signups.push(salesuser.length))))
+            .then(() => { return { 'signups': signups.reduce((acc, curr) => acc += curr, 0) }; });
+    }
+    fetchSalesPartner(period) {
+        common_1.Logger.debug(`fetchSalesPartner() period: [${JSON.stringify(period)}]`, APP);
+        return this.salesDb.fetchAllByPeriod((0, create_sale_dto_1.Interval)(period)).pipe((0, rxjs_1.catchError)(err => { throw new common_1.BadRequestException(err.message); }), (0, rxjs_1.map)(doc => {
+            if (doc.length === 0)
+                throw new common_1.NotFoundException("sales partner not found");
+            return this.fetchSalesPartnerCommission(doc, period);
+        }));
+    }
+    fetchSalesPartnerCommission(createSalesPartner, period) {
+        common_1.Logger.debug(`fetchSalesPartnerCommission() createSalesPartner: [${JSON.stringify(createSalesPartner)}]`, APP);
+        let commission = [];
+        return (0, rxjs_1.lastValueFrom)((0, rxjs_1.from)(createSalesPartner).pipe((0, rxjs_1.switchMap)(salesPartner => (0, rxjs_1.lastValueFrom)(this.fetchTotalCommission(salesPartner, period)).then(doc => { commission.push(doc); })))).then(doc => (Object.assign(Object.assign({}, commission.reduce((prev, current) => current.totalCommission > prev.totalCommission ? current : prev)), { 'count': createSalesPartner.length })));
+    }
+    fetchTotalCommission(createSalesPartner, period) {
+        common_1.Logger.debug(`fetchTotalCommission() CreateSalesPartner: [${JSON.stringify(createSalesPartner)}] , period: [${JSON.stringify(period)}]`, APP);
+        return this.salesJunctionDb.find({ sales_code: createSalesPartner.sales_code }).pipe((0, rxjs_1.concatMap)(doc => this.fetchSalesPartnerSignups(doc, createSalesPartner, period)), (0, rxjs_1.map)(doc => doc));
+    }
+    fetchSalesPartnerSignups(createSalesJunction, createSalesPartner, period) {
+        common_1.Logger.debug(`fetchSalesPartnerSignups() createSalesJunction: [${JSON.stringify(createSalesJunction)}],  CreateSalesPartner: [${JSON.stringify(createSalesPartner)}], period: [${JSON.stringify(period)}]`, APP);
+        return this.salesuser.find({ sales_code: createSalesPartner.sales_code }).pipe((0, rxjs_1.map)(doc => {
+            return { 'totalCommission': createSalesJunction.reduce((acc, curr) => acc += curr.commission_amount, 0),
+                'name': createSalesPartner.name,
+                'signups': doc.length };
         }));
     }
     async fetchUser(createSalesPartner) {
@@ -317,13 +351,30 @@ let AdminService = class AdminService {
                 const paid_on = date.filter((res) => res);
                 await this.fetchSignup(yearMonthDto.year, month)
                     .then(signup => {
-                    reportData.push({ "total_paid_amount": total_paid_amount, "month": month, "total_dues": total_dues, "hsa_sing_up": signup, "paid_on": paid_on[0] });
+                    reportData.push({ "total_paid_amount": total_paid_amount, "month": month, "total_dues": (0, create_admin_dto_1.fetchDues)(salesJunctionDoc), "hsa_sing_up": signup, "paid_on": paid_on[0] });
                 }).catch(error => { throw new common_1.NotFoundException(error.message); });
                 return reportData;
             })
                 .catch(error => { throw new common_1.NotFoundException(error.message); })
                 .then(doc => reportData);
         }));
+    }
+    fetchMonthlyReport(dateDTO) {
+        common_1.Logger.debug(`fetchMonthlyReport() date: [${JSON.stringify(dateDTO)}]`, APP);
+        return this.salesDb.fetchAll().pipe((0, rxjs_1.map)(salesDb => this.fetchCommissionReportforSalesPartner(salesDb, dateDTO)));
+    }
+    fetchCommissionReportforSalesPartner(createSalesPartner, dateDTO) {
+        common_1.Logger.debug(`fetchCommissionReportforSalesPartner() createSalesPartner: [${JSON.stringify(createSalesPartner)}]`, APP);
+        let performance = [];
+        return (0, rxjs_1.lastValueFrom)((0, rxjs_1.from)(createSalesPartner).pipe((0, rxjs_1.switchMap)(salesDoc => (0, rxjs_1.lastValueFrom)(this.fetchSignupforPerformace(salesDoc, dateDTO)).then(doc => performance.push(doc))))).then(doc => (0, login_dto_1.applyPerformance)(performance, (0, login_dto_1.averageSignup)(createSalesPartner.length, performance.reduce((acc, curr) => acc += curr.signups, 0))));
+    }
+    fetchSignupforPerformace(createSalesPartner, dateDTO) {
+        common_1.Logger.debug(`fetchSignupAndPerformace() createSalesPartner: [${JSON.stringify(createSalesPartner)}]`, APP);
+        return this.salesJunctionDb.fetchByYear({ columnName: "sales_code", columnvalue: createSalesPartner.sales_code, year: dateDTO.year, month: dateDTO.month }).pipe((0, rxjs_1.switchMap)(salesJunctionDoc => this.fetchSignUpsforPerformance(createSalesPartner, salesJunctionDoc, dateDTO)));
+    }
+    fetchSignUpsforPerformance(createSalesPartner, createSalesJunction, dateDTO) {
+        common_1.Logger.debug(`fetchSignUpsforPerformance() createSalesJunction: [${JSON.stringify(createSalesJunction)}]`, APP);
+        return this.salesuser.fetchByYear({ columnName: "sales_code", columnvalue: createSalesPartner.sales_code, year: dateDTO.year, month: dateDTO.month }).pipe((0, rxjs_1.map)(doc => (0, login_dto_1.makeEarningDuesFormat)(createSalesPartner.name, createSalesJunction.reduce((acc, curr) => acc += curr.commission_amount, 0), !createSalesJunction[createSalesJunction.length - 1] ? 0 : createSalesJunction[createSalesJunction.length - 1].dues, doc.length)));
     }
     async fetchSignup(year, month) {
         common_1.Logger.debug(`fetchSignup() year: [${year}] month: [${month}]`, APP);
