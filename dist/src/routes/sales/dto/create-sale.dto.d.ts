@@ -7,6 +7,7 @@ export declare class CreateSalesJunction {
     created_date: string;
     updated_date: Date;
     dues: number;
+    total_count: number;
 }
 export declare class CreateSalesPartner {
     id: number;
@@ -98,3 +99,7 @@ export declare class EarningResponse {
 }
 export declare const Interval: (period: Period) => string;
 export declare const makeEarningFormat: (earning: number[]) => EarningResponse;
+export declare class YearMonthDto {
+    year: string;
+    salesCode: string;
+}

@@ -84,6 +84,12 @@ export interface MONTHYEAR {
     month: number;
 }
 export declare const fetchMonthYear: (MONTHYEAR: MONTHYEAR) => MONTHYEAR;
+export interface fetchByYearAndMonthParams {
+    year: string;
+    month: string;
+    columnName: string;
+    columnvalue: string;
+}
 export interface DatabaseInterface<T> {
     tableName: string;
     save(queryRequest: object): Observable<T[]>;

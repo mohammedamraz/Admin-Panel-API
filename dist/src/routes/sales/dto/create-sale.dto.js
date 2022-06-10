@@ -9,7 +9,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.makeEarningFormat = exports.Interval = exports.EarningResponse = exports.PERIOD = exports.Period = exports.UpdateImageDTO = exports.Periodicity = exports.ZQueryParamsDto = exports.Is_active = exports.UpdateSalesPartner = exports.CreateSalesInvitationJunction = exports.CreateWithdrawn = exports.CreateSalesPartnerRequest = exports.CreateSalesPartner = exports.CreateSalesJunction = void 0;
+exports.YearMonthDto = exports.makeEarningFormat = exports.Interval = exports.EarningResponse = exports.PERIOD = exports.Period = exports.UpdateImageDTO = exports.Periodicity = exports.ZQueryParamsDto = exports.Is_active = exports.UpdateSalesPartner = exports.CreateSalesInvitationJunction = exports.CreateWithdrawn = exports.CreateSalesPartnerRequest = exports.CreateSalesPartner = exports.CreateSalesJunction = void 0;
 const class_validator_1 = require("class-validator");
 class CreateSalesJunction {
 }
@@ -140,4 +140,18 @@ const makeEarningFormat = (earning) => ({
     paidAmount: earning[1]
 });
 exports.makeEarningFormat = makeEarningFormat;
+class YearMonthDto {
+}
+__decorate([
+    (0, class_validator_1.IsNotEmpty)(),
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.MinLength)(4, { message: 'Enter only 4 digit value of year, This is too short', }),
+    (0, class_validator_1.MaxLength)(4, { message: 'Enter only 4 digit value of year, This is too long', }),
+    __metadata("design:type", String)
+], YearMonthDto.prototype, "year", void 0);
+__decorate([
+    (0, class_validator_1.IsNotEmpty)(),
+    __metadata("design:type", String)
+], YearMonthDto.prototype, "salesCode", void 0);
+exports.YearMonthDto = YearMonthDto;
 //# sourceMappingURL=create-sale.dto.js.map

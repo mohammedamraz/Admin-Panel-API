@@ -1,11 +1,15 @@
 /* eslint-disable max-lines-per-function */
-import { BadRequestException, Injectable, Logger, NotFoundException, UnprocessableEntityException } from '@nestjs/common';
+import { BadRequestException, Injectable, Logger, NotFoundException, ParseArrayPipe, UnprocessableEntityException } from '@nestjs/common';
 import { DatabaseTable } from 'src/lib/database/database.decorator';
 import { DatabaseService } from 'src/lib/database/database.service';
-import { CreateSalesInvitationJunction, CreateSalesJunction, CreateSalesPartner, CreateWithdrawn, Interval, makeEarningFormat, Period, SalesUserJunction, UpdateImageDTO, UpdateSalesPartner, ZQueryParamsDto } from './dto/create-sale.dto';
+import { CreateSalesInvitationJunction, CreateSalesJunction, CreateSalesPartner, CreateWithdrawn, Interval, makeEarningFormat, Period, SalesUserJunction, UpdateImageDTO, UpdateSalesPartner, YearMonthDto, ZQueryParamsDto } from './dto/create-sale.dto';
 import { HttpService } from '@nestjs/axios';
 import { fetchAccountBySalesCode, fetchUserByMobileNumber, findUserByCustomerId } from 'src/constants/helper';
-import { catchError, from, lastValueFrom, map, of, switchMap } from 'rxjs';
+import { CreateSalesPartnerModel } from 'src/lib/config/model/sales.model';
+import { DirectConnect } from 'aws-sdk';
+import { InvitationJunctionModel } from './dto/invitation-junction.model';
+import { catchError, concatMap, from, lastValueFrom, map, of, switchMap } from 'rxjs';
+import { fetchmonths } from '../admin/dto/create-admin.dto';
 
 const APP = 'SalesService';
 
@@ -14,11 +18,12 @@ export class SalesService {
   // create(c
 
   constructor(
-    @DatabaseTable('sales_partner') private readonly db: DatabaseService<CreateSalesPartner>,
+    @DatabaseTable('sales_partner') private readonly db: DatabaseService<CreateSalesPartnerModel>,
     @DatabaseTable('sales_partner_invitation_junction') private readonly invitationJunctiondb: DatabaseService<CreateSalesInvitationJunction>,
     @DatabaseTable('sales_commission_junction') private readonly junctiondb: DatabaseService<CreateSalesJunction>,
     @DatabaseTable('sales_withdrawn_amount') private readonly withdrawndb: DatabaseService<CreateWithdrawn>,
     @DatabaseTable('sales_user_junction') private readonly salesuser: DatabaseService<SalesUserJunction>,
+     @DatabaseTable('sales_user_junction') private readonly salesUserJunctionDb: DatabaseService<CreateSalesJunction>,
 
     private http: HttpService) { }
 
@@ -41,7 +46,7 @@ export class SalesService {
         if (!doc[0]) return this.db.save({ name: createSalesPartner.name, location: createSalesPartner.location, commission: createSalesPartner.commission, mobile: createSalesPartner.mobile, email: createSalesPartner.email })
         else return this.db.save({ name: createSalesPartner.name, location: createSalesPartner.location, commission: createSalesPartner.commission, mobile: createSalesPartner.mobile, email: createSalesPartner.email, user_id: doc[0].fedo_id })
       }),
-      switchMap(doc => { salesId = doc[0].id; createSalesPartner.sales_code = "FEDSP" + todayDate + 500 + doc[0].id; createSalesPartner.id = doc[0].id; return this.junctiondb.save({ sales_code: "FEDSP" + todayDate + 500 + doc[0].id }).pipe(catchError(err => { throw new BadRequestException(err.message) }), map(doc => doc)) }),
+      switchMap(doc => { salesId = doc[0].id; createSalesPartner.sales_code = "FEDSP" + todayDate + 500 + doc[0].id; createSalesPartner.id = doc[0].id; return this.junctiondb.save({ sales_code: createSalesPartner.sales_code }).pipe(catchError(err => { throw new BadRequestException(err.message) }), map(doc => doc)) }),
       switchMap(doc => this.createInvitation(createSalesPartner, doc)),
       switchMap(doc => this.updateSalesPartner(salesId, <UpdateSalesPartner>{ sales_code: createSalesPartner.sales_code })),
       switchMap(doc => this.fetchSalesPartnerById(createSalesPartner.id.toString()))
@@ -89,6 +94,16 @@ export class SalesService {
     }))));
   }
 
+  fetchSalesPartnerBySalesCode(id: string) {
+    Logger.debug(`fetchSalesPartnerById() id: [${JSON.stringify(id)}]`, APP);
+
+    return from(lastValueFrom(this.db.find({ sales_code: id }).pipe(catchError(err => { throw new UnprocessableEntityException(err.message) }), map((res) => {
+      if (res[0] == null) throw new NotFoundException(`Sales Partner Not Found`)
+      if (res[0].is_active == false) throw new NotFoundException(`Sales Partner Not Found`)
+      return res
+    }))));
+  }
+
 
   deleteSalesPartner(id: string) {
     Logger.debug(`deleteSalesPartner id: [${id}]`, APP);
@@ -111,31 +126,85 @@ export class SalesService {
 
   }
 
+  // updateCustomerIdInSales(id: string, updateSalesPartnerDto: UpdateSalesPartner) {
+  //   Logger.debug(`updateSalesPartner() id: [${id}], body: [${JSON.stringify(updateSalesPartnerDto)}]`, APP,);
+
+  //   return this.db.find({ id: id }).pipe(switchMap(res => {
+  //     if (res[0] == null) throw new NotFoundException(`Sales Partner Not Found`)
+  //     else return this.usersService.findUserByCustomerId(updateSalesPartnerDto.customer_id)
+  //   }),
+  //     switchMap(doc => {
+  //       return lastValueFrom(this.db.findByIdandUpdate({ id: id, quries: { customer_id: updateSalesPartnerDto.customer_id } }).pipe(catchError(err => { throw new BadRequestException(err.message) }), map(doc => { return doc })))
+  //     }))
+
+  // }
+
+
   fetchAllSalesPartnersByDate(params: ZQueryParamsDto) {
     Logger.debug(`fetchAllSalesPartnersByDate() params:[${JSON.stringify(params)}] `, APP);
-
     if (Object.keys(params).length == 0) return this.db.fetchAll()
     else {
       if (params.date === undefined) return this.db.findByAlphabet(params).pipe(map(doc => { return doc }))
-      else return this.db.findByDate(this.makeDateFormat(params)).pipe(map(doc => { return doc }))
+      else return this.fetchCommissionFromJunctionDb(params).pipe(switchMap(doc => { return this.db.findByDate(this.makeDateFormat(params)) }))
     }
   }
 
-  fetchCommissionFromJunctionDb(params: ZQueryParamsDto) {
-    Logger.debug(`fetchCommissionFromJunctionDb() params:[${JSON.stringify(params)}] `, APP);
+  fetchCommissionFromJunctionDb(ZQueryParamsDto: ZQueryParamsDto) {
+    Logger.debug(`fetchCommissionFromJunctionDb() params:[${JSON.stringify(ZQueryParamsDto)}] `, APP);
 
-    if (params.date === undefined) return []
-    else return this.junctiondb.findByDate(this.makeDateFormat(params)).pipe(map(doc => { return doc }))
+    let arrays = [];
+    return this.junctiondb.findByDate(this.makeDateFormatJunction(ZQueryParamsDto)).pipe(switchMap(async (doc: any) => {
+      let salesceode = []
+      for (let j = 0; j <= doc.length - 1; j++) {
+        for (let i = 0; i <= arrays.length; i++) {
+          if (arrays.length == 0) { arrays.push({ commission_amount: doc[j].commission_amount, sales_code: doc[j].sales_code, total_signups: 1 }); break }
 
+          if (doc[j].sales_code == arrays[i]?.sales_code) {
+            arrays[i].commission_amount = arrays[i].commission_amount + doc[j].commission_amount;
+            arrays[i].total_signups = arrays[i].total_signups + 1
+            break
+          }
+        }
+        for (let i = 0; i <= arrays.length - 1; i++) {
+          salesceode.push(arrays[i]?.sales_code)
+        }
+        if (!salesceode.includes(doc[j].sales_code)) {
+          arrays.push({ commission_amount: doc[j].commission_amount, sales_code: doc[j].sales_code, total_signups: 1 })
+        } else {
+
+        }
+      }
+      for (var k = 0; k <= arrays.length - 1; k++) {
+        await lastValueFrom(this.db.findandUpdate({ columnName: 'sales_code', columnvalue: arrays[k].sales_code, quries: { total_commission: arrays[k].commission_amount, total_signups: arrays[k].total_signups } }));
+      }
+    })
+    )
   }
 
 
 
   fetchAllSalesPartnersFromJunctionByDate(id: string, params: ZQueryParamsDto) {
     Logger.debug(`fetchAllSalesPartnersByDate() id: [${id}] params:[${JSON.stringify(params)}] `, APP);
+    let contents = []
+    let contentsParams = []
 
-    if (params.date == undefined) return []
-    else return this.invitationJunctiondb.findByConditionSales(id, this.makeDateFormat(params)).pipe(map(doc => { return doc }))
+    if (Object.keys(params).length == 0) return this.invitationJunctiondb.fetchAll().pipe(
+      map(async (doc, index: Number) => {
+        for (let i = 0; i <= doc.length - 1; i++) 
+          await lastValueFrom(this.db.find({ sales_code: doc[i].sp_id }).pipe(map(res => { contents.push(res[0]) })))
+        
+        return contents
+      }))
+    else if (params.date == undefined) return []
+    else return this.fetchCommissionFromJunctionDb(params).pipe(switchMap(doc => {
+      return this.invitationJunctiondb.findByConditionSales(id, this.makeDateFormat(params)).pipe(
+        map(async (doc: InvitationJunctionModel[], index: Number) => {
+          for (let i = 0; i <= doc.length - 1; i++) {
+            await lastValueFrom(this.db.find({ sales_code: doc[i].sp_id }).pipe(map(res => { contentsParams.push(res[0]) })))
+          }
+          return contentsParams
+        }))
+    }))
   }
 
   makeDateFormat(params: any) {
@@ -156,6 +225,27 @@ export class SalesService {
       is_active: params.is_active
     };
 
+    return modifiedParams
+  }
+  makeDateFormatJunction(params: any) {
+    Logger.debug(`makeDateFormatJunction() params:[${JSON.stringify(params)}] `, APP);
+
+    let date = '';
+    if (params.date === 'monthly') date = '30';
+    else if (params.date === 'quarterly') date = '90';
+    else if (params.date === 'weekly') date = '7';
+    else if (params.date === 'yearly') date = '365';
+    else if (params.date === 'daily') date = '1';
+
+    const modifiedParams = {
+      number_of_rows: params.number_of_rows,
+      number_of_pages: params.number_of_pages,
+      name: params.name,
+      date: date,
+      is_active: params.is_active
+
+    };
+    delete modifiedParams.is_active
     return modifiedParams
   }
 
@@ -262,5 +352,38 @@ export class SalesService {
       }))
     }))
   }
-  
+fetchEarnigReport(yearMonthDto: YearMonthDto){
+  Logger.debug(`fetchCommissionReport() year: [${yearMonthDto.year}]`)
+
+  const reportData=[]
+  return from(fetchmonths((yearMonthDto.year))).pipe(
+    concatMap(async( month: number) => {
+      return await lastValueFrom(this.junctiondb.fetchByYear({columnName: 'sales_code', columnvalue: yearMonthDto.salesCode, year: yearMonthDto.year, month: month.toString() }))
+      .then(async salesJunctionDoc=> {
+       const paid_amount=salesJunctionDoc.map(doc=>doc.paid_amount)
+       const total_paid_amount=paid_amount.reduce((next,prev)=> next + prev,0)
+       const date = salesJunctionDoc.map(doc=>{if(doc.paid_amount > 0) return doc.created_date})
+       const paid_on = date.filter((res) => res) 
+       await this.fetchSignup(yearMonthDto.year,month,yearMonthDto)
+       .then(signup => {
+         reportData.push({"total_paid_amount":total_paid_amount,"month": month,"hsa_sing_up": signup, "paid_on": paid_on[0],'total_dues': Number(salesJunctionDoc[salesJunctionDoc.length-1]?.dues)})
+        }).catch(error=> {throw new NotFoundException(error.message)})
+       return reportData
+      })
+      .catch(error=> {throw new NotFoundException(error.message)})
+      
+    })
+  )
+
 }
+
+async fetchSignup(year,month,yearMonthDto: YearMonthDto){
+  Logger.debug(`fetchSignup() year: [${year}] month: [${month}] salesCode:[${yearMonthDto.salesCode}]`, APP);
+
+   return await lastValueFrom(this.salesUserJunctionDb.fetchByYear({columnName: 'sales_code', columnvalue: yearMonthDto.salesCode, year: yearMonthDto.year, month: month.toString() }))
+   .then(userJunctionDoc=> { console.log("junct",userJunctionDoc);console.log("junct",userJunctionDoc.length);
+    return userJunctionDoc.length})
+   .catch(error=>{throw new UnprocessableEntityException(error.message)})
+ }
+}
+  

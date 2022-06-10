@@ -45,17 +45,9 @@ let SalesController = class SalesController {
         common_1.Logger.debug(`fetchEarnings()salesCode: [${salesCode}] `, APP);
         return this.salesService.fetchEarnings(salesCode, period);
     }
-    fetchInvitationResponse(salesCode, period) {
-        common_1.Logger.debug(`fetchInvitationResponse()salesCode: [${salesCode}] `, APP);
-        return this.salesService.fetchInvitationResponse(salesCode, period);
-    }
     fetchAllSalesPartnersByDate(params) {
         common_1.Logger.debug(`fetchAllSalesPartnersByDate() params:${JSON.stringify(params)}`, APP);
         return this.salesService.fetchAllSalesPartnersByDate(params);
-    }
-    fetchCommissionFromJunctionDb(params) {
-        common_1.Logger.debug(`fetchCommissionFromJunctionDb() params:${JSON.stringify(params)}`, APP);
-        return this.salesService.fetchCommissionFromJunctionDb(params);
     }
     fetchAllSalesPartnersFromJunctionByDate(id, params) {
         common_1.Logger.debug(`fetchAllSalesPartnersFromJunctionByDate() id: [${id}] params:${JSON.stringify(params)}`, APP);
@@ -76,6 +68,10 @@ let SalesController = class SalesController {
     updateUserIdInSales(id, updateSalesPartnerDto) {
         common_1.Logger.debug(`updateCustomerIdInSales() id: [${id}] DTO:${JSON.stringify(updateSalesPartnerDto)}`, APP);
         return this.salesService.updateUserIdInSales(id, updateSalesPartnerDto);
+    }
+    fetchEarnigReport(yearMonthDto) {
+        common_1.Logger.debug(`fetchEarnigReport() year: [${yearMonthDto.year}`, APP);
+        return this.salesService.fetchEarnigReport(yearMonthDto);
     }
 };
 __decorate([
@@ -115,27 +111,12 @@ __decorate([
     __metadata("design:returntype", void 0)
 ], SalesController.prototype, "fetchEarnings", null);
 __decorate([
-    (0, common_1.Get)(':salesCode/invatationResponse'),
-    __param(0, (0, common_1.Param)('salesCode')),
-    __param(1, (0, common_1.Query)()),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String, create_sale_dto_1.Period]),
-    __metadata("design:returntype", void 0)
-], SalesController.prototype, "fetchInvitationResponse", null);
-__decorate([
     (0, common_1.Get)(),
     __param(0, (0, common_1.Query)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [create_sale_dto_1.ZQueryParamsDto]),
     __metadata("design:returntype", void 0)
 ], SalesController.prototype, "fetchAllSalesPartnersByDate", null);
-__decorate([
-    (0, common_1.Get)('id/id/id'),
-    __param(0, (0, common_1.Query)()),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [create_sale_dto_1.ZQueryParamsDto]),
-    __metadata("design:returntype", void 0)
-], SalesController.prototype, "fetchCommissionFromJunctionDb", null);
 __decorate([
     (0, common_1.Get)(':id/sales_junction'),
     __param(0, (0, common_1.Param)('id')),
@@ -188,6 +169,13 @@ __decorate([
     __metadata("design:paramtypes", [String, create_sale_dto_1.UpdateSalesPartner]),
     __metadata("design:returntype", void 0)
 ], SalesController.prototype, "updateUserIdInSales", null);
+__decorate([
+    (0, common_1.Get)(':salesCode/earning-report/:year'),
+    __param(0, (0, common_1.Param)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [create_sale_dto_1.YearMonthDto]),
+    __metadata("design:returntype", void 0)
+], SalesController.prototype, "fetchEarnigReport", null);
 SalesController = __decorate([
     (0, common_1.Controller)(),
     __metadata("design:paramtypes", [sales_service_1.SalesService])
