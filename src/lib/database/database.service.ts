@@ -1,7 +1,7 @@
 import { Injectable, Logger, Type } from '@nestjs/common';
 import { Pool } from 'pg';
 import { from, Observable, of } from 'rxjs';
-import { DatabaseFeatureOptions, DatabaseInterface, findAllParamsandUpdate, findAndUpdateParams, findByConditionParams, findByConditionParamsAlign, findByDateParams, findByIDAndUpdateParams, findParams, InsertParams, QueryParams, findByPeriodParams } from './interfaces/database.interface';
+import { DatabaseFeatureOptions, DatabaseInterface, findAllParamsandUpdate, findAndUpdateParams, findByConditionParams, findByConditionParamsAlign, findByDateParams, findByIDAndUpdateParams, findParams, InsertParams, QueryParams, findByPeriodParams, fetchByYearAndMonthParams } from './interfaces/database.interface';
 
 const APP = "DatabaseService"
 @Injectable()
@@ -272,5 +272,27 @@ export class DatabaseService<T> implements DatabaseInterface<T> {
     return this.runQuery(query);
 
   }
+  fetchByYear(obj: fetchByYearAndMonthParams): Observable<T[]> {
+
+    Logger.debug(`fetchByYear(): params ${[JSON.stringify(obj)]}`, APP);
+
+
+    const query = `SELECT * FROM ${this.tableName} WHERE  ${obj.columnName} = '${obj.columnvalue}' AND date_part('year',created_date) = ${obj.year} AND date_part('month',created_date) = ${obj.month} `;
+
+    return this.runQuery(query);
+
+  }
+
+  fetchSignUp(obj: fetchByYearAndMonthParams): Observable<T[]> {
+
+    Logger.debug(`fetchByYear(): params ${[JSON.stringify(obj)]}`, APP);
+
+
+    const query = `SELECT * FROM ${this.tableName} WHERE  ${obj.columnName} = '${obj.columnvalue}' AND date_part('year',created_date) = ${obj.year} AND date_part('month',created_date) = ${obj.month} `;
+
+    return this.runQuery(query);
+
+  }
+
 
 }

@@ -1,6 +1,6 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, Logger, Query, UseInterceptors, ParseIntPipe, UploadedFile } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { CreateSalesPartner, Period, UpdateSalesPartner, ZQueryParamsDto } from './dto/create-sale.dto';
+import { CreateSalesPartner, Period, UpdateSalesPartner, YearMonthDto, ZQueryParamsDto } from './dto/create-sale.dto';
 import { SalesService } from './sales.service';
 import { diskStorage } from 'multer';
 import { STATIC_IMAGES_PROFILE } from 'src/constants';
@@ -116,6 +116,12 @@ export class SalesController {
       Logger.debug(`updateCustomerIdInSales() id: [${id}] DTO:${JSON.stringify(updateSalesPartnerDto,)}`, APP);
 
       return this.salesService.updateUserIdInSales(id, updateSalesPartnerDto);
+  }
+  @Get(':salesCode/earning-report/:year')
+  fetchEarnigReport(@Param() yearMonthDto: YearMonthDto ){
+    Logger.debug(`fetchEarnigReport() year: [${yearMonthDto.year}`, APP);
+
+    return this.salesService.fetchEarnigReport(yearMonthDto);
   }
 
   

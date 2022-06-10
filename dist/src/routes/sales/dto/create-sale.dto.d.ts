@@ -99,3 +99,7 @@ export declare class EarningResponse {
 }
 export declare const Interval: (period: Period) => string;
 export declare const makeEarningFormat: (earning: number[]) => EarningResponse;
+export declare class YearMonthDto {
+    year: string;
+    salesCode: string;
+}
