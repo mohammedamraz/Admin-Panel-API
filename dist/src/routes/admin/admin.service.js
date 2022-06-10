@@ -374,8 +374,8 @@ let AdminService = class AdminService {
     }
     fetchSignUpsforPerformance(createSalesPartner, createSalesJunction, dateDTO) {
         common_1.Logger.debug(`fetchSignUpsforPerformance() createSalesJunction: [${JSON.stringify(createSalesJunction)}]`, APP);
-        console.log('don', createSalesJunction[createSalesJunction.length - 1]);
-        return this.salesuser.fetchByYear({ columnName: "sales_code", columnvalue: createSalesPartner.sales_code, year: dateDTO.year, month: dateDTO.month }).pipe((0, rxjs_1.map)(doc => (0, login_dto_1.makeEarningDuesFormat)(createSalesPartner.name, createSalesJunction.reduce((acc, curr) => acc += curr.commission_amount, 0), !!createSalesJunction[createSalesJunction.length - 1] ? 0 : createSalesJunction[createSalesJunction.length - 1].dues, doc.length)));
+        console.log('don', !!createSalesJunction[createSalesJunction.length - 1]);
+        return this.salesuser.fetchByYear({ columnName: "sales_code", columnvalue: createSalesPartner.sales_code, year: dateDTO.year, month: dateDTO.month }).pipe((0, rxjs_1.map)(doc => (0, login_dto_1.makeEarningDuesFormat)(createSalesPartner.name, createSalesJunction.reduce((acc, curr) => acc += curr.commission_amount, 0), !createSalesJunction[createSalesJunction.length - 1] ? 0 : createSalesJunction[createSalesJunction.length - 1].dues, doc.length)));
     }
     async fetchSignup(year, month) {
         common_1.Logger.debug(`fetchSignup() year: [${year}] month: [${month}]`, APP);
