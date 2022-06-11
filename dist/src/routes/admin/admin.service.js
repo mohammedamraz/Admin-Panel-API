@@ -252,15 +252,19 @@ let AdminService = class AdminService {
     }
     async updatingPaidAmount(updateAmountdto) {
         common_1.Logger.debug(`updatePaidAmount() updateAmountdto: [${JSON.stringify(updateAmountdto)}]`, APP);
-        updateAmountdto['data'].map(res => {
-            return (0, rxjs_1.lastValueFrom)(this.salesJunctionDb.find({ "sales_code": res.salesCode }).pipe((0, rxjs_1.map)(doc => {
+        await (0, rxjs_1.lastValueFrom)((0, rxjs_1.from)(updateAmountdto['data']).pipe((0, rxjs_1.map)(res => {
+            return (0, rxjs_1.lastValueFrom)(this.salesJunctionDb.find({ "sales_code": res.salesCode }).pipe((0, rxjs_1.switchMap)(doc => {
+                var _a, _b;
                 const sort_doc = Math.max(...doc.map(user => parseInt(user['id'].toString())));
                 const user_doc = doc.filter(item => item['id'] == sort_doc);
-                const finalRes = user_doc[0].dues;
+                if (user_doc.length < 0) {
+                    throw new common_1.BadRequestException();
+                }
+                const finalRes = (_a = user_doc[0]) === null || _a === void 0 ? void 0 : _a.dues;
                 const dueCommission = Number(finalRes) - Number(res.paid_amount);
-                return this.salesJunctionDb.save({ sales_code: user_doc[0].sales_code, paid_amount: res.paid_amount, dues: dueCommission });
+                return this.salesJunctionDb.save({ sales_code: (_b = user_doc[0]) === null || _b === void 0 ? void 0 : _b.sales_code, paid_amount: res.paid_amount, dues: dueCommission }).pipe((0, rxjs_1.catchError)(res => { throw new common_1.BadRequestException(); }));
             })));
-        });
+        })));
     }
     sendCreateSalesPartnerLinkToPhoneNumber(mobileNumberDtO) {
         common_1.Logger.debug(`sendCreateSalesPartnerLinkToPhoneNumber() mobileNumberDtO: [${JSON.stringify(mobileNumberDtO)}]`, APP);
