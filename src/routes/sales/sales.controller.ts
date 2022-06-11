@@ -35,21 +35,19 @@ export class SalesController {
 
         return this.salesService.deleteSalesPartner(id);
     }
-
-
-
+    
     @Get(':id')
     fetchSalesPartnerById(@Param('id') id: string) {
         Logger.debug(`fetchSalesPartnerById() id: [${id}]`, APP);
 
-        return this.salesService.fetchSalesPartnerById(id);
+      return this.salesService.fetchSalesPartnerById(id);
     }
 
     @Get(':salesCode/earning')
     fetchEarnings(@Param('salesCode') salesCode: string, @Query() period: Period) {
-        Logger.debug(`fetchEarnings()salesCode: [${salesCode}] `, APP);
+      Logger.debug(`fetchEarnings()salesCode: [${salesCode}] `, APP);
 
-        return this.salesService.fetchEarnings(salesCode, period);
+      return this.salesService.fetchEarnings(salesCode, period);
     }
 
     @Get()
@@ -86,6 +84,12 @@ export class SalesController {
 
         return this.salesService.uploadImage(id, file.filename);
     }
+    @Get(':salesCode/invatationResponse')
+    fetchInvitationResponse(@Param('salesCode') salesCode: string, @Query() period: Period) {
+      Logger.debug(`fetchInvitationResponse()salesCode: [${salesCode}] `, APP);
+
+      return this.salesService.fetchInvitationResponse(salesCode, period);
+    }
 
     @Patch(':id')
     updateSalesPartner(@Param('id', ParseIntPipe) id: number, @Body() updateSalesPartnerDto: UpdateSalesPartner) {
@@ -112,7 +116,6 @@ export class SalesController {
 
         return this.salesService.fetchEarnigReport(yearMonthDto);
     }
-
 
 }
 
