@@ -1,15 +1,15 @@
-    import { Email } from "aws-sdk/clients/codecommit";
+import { Email } from "aws-sdk/clients/codecommit";
 import { phoneNumber } from "aws-sdk/clients/importexport";
 import { IsEmail, IsEnum, IsNotEmpty, IsOptional, IsString, MaxLength, MinLength } from "class-validator";
 
 export class CreateSalesJunction {
     sales_code: string;
-    commission_amount :number;
+    commission_amount: number;
     paid_amount: number;
     created_date: string;
     updated_date: Date;
-    dues:number;
-    total_count:number;
+    dues: number;
+    total_count: number;
 
 }
 
@@ -17,16 +17,12 @@ export class CreateSalesPartner {
 
     id: number;
     name: string;
-
     @IsNotEmpty()
     mobile: phoneNumber;
-
     @IsNotEmpty()
     location: string;
-
     @IsEmail()
     email: Email;
-
     @IsNotEmpty()
     commission: number;
     user_id: number;
@@ -36,18 +32,15 @@ export class CreateSalesPartner {
     refered_by: string;
     block_account: boolean;
     is_hsa_account: boolean;
-
     @IsNotEmpty()
     profile_confirmation: boolean;
-    }
+}
 
 export class CreateSalesPartnerRequest {
     @IsNotEmpty()
     sales_code: string;
-
     @IsNotEmpty()
     request_id: string;
-
     id: string;
 }
 
@@ -55,18 +48,15 @@ export class CreateWithdrawn {
     id: string;
     @IsNotEmpty()
     created_date: Date;
-
     @IsNotEmpty()
     updated_date: Date;
-
     @IsNotEmpty()
     sp_id: string;
-
     @IsNotEmpty()
     paid_amount: number;
 }
 
-export interface SalesUserJunction{
+export interface SalesUserJunction {
     id: number;
     sales_code: string;
     users: number;
@@ -89,7 +79,7 @@ export class UpdateSalesPartner {
     sales_code: string;
     block_account: boolean;
     profile_confirmation: boolean;
-    customer_id:string
+    customer_id: string
 
 }
 export enum Is_active {
@@ -100,17 +90,13 @@ export enum Is_active {
 export class ZQueryParamsDto {
     @IsOptional()
     name?: string;
-
     @IsOptional()
     date?: string;
-
     @IsOptional()
     number_of_pages?: number;
-
     @IsOptional()
     number_of_rows?: number;
     @IsOptional()
-
     @IsEnum(Is_active)
     is_active: Is_active;
 }
@@ -150,22 +136,21 @@ export class EarningResponse {
 }
 
 export const Interval = (period: Period) => PERIOD[period.period]
-export const makeEarningFormat =(earning:number[]): EarningResponse=>
-    ( {
-        earnedAmount: earning[0],
-        paidAmount: earning[1]
-    }
-    )
+export const makeEarningFormat = (earning: number[]): EarningResponse =>
+({
+    earnedAmount: earning[0],
+    paidAmount: earning[1]
+}
+)
 
-export class YearMonthDto{
+export class YearMonthDto {
 
     @IsNotEmpty()
-     @IsString()
-     @MinLength(4, {message: 'Enter only 4 digit value of year, This is too short',})
-     @MaxLength(4, {message: 'Enter only 4 digit value of year, This is too long',}) 
+    @IsString()
+    @MinLength(4, { message: 'Enter only 4 digit value of year, This is too short', })
+    @MaxLength(4, { message: 'Enter only 4 digit value of year, This is too long', })
     year: string;
-
     @IsNotEmpty()
     salesCode: string;
-   
-  }
+
+}

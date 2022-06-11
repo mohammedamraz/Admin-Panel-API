@@ -21,12 +21,12 @@ export class SalesController {
         return this.salesService.createSalesPartner(createSalesPartner)
     }
 
-  @Post(':sales_code/addCommission')
-  addCommission(@Param('sales_code') salesCode: string) {
-      Logger.debug(`addCommission() salesCode: [${salesCode}] `, APP);
+    @Post(':sales_code/addCommission')
+    addCommission(@Param('sales_code') salesCode: string) {
+        Logger.debug(`addCommission() salesCode: [${salesCode}] `, APP);
 
-      return this.salesService.addCommission(salesCode);
-  }
+        return this.salesService.addCommission(salesCode);
+    }
 
 
     @Delete(':id')
@@ -36,11 +36,11 @@ export class SalesController {
         return this.salesService.deleteSalesPartner(id);
     }
 
- 
 
-  @Get(':id')
-  fetchSalesPartnerById(@Param('id') id: string) {
-      Logger.debug(`fetchSalesPartnerById() id: [${id}]`, APP);
+
+    @Get(':id')
+    fetchSalesPartnerById(@Param('id') id: string) {
+        Logger.debug(`fetchSalesPartnerById() id: [${id}]`, APP);
 
         return this.salesService.fetchSalesPartnerById(id);
     }
@@ -51,12 +51,6 @@ export class SalesController {
 
         return this.salesService.fetchEarnings(salesCode, period);
     }
-
-    // @Get(':salesCode/invatationResponse')
-    // fetchInvitationResponse(@Param('salesCode') salesCode: string) {
-    //     Logger.debug(`fetchInvitationResponse()salesCode: [${salesCode}] `, APP);
-    //     return this.salesService.fetchInvitationResponse(salesCode);
-    // }
 
     @Get()
     fetchAllSalesPartnersByDate(@Query() params: ZQueryParamsDto) {
@@ -93,37 +87,33 @@ export class SalesController {
         return this.salesService.uploadImage(id, file.filename);
     }
 
+    @Patch(':id')
+    updateSalesPartner(@Param('id', ParseIntPipe) id: number, @Body() updateSalesPartnerDto: UpdateSalesPartner) {
+        Logger.debug(`updateSalesPartner() id: [${id}] DTO:${JSON.stringify(updateSalesPartnerDto,)}`, APP);
+
+        return this.salesService.updateSalesPartner(id, updateSalesPartnerDto);
+    }
+
+    @Patch('bank-details-verification/:id')
+    changeBankDetailsVerificationStatus(@Param('id', ParseIntPipe) id: number) {
+        Logger.debug(`changeBankDetailsVerificationSatatus() id:[${id}] `, APP);
+
+        return this.salesService.changeBankDetailsVerificationSatatus(id);
+    }
+    @Patch(':id/updateCustomer')
+    updateUserIdInSales(@Param('id') id: string, @Body() updateSalesPartnerDto: UpdateSalesPartner) {
+        Logger.debug(`updateCustomerIdInSales() id: [${id}] DTO:${JSON.stringify(updateSalesPartnerDto,)}`, APP);
+
+        return this.salesService.updateUserIdInSales(id, updateSalesPartnerDto);
+    }
+    @Get(':salesCode/earning-report/:year')
+    fetchEarnigReport(@Param() yearMonthDto: YearMonthDto) {
+        Logger.debug(`fetchEarnigReport() year: [${yearMonthDto.year}`, APP);
+
+        return this.salesService.fetchEarnigReport(yearMonthDto);
+    }
 
 
-
-
-  @Patch(':id')
-  updateSalesPartner(@Param('id',ParseIntPipe) id: number, @Body() updateSalesPartnerDto: UpdateSalesPartner) {
-      Logger.debug(`updateSalesPartner() id: [${id}] DTO:${JSON.stringify(updateSalesPartnerDto,)}`, APP);
-
-      return this.salesService.updateSalesPartner(id, updateSalesPartnerDto);
-  }
-
-  @Patch('bank-details-verification/:id')
-  changeBankDetailsVerificationStatus(@Param('id', ParseIntPipe) id: number) {
-    Logger.debug(`changeBankDetailsVerificationSatatus() id:[${id}] `, APP);
-
-    return this.salesService.changeBankDetailsVerificationSatatus(id);
-  }
-  @Patch(':id/updateCustomer')
-  updateUserIdInSales(@Param('id') id: string, @Body() updateSalesPartnerDto: UpdateSalesPartner) {
-      Logger.debug(`updateCustomerIdInSales() id: [${id}] DTO:${JSON.stringify(updateSalesPartnerDto,)}`, APP);
-
-      return this.salesService.updateUserIdInSales(id, updateSalesPartnerDto);
-  }
-  @Get(':salesCode/earning-report/:year')
-  fetchEarnigReport(@Param() yearMonthDto: YearMonthDto ){
-    Logger.debug(`fetchEarnigReport() year: [${yearMonthDto.year}`, APP);
-
-    return this.salesService.fetchEarnigReport(yearMonthDto);
-  }
-
-  
 }
 
 
