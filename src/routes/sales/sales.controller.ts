@@ -101,11 +101,6 @@ export class SalesController {
 
       return this.salesService.uploadImage(id, file.filename);
   }
-
-
-
-
-
   @Patch(':id')
   updateSalesPartner(@Param('id',ParseIntPipe) id: number, @Body() updateSalesPartnerDto: UpdateSalesPartner) {
       Logger.debug(`updateSalesPartner() id: [${id}] DTO:${JSON.stringify(updateSalesPartnerDto,)}`, APP);

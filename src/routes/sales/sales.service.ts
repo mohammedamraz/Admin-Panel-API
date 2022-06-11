@@ -278,7 +278,7 @@ fetchEarnigReport(yearMonthDto: YearMonthDto){
        const paid_on = date.filter((res) => res) 
        await this.fetchSignup(yearMonthDto.year,month,yearMonthDto)
        .then(signup => {
-         reportData.push({"total_paid_amount":total_paid_amount,"month": month,"hsa_sing_up": signup, "paid_on": paid_on[0],'total_dues': Number(salesJunctionDoc[salesJunctionDoc.length-1]?.dues)})
+         reportData.push({"total_paid_amount":total_paid_amount,"month": month-1,"hsa_sing_up": signup, "paid_on": paid_on[0],'total_dues': Number(salesJunctionDoc[salesJunctionDoc.length-1]?.dues)})
         }).catch(error=> {throw new NotFoundException(error.message)})
        return reportData
       })
@@ -292,9 +292,8 @@ fetchEarnigReport(yearMonthDto: YearMonthDto){
 async fetchSignup(year,month,yearMonthDto: YearMonthDto){
   Logger.debug(`fetchSignup() year: [${year}] month: [${month}] salesCode:[${yearMonthDto.salesCode}]`, APP);
 
-   return await lastValueFrom(this.salesUserJunctionDb.fetchSignUp({columnName: 'sales_code', columnvalue: yearMonthDto.salesCode, year: yearMonthDto.year, month: month.toString() }))
-   .then(userJunctionDoc=> { console.log("junct",userJunctionDoc);console.log("junct",userJunctionDoc.length);
-    return userJunctionDoc.length})
+   return await lastValueFrom(this.salesUserJunctionDb.fetchByYear({columnName: 'sales_code', columnvalue: yearMonthDto.salesCode, year: yearMonthDto.year, month: (month-1).toString() }))
+   .then(userJunctionDoc=> {return userJunctionDoc.length})
    .catch(error=>{throw new UnprocessableEntityException(error.message)})
  }
 }

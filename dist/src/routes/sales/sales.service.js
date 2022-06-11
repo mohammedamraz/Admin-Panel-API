@@ -233,7 +233,7 @@ let SalesService = class SalesService {
                 await this.fetchSignup(yearMonthDto.year, month, yearMonthDto)
                     .then(signup => {
                     var _a;
-                    reportData.push({ "total_paid_amount": total_paid_amount, "month": month, "hsa_sing_up": signup, "paid_on": paid_on[0], 'total_dues': Number((_a = salesJunctionDoc[salesJunctionDoc.length - 1]) === null || _a === void 0 ? void 0 : _a.dues) });
+                    reportData.push({ "total_paid_amount": total_paid_amount, "month": month - 1, "hsa_sing_up": signup, "paid_on": paid_on[0], 'total_dues': Number((_a = salesJunctionDoc[salesJunctionDoc.length - 1]) === null || _a === void 0 ? void 0 : _a.dues) });
                 }).catch(error => { throw new common_1.NotFoundException(error.message); });
                 return reportData;
             })
@@ -242,12 +242,8 @@ let SalesService = class SalesService {
     }
     async fetchSignup(year, month, yearMonthDto) {
         common_1.Logger.debug(`fetchSignup() year: [${year}] month: [${month}] salesCode:[${yearMonthDto.salesCode}]`, APP);
-        return await (0, rxjs_1.lastValueFrom)(this.salesUserJunctionDb.fetchSignUp({ columnName: 'sales_code', columnvalue: yearMonthDto.salesCode, year: yearMonthDto.year, month: month.toString() }))
-            .then(userJunctionDoc => {
-            console.log("junct", userJunctionDoc);
-            console.log("junct", userJunctionDoc.length);
-            return userJunctionDoc.length;
-        })
+        return await (0, rxjs_1.lastValueFrom)(this.salesUserJunctionDb.fetchByYear({ columnName: 'sales_code', columnvalue: yearMonthDto.salesCode, year: yearMonthDto.year, month: (month - 1).toString() }))
+            .then(userJunctionDoc => { return userJunctionDoc.length; })
             .catch(error => { throw new common_1.UnprocessableEntityException(error.message); });
     }
 };

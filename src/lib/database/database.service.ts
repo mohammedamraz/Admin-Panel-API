@@ -283,16 +283,4 @@ export class DatabaseService<T> implements DatabaseInterface<T> {
 
   }
 
-  fetchSignUp(obj: fetchByYearAndMonthParams): Observable<T[]> {
-
-    Logger.debug(`fetchByYear(): params ${[JSON.stringify(obj)]}`, APP);
-
-
-    const query = `SELECT * FROM ${this.tableName} WHERE  ${obj.columnName} = '${obj.columnvalue}' AND date_part('year',created_date) = ${obj.year} AND date_part('month',created_date) = ${obj.month} `;
-
-    return this.runQuery(query);
-
-  }
-
-
 }
