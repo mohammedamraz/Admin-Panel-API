@@ -1,11 +1,18 @@
-import { ArrayMinSize, IsNotEmpty, IsPhoneNumber, ValidateNested } from 'class-validator';
+import { ArrayMinSize, IsNotEmpty, IsNumber, IsPhoneNumber, IsString, MaxLength, MinLength, ValidateNested } from 'class-validator';
 import { phoneNumber } from 'aws-sdk/clients/importexport';
 import { Type } from 'class-transformer';
+import { Logger } from '@nestjs/common';
+import { CreateSalesJunction } from 'src/routes/sales/dto/create-sale.dto';
 
 export class MobileNumberDtO {
+
   @IsNotEmpty()
   @IsPhoneNumber()
   phoneNumber: phoneNumber;
+
+  @IsNotEmpty()
+  @IsNumber()
+  commission:number;
 }
 
 export class MobileNumberAndOtpDtO {
@@ -42,7 +49,7 @@ export class User {
 	aadhaar_id: string;
 	userreference_id: string;
 	kycschedule: string;
-	phone_number:phoneNumber;
+	mobile:phoneNumber;
 
 }
 
@@ -90,6 +97,8 @@ export class createAccount {
   savings_beneficiary_id:string
   partner_id:number;
   sales_code: string;
+  fedo_id: string;
+  userreference_id:string
 }
 
 export class createPaidAmountDto {
@@ -107,4 +116,48 @@ export class createPaid {
   @ArrayMinSize(1)
   @IsNotEmpty()
   data : createPaidAmountDto[];
+}
+
+export class YearMonthDto{
+
+  @IsNotEmpty()
+   @IsString()
+   @MinLength(4, {message: 'Enter only 4 digit value of year, This is too short'})
+   @MaxLength(4, {message: 'Enter only 4 digit value of year, This is too long'}) 
+  year: string;
+}
+
+export class DateDTO extends YearMonthDto{
+
+  @IsNotEmpty()
+  @MinLength(2, {message: 'Enter only 2 digit value of month, This is too short'})
+  @MaxLength(2, {message: 'Enter only 2 digit value of month, This is too long'}) 
+  month: string;
+}
+export const fetchmonths =(year: string) => {
+  Logger.debug(`fetchmonths() year: [${year}]`);
+
+  let month = [];
+  let i = 0;
+  if(new Date().getFullYear().toString() === year){
+    for(i = new Date().getMonth()+1; i> 0 ; i--)
+    month.push(i)
+   return month
+  }
+  else {
+    for(i = 12; i> 0 ; i--)
+    month.push(i)
+  return month
+  }
+}
+export const fetchDues = (createSalesJunction: CreateSalesJunction[]) => {
+  Logger.debug(`fetchDues() createSalesJunction: [${createSalesJunction}]`);
+
+  const don = createSalesJunction.reduce((acc, curr) => {
+    const index = acc.findIndex(x => x.sales_code === curr.sales_code);
+    index === -1 ? acc.push({sales_code: curr.sales_code, dues: [curr.dues]}) : acc[index].dues.push(curr.dues);
+    return acc
+  },[]).map(salesCode => ({sales_code: salesCode.sales_code, dues: Math.max(...salesCode.dues)}));
+  
+  return don.reduce((acc, curr) => acc+=curr.dues, 0)
 }

@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.findByConditionParamsAlign = exports.findByDateParams = void 0;
+exports.fetchMonthYear = exports.findByConditionParamsAlign = exports.findByDateParams = void 0;
 class findByDateParams {
 }
 exports.findByDateParams = findByDateParams;
@@ -15,4 +15,12 @@ const findByConditionParamsAlign = (findbyConditionParams) => {
     return params;
 };
 exports.findByConditionParamsAlign = findByConditionParamsAlign;
+const fetchMonthYear = (MONTHYEAR) => {
+    const params = {
+        year: MONTHYEAR.year,
+        month: MONTHYEAR.month
+    };
+    return params;
+};
+exports.fetchMonthYear = fetchMonthYear;
 //# sourceMappingURL=database.interface.js.map

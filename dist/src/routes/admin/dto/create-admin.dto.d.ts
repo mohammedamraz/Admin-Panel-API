@@ -1,6 +1,8 @@
 import { phoneNumber } from 'aws-sdk/clients/importexport';
+import { CreateSalesJunction } from 'src/routes/sales/dto/create-sale.dto';
 export declare class MobileNumberDtO {
     phoneNumber: phoneNumber;
+    commission: number;
 }
 export declare class MobileNumberAndOtpDtO {
     phoneNumber: phoneNumber;
@@ -26,7 +28,7 @@ export declare class User {
     aadhaar_id: string;
     userreference_id: string;
     kycschedule: string;
-    phone_number: phoneNumber;
+    mobile: phoneNumber;
 }
 export declare class AccountZwitchResponseBody {
     id: string;
@@ -66,6 +68,8 @@ export declare class createAccount {
     savings_beneficiary_id: string;
     partner_id: number;
     sales_code: string;
+    fedo_id: string;
+    userreference_id: string;
 }
 export declare class createPaidAmountDto {
     paid_amount: number;
@@ -78,3 +82,11 @@ export declare class createPaidAmountDto {
 export declare class createPaid {
     data: createPaidAmountDto[];
 }
+export declare class YearMonthDto {
+    year: string;
+}
+export declare class DateDTO extends YearMonthDto {
+    month: string;
+}
+export declare const fetchmonths: (year: string) => any[];
+export declare const fetchDues: (createSalesJunction: CreateSalesJunction[]) => number;

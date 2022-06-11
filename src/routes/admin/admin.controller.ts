@@ -1,19 +1,62 @@
-import { Controller, Get, Post, Body, Param, Logger } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Logger, Query } from '@nestjs/common';
+import { Period } from '../sales/dto/create-sale.dto';
 import { AdminService } from './admin.service';
-import { createPaid, MobileNumberAndOtpDtO, MobileNumberDtO, ParamDto, requestDto } from './dto/create-admin.dto';
-import { ConfirmForgotPasswordDTO, ForgotPasswordDTO, LoginDTO } from './dto/login.dto';
+import { createPaid, DateDTO, MobileNumberAndOtpDtO, MobileNumberDtO, ParamDto, requestDto, YearMonthDto } from './dto/create-admin.dto';
+import { ConfirmForgotPasswordDTO, ForgotPasswordDTO, LoginDTO, PeriodRange, State } from './dto/login.dto';
 
 const APP = 'AdminController';
-
 @Controller()
 export class AdminController {
   constructor(private readonly adminService: AdminService) {}
+
+  @Get('sales-partner')
+  fetchSalesPartner(@Query() period: Period) {
+    Logger.debug(`fetchSalesPartner() period: [${JSON.stringify(period)}]`, APP);
+
+    return this.adminService.fetchSalesPartner(period);
+  }
+
+  @Get('commission-report/:year')
+  fetchCommissionReport(@Param() yearMonthDto:YearMonthDto){
+    Logger.debug(`fetchCommissionReport() yearMonthDto: [${yearMonthDto.year}]`, APP);
+
+    return this.adminService.fetchCommissionReport(yearMonthDto);
+  }
+
+  @Get('monthly-report/:year/:month')
+  fetchMonthlyReport(@Param() dateDTO: DateDTO){
+    Logger.debug(`fetchMonthlyReport() dateDTO: [${JSON.stringify(dateDTO)}]`, APP);
+
+    return this.adminService.fetchMonthlyReport(dateDTO);
+
+  }
 
   @Get('sales/account-details')
   fetchSalesPartnerAccountDetails() {
    Logger.debug(`getSalesPartnerAccountDetails()`, APP);
 
     return this.adminService.fetchSalesPartnerAccountDetails()
+  }
+
+  @Get('commission-dispersals')
+  fetchCommissionDispersals(@Query() period: PeriodRange) {
+      Logger.debug(`fetchCommissionDispersals() period: [${JSON.stringify(period.period)}]`, APP);
+
+      return this.adminService.fetchCommissionDispersals(period);
+  }
+
+  @Get('invitation-responses')
+  fetchInvitationResponses(@Query() state: State) {
+    Logger.debug(`fetchInvitationResponses() state: [${JSON.stringify(state)}]`, APP);
+
+    return this.adminService.fetchInvitationResponse(state);
+  }
+
+  @Get('sales/account-details/:salesCode')
+  fetchSalesPartnerAccountDetailsBySalesCode(@Param('salesCode') salesCode: string) {
+   Logger.debug(`fetchSalesPartnerAccountDetailsByID()`, APP);
+
+    return this.adminService.fetchSalesPartnerAccountDetailsBySalesCode(salesCode)
   }
 
   @Post()
@@ -30,7 +73,7 @@ export class AdminController {
     return this.adminService.verifyOtp(mobileNumberAndOtpDtO);
   }
 
-  @Post('/download-link')
+  @Post('download-link')
   sentFedoAppDownloadLinkToMobileAndWhatsappNumber(@Body() mobileNumberDtO: MobileNumberDtO) {
     Logger.debug(`sentFedoAppDownloadLinkToMobileAndWhatsappNumber() mobileNumberDtO: [${JSON.stringify(mobileNumberDtO)}]`, APP);
 
@@ -58,7 +101,7 @@ export class AdminController {
     return this.adminService.confirmForgotPassword(confirmForgotPasswordDTO);
   }
 
-  @Post('/send-email/:mobileNumber')
+  @Post('send-email/:mobileNumber')
   sendEmailOnIncorrectBankDetails(@Body() body: requestDto, @Param() param: ParamDto) {
     Logger.debug(`sendEmailOnIncorrectBankDetails() body: [${JSON.stringify(body)}] param: [${JSON.stringify(param)}] `, APP);
 
@@ -66,10 +109,16 @@ export class AdminController {
   }
 
   @Post("payment-record")
-  updatingPaidAmount(@Body() updateAmountdto:createPaid) {
+  updatePaidAmount(@Body() updateAmountdto:createPaid) {
     Logger.debug(`updatePaidAmount() updateAmountdto: [${JSON.stringify(updateAmountdto)}]`, APP);
 
-    return this.adminService.updatingPaidAmount(updateAmountdto)
+    return this.adminService.updatePaidAmount(updateAmountdto)
+  }
 
-}
+  @Post('/sales-link')
+  sendCreateSalesPartnerLinkToMobileAndWhatsappNumber(@Body() mobileNumberDtO: MobileNumberDtO) {
+    Logger.debug(`sendCreateSalesPartnerLinkToMobileAndWhatsappNumber() mobileNumberDtO: [${JSON.stringify(mobileNumberDtO)}]`, APP);
+
+    return this.adminService.sendCreateSalesPartnerLinkToMobileAndWhatsappNumber(mobileNumberDtO);
+  }
 }

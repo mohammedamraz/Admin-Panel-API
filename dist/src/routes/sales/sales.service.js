@@ -20,17 +20,21 @@ const create_sale_dto_1 = require("./dto/create-sale.dto");
 const axios_1 = require("@nestjs/axios");
 const helper_1 = require("../../constants/helper");
 const rxjs_1 = require("rxjs");
+const create_admin_dto_1 = require("../admin/dto/create-admin.dto");
 const APP = 'SalesService';
 let SalesService = class SalesService {
-    constructor(db, invitationJunctiondb, junctiondb, withdrawndb, http) {
+    constructor(db, invitationJunctiondb, junctiondb, withdrawndb, salesuser, salesUserJunctionDb, http) {
         this.db = db;
         this.invitationJunctiondb = invitationJunctiondb;
         this.junctiondb = junctiondb;
         this.withdrawndb = withdrawndb;
+        this.salesuser = salesuser;
+        this.salesUserJunctionDb = salesUserJunctionDb;
         this.http = http;
     }
     createSalesPartner(createSalesPartner) {
         common_1.Logger.debug(`createSalesPartner() DTO:${JSON.stringify(createSalesPartner)}`, APP);
+        let userId;
         let salesId;
         var todayDate;
         var today = new Date();
@@ -41,7 +45,7 @@ let SalesService = class SalesService {
             if (!doc[0])
                 return this.db.save({ name: createSalesPartner.name, location: createSalesPartner.location, commission: createSalesPartner.commission, mobile: createSalesPartner.mobile, email: createSalesPartner.email });
             else
-                return this.db.save({ name: createSalesPartner.name, location: createSalesPartner.location, commission: createSalesPartner.commission, mobile: createSalesPartner.mobile, email: createSalesPartner.email, user_id: doc[0].fedo_id });
+                return this.db.save({ name: createSalesPartner.name, location: createSalesPartner.location, commission: createSalesPartner.commission, mobile: createSalesPartner.mobile, email: createSalesPartner.email, user_id: doc[0].fedo_id, is_hsa_account: true });
         }), (0, rxjs_1.switchMap)(doc => { salesId = doc[0].id; createSalesPartner.sales_code = "FEDSP" + todayDate + 500 + doc[0].id; createSalesPartner.id = doc[0].id; return this.junctiondb.save({ sales_code: createSalesPartner.sales_code }).pipe((0, rxjs_1.catchError)(err => { throw new common_1.BadRequestException(err.message); }), (0, rxjs_1.map)(doc => doc)); }), (0, rxjs_1.switchMap)(doc => this.createInvitation(createSalesPartner, doc)), (0, rxjs_1.switchMap)(doc => this.updateSalesPartner(salesId, { sales_code: createSalesPartner.sales_code })), (0, rxjs_1.switchMap)(doc => this.fetchSalesPartnerById(createSalesPartner.id.toString())));
     }
     createInvitation(createSalesPartner, createSalesJunction) {
@@ -103,7 +107,7 @@ let SalesService = class SalesService {
                 throw new common_1.NotFoundException(`Sales Partner Not Found`);
             if (res[0].is_active === false)
                 throw new common_1.NotFoundException(`Sales Partner Not Found`);
-            return (0, rxjs_1.lastValueFrom)(this.db.findByIdandUpdate({ id: id, quries: updateSalesPartnerDto }).pipe((0, rxjs_1.catchError)(err => { throw new common_1.BadRequestException(); }), (0, rxjs_1.map)(doc => { return doc; })));
+            return (0, rxjs_1.lastValueFrom)(this.db.findByIdandUpdate({ id: String(id), quries: updateSalesPartnerDto }).pipe((0, rxjs_1.catchError)(err => { throw new common_1.BadRequestException(); }), (0, rxjs_1.map)(doc => { return doc; })));
         }));
     }
     fetchAllSalesPartnersByDate(params) {
@@ -155,9 +159,8 @@ let SalesService = class SalesService {
         let contentsParams = [];
         if (Object.keys(params).length == 0)
             return this.invitationJunctiondb.fetchAll().pipe((0, rxjs_1.map)(async (doc, index) => {
-                for (let i = 0; i <= doc.length - 1; i++) {
+                for (let i = 0; i <= doc.length - 1; i++)
                     await (0, rxjs_1.lastValueFrom)(this.db.find({ sales_code: doc[i].sp_id }).pipe((0, rxjs_1.map)(res => { contents.push(res[0]); })));
-                }
                 return contents;
             }));
         else if (params.date == undefined)
@@ -245,15 +248,9 @@ let SalesService = class SalesService {
             return res[res.length - 1];
         }));
     }
-    paymentCalculation(salesCode) {
-        common_1.Logger.debug(`paymentCalculation salesCode: ${salesCode}`, APP);
-        let totalCommission;
-        let remainingCommission;
-        return this.fetchSalesBySalesCode(salesCode).pipe((0, rxjs_1.switchMap)(doc => { return this.fetchCommisionBySalesCode(salesCode); }), (0, rxjs_1.switchMap)(doc => { console.log(doc.commission_amount); totalCommission = doc.commission_amount; return this.fetchSalesBySalesCode(salesCode).pipe((0, rxjs_1.map)(doc => { return doc; })); }), (0, rxjs_1.switchMap)(doc => this.withdrawndb.find({ 'sale_id': doc.id })), (0, rxjs_1.switchMap)(doc => { console.log(doc[0].paid_amount, totalCommission); remainingCommission = totalCommission - doc[0].paid_amount; console.log(remainingCommission); return this.junctiondb.save({ sales_code: salesCode, commission_amount: remainingCommission }); }));
-    }
     changeBankDetailsVerificationSatatus(id) {
-        common_1.Logger.debug(`changeBankDetailsVerificationSatatus() id: [${id}] quries:{'bank_details_verification':true}`, APP);
-        return (this.db.find({ id: id })).pipe((0, rxjs_1.catchError)(err => { (err); throw new common_1.UnprocessableEntityException(); }), (0, rxjs_1.map)(res => {
+        common_1.Logger.debug(`changeBankDetailsVerificationSatatus() id: [${id}] `, APP);
+        return (this.db.find({ id: id })).pipe((0, rxjs_1.catchError)(err => { (err); throw new common_1.UnprocessableEntityException(err.message); }), (0, rxjs_1.map)(res => {
             if (res.length === 0)
                 throw new common_1.NotFoundException();
             return this.db.findByIdandUpdate({ id: String(id), quries: { 'bank_details_verification': true } });
@@ -267,13 +264,64 @@ let SalesService = class SalesService {
             return (0, create_sale_dto_1.makeEarningFormat)(salesjuncdoc.reduce((acc, curr) => ([acc[0] += curr.commission_amount, acc[1] += curr.paid_amount]), [0, 0]));
         }));
     }
-    fetchInvitationResponse(salesCode) {
+    fetchInvitationResponse(salesCode, period) {
         common_1.Logger.debug(`fetchInvitationResponse() salesCode: ${salesCode}`, APP);
-        return (0, helper_1.fetchAccountBySalesCode)(salesCode).pipe((0, rxjs_1.catchError)(error => { throw new common_1.BadRequestException(error.message); }), (0, rxjs_1.map)(accounts => {
-            if (accounts.length === 0)
+        return this.salesuser.findByPeriod({ columnName: "sales_code", columnvalue: salesCode, period: (0, create_sale_dto_1.Interval)(period) }).pipe((0, rxjs_1.catchError)(error => { throw new common_1.BadRequestException(error.message); }), (0, rxjs_1.map)(salesuser => {
+            if (salesuser.length === 0)
                 throw new common_1.NotFoundException("no Account found");
-            return { "signup": (accounts.filter(account => account.zwitch_id !== null)).length };
+            return { "signup": salesuser.length };
         }));
+    }
+    addCommission(salesCode) {
+        common_1.Logger.debug(`addCommission() salesCode: ${salesCode}`, APP);
+        return this.fetchSalesBySalesCode(salesCode).pipe((0, rxjs_1.switchMap)(salesCommission => (0, rxjs_1.lastValueFrom)(this.junctiondb.find({ "sales_code": String(salesCode), }))
+            .then(res => { console.log('dds', res); return [salesCommission, res[res.length - 1]]; })), (0, rxjs_1.switchMap)(async ([salesCommission, res]) => { await this.salesuser.save({ sales_code: salesCode }); return [salesCommission, res]; }), (0, rxjs_1.switchMap)(([salesCommission, res]) => this.junctiondb.save({ sales_code: salesCode, commission_amount: salesCommission["commission"], dues: (Number(res['dues']) + Number(salesCommission["commission"])) })));
+    }
+    updateUserIdInSales(id, updateSalesPartnerDto) {
+        common_1.Logger.debug(`updateSalesPartner() id: [${id}], body: [${JSON.stringify(updateSalesPartnerDto)}]`, APP);
+        return this.db.find({ id: id }).pipe((0, rxjs_1.switchMap)(res => {
+            if (res.length == 0)
+                throw new common_1.NotFoundException(`Sales Partner Not Found`);
+            else
+                return (0, helper_1.findUserByCustomerId)(updateSalesPartnerDto.customer_id).pipe((0, rxjs_1.map)((userDoc) => {
+                    if (userDoc.length == 0)
+                        throw new common_1.NotFoundException("User not found");
+                    else if (userDoc[0].userreference_id === updateSalesPartnerDto.customer_id) {
+                        return (0, rxjs_1.lastValueFrom)(this.db.findByIdandUpdate({ id: id, quries: { user_id: userDoc[0].fedo_id } }).pipe((0, rxjs_1.catchError)(err => { throw new common_1.BadRequestException(err.message); }), (0, rxjs_1.map)(doc => { return doc; })));
+                    }
+                }));
+        }));
+    }
+    fetchEarnigReport(yearMonthDto) {
+        common_1.Logger.debug(`fetchCommissionReport() year: [${yearMonthDto.year}]`);
+        const reportData = [];
+        return (0, rxjs_1.from)((0, create_admin_dto_1.fetchmonths)((yearMonthDto.year))).pipe((0, rxjs_1.concatMap)(async (month) => {
+            return await (0, rxjs_1.lastValueFrom)(this.junctiondb.fetchByYear({ columnName: 'sales_code', columnvalue: yearMonthDto.salesCode, year: yearMonthDto.year, month: month.toString() }))
+                .then(async (salesJunctionDoc) => {
+                const paid_amount = salesJunctionDoc.map(doc => doc.paid_amount);
+                const total_paid_amount = paid_amount.reduce((next, prev) => next + prev, 0);
+                const date = salesJunctionDoc.map(doc => { if (doc.paid_amount > 0)
+                    return doc.created_date; });
+                const paid_on = date.filter((res) => res);
+                await this.fetchSignup(yearMonthDto.year, month, yearMonthDto)
+                    .then(signup => {
+                    var _a;
+                    reportData.push({ "total_paid_amount": total_paid_amount, "month": month, "hsa_sing_up": signup, "paid_on": paid_on[0], 'total_dues': Number((_a = salesJunctionDoc[salesJunctionDoc.length - 1]) === null || _a === void 0 ? void 0 : _a.dues) });
+                }).catch(error => { throw new common_1.NotFoundException(error.message); });
+                return reportData;
+            })
+                .catch(error => { throw new common_1.NotFoundException(error.message); });
+        }));
+    }
+    async fetchSignup(year, month, yearMonthDto) {
+        common_1.Logger.debug(`fetchSignup() year: [${year}] month: [${month}] salesCode:[${yearMonthDto.salesCode}]`, APP);
+        return await (0, rxjs_1.lastValueFrom)(this.salesUserJunctionDb.fetchByYear({ columnName: 'sales_code', columnvalue: yearMonthDto.salesCode, year: yearMonthDto.year, month: month.toString() }))
+            .then(userJunctionDoc => {
+            console.log("junct", userJunctionDoc);
+            console.log("junct", userJunctionDoc.length);
+            return userJunctionDoc.length;
+        })
+            .catch(error => { throw new common_1.UnprocessableEntityException(error.message); });
     }
 };
 SalesService = __decorate([
@@ -282,7 +330,11 @@ SalesService = __decorate([
     __param(1, (0, database_decorator_1.DatabaseTable)('sales_partner_invitation_junction')),
     __param(2, (0, database_decorator_1.DatabaseTable)('sales_commission_junction')),
     __param(3, (0, database_decorator_1.DatabaseTable)('sales_withdrawn_amount')),
+    __param(4, (0, database_decorator_1.DatabaseTable)('sales_user_junction')),
+    __param(5, (0, database_decorator_1.DatabaseTable)('sales_user_junction')),
     __metadata("design:paramtypes", [database_service_1.DatabaseService,
+        database_service_1.DatabaseService,
+        database_service_1.DatabaseService,
         database_service_1.DatabaseService,
         database_service_1.DatabaseService,
         database_service_1.DatabaseService,

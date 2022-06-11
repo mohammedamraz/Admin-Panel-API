@@ -14,11 +14,12 @@ exports.PORT = parseInt(process.env.FEDO_HSA_SERVER_PORT, 10) || 36000;
 exports.APP_VERSION = package_json_1.default.version;
 exports.DEBUG_LEVEL = process.env.FEDO_HSA_SERVER_LOG_LEVEL || 'debug';
 exports.APP_DOCUMENTATION = process.env.FEDO_HSA_SERVER_DOCUMENTATION || 'https://fedo.health/hsa/docs';
-exports.POSTGRES_DB_URI_DB_URL = process.env.FEDO_HSA_SERVER_DB_URI || 'postgresql://postgres:ban0Malik@localhost:5432/fedo-hsa';
+exports.POSTGRES_DB_URI_DB_URL = process.env.FEDO_HSA_SERVER_DB_URI || 'postgresql://postgres:admin@localhost:5432/fedo-sales';
 exports.AKASH_ACCOUNTID = process.env.FEDO_HSA_TWILIO_ACCOUNTID || "ACff6fccefe46883e8857e636bec9575f0";
 exports.AKASH_AUTHTOKEN = process.env.FEDO_HSA_TWILIO_AUTHTOKEN || "73b826f040ca14bdde6aaa8f4ea4fb44";
 exports.AKASH_SERVICEID = process.env.FEDO_HSA_TWILIO_SERVICEID || "VA3b831c8b177fb8226f87f1c6f4b0dae5";
 exports.APP_DOWNLOAD_LINK = process.env.FEDO_HSA_APP_DOWNLOAD_LINK || "https://play.google.com/store/apps/details?id=com.fedo.auth";
+exports.SALES_PARTNER_LINK = process.env.FEDO_HSA_SALES_PARTNER_LINK || "http://0.0.0.0:35000/sales-partner";
 exports.AWS_ACCESS_KEY_ID = process.env.FEDO_HSA_AWS_ACCESS_KEY_ID || 'AKIAWVJICQ3FDBOB6CGC';
 exports.AWS_SECRET_ACCESS_KEY = process.env.FEDO_HSA_AWS_SECRET_ACCESS_KEY || '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';
 exports.SES_SOURCE_EMAIL = process.env.FEDO_COMM_SERVER_AWS_SES_SOURCE_EMAIL || "FEDO HSA <hsa@fedo.ai>";
@@ -36,11 +37,11 @@ class ZwitchHttpBody {
 }
 exports.ZwitchHttpBody = ZwitchHttpBody;
 exports.debugLevel = (() => {
-    if (exports.DEBUG_LEVEL == 'debug')
+    if (exports.DEBUG_LEVEL === 'debug')
         return ['debug', 'warn', 'error'];
-    if (exports.DEBUG_LEVEL == 'warn')
+    if (exports.DEBUG_LEVEL === 'warn')
         return ['warn', 'error'];
-    if (exports.DEBUG_LEVEL == 'error')
+    if (exports.DEBUG_LEVEL === 'error')
         return ['error'];
 })();
 var routes_1 = require("./routes");

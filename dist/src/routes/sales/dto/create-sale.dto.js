@@ -9,7 +9,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.makeEarningFormat = exports.Interval = exports.EarningResponse = exports.PERIOD = exports.Period = exports.UpdateImageDTO = exports.Periodicity = exports.ZQueryParamsDto = exports.Is_active = exports.UpdateSalesPartner = exports.CreateSalesInvitationJunction = exports.CreateWithdrawn = exports.CreateSalesPartnerRequest = exports.CreateSalesPartner = exports.CreateSalesJunction = void 0;
+exports.YearMonthDto = exports.makeEarningFormat = exports.Interval = exports.EarningResponse = exports.PERIOD = exports.Period = exports.UpdateImageDTO = exports.Periodicity = exports.ZQueryParamsDto = exports.Is_active = exports.UpdateSalesPartner = exports.CreateSalesInvitationJunction = exports.CreateWithdrawn = exports.CreateSalesPartnerRequest = exports.CreateSalesPartner = exports.CreateSalesJunction = void 0;
 const class_validator_1 = require("class-validator");
 class CreateSalesJunction {
 }
@@ -20,6 +20,10 @@ __decorate([
     (0, class_validator_1.IsNotEmpty)(),
     __metadata("design:type", String)
 ], CreateSalesPartner.prototype, "mobile", void 0);
+__decorate([
+    (0, class_validator_1.IsNotEmpty)(),
+    __metadata("design:type", String)
+], CreateSalesPartner.prototype, "location", void 0);
 __decorate([
     (0, class_validator_1.IsEmail)(),
     __metadata("design:type", String)
@@ -100,6 +104,8 @@ __decorate([
 exports.ZQueryParamsDto = ZQueryParamsDto;
 var Periodicity;
 (function (Periodicity) {
+    Periodicity["DAILY"] = "daily";
+    Periodicity["WEEKLY"] = "weekly";
     Periodicity["MONTHLY"] = "monthly";
     Periodicity["QUARTERLY"] = "quarterly";
     Periodicity["HALF_YEARLY"] = "halfyearly";
@@ -117,6 +123,8 @@ __decorate([
 ], Period.prototype, "period", void 0);
 exports.Period = Period;
 exports.PERIOD = {
+    daily: '1 day',
+    weekly: '1 week',
     monthly: '1 months',
     quarterly: '3 months',
     halfyearly: '6 months',
@@ -127,11 +135,23 @@ class EarningResponse {
 exports.EarningResponse = EarningResponse;
 const Interval = (period) => exports.PERIOD[period.period];
 exports.Interval = Interval;
-const makeEarningFormat = (earning) => {
-    return {
-        earnedAmount: earning[0],
-        paidAmount: earning[1]
-    };
-};
+const makeEarningFormat = (earning) => ({
+    earnedAmount: earning[0],
+    paidAmount: earning[1]
+});
 exports.makeEarningFormat = makeEarningFormat;
+class YearMonthDto {
+}
+__decorate([
+    (0, class_validator_1.IsNotEmpty)(),
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.MinLength)(4, { message: 'Enter only 4 digit value of year, This is too short', }),
+    (0, class_validator_1.MaxLength)(4, { message: 'Enter only 4 digit value of year, This is too long', }),
+    __metadata("design:type", String)
+], YearMonthDto.prototype, "year", void 0);
+__decorate([
+    (0, class_validator_1.IsNotEmpty)(),
+    __metadata("design:type", String)
+], YearMonthDto.prototype, "salesCode", void 0);
+exports.YearMonthDto = YearMonthDto;
 //# sourceMappingURL=create-sale.dto.js.map

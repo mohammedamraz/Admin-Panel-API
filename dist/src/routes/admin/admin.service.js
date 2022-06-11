@@ -18,23 +18,23 @@ const axios_1 = require("@nestjs/axios");
 const constants_1 = require("../../constants");
 const database_decorator_1 = require("../../lib/database/database.decorator");
 const database_service_1 = require("../../lib/database/database.service");
+const create_sale_dto_1 = require("../sales/dto/create-sale.dto");
+const create_admin_dto_1 = require("./dto/create-admin.dto");
 const rxjs_1 = require("rxjs");
+const login_dto_1 = require("./dto/login.dto");
 const helper_1 = require("../../constants/helper");
 const template_service_1 = require("../../constants/template.service");
 const APP = "AdminService";
 let AdminService = class AdminService {
-    constructor(salesJunctionDb, salesDb, salesPartnerRequestDb, templateService, http) {
+    constructor(salesJunctionDb, salesDb, salesPartnerRequestDb, salesuser, salesUserJunctionDb, templateService, http) {
         this.salesJunctionDb = salesJunctionDb;
         this.salesDb = salesDb;
         this.salesPartnerRequestDb = salesPartnerRequestDb;
+        this.salesuser = salesuser;
+        this.salesUserJunctionDb = salesUserJunctionDb;
         this.templateService = templateService;
         this.http = http;
-        this.accountSid = constants_1.AKASH_ACCOUNTID;
-        this.authToken = constants_1.AKASH_AUTHTOKEN;
-        this.serviceSid = constants_1.AKASH_SERVICEID;
-        this.client = require('twilio')(this.accountSid, this.authToken);
-        this.salesPartnerAccountDetails = [];
-        this.salesPartnerAccountData = [];
+        this.client = require('twilio')(constants_1.AKASH_ACCOUNTID, constants_1.AKASH_AUTHTOKEN);
         this.onTwilioErrorResponse = async (err) => {
             common_1.Logger.debug('onTwilioErrorResponse(), ' + err, APP);
             if (err.status === 400)
@@ -88,30 +88,73 @@ let AdminService = class AdminService {
     }
     fetchSalesPartnerAccountDetails() {
         common_1.Logger.debug(`fetchSalesPartnerAccountDetails()`, APP);
-        return this.salesDb.find({ block_account: true, is_hsa_account: true }).pipe((0, rxjs_1.map)(salesDoc => {
+        return this.salesDb.find({ block_account: false, is_hsa_account: true }).pipe((0, rxjs_1.map)(salesDoc => {
             if (salesDoc.length === 0)
                 throw new common_1.NotFoundException("sales partner not found");
             return this.fetchUser(salesDoc);
         }), (0, rxjs_1.catchError)(err => { throw new common_1.BadRequestException(err.message); }));
     }
+    fetchCommissionDispersals(period) {
+        common_1.Logger.debug(`fetchCommissionDispersals()  period: [${JSON.stringify(period)}]`, APP);
+        return this.salesJunctionDb.fetchBetweenRange((0, login_dto_1.fetchDAte)(new Date(), login_dto_1.PERIODADMIN[period.period])).pipe((0, rxjs_1.switchMap)(salesJunctionDoc => this.fetchPreviousMonthCommissionDispersal(salesJunctionDoc, period, new Date((0, login_dto_1.fetchDAte)(new Date(), login_dto_1.PERIODADMIN[period.period]).from))));
+    }
+    fetchPreviousMonthCommissionDispersal(createSalesJunction, period, date) {
+        common_1.Logger.debug(`fetchPreviousMonthCommissionDispersal() createSalesJunction: [${JSON.stringify(createSalesJunction)}] period: [${JSON.stringify(period)}] date: [${date}]`, APP);
+        return this.salesJunctionDb.fetchBetweenRange((0, login_dto_1.fetchDAte)(date, login_dto_1.PERIODADMIN[period.period])).pipe((0, rxjs_1.map)(salesJunctionDoc => ({ thisMonth: createSalesJunction.reduce((acc, curr) => acc += curr.paid_amount, 0), previousMonth: salesJunctionDoc.reduce((acc, curr) => acc += curr.paid_amount, 0) })));
+    }
+    fetchInvitationResponse(state) {
+        common_1.Logger.debug(`fetchInvitationResponse() state: [${JSON.stringify(state)}]`, APP);
+        if (state.state !== 'all')
+            return this.salesDb.find({ is_active: (0, login_dto_1.makeStateFormat)(state) }).pipe((0, rxjs_1.map)(doc => this.fetchSignUps(doc, state)));
+        return this.salesDb.fetchAll().pipe((0, rxjs_1.map)(doc => this.fetchSignUps(doc, state)));
+    }
+    fetchSignUps(createSalesPartner, state) {
+        common_1.Logger.debug(`fetchSignUps() createSalesPartner: [${JSON.stringify(createSalesPartner)}]`, APP);
+        let signups = [];
+        return (0, rxjs_1.lastValueFrom)((0, rxjs_1.from)(createSalesPartner).pipe((0, rxjs_1.concatMap)(salesPartner => this.salesuser.findByPeriod({ columnName: "sales_code", columnvalue: salesPartner.sales_code, period: create_sale_dto_1.PERIOD[state.period] })), (0, rxjs_1.map)(salesuser => signups.push(salesuser.length)))).then(() => ({ signups: signups.reduce((acc, curr) => acc += curr, 0) }));
+    }
+    fetchSalesPartner(period) {
+        common_1.Logger.debug(`fetchSalesPartner() period: [${JSON.stringify(period)}]`, APP);
+        return this.salesDb.fetchAllByPeriod((0, create_sale_dto_1.Interval)(period)).pipe((0, rxjs_1.catchError)(err => { throw new common_1.BadRequestException(err.message); }), (0, rxjs_1.map)(doc => {
+            if (doc.length === 0)
+                throw new common_1.NotFoundException("sales partner not found");
+            return this.fetchSalesPartnerCommission(doc, period);
+        }));
+    }
+    fetchSalesPartnerCommission(createSalesPartner, period) {
+        common_1.Logger.debug(`fetchSalesPartnerCommission() createSalesPartner: [${JSON.stringify(createSalesPartner)}]`, APP);
+        let commission = [];
+        return (0, rxjs_1.lastValueFrom)((0, rxjs_1.from)(createSalesPartner).pipe((0, rxjs_1.switchMap)(salesPartner => (0, rxjs_1.lastValueFrom)(this.fetchTotalCommission(salesPartner, period)).then(doc => { commission.push(doc); }))))
+            .then(_doc => (Object.assign(Object.assign({}, commission.reduce((prev, current) => current.totalCommission > prev.totalCommission ? current : prev)), { 'count': createSalesPartner.length })));
+    }
+    fetchTotalCommission(createSalesPartner, period) {
+        common_1.Logger.debug(`fetchTotalCommission() CreateSalesPartner: [${JSON.stringify(createSalesPartner)}] , period: [${JSON.stringify(period)}]`, APP);
+        return this.salesJunctionDb.find({ sales_code: createSalesPartner.sales_code }).pipe((0, rxjs_1.concatMap)(doc => this.fetchSalesPartnerSignups(doc, createSalesPartner, period)), (0, rxjs_1.map)(doc => doc));
+    }
+    fetchSalesPartnerSignups(createSalesJunction, createSalesPartner, period) {
+        common_1.Logger.debug(`fetchSalesPartnerSignups() createSalesJunction: [${JSON.stringify(createSalesJunction)}],  CreateSalesPartner: [${JSON.stringify(createSalesPartner)}], period: [${JSON.stringify(period)}]`, APP);
+        return this.salesuser.find({ sales_code: createSalesPartner.sales_code }).pipe((0, rxjs_1.map)(doc => ({ totalCommission: createSalesJunction.reduce((acc, curr) => acc += curr.commission_amount, 0),
+            name: createSalesPartner.name,
+            signups: doc.length })));
+    }
     async fetchUser(createSalesPartner) {
         common_1.Logger.debug(`fetchUser() createSalesPartner: ${JSON.stringify(createSalesPartner)}`, APP);
-        this.salesPartnerAccountDetails = [];
-        return (0, rxjs_1.lastValueFrom)((0, rxjs_1.from)(createSalesPartner).pipe((0, rxjs_1.concatMap)(async (saleDoc) => await (0, rxjs_1.lastValueFrom)((0, helper_1.fetchUser)(saleDoc.user_id.toString()))
-            .then(userDoc => this.fetchAccount(userDoc, saleDoc).then(result => { this.salesPartnerAccountDetails.push(result); }))
-            .catch(error => { throw new common_1.UnprocessableEntityException(error.message); })))).then(doc => this.salesPartnerAccountDetails);
+        let salesPartnerAccountDetails = [];
+        return (0, rxjs_1.lastValueFrom)((0, rxjs_1.from)(createSalesPartner).pipe((0, rxjs_1.concatMap)(saleDoc => (0, rxjs_1.lastValueFrom)((0, helper_1.fetchUser)(saleDoc.user_id.toString()))
+            .then(userDoc => this.fetchAccount(userDoc, saleDoc).then(result => { salesPartnerAccountDetails.push(result); }))
+            .catch(error => { throw new common_1.UnprocessableEntityException(error.message); })))).then(_doc => salesPartnerAccountDetails);
     }
     async fetchAccount(userDoc, saleDoc) {
         common_1.Logger.debug(`fetchAccount() userDoc: ${JSON.stringify(userDoc)}  saleDoc: ${JSON.stringify(saleDoc)}`, APP);
         return (0, rxjs_1.lastValueFrom)((0, helper_1.fetchAccount)(userDoc[0].fedo_id, String(userDoc[0].account_id)))
             .then(async (accountDoc) => {
             const salesJunctionDoc = await (0, rxjs_1.lastValueFrom)(this.salesJunctionDb.find({ sales_code: saleDoc.sales_code })).catch(error => { throw new common_1.NotFoundException(error.message); });
-            return { "account_holder_name": accountDoc.name, "account_number": accountDoc.account_number, "ifsc_code": accountDoc.ifsc_code, "bank": accountDoc.bank_name, "sales_code": saleDoc.sales_code, "commission_amount": salesJunctionDoc.pop().dues };
+            return ({ account_holder_name: accountDoc.name, account_number: accountDoc.account_number, ifsc_code: accountDoc.ifsc_code, bank: accountDoc.bank_name, sales_code: saleDoc.sales_code, commission_amount: salesJunctionDoc.pop().dues });
         });
     }
-    fetchSalesPartnerAccountDetailsBySalesCode(sales_code) {
-        common_1.Logger.debug(`fetchSalesPartnerAccountDetailsBySalesCode()`, APP);
-        return this.salesDb.find({ sales_code: sales_code }).pipe((0, rxjs_1.map)(salesDoc => {
+    fetchSalesPartnerAccountDetailsBySalesCode(salesCode) {
+        common_1.Logger.debug(`fetchSalesPartnerAccountDetailsBySalesCode() salesCode: ${salesCode}`, APP);
+        return this.salesDb.find({ sales_code: salesCode }).pipe((0, rxjs_1.map)(salesDoc => {
             if (salesDoc.length === 0)
                 throw new common_1.NotFoundException("sales partner not found");
             return this.fetchUserById(salesDoc);
@@ -119,71 +162,49 @@ let AdminService = class AdminService {
     }
     async fetchUserById(createSalesPartner) {
         common_1.Logger.debug(`fetchUserById() createSalesPartner: ${JSON.stringify(createSalesPartner)}`, APP);
-        this.salesPartnerAccountData = [];
+        let salesPartnerAccountData = [];
         if (!createSalesPartner[0].user_id)
             throw new common_1.NotFoundException("HSA account not found ");
         return (0, rxjs_1.lastValueFrom)((0, rxjs_1.from)(createSalesPartner).pipe((0, rxjs_1.concatMap)(async (saleDoc) => await (0, rxjs_1.lastValueFrom)((0, helper_1.fetchUser)(saleDoc.user_id.toString()))
-            .then(userDoc => this.fetchAccountById(userDoc, saleDoc).then(result => { this.salesPartnerAccountData.push(result); }))
-            .catch(error => { throw new common_1.UnprocessableEntityException(error.message); })))).then(doc => this.salesPartnerAccountData);
+            .then(userDoc => this.fetchAccountById(userDoc, saleDoc).then(result => { salesPartnerAccountData.push(result); }))
+            .catch(error => { throw new common_1.UnprocessableEntityException(error.message); })))).then(doc => salesPartnerAccountData);
     }
     async fetchAccountById(userDoc, saleDoc) {
         common_1.Logger.debug(`fetchAccountById() userDoc: ${JSON.stringify(userDoc)}  saleDoc: ${JSON.stringify(saleDoc)}`, APP);
         return (0, rxjs_1.lastValueFrom)((0, helper_1.fetchAccount)(userDoc[0].fedo_id, (userDoc[0].account_id).toString()))
             .then(async (accountDoc) => {
             const salesJunctionDoc = await (0, rxjs_1.lastValueFrom)(this.salesJunctionDb.find({ sales_code: saleDoc.sales_code })).catch(error => { throw new common_1.NotFoundException(error.message); });
-            return { "account_holder_name": accountDoc.name, "account_number": accountDoc.account_number, "ifsc_code": accountDoc.ifsc_code, "bank": accountDoc.bank_name, "sales_code": saleDoc.sales_code, "commission_amount": salesJunctionDoc.pop().dues };
+            return ({ account_holder_name: accountDoc.name, account_number: accountDoc.account_number, ifsc_code: accountDoc.ifsc_code, bank: accountDoc.bank_name, sales_code: saleDoc.sales_code, commission_amount: salesJunctionDoc.pop().dues });
         });
     }
     sentOtpToPhoneNumber(mobileNumberDtO) {
         common_1.Logger.debug(`sentOtpToPhoneNumber() mobileNumberDtO: [${JSON.stringify(mobileNumberDtO)}]`, APP);
-        return this.client.verify.services(this.serviceSid)
+        return this.client.verify.services(constants_1.AKASH_SERVICEID)
             .verifications
-            .create({
-            to: mobileNumberDtO.phoneNumber,
-            channel: 'sms',
-            locale: 'en'
-        })
-            .then(_res => {
-            return { 'status': `OTP Send to ${mobileNumberDtO.phoneNumber} number` };
-        })
+            .create({ to: mobileNumberDtO.phoneNumber, channel: 'sms', locale: 'en' })
+            .then(_res => ({ status: `OTP Send to ${mobileNumberDtO.phoneNumber} number` }))
             .catch(err => this.onTwilioErrorResponse(err));
     }
     verifyOtp(mobileNumberAndOtpDtO) {
         common_1.Logger.debug(`verifyOtp() mobileNumberAndOtpDtO: [${JSON.stringify(mobileNumberAndOtpDtO)}]`, APP);
-        return this.client.verify.services(this.serviceSid)
-            .verificationChecks
-            .create({ to: mobileNumberAndOtpDtO.phoneNumber, code: mobileNumberAndOtpDtO.otp.toString() })
+        return this.client.verify.services(constants_1.AKASH_SERVICEID).verificationChecks.create({ to: mobileNumberAndOtpDtO.phoneNumber, code: mobileNumberAndOtpDtO.otp.toString() })
             .then(verification_check => {
             if (!verification_check.valid || verification_check.status !== 'approved')
                 throw new common_1.BadRequestException('Wrong code provided ');
-            return { "status": verification_check.status };
+            return ({ status: verification_check.status });
         })
             .catch(err => this.onTwilioErrorResponse(err));
     }
     sentFedoAppDownloadLinkToPhoneNumber(mobileNumberDtO) {
         common_1.Logger.debug(`sentFedoAppDownloadLinkToPhoneNumber() mobileNumberDtO: [${JSON.stringify(mobileNumberDtO)}]`, APP);
-        return this.client.messages
-            .create({
-            body: constants_1.APP_DOWNLOAD_LINK,
-            from: '+19402908957',
-            to: mobileNumberDtO.phoneNumber
-        })
-            .then(_res => {
-            return { "status": `Link ${constants_1.APP_DOWNLOAD_LINK}  send to  ${mobileNumberDtO.phoneNumber} number` };
-        })
+        return this.client.messages.create({ body: constants_1.APP_DOWNLOAD_LINK, from: '+19402908957', to: mobileNumberDtO.phoneNumber })
+            .then(_res => ({ status: `Link ${constants_1.APP_DOWNLOAD_LINK}  send to  ${mobileNumberDtO.phoneNumber} number` }))
             .catch(err => this.onTwilioErrorResponse(err));
     }
     sentFedoAppDownloadLinkToWhatsappNumber(mobileNumberDtO) {
         common_1.Logger.debug(`sentFedoAppDownloadLinkToWhatsappNumber() mobileNumberDtO: [${JSON.stringify(mobileNumberDtO)}]`, APP);
-        return this.client.messages
-            .create({
-            body: constants_1.APP_DOWNLOAD_LINK,
-            from: 'whatsapp:+14155238886',
-            to: `whatsapp:${mobileNumberDtO.phoneNumber}`
-        })
-            .then(_res => {
-            return { "status": `Link ${constants_1.APP_DOWNLOAD_LINK}  send to  ${mobileNumberDtO.phoneNumber} whatsapp number` };
-        })
+        return this.client.messages.create({ body: constants_1.APP_DOWNLOAD_LINK, from: 'whatsapp:+14155238886', to: `whatsapp:${mobileNumberDtO.phoneNumber}` })
+            .then(_res => ({ status: `Link ${constants_1.APP_DOWNLOAD_LINK}  send to  ${mobileNumberDtO.phoneNumber} whatsapp number` }))
             .catch(err => this.onTwilioErrorResponse(err));
     }
     sentFedoAppDownloadLinkToMobileAndWhatsappNumber(mobileNumberDtO) {
@@ -192,7 +213,7 @@ let AdminService = class AdminService {
     }
     sendEmailOnIncorrectBankDetails(body, param) {
         common_1.Logger.debug(`sendEmailOnIncorrectBankDetails() body: [${JSON.stringify(body)}] param: [${JSON.stringify(param)}] `, APP);
-        return (0, helper_1.fetchUserByMobileNumber)(param.mobileNumber).pipe((0, rxjs_1.map)(doc => { this.salesParterEmail = doc[0].email; return doc; }), (0, rxjs_1.switchMap)(doc => { return this.salesDb.find({ user_id: doc[0].fedo_id }); }), (0, rxjs_1.switchMap)(doc => {
+        return (0, helper_1.fetchUserByMobileNumber)(param.mobileNumber).pipe((0, rxjs_1.map)(doc => { this.salesParterEmail = doc[0].email; return doc; }), (0, rxjs_1.switchMap)(doc => this.salesDb.find({ user_id: doc[0].fedo_id })), (0, rxjs_1.switchMap)(doc => {
             if (doc.length === 0)
                 throw new common_1.NotFoundException('Sales Partner not found');
             else
@@ -229,11 +250,16 @@ let AdminService = class AdminService {
         confirmForgotPasswordDTO.fedoApp = constants_1.FEDO_APP;
         return this.http.patch(`${constants_1.AWS_COGNITO_USER_CREATION_URL_SIT}/password/otp/${confirmForgotPasswordDTO.ConfirmationCode}`, confirmForgotPasswordDTO).pipe((0, rxjs_1.catchError)(err => { return this.onHTTPErrorResponse(err); }), (0, rxjs_1.map)(_res => []));
     }
-    async updatingPaidAmount(updateAmountdto) {
+    encryptPassword(password) {
+        const NodeRSA = require('node-rsa');
+        let key_public = new NodeRSA(constants_1.PUBLIC_KEY);
+        var encryptedString = key_public.encrypt(password, 'base64');
+        return encryptedString;
+    }
+    async updatePaidAmount(updateAmountdto) {
         common_1.Logger.debug(`updatePaidAmount() updateAmountdto: [${JSON.stringify(updateAmountdto)}]`, APP);
-        console.log(updateAmountdto['data']);
         updateAmountdto['data'].map(res => {
-            return (0, rxjs_1.lastValueFrom)(this.salesJunctionDb.find({ "sales_code": res.salesCode }).pipe((0, rxjs_1.map)(doc => {
+            return (0, rxjs_1.lastValueFrom)(this.salesJunctionDb.find({ sales_code: res.salesCode }).pipe((0, rxjs_1.map)(doc => {
                 const sort_doc = Math.max(...doc.map(user => parseInt(user['id'].toString())));
                 const user_doc = doc.filter(item => item['id'] == sort_doc);
                 const finalRes = user_doc[0].dues;
@@ -242,13 +268,93 @@ let AdminService = class AdminService {
             })));
         });
     }
+    sendCreateSalesPartnerLinkToPhoneNumber(mobileNumberDtO) {
+        common_1.Logger.debug(`sendCreateSalesPartnerLinkToPhoneNumber() mobileNumberDtO: [${JSON.stringify(mobileNumberDtO)}]`, APP);
+        return this.client.messages.create({
+            body: `Click on Link ${constants_1.SALES_PARTNER_LINK}?mobile=${this.encryptPassword_(mobileNumberDtO.phoneNumber)}&commission=${this.encryptPassword_(mobileNumberDtO.commission)} `,
+            from: '+19402908957',
+            to: mobileNumberDtO.phoneNumber
+        })
+            .then(_res => ({ "status": `Link ${constants_1.SALES_PARTNER_LINK}  send to  ${mobileNumberDtO.phoneNumber} number` }))
+            .catch(err => this.onTwilioErrorResponse(err));
+    }
+    sendCreateSalesPartnerLinkToWhatsappNumber(mobileNumberDtO) {
+        common_1.Logger.debug(`sendCreateSalesPartnerLinkToWhatsappNumber() mobileNumberDtO: [${JSON.stringify(mobileNumberDtO)}]`, APP);
+        return this.client.messages.create({
+            body: `Click on Link ${constants_1.SALES_PARTNER_LINK}?mobile=${this.encryptPassword_(mobileNumberDtO.phoneNumber)}&commission=${this.encryptPassword_(mobileNumberDtO.commission)} `,
+            from: 'whatsapp:+14155238886',
+            to: `whatsapp:${mobileNumberDtO.phoneNumber}`
+        })
+            .then(_res => ({ status: `Link ${constants_1.SALES_PARTNER_LINK}  send to  ${mobileNumberDtO.phoneNumber} whatsapp number` }))
+            .catch(err => this.onTwilioErrorResponse(err));
+    }
+    sendCreateSalesPartnerLinkToMobileAndWhatsappNumber(mobileNumberDtO) {
+        common_1.Logger.debug(`sendCreateSalesPartnerLinkToMobileAndWhatsappNumber() mobileNumberDtO: [${JSON.stringify(mobileNumberDtO)}]`, APP);
+        return (0, rxjs_1.from)(this.sendCreateSalesPartnerLinkToPhoneNumber(mobileNumberDtO)).pipe((0, rxjs_1.map)(_doc => this.sendCreateSalesPartnerLinkToWhatsappNumber(mobileNumberDtO)), (0, rxjs_1.switchMap)(doc => (0, rxjs_1.of)({ status: "Sales Partner link sent" })));
+    }
+    encryptPassword_(password) {
+        const NodeRSA = require('node-rsa');
+        let key_public = new NodeRSA(constants_1.PUBLIC_KEY);
+        var encryptedString = key_public.encrypt(password, 'base64');
+        return encryptedString;
+    }
+    fetchCommissionReport(yearMonthDto) {
+        common_1.Logger.debug(`fetchCommissionReport() year: [${yearMonthDto.year}]`, APP);
+        const reportData = [];
+        return (0, rxjs_1.from)((0, create_admin_dto_1.fetchmonths)((yearMonthDto.year))).pipe((0, rxjs_1.concatMap)(async (month) => {
+            return await (0, rxjs_1.lastValueFrom)(this.salesJunctionDb.fetchCommissionReportByYear(yearMonthDto.year, month))
+                .then(async (salesJunctionDoc) => {
+                await this.fetchSignup(yearMonthDto.year, month).then(signup => {
+                    reportData.push({
+                        total_paid_amount: salesJunctionDoc.reduce((next, prev) => next += prev.paid_amount, 0),
+                        month: month,
+                        total_dues: (0, create_admin_dto_1.fetchDues)(salesJunctionDoc),
+                        hsa_sing_up: signup,
+                        paid_on: salesJunctionDoc.map(doc => { if (doc.paid_amount > 0)
+                            return doc.created_date; }).filter((res) => res)[0]
+                    });
+                }).catch(error => { throw new common_1.NotFoundException(error.message); });
+                return reportData;
+            })
+                .catch(error => { throw new common_1.NotFoundException(error.message); })
+                .then(_doc => reportData);
+        }));
+    }
+    fetchMonthlyReport(dateDTO) {
+        common_1.Logger.debug(`fetchMonthlyReport() date: [${JSON.stringify(dateDTO)}]`, APP);
+        return this.salesDb.fetchAll().pipe((0, rxjs_1.map)(salesDb => this.fetchCommissionReportforSalesPartner(salesDb, dateDTO)));
+    }
+    fetchCommissionReportforSalesPartner(createSalesPartner, dateDTO) {
+        common_1.Logger.debug(`fetchCommissionReportforSalesPartner() createSalesPartner: [${JSON.stringify(createSalesPartner)}]`, APP);
+        let performance = [];
+        return (0, rxjs_1.lastValueFrom)((0, rxjs_1.from)(createSalesPartner).pipe((0, rxjs_1.switchMap)(salesDoc => (0, rxjs_1.lastValueFrom)(this.fetchSignupforPerformace(salesDoc, dateDTO)).then(doc => performance.push(doc)))))
+            .then(_doc => (0, login_dto_1.applyPerformance)(performance, (0, login_dto_1.averageSignup)(createSalesPartner.length, performance.reduce((acc, curr) => acc += curr.signups, 0))));
+    }
+    fetchSignupforPerformace(createSalesPartner, dateDTO) {
+        common_1.Logger.debug(`fetchSignupAndPerformace() createSalesPartner: [${JSON.stringify(createSalesPartner)}]`, APP);
+        return this.salesJunctionDb.fetchByYear({ columnName: "sales_code", columnvalue: createSalesPartner.sales_code, year: dateDTO.year, month: dateDTO.month }).pipe((0, rxjs_1.switchMap)(salesJunctionDoc => this.fetchSignUpsforPerformance(createSalesPartner, salesJunctionDoc, dateDTO)));
+    }
+    fetchSignUpsforPerformance(createSalesPartner, createSalesJunction, dateDTO) {
+        common_1.Logger.debug(`fetchSignUpsforPerformance() createSalesJunction: [${JSON.stringify(createSalesJunction)}]`, APP);
+        return this.salesuser.fetchByYear({ columnName: "sales_code", columnvalue: createSalesPartner.sales_code, year: dateDTO.year, month: dateDTO.month }).pipe((0, rxjs_1.map)(doc => (0, login_dto_1.makeEarningDuesFormat)(createSalesPartner.name, createSalesJunction.reduce((acc, curr) => acc += curr.commission_amount, 0), !createSalesJunction[createSalesJunction.length - 1] ? 0 : createSalesJunction[createSalesJunction.length - 1].dues, doc.length)));
+    }
+    async fetchSignup(year, month) {
+        common_1.Logger.debug(`fetchSignup() year: [${year}] month: [${month}]`, APP);
+        return await (0, rxjs_1.lastValueFrom)(this.salesUserJunctionDb.fetchCommissionReportByYear(year, month))
+            .then(userJunctionDoc => { return userJunctionDoc.length; })
+            .catch(error => { throw new common_1.UnprocessableEntityException(error.message); });
+    }
 };
 AdminService = __decorate([
     (0, common_1.Injectable)(),
     __param(0, (0, database_decorator_1.DatabaseTable)('sales_commission_junction')),
     __param(1, (0, database_decorator_1.DatabaseTable)('sales_partner')),
     __param(2, (0, database_decorator_1.DatabaseTable)('sales_partner_requests')),
+    __param(3, (0, database_decorator_1.DatabaseTable)('sales_user_junction')),
+    __param(4, (0, database_decorator_1.DatabaseTable)('sales_user_junction')),
     __metadata("design:paramtypes", [database_service_1.DatabaseService,
+        database_service_1.DatabaseService,
+        database_service_1.DatabaseService,
         database_service_1.DatabaseService,
         database_service_1.DatabaseService,
         template_service_1.TemplateService,

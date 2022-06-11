@@ -201,6 +201,26 @@ let DatabaseService = class DatabaseService {
         const query = `SELECT * FROM ${this.tableName} WHERE ${findByPeriodParams.columnName} = '${findByPeriodParams.columnvalue}' AND created_date > CURRENT_DATE - INTERVAL '${findByPeriodParams.period}'  ORDER BY ${"created_date"} DESC`;
         return this.runQuery(query);
     }
+    fetchAllByPeriod(period) {
+        common_1.Logger.debug(`fetchAllByPeriod(): params ${[JSON.stringify(period)]}`, APP);
+        const query = `SELECT * FROM ${this.tableName} WHERE created_date > CURRENT_DATE - INTERVAL '${period}'`;
+        return this.runQuery(query);
+    }
+    fetchCommissionReportByYear(year, month) {
+        common_1.Logger.debug(`fetchCommissionReportByYear(): year ${year}`, APP);
+        const query = `SELECT * FROM ${this.tableName} WHERE date_part('year',created_date) = ${year} AND date_part('month',created_date) = ${month}`;
+        return this.runQuery(query);
+    }
+    fetchByYear(obj) {
+        common_1.Logger.debug(`fetchByYear(): params ${[JSON.stringify(obj)]}`, APP);
+        const query = `SELECT * FROM ${this.tableName} WHERE  ${obj.columnName} = '${obj.columnvalue}' AND date_part('year',created_date) = ${obj.year} AND date_part('month',created_date) = ${obj.month} `;
+        return this.runQuery(query);
+    }
+    fetchBetweenRange(date) {
+        common_1.Logger.debug(`fetchByMonth(): date ${[JSON.stringify(date)]}`, APP);
+        const query = `SELECT * FROM ${this.tableName} WHERE ((created_date between '${date.from}' and '${date.to}'))`;
+        return this.runQuery(query);
+    }
 };
 DatabaseService = __decorate([
     (0, common_1.Injectable)(),

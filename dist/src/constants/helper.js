@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.encryptPassword = exports.imageFileFilter = exports.editFileName = exports.fetchAccountBySalesCode = exports.fetchUserByMobileNumber = exports.fetchAccount = exports.fetchUser = void 0;
+exports.encryptPassword = exports.imageFileFilter = exports.editFileName = exports.findUserByCustomerId = exports.fetchAccountBySalesCode = exports.fetchUserByMobileNumber = exports.fetchAccount = exports.fetchUser = void 0;
 const axios_1 = require("@nestjs/axios");
 const rxjs_1 = require("rxjs");
 const path_1 = require("path");
@@ -22,6 +22,10 @@ const fetchAccountBySalesCode = (salesCode) => {
     return new axios_1.HttpService().get(`http://0.0.0.0:35000/users/${salesCode}/accounts`).pipe((0, rxjs_1.catchError)(err => onHTTPErrorResponse(err)), (0, rxjs_1.map)((res) => res.data));
 };
 exports.fetchAccountBySalesCode = fetchAccountBySalesCode;
+const findUserByCustomerId = (id) => {
+    return new axios_1.HttpService().get(`http://0.0.0.0:35000/users/customer/${id}`).pipe((0, rxjs_1.catchError)(err => onHTTPErrorResponse(err)), (0, rxjs_1.map)((res) => res.data));
+};
+exports.findUserByCustomerId = findUserByCustomerId;
 const editFileName = (req, file, callback) => {
     const name = file.originalname.split('.')[0];
     const fileExtName = (0, path_1.extname)(file.originalname);

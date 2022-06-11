@@ -57,6 +57,20 @@ export interface findByPeriodParams {
     columnvalue: string;
     period: string;
 }
+export interface findBycolumnParams {
+    columnName: string;
+    columnvalue: string;
+}
+export interface DateRangeParams {
+    from: string;
+    to: string;
+}
+export interface fetchByYearAndMonthParams {
+    year: string;
+    month: string;
+    columnName: string;
+    columnvalue: string;
+}
 export interface findByConditionParams {
     created_date: string;
     endcreated_date: string;
@@ -65,6 +79,17 @@ export interface findByConditionParams {
     numberOfRows: number;
 }
 export declare const findByConditionParamsAlign: (findbyConditionParams: findByConditionParams) => findByConditionParams;
+export interface MONTHYEAR {
+    year: number;
+    month: number;
+}
+export declare const fetchMonthYear: (MONTHYEAR: MONTHYEAR) => MONTHYEAR;
+export interface fetchByYearAndMonthParams {
+    year: string;
+    month: string;
+    columnName: string;
+    columnvalue: string;
+}
 export interface DatabaseInterface<T> {
     tableName: string;
     save(queryRequest: object): Observable<T[]>;

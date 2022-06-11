@@ -14,6 +14,7 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.AdminController = void 0;
 const common_1 = require("@nestjs/common");
+const create_sale_dto_1 = require("../sales/dto/create-sale.dto");
 const admin_service_1 = require("./admin.service");
 const create_admin_dto_1 = require("./dto/create-admin.dto");
 const login_dto_1 = require("./dto/login.dto");
@@ -22,9 +23,33 @@ let AdminController = class AdminController {
     constructor(adminService) {
         this.adminService = adminService;
     }
+    fetchSalesPartner(period) {
+        common_1.Logger.debug(`fetchSalesPartner() period: [${JSON.stringify(period)}]`, APP);
+        return this.adminService.fetchSalesPartner(period);
+    }
+    fetchCommissionReport(yearMonthDto) {
+        common_1.Logger.debug(`fetchCommissionReport() yearMonthDto: [${yearMonthDto.year}]`, APP);
+        return this.adminService.fetchCommissionReport(yearMonthDto);
+    }
+    fetchMonthlyReport(dateDTO) {
+        common_1.Logger.debug(`fetchMonthlyReport() dateDTO: [${JSON.stringify(dateDTO)}]`, APP);
+        return this.adminService.fetchMonthlyReport(dateDTO);
+    }
     fetchSalesPartnerAccountDetails() {
         common_1.Logger.debug(`getSalesPartnerAccountDetails()`, APP);
         return this.adminService.fetchSalesPartnerAccountDetails();
+    }
+    fetchCommissionDispersals(period) {
+        common_1.Logger.debug(`fetchCommissionDispersals() period: [${JSON.stringify(period.period)}]`, APP);
+        return this.adminService.fetchCommissionDispersals(period);
+    }
+    fetchInvitationResponses(state) {
+        common_1.Logger.debug(`fetchInvitationResponses() state: [${JSON.stringify(state)}]`, APP);
+        return this.adminService.fetchInvitationResponse(state);
+    }
+    fetchSalesPartnerAccountDetailsBySalesCode(salesCode) {
+        common_1.Logger.debug(`fetchSalesPartnerAccountDetailsByID()`, APP);
+        return this.adminService.fetchSalesPartnerAccountDetailsBySalesCode(salesCode);
     }
     sentOtpToPhoneNumber(mobileNumberDtO) {
         common_1.Logger.debug(`sentOtpToPhoneNumber() mobileNumberDtO: [${JSON.stringify(mobileNumberDtO)}]`, APP);
@@ -54,17 +79,63 @@ let AdminController = class AdminController {
         common_1.Logger.debug(`sendEmailOnIncorrectBankDetails() body: [${JSON.stringify(body)}] param: [${JSON.stringify(param)}] `, APP);
         return this.adminService.sendEmailOnIncorrectBankDetails(body, param);
     }
-    updatingPaidAmount(updateAmountdto) {
+    updatePaidAmount(updateAmountdto) {
         common_1.Logger.debug(`updatePaidAmount() updateAmountdto: [${JSON.stringify(updateAmountdto)}]`, APP);
-        return this.adminService.updatingPaidAmount(updateAmountdto);
+        return this.adminService.updatePaidAmount(updateAmountdto);
+    }
+    sendCreateSalesPartnerLinkToMobileAndWhatsappNumber(mobileNumberDtO) {
+        common_1.Logger.debug(`sendCreateSalesPartnerLinkToMobileAndWhatsappNumber() mobileNumberDtO: [${JSON.stringify(mobileNumberDtO)}]`, APP);
+        return this.adminService.sendCreateSalesPartnerLinkToMobileAndWhatsappNumber(mobileNumberDtO);
     }
 };
+__decorate([
+    (0, common_1.Get)('sales-partner'),
+    __param(0, (0, common_1.Query)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [create_sale_dto_1.Period]),
+    __metadata("design:returntype", void 0)
+], AdminController.prototype, "fetchSalesPartner", null);
+__decorate([
+    (0, common_1.Get)('commission-report/:year'),
+    __param(0, (0, common_1.Param)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [create_admin_dto_1.YearMonthDto]),
+    __metadata("design:returntype", void 0)
+], AdminController.prototype, "fetchCommissionReport", null);
+__decorate([
+    (0, common_1.Get)('monthly-report/:year/:month'),
+    __param(0, (0, common_1.Param)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [create_admin_dto_1.DateDTO]),
+    __metadata("design:returntype", void 0)
+], AdminController.prototype, "fetchMonthlyReport", null);
 __decorate([
     (0, common_1.Get)('sales/account-details'),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", []),
     __metadata("design:returntype", void 0)
 ], AdminController.prototype, "fetchSalesPartnerAccountDetails", null);
+__decorate([
+    (0, common_1.Get)('commission-dispersals'),
+    __param(0, (0, common_1.Query)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [login_dto_1.PeriodRange]),
+    __metadata("design:returntype", void 0)
+], AdminController.prototype, "fetchCommissionDispersals", null);
+__decorate([
+    (0, common_1.Get)('invitation-responses'),
+    __param(0, (0, common_1.Query)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [login_dto_1.State]),
+    __metadata("design:returntype", void 0)
+], AdminController.prototype, "fetchInvitationResponses", null);
+__decorate([
+    (0, common_1.Get)('sales/account-details/:salesCode'),
+    __param(0, (0, common_1.Param)('salesCode')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", void 0)
+], AdminController.prototype, "fetchSalesPartnerAccountDetailsBySalesCode", null);
 __decorate([
     (0, common_1.Post)(),
     __param(0, (0, common_1.Body)()),
@@ -80,7 +151,7 @@ __decorate([
     __metadata("design:returntype", void 0)
 ], AdminController.prototype, "verifyOtp", null);
 __decorate([
-    (0, common_1.Post)('/download-link'),
+    (0, common_1.Post)('download-link'),
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [create_admin_dto_1.MobileNumberDtO]),
@@ -108,7 +179,7 @@ __decorate([
     __metadata("design:returntype", void 0)
 ], AdminController.prototype, "confirmForgotPassword", null);
 __decorate([
-    (0, common_1.Post)('/send-email/:mobileNumber'),
+    (0, common_1.Post)('send-email/:mobileNumber'),
     __param(0, (0, common_1.Body)()),
     __param(1, (0, common_1.Param)()),
     __metadata("design:type", Function),
@@ -121,7 +192,14 @@ __decorate([
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [create_admin_dto_1.createPaid]),
     __metadata("design:returntype", void 0)
-], AdminController.prototype, "updatingPaidAmount", null);
+], AdminController.prototype, "updatePaidAmount", null);
+__decorate([
+    (0, common_1.Post)('/sales-link'),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [create_admin_dto_1.MobileNumberDtO]),
+    __metadata("design:returntype", void 0)
+], AdminController.prototype, "sendCreateSalesPartnerLinkToMobileAndWhatsappNumber", null);
 AdminController = __decorate([
     (0, common_1.Controller)(),
     __metadata("design:paramtypes", [admin_service_1.AdminService])

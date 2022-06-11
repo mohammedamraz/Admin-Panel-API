@@ -22,6 +22,7 @@ export declare class CreateSalesPartner {
     created_date: Date;
     refered_by: string;
     block_account: boolean;
+    is_hsa_account: boolean;
     profile_confirmation: boolean;
 }
 export declare class CreateSalesPartnerRequest {
@@ -35,6 +36,13 @@ export declare class CreateWithdrawn {
     updated_date: Date;
     sp_id: string;
     paid_amount: number;
+}
+export interface SalesUserJunction {
+    id: number;
+    sales_code: string;
+    users: number;
+    created_date: string;
+    updated_date: string;
 }
 export declare class CreateSalesInvitationJunction {
     refered_by: string;
@@ -64,6 +72,8 @@ export declare class ZQueryParamsDto {
     is_active: Is_active;
 }
 export declare enum Periodicity {
+    DAILY = "daily",
+    WEEKLY = "weekly",
     MONTHLY = "monthly",
     QUARTERLY = "quarterly",
     HALF_YEARLY = "halfyearly",
@@ -76,6 +86,8 @@ export declare class Period {
     period: Periodicity;
 }
 export declare const PERIOD: {
+    daily: string;
+    weekly: string;
     monthly: string;
     quarterly: string;
     halfyearly: string;
@@ -87,3 +99,7 @@ export declare class EarningResponse {
 }
 export declare const Interval: (period: Period) => string;
 export declare const makeEarningFormat: (earning: number[]) => EarningResponse;
+export declare class YearMonthDto {
+    year: string;
+    salesCode: string;
+}

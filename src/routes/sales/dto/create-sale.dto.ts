@@ -1,6 +1,6 @@
-import { Email } from "aws-sdk/clients/codecommit";
+    import { Email } from "aws-sdk/clients/codecommit";
 import { phoneNumber } from "aws-sdk/clients/importexport";
-import { IsEmail, IsEnum, IsNotEmpty, IsOptional } from "class-validator";
+import { IsEmail, IsEnum, IsNotEmpty, IsOptional, IsString, MaxLength, MinLength } from "class-validator";
 
 export class CreateSalesJunction {
     sales_code: string;
@@ -21,7 +21,7 @@ export class CreateSalesPartner {
     @IsNotEmpty()
     mobile: phoneNumber;
 
-
+    @IsNotEmpty()
     location: string;
 
     @IsEmail()
@@ -35,6 +35,7 @@ export class CreateSalesPartner {
     created_date: Date;
     refered_by: string;
     block_account: boolean;
+    is_hsa_account: boolean;
 
     @IsNotEmpty()
     profile_confirmation: boolean;
@@ -65,6 +66,14 @@ export class CreateWithdrawn {
     paid_amount: number;
 }
 
+export interface SalesUserJunction{
+    id: number;
+    sales_code: string;
+    users: number;
+    created_date: string;
+    updated_date: string;
+}
+
 export class CreateSalesInvitationJunction {
     refered_by: string;
     sp_id: string;
@@ -80,7 +89,8 @@ export class UpdateSalesPartner {
     sales_code: string;
     block_account: boolean;
     profile_confirmation: boolean;
-    customer_id:string;
+    customer_id:string
+
 }
 export enum Is_active {
     TRUE = 'true',
@@ -107,6 +117,8 @@ export class ZQueryParamsDto {
 
 
 export enum Periodicity {
+    DAILY = 'daily',
+    WEEKLY = 'weekly',
     MONTHLY = 'monthly',
     QUARTERLY = 'quarterly',
     HALF_YEARLY = 'halfyearly',
@@ -124,6 +136,8 @@ export class Period {
 }
 
 export const PERIOD = {
+    daily: '1 day',
+    weekly: '1 week',
     monthly: '1 months',
     quarterly: '3 months',
     halfyearly: '6 months',
@@ -136,9 +150,22 @@ export class EarningResponse {
 }
 
 export const Interval = (period: Period) => PERIOD[period.period]
-export const makeEarningFormat =(earning:number[]): EarningResponse=>{
-    return {
+export const makeEarningFormat =(earning:number[]): EarningResponse=>
+    ( {
         earnedAmount: earning[0],
         paidAmount: earning[1]
     }
-}
+    )
+
+export class YearMonthDto{
+
+    @IsNotEmpty()
+     @IsString()
+     @MinLength(4, {message: 'Enter only 4 digit value of year, This is too short',})
+     @MaxLength(4, {message: 'Enter only 4 digit value of year, This is too long',}) 
+    year: string;
+
+    @IsNotEmpty()
+    salesCode: string;
+   
+  }
