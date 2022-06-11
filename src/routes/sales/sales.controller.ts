@@ -42,62 +42,65 @@ export class SalesController {
   fetchSalesPartnerById(@Param('id') id: string) {
       Logger.debug(`fetchSalesPartnerById() id: [${id}]`, APP);
 
-        return this.salesService.fetchSalesPartnerById(id);
-    }
+      return this.salesService.fetchSalesPartnerById(id);
+  }
 
-    @Get(':salesCode/earning')
-    fetchEarnings(@Param('salesCode') salesCode: string, @Query() period: Period) {
-        Logger.debug(`fetchEarnings()salesCode: [${salesCode}] `, APP);
+  @Get(':salesCode/earning')
+  fetchEarnings(@Param('salesCode') salesCode: string, @Query() period: Period) {
+      Logger.debug(`fetchEarnings()salesCode: [${salesCode}] `, APP);
 
-        return this.salesService.fetchEarnings(salesCode, period);
-    }
+      return this.salesService.fetchEarnings(salesCode, period);
+  }
 
-    // @Get(':salesCode/invatationResponse')
-    // fetchInvitationResponse(@Param('salesCode') salesCode: string) {
-    //     Logger.debug(`fetchInvitationResponse()salesCode: [${salesCode}] `, APP);
+  @Get(':salesCode/invatationResponse')
+  fetchInvitationResponse(@Param('salesCode') salesCode: string, @Query() period: Period) {
+      Logger.debug(`fetchInvitationResponse()salesCode: [${salesCode}] `, APP);
 
-    //     return this.salesService.fetchInvitationResponse(salesCode);
+      return this.salesService.fetchInvitationResponse(salesCode, period);
+  }
 
-    // }
+ 
 
-    @Get()
-    fetchAllSalesPartnersByDate(@Query() params: ZQueryParamsDto) {
-        Logger.debug(`fetchAllSalesPartnersByDate() params:${JSON.stringify(params)}`, APP);
-        return this.salesService.fetchAllSalesPartnersByDate(params)
-    }
-
-    @Get(':id/sales_junction')
-    fetchAllSalesPartnersFromJunctionByDate(@Param('id') id: string, @Query() params: ZQueryParamsDto) {
-        Logger.debug(`fetchAllSalesPartnersFromJunctionByDate() id: [${id}] params:${JSON.stringify(params)}`, APP);
-
-        return this.salesService.fetchAllSalesPartnersFromJunctionByDate(id, params)
-    }
-
-    @Patch(':id/image')
-    @UseInterceptors(FileInterceptor('file', {
-        storage: diskStorage({
-            _destination: STATIC_IMAGES_PROFILE,
-            get destination() {
-                return this._destination;
-            },
-            set destination(value) {
-                this._destination = value;
-            },
-            filename: editFileName,
-        }),
-        fileFilter: imageFileFilter,
-    }),
-    )
-    async uploadImage(@Param('id') id: string, @UploadedFile() file) {
-        Logger.debug(`UploadImage: ${file}`, APP);
-
-        return this.salesService.uploadImage(id, file.filename);
-    }
+  @Get()
+  fetchAllSalesPartnersByDate(@Query() params: ZQueryParamsDto) {
+      Logger.debug(`fetchAllSalesPartnersByDate() params:${JSON.stringify(params)}`, APP);
+      return this.salesService.fetchAllSalesPartnersByDate(params)
+  }
 
 
+  @Get('id/id/id')
+  fetchCommissionFromJunctionDb(@Query() params: ZQueryParamsDto) {
+      Logger.debug(`fetchCommissionFromJunctionDb() params:${JSON.stringify(params)}`, APP);
+      return this.salesService.fetchCommissionFromJunctionDb(params)
+  }
 
+  @Get(':id/sales_junction')
+  fetchAllSalesPartnersFromJunctionByDate(@Param('id') id: string,@Query() params: ZQueryParamsDto) {
+      Logger.debug(`fetchAllSalesPartnersFromJunctionByDate() id: [${id}] params:${JSON.stringify(params)}`, APP);
 
+      return this.salesService.fetchAllSalesPartnersFromJunctionByDate(id,params)
+  }
 
+  @Patch(':id/image')
+  @UseInterceptors(FileInterceptor('file', {
+      storage: diskStorage({
+        _destination: STATIC_IMAGES_PROFILE,
+        get destination() {
+          return this._destination;
+        },
+        set destination(value) {
+          this._destination = value;
+        },
+          filename: editFileName,
+      }),
+      fileFilter: imageFileFilter,
+  }),
+  )
+  async uploadImage(@Param('id') id: string, @UploadedFile() file) {
+      Logger.debug(`UploadImage: ${file}`, APP);
+
+      return this.salesService.uploadImage(id, file.filename);
+  }
   @Patch(':id')
   updateSalesPartner(@Param('id',ParseIntPipe) id: number, @Body() updateSalesPartnerDto: UpdateSalesPartner) {
       Logger.debug(`updateSalesPartner() id: [${id}] DTO:${JSON.stringify(updateSalesPartnerDto,)}`, APP);
