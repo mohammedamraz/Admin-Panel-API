@@ -1,4 +1,4 @@
-import { ArrayMinSize, IsNotEmpty, IsPhoneNumber, IsString, MaxLength, MinLength, ValidateNested } from 'class-validator';
+import { ArrayMinSize, IsNotEmpty, IsNumber, IsPhoneNumber, IsString, MaxLength, MinLength, ValidateNested } from 'class-validator';
 import { phoneNumber } from 'aws-sdk/clients/importexport';
 import { Type } from 'class-transformer';
 import { Logger } from '@nestjs/common';
@@ -100,7 +100,7 @@ export class createAccount {
 }
 
 export class createPaidAmountDto {
-  @IsNotEmpty() paid_amount: number;
+  @IsNotEmpty()@IsNumber() paid_amount: number;
   @IsNotEmpty() salesCode:string; 
   account_holder_name:string;
   account_number:string;
