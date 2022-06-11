@@ -16,7 +16,7 @@ export declare class AdminController {
     fetchInvitationResponses(state: State): import("rxjs").Observable<Promise<{
         signups: any;
     }>>;
-    fetchSalesPartnerAccountDetailsBySalesCode(sales_code: string): import("rxjs").Observable<Promise<any[]>>;
+    fetchSalesPartnerAccountDetailsBySalesCode(salesCode: string): import("rxjs").Observable<Promise<any[]>>;
     sentOtpToPhoneNumber(mobileNumberDtO: MobileNumberDtO): any;
     verifyOtp(mobileNumberAndOtpDtO: MobileNumberAndOtpDtO): any;
     sentFedoAppDownloadLinkToMobileAndWhatsappNumber(mobileNumberDtO: MobileNumberDtO): import("rxjs").Observable<{
@@ -30,7 +30,7 @@ export declare class AdminController {
     forgotPassword(forgotPasswordDTO: ForgotPasswordDTO): import("rxjs").Observable<any>;
     confirmForgotPassword(confirmForgotPasswordDTO: ConfirmForgotPasswordDTO): import("rxjs").Observable<any[]>;
     sendEmailOnIncorrectBankDetails(body: requestDto, param: ParamDto): import("rxjs").Observable<unknown>;
-    updatingPaidAmount(updateAmountdto: createPaid): Promise<void>;
+    updatePaidAmount(updateAmountdto: createPaid): Promise<void>;
     sendCreateSalesPartnerLinkToMobileAndWhatsappNumber(mobileNumberDtO: MobileNumberDtO): import("rxjs").Observable<{
         status: string;
     }>;

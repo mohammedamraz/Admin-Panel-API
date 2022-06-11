@@ -1,15 +1,17 @@
-import { ArrayMinSize, IsNotEmpty, IsPhoneNumber, IsString, MaxLength, MinLength, ValidateNested } from 'class-validator';
+import { ArrayMinSize, IsNotEmpty, IsNumber, IsPhoneNumber, IsString, MaxLength, MinLength, ValidateNested } from 'class-validator';
 import { phoneNumber } from 'aws-sdk/clients/importexport';
 import { Type } from 'class-transformer';
 import { Logger } from '@nestjs/common';
 import { CreateSalesJunction } from 'src/routes/sales/dto/create-sale.dto';
 
 export class MobileNumberDtO {
+
   @IsNotEmpty()
   @IsPhoneNumber()
   phoneNumber: phoneNumber;
-  
+
   @IsNotEmpty()
+  @IsNumber()
   commission:number;
 }
 
@@ -123,35 +125,29 @@ export class YearMonthDto{
    @MinLength(4, {message: 'Enter only 4 digit value of year, This is too short'})
    @MaxLength(4, {message: 'Enter only 4 digit value of year, This is too long'}) 
   year: string;
-  
- 
 }
 
 export class DateDTO extends YearMonthDto{
 
   @IsNotEmpty()
-  @IsString()
-  @MinLength(2, {message: 'Enter only 4 digit value of year, This is too short'})
-  @MaxLength(2, {message: 'Enter only 4 digit value of year, This is too long'}) 
+  @MinLength(2, {message: 'Enter only 2 digit value of month, This is too short'})
+  @MaxLength(2, {message: 'Enter only 2 digit value of month, This is too long'}) 
   month: string;
 }
-
-export const fetchmonths =(year: String) => {
+export const fetchmonths =(year: string) => {
   Logger.debug(`fetchmonths() year: [${year}]`);
-  let month = [];
-  let month1=[];
-  let i = 0;
 
+  let month = [];
+  let i = 0;
   if(new Date().getFullYear().toString() === year){
-    for(i = new Date().getMonth()+1; i> 0 ; i-- )
+    for(i = new Date().getMonth()+1; i> 0 ; i--)
     month.push(i)
    return month
   }
   else {
-    for(i = 12; i> 0 ; i-- )
-    month1.push(i)
-    console.log("month1",month1)
-  return month1
+    for(i = 12; i> 0 ; i--)
+    month.push(i)
+  return month
   }
 }
 export const fetchDues = (createSalesJunction: CreateSalesJunction[]) => {

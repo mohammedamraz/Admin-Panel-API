@@ -55,14 +55,13 @@ export class SalesController {
     // @Get(':salesCode/invatationResponse')
     // fetchInvitationResponse(@Param('salesCode') salesCode: string) {
     //     Logger.debug(`fetchInvitationResponse()salesCode: [${salesCode}] `, APP);
-
     //     return this.salesService.fetchInvitationResponse(salesCode);
-
     // }
 
     @Get()
     fetchAllSalesPartnersByDate(@Query() params: ZQueryParamsDto) {
         Logger.debug(`fetchAllSalesPartnersByDate() params:${JSON.stringify(params)}`, APP);
+
         return this.salesService.fetchAllSalesPartnersByDate(params)
     }
 

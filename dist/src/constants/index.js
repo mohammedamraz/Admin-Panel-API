@@ -11,7 +11,7 @@ exports.PORT = parseInt(process.env.FEDO_HSA_SERVER_PORT, 10) || 36000;
 exports.APP_VERSION = package_json_1.default.version;
 exports.DEBUG_LEVEL = process.env.FEDO_HSA_SERVER_LOG_LEVEL || 'debug';
 exports.APP_DOCUMENTATION = process.env.FEDO_HSA_SERVER_DOCUMENTATION || 'https://fedo.health/hsa/docs';
-exports.POSTGRES_DB_URI_DB_URL = process.env.FEDO_HSA_SERVER_DB_URI || 'postgresql://postgres:Fedo@1234@localhost:5432/HSA_Sales';
+exports.POSTGRES_DB_URI_DB_URL = process.env.FEDO_HSA_SERVER_DB_URI || 'postgresql://postgres:admin@localhost:5432/fedo-sales';
 exports.AKASH_ACCOUNTID = process.env.FEDO_HSA_TWILIO_ACCOUNTID || "ACff6fccefe46883e8857e636bec9575f0";
 exports.AKASH_AUTHTOKEN = process.env.FEDO_HSA_TWILIO_AUTHTOKEN || "73b826f040ca14bdde6aaa8f4ea4fb44";
 exports.AKASH_SERVICEID = process.env.FEDO_HSA_TWILIO_SERVICEID || "VA3b831c8b177fb8226f87f1c6f4b0dae5";
@@ -34,11 +34,11 @@ class ZwitchHttpBody {
 }
 exports.ZwitchHttpBody = ZwitchHttpBody;
 exports.debugLevel = (() => {
-    if (exports.DEBUG_LEVEL == 'debug')
+    if (exports.DEBUG_LEVEL === 'debug')
         return ['debug', 'warn', 'error'];
-    if (exports.DEBUG_LEVEL == 'warn')
+    if (exports.DEBUG_LEVEL === 'warn')
         return ['warn', 'error'];
-    if (exports.DEBUG_LEVEL == 'error')
+    if (exports.DEBUG_LEVEL === 'error')
         return ['error'];
 })();
 var routes_1 = require("./routes");

@@ -15,9 +15,9 @@ export declare class ConfirmForgotPasswordDTO {
     password: string;
 }
 export declare enum PeriodicityAdmin {
-    MONTH = "month",
-    QUARTER = "quarter",
-    YEARLY = "year"
+    MONTH = "monthly",
+    QUARTER = "quarterly",
+    YEARLY = "yearly"
 }
 export declare class PeriodRange {
     period: PeriodicityAdmin;

@@ -5,12 +5,11 @@ import { createPaid, DateDTO, MobileNumberAndOtpDtO, MobileNumberDtO, ParamDto, 
 import { ConfirmForgotPasswordDTO, ForgotPasswordDTO, LoginDTO, PeriodRange, State } from './dto/login.dto';
 
 const APP = 'AdminController';
-
 @Controller()
 export class AdminController {
   constructor(private readonly adminService: AdminService) {}
 
-  @Get('salesPartner')
+  @Get('sales-partner')
   fetchSalesPartner(@Query() period: Period) {
     Logger.debug(`fetchSalesPartner() period: [${JSON.stringify(period)}]`, APP);
 
@@ -19,12 +18,12 @@ export class AdminController {
 
   @Get('commission-report/:year')
   fetchCommissionReport(@Param() yearMonthDto:YearMonthDto){
-    Logger.debug(`fetchCommissionReport() year: [${yearMonthDto.year}]`, APP);
+    Logger.debug(`fetchCommissionReport() yearMonthDto: [${yearMonthDto.year}]`, APP);
 
     return this.adminService.fetchCommissionReport(yearMonthDto);
   }
 
-  @Get('monthlyreport/:year/:month')
+  @Get('monthly-report/:year/:month')
   fetchMonthlyReport(@Param() dateDTO: DateDTO){
     Logger.debug(`fetchMonthlyReport() dateDTO: [${JSON.stringify(dateDTO)}]`, APP);
 
@@ -39,25 +38,25 @@ export class AdminController {
     return this.adminService.fetchSalesPartnerAccountDetails()
   }
 
-  @Get('commissionDispersals')
+  @Get('commission-dispersals')
   fetchCommissionDispersals(@Query() period: PeriodRange) {
       Logger.debug(`fetchCommissionDispersals() period: [${JSON.stringify(period.period)}]`, APP);
 
       return this.adminService.fetchCommissionDispersals(period);
   }
 
-  @Get('invitationResponses')
+  @Get('invitation-responses')
   fetchInvitationResponses(@Query() state: State) {
     Logger.debug(`fetchInvitationResponses() state: [${JSON.stringify(state)}]`, APP);
 
     return this.adminService.fetchInvitationResponse(state);
   }
 
-   @Get('sales/account-details/:sales_code')
-  fetchSalesPartnerAccountDetailsBySalesCode(@Param('sales_code') sales_code: string) {
+  @Get('sales/account-details/:salesCode')
+  fetchSalesPartnerAccountDetailsBySalesCode(@Param('salesCode') salesCode: string) {
    Logger.debug(`fetchSalesPartnerAccountDetailsByID()`, APP);
 
-    return this.adminService.fetchSalesPartnerAccountDetailsBySalesCode(sales_code)
+    return this.adminService.fetchSalesPartnerAccountDetailsBySalesCode(salesCode)
   }
 
   @Post()
@@ -74,7 +73,7 @@ export class AdminController {
     return this.adminService.verifyOtp(mobileNumberAndOtpDtO);
   }
 
-  @Post('/download-link')
+  @Post('download-link')
   sentFedoAppDownloadLinkToMobileAndWhatsappNumber(@Body() mobileNumberDtO: MobileNumberDtO) {
     Logger.debug(`sentFedoAppDownloadLinkToMobileAndWhatsappNumber() mobileNumberDtO: [${JSON.stringify(mobileNumberDtO)}]`, APP);
 
@@ -102,7 +101,7 @@ export class AdminController {
     return this.adminService.confirmForgotPassword(confirmForgotPasswordDTO);
   }
 
-  @Post('/send-email/:mobileNumber')
+  @Post('send-email/:mobileNumber')
   sendEmailOnIncorrectBankDetails(@Body() body: requestDto, @Param() param: ParamDto) {
     Logger.debug(`sendEmailOnIncorrectBankDetails() body: [${JSON.stringify(body)}] param: [${JSON.stringify(param)}] `, APP);
 
@@ -110,10 +109,10 @@ export class AdminController {
   }
 
   @Post("payment-record")
-  updatingPaidAmount(@Body() updateAmountdto:createPaid) {
+  updatePaidAmount(@Body() updateAmountdto:createPaid) {
     Logger.debug(`updatePaidAmount() updateAmountdto: [${JSON.stringify(updateAmountdto)}]`, APP);
 
-    return this.adminService.updatingPaidAmount(updateAmountdto)
+    return this.adminService.updatePaidAmount(updateAmountdto)
   }
 
   @Post('/sales-link')
@@ -122,7 +121,4 @@ export class AdminController {
 
     return this.adminService.sendCreateSalesPartnerLinkToMobileAndWhatsappNumber(mobileNumberDtO);
   }
-
- 
-
 }
