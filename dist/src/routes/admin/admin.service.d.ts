@@ -58,6 +58,8 @@ export declare class AdminService {
     confirmForgotPassword(confirmForgotPasswordDTO: ConfirmForgotPasswordDTO): import("rxjs").Observable<any[]>;
     private readonly onAWSErrorResponse;
     private readonly onHTTPErrorResponse;
-    encryptPassword(password: any): any;
+    encryptPassword: (password: any) => {
+        passcode: any;
+    };
     updatingPaidAmount(updateAmountdto: createPaid): Promise<void>;
 }

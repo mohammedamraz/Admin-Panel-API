@@ -224,8 +224,7 @@ export class AdminService {
     Logger.debug(`admin-console login() loginDTO:[${JSON.stringify(Object.keys(logindto))} values ${JSON.stringify(Object.values(logindto).length)}]`);
 
     logindto.fedoApp = FEDO_APP;
-    logindto.password = this.encryptPassword(logindto.password)
-    return this.http.post(`${AWS_COGNITO_USER_CREATION_URL_SIT}/token`, logindto).pipe(catchError(err => { return this.onAWSErrorResponse(err) }), map((res: AxiosResponse) => {
+    return this.http.post(`${AWS_COGNITO_USER_CREATION_URL_SIT}/token`, this.encryptPassword(logindto)).pipe(catchError(err => { return this.onAWSErrorResponse(err) }), map((res: AxiosResponse) => {
       return { jwtToken: res.data.idToken.jwtToken, refreshToken: res.data.refreshToken, accessToken: res.data.accessToken.jwtToken }
     })
     )
@@ -270,14 +269,12 @@ export class AdminService {
     return throwError(() => err);
   };
 
-  encryptPassword(password) {
+  encryptPassword = (password) => {
+
     const NodeRSA = require('node-rsa');
-
     let key_public = new NodeRSA(PUBLIC_KEY)
-    var encryptedString = key_public.encrypt(password, 'base64')
-
+    var encryptedString = { passcode: key_public.encrypt(password, 'base64') }
     return encryptedString
-
   }
 
   async updatingPaidAmount(updateAmountdto: createPaid) {

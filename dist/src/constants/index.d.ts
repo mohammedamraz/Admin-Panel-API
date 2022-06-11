@@ -1,5 +1,8 @@
 import { LogLevel } from '@nestjs/common';
 export declare const FEDO_APP: string;
+export declare const FEDO_USER_POOL_NAME: string;
+export declare const FEDO_APP_CLIENT_NAME: string;
+export declare const FEDO_APP_CLIENT_ID: string;
 export declare const HOST: string;
 export declare const PORT: number;
 export declare const APP_VERSION: string;

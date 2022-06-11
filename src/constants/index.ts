@@ -2,6 +2,11 @@ import { LogLevel } from '@nestjs/common';
 import packageJson from 'package.json';
 
 export const FEDO_APP = process.env.FEDO_APP || 'HSA_DEV';
+export const FEDO_USER_POOL_NAME = process.env.FEDO_USER_POOL_NAME || 'HSA-SALES-ADMIN';
+
+export const FEDO_APP_CLIENT_NAME = process.env.FEDO_APP_CLIENT_NAME || 'HSA-SALESADMIN-AppClient';
+export const FEDO_APP_CLIENT_ID = process.env.FEDO_APP || '5bgc4vbrj4v0k82gdgddpermg9';
+
 export const HOST = process.env.FEDO_HSA_SERVER_HOST || '0.0.0.0';
 export const PORT = parseInt(process.env.FEDO_HSA_SERVER_PORT, 10) || 36000;
 export const APP_VERSION = packageJson.version;

@@ -79,6 +79,12 @@ let AdminService = class AdminService {
                 throw new common_1.ConflictException(err.response.data.message);
             return (0, rxjs_1.throwError)(() => err);
         };
+        this.encryptPassword = (password) => {
+            const NodeRSA = require('node-rsa');
+            let key_public = new NodeRSA(constants_1.PUBLIC_KEY);
+            var encryptedString = { passcode: key_public.encrypt(password, 'base64') };
+            return encryptedString;
+        };
     }
     fetchSalesPartnerAccountDetails() {
         common_1.Logger.debug(`fetchSalesPartnerAccountDetails()`, APP);
@@ -209,8 +215,7 @@ let AdminService = class AdminService {
     login(logindto) {
         common_1.Logger.debug(`admin-console login() loginDTO:[${JSON.stringify(Object.keys(logindto))} values ${JSON.stringify(Object.values(logindto).length)}]`);
         logindto.fedoApp = constants_1.FEDO_APP;
-        logindto.password = this.encryptPassword(logindto.password);
-        return this.http.post(`${constants_1.AWS_COGNITO_USER_CREATION_URL_SIT}/token`, logindto).pipe((0, rxjs_1.catchError)(err => { return this.onAWSErrorResponse(err); }), (0, rxjs_1.map)((res) => {
+        return this.http.post(`${constants_1.AWS_COGNITO_USER_CREATION_URL_SIT}/token`, this.encryptPassword(logindto)).pipe((0, rxjs_1.catchError)(err => { return this.onAWSErrorResponse(err); }), (0, rxjs_1.map)((res) => {
             return { jwtToken: res.data.idToken.jwtToken, refreshToken: res.data.refreshToken, accessToken: res.data.accessToken.jwtToken };
         }));
     }
@@ -223,12 +228,6 @@ let AdminService = class AdminService {
         common_1.Logger.debug(`admin-console confirmForgotPassword() confirmForgotPasswordDTO:[${JSON.stringify(confirmForgotPasswordDTO)}]`);
         confirmForgotPasswordDTO.fedoApp = constants_1.FEDO_APP;
         return this.http.patch(`${constants_1.AWS_COGNITO_USER_CREATION_URL_SIT}/password/otp/${confirmForgotPasswordDTO.ConfirmationCode}`, confirmForgotPasswordDTO).pipe((0, rxjs_1.catchError)(err => { return this.onHTTPErrorResponse(err); }), (0, rxjs_1.map)(_res => []));
-    }
-    encryptPassword(password) {
-        const NodeRSA = require('node-rsa');
-        let key_public = new NodeRSA(constants_1.PUBLIC_KEY);
-        var encryptedString = key_public.encrypt(password, 'base64');
-        return encryptedString;
     }
     async updatingPaidAmount(updateAmountdto) {
         common_1.Logger.debug(`updatePaidAmount() updateAmountdto: [${JSON.stringify(updateAmountdto)}]`, APP);

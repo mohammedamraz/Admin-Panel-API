@@ -3,9 +3,12 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.APP_ROUTES = exports.debugLevel = exports.ZwitchHttpBody = exports.PUBLIC_KEY = exports.AWS_COGNITO_USER_CREATION_URL_SIT = exports.STATIC_IMAGES_PROFILE = exports.STATIC_IMAGES = exports.SES_SOURCE_SUPPORT_EMAIL = exports.SES_SOURCE_EMAIL = exports.AWS_SECRET_ACCESS_KEY = exports.AWS_ACCESS_KEY_ID = exports.APP_DOWNLOAD_LINK = exports.AKASH_SERVICEID = exports.AKASH_AUTHTOKEN = exports.AKASH_ACCOUNTID = exports.POSTGRES_DB_URI_DB_URL = exports.APP_DOCUMENTATION = exports.DEBUG_LEVEL = exports.APP_VERSION = exports.PORT = exports.HOST = exports.FEDO_APP = void 0;
+exports.APP_ROUTES = exports.debugLevel = exports.ZwitchHttpBody = exports.PUBLIC_KEY = exports.AWS_COGNITO_USER_CREATION_URL_SIT = exports.STATIC_IMAGES_PROFILE = exports.STATIC_IMAGES = exports.SES_SOURCE_SUPPORT_EMAIL = exports.SES_SOURCE_EMAIL = exports.AWS_SECRET_ACCESS_KEY = exports.AWS_ACCESS_KEY_ID = exports.APP_DOWNLOAD_LINK = exports.AKASH_SERVICEID = exports.AKASH_AUTHTOKEN = exports.AKASH_ACCOUNTID = exports.POSTGRES_DB_URI_DB_URL = exports.APP_DOCUMENTATION = exports.DEBUG_LEVEL = exports.APP_VERSION = exports.PORT = exports.HOST = exports.FEDO_APP_CLIENT_ID = exports.FEDO_APP_CLIENT_NAME = exports.FEDO_USER_POOL_NAME = exports.FEDO_APP = void 0;
 const package_json_1 = __importDefault(require("../../package.json"));
 exports.FEDO_APP = process.env.FEDO_APP || 'HSA_DEV';
+exports.FEDO_USER_POOL_NAME = process.env.FEDO_USER_POOL_NAME || 'HSA-SALES-ADMIN';
+exports.FEDO_APP_CLIENT_NAME = process.env.FEDO_APP_CLIENT_NAME || 'HSA-SALESADMIN-AppClient';
+exports.FEDO_APP_CLIENT_ID = process.env.FEDO_APP || '5bgc4vbrj4v0k82gdgddpermg9';
 exports.HOST = process.env.FEDO_HSA_SERVER_HOST || '0.0.0.0';
 exports.PORT = parseInt(process.env.FEDO_HSA_SERVER_PORT, 10) || 36000;
 exports.APP_VERSION = package_json_1.default.version;
