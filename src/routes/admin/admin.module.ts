@@ -4,7 +4,6 @@ import { AdminController } from './admin.controller';
 import { DatabaseModule } from 'src/lib/database/database.module';
 import { HttpModule } from '@nestjs/axios';
 import { TemplateService } from 'src/constants/template.service';
-import { SalesService } from '../sales/sales.service';
 
 @Module({
   imports: [
@@ -12,7 +11,6 @@ import { SalesService } from '../sales/sales.service';
     DatabaseModule.forFeature({ tableName: 'sales_partner'}),
     DatabaseModule.forFeature({ tableName: 'sales_partner_requests'}),
     DatabaseModule.forFeature({ tableName: 'sales_user_junction'}),
-
     HttpModule.register({
       timeout: 10000,
       maxRedirects: 5

@@ -88,5 +88,5 @@ export declare class YearMonthDto {
 export declare class DateDTO extends YearMonthDto {
     month: string;
 }
-export declare const fetchmonths: (year: String) => any[];
+export declare const fetchmonths: (year: string) => any[];
 export declare const fetchDues: (createSalesJunction: CreateSalesJunction[]) => number;

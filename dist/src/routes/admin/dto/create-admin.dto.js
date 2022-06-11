@@ -22,6 +22,7 @@ __decorate([
 ], MobileNumberDtO.prototype, "phoneNumber", void 0);
 __decorate([
     (0, class_validator_1.IsNotEmpty)(),
+    (0, class_validator_1.IsNumber)(),
     __metadata("design:type", Number)
 ], MobileNumberDtO.prototype, "commission", void 0);
 exports.MobileNumberDtO = MobileNumberDtO;
@@ -103,16 +104,14 @@ class DateDTO extends YearMonthDto {
 }
 __decorate([
     (0, class_validator_1.IsNotEmpty)(),
-    (0, class_validator_1.IsString)(),
-    (0, class_validator_1.MinLength)(2, { message: 'Enter only 4 digit value of year, This is too short' }),
-    (0, class_validator_1.MaxLength)(2, { message: 'Enter only 4 digit value of year, This is too long' }),
+    (0, class_validator_1.MinLength)(2, { message: 'Enter only 2 digit value of month, This is too short' }),
+    (0, class_validator_1.MaxLength)(2, { message: 'Enter only 2 digit value of month, This is too long' }),
     __metadata("design:type", String)
 ], DateDTO.prototype, "month", void 0);
 exports.DateDTO = DateDTO;
 const fetchmonths = (year) => {
     common_1.Logger.debug(`fetchmonths() year: [${year}]`);
     let month = [];
-    let month1 = [];
     let i = 0;
     if (new Date().getFullYear().toString() === year) {
         for (i = new Date().getMonth() + 1; i > 0; i--)
@@ -121,9 +120,8 @@ const fetchmonths = (year) => {
     }
     else {
         for (i = 12; i > 0; i--)
-            month1.push(i);
-        console.log("month1", month1);
-        return month1;
+            month.push(i);
+        return month;
     }
 };
 exports.fetchmonths = fetchmonths;

@@ -13,12 +13,7 @@ export declare class AdminService {
     private readonly templateService;
     private http;
     constructor(salesJunctionDb: DatabaseService<CreateSalesJunction>, salesDb: DatabaseService<CreateSalesPartner>, salesPartnerRequestDb: DatabaseService<CreateSalesPartnerRequest>, salesuser: DatabaseService<SalesUserJunction>, salesUserJunctionDb: DatabaseService<CreateSalesJunction>, templateService: TemplateService, http: HttpService);
-    accountSid: string;
-    authToken: string;
-    serviceSid: string;
     client: any;
-    salesPartnerAccountDetails: any[];
-    salesPartnerAccountData: any[];
     salesPartnerRequestDetails: any;
     salesPartnerDetails: any;
     salesParterEmail: any;
@@ -58,7 +53,7 @@ export declare class AdminService {
         sales_code: string;
         commission_amount: number;
     }>;
-    fetchSalesPartnerAccountDetailsBySalesCode(sales_code: string): import("rxjs").Observable<Promise<any[]>>;
+    fetchSalesPartnerAccountDetailsBySalesCode(salesCode: string): import("rxjs").Observable<Promise<any[]>>;
     fetchUserById(createSalesPartner: CreateSalesPartner[]): Promise<any[]>;
     fetchAccountById(userDoc: User[], saleDoc: CreateSalesPartner): Promise<{
         account_holder_name: string;
@@ -86,8 +81,10 @@ export declare class AdminService {
     confirmForgotPassword(confirmForgotPasswordDTO: ConfirmForgotPasswordDTO): import("rxjs").Observable<any[]>;
     private readonly onAWSErrorResponse;
     private readonly onHTTPErrorResponse;
-    encryptPassword(password: any): any;
-    updatingPaidAmount(updateAmountdto: createPaid): Promise<void>;
+    encryptPassword: (password: any) => {
+        passcode: any;
+    };
+    updatePaidAmount(updateAmountdto: createPaid): Promise<void>;
     sendCreateSalesPartnerLinkToPhoneNumber(mobileNumberDtO: MobileNumberDtO): any;
     sendCreateSalesPartnerLinkToWhatsappNumber(mobileNumberDtO: MobileNumberDtO): any;
     sendCreateSalesPartnerLinkToMobileAndWhatsappNumber(mobileNumberDtO: MobileNumberDtO): import("rxjs").Observable<{
