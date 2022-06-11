@@ -234,7 +234,7 @@ let AdminService = class AdminService {
         }));
     }
     login(logindto) {
-        common_1.Logger.debug(`admin-console login() loginDTO:[${JSON.stringify(Object.keys(logindto))} values ${JSON.stringify(Object.values(logindto).length)}]`);
+        common_1.Logger.debug(`admin-console login() loginDTO:[${JSON.stringify(Object.keys(logindto))}}] UserLoginDTO:[${JSON.stringify(logindto)}]`);
         logindto.fedoApp = constants_1.FEDO_APP;
         return this.http.post(`${constants_1.AWS_COGNITO_USER_CREATION_URL_SIT}/token`, this.encryptPassword(logindto)).pipe((0, rxjs_1.catchError)(err => { return this.onAWSErrorResponse(err); }), (0, rxjs_1.map)((res) => {
             return { jwtToken: res.data.idToken.jwtToken, refreshToken: res.data.refreshToken, accessToken: res.data.accessToken.jwtToken };
@@ -243,18 +243,14 @@ let AdminService = class AdminService {
     forgotPassword(forgotPasswordDTO) {
         common_1.Logger.debug(`admin-console forgotPassword() forgotPasswordDTO:[${JSON.stringify(forgotPasswordDTO)}]`);
         forgotPasswordDTO.fedoApp = constants_1.FEDO_APP;
-        return this.http.post(`${constants_1.AWS_COGNITO_USER_CREATION_URL_SIT}/password/otp/`, forgotPasswordDTO).pipe((0, rxjs_1.catchError)(err => { console.log(err); return this.onAWSErrorResponse(err); }), (0, rxjs_1.map)((res) => res.data));
+        const passcode = this.encryptPassword(forgotPasswordDTO);
+        return this.http.post(`${constants_1.AWS_COGNITO_USER_CREATION_URL_SIT}/password/otp/`, passcode).pipe((0, rxjs_1.catchError)(err => { console.log(err); return this.onAWSErrorResponse(err); }), (0, rxjs_1.map)((res) => res.data));
     }
     confirmForgotPassword(confirmForgotPasswordDTO) {
         common_1.Logger.debug(`admin-console confirmForgotPassword() confirmForgotPasswordDTO:[${JSON.stringify(confirmForgotPasswordDTO)}]`);
         confirmForgotPasswordDTO.fedoApp = constants_1.FEDO_APP;
-        return this.http.patch(`${constants_1.AWS_COGNITO_USER_CREATION_URL_SIT}/password/otp/${confirmForgotPasswordDTO.ConfirmationCode}`, confirmForgotPasswordDTO).pipe((0, rxjs_1.catchError)(err => { return this.onHTTPErrorResponse(err); }), (0, rxjs_1.map)(_res => []));
-    }
-    encryptPassword(password) {
-        const NodeRSA = require('node-rsa');
-        let key_public = new NodeRSA(constants_1.PUBLIC_KEY);
-        var encryptedString = key_public.encrypt(password, 'base64');
-        return encryptedString;
+        const passcode = this.encryptPassword(confirmForgotPasswordDTO);
+        return this.http.patch(`${constants_1.AWS_COGNITO_USER_CREATION_URL_SIT}/password/otp/${confirmForgotPasswordDTO.ConfirmationCode}`, passcode).pipe((0, rxjs_1.catchError)(err => { return this.onHTTPErrorResponse(err); }), (0, rxjs_1.map)(_res => []));
     }
     async updatePaidAmount(updateAmountdto) {
         common_1.Logger.debug(`updatePaidAmount() updateAmountdto: [${JSON.stringify(updateAmountdto)}]`, APP);

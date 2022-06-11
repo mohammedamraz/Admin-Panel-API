@@ -1,8 +1,8 @@
 /* eslint-disable max-lines-per-function */
-import { BadRequestException, Injectable, Logger, NotFoundException, ParseArrayPipe, UnprocessableEntityException } from '@nestjs/common';
+import { BadRequestException, Injectable, Logger, NotFoundException, UnprocessableEntityException } from '@nestjs/common';
 import { DatabaseTable } from 'src/lib/database/database.decorator';
 import { DatabaseService } from 'src/lib/database/database.service';
-import { CreateSalesInvitationJunction, CreateSalesJunction, CreateSalesPartner, CreateWithdrawn, Interval, makeEarningFormat, Period, SalesUserJunction, UpdateImageDTO, UpdateSalesPartner, YearMonthDto, ZQueryParamsDto } from './dto/create-sale.dto';
+import { CreateSalesInvitationJunction, CreateSalesJunction, CreateSalesPartner, Interval, makeEarningFormat, Period, SalesUserJunction, UpdateImageDTO, UpdateSalesPartner, YearMonthDto, ZQueryParamsDto } from './dto/create-sale.dto';
 import { HttpService } from '@nestjs/axios';
 import { fetchUserByMobileNumber, findUserByCustomerId } from 'src/constants/helper';
 import { CreateSalesPartnerModel } from 'src/lib/config/model/sales.model';
@@ -19,9 +19,7 @@ export class SalesService {
     @DatabaseTable('sales_partner') private readonly db: DatabaseService<CreateSalesPartnerModel>,
     @DatabaseTable('sales_partner_invitation_junction') private readonly invitationJunctiondb: DatabaseService<CreateSalesInvitationJunction>,
     @DatabaseTable('sales_commission_junction') private readonly junctiondb: DatabaseService<CreateSalesJunction>,
-    @DatabaseTable('sales_withdrawn_amount') private readonly withdrawndb: DatabaseService<CreateWithdrawn>,
-    @DatabaseTable('sales_user_junction') private readonly salesuser: DatabaseService<SalesUserJunction>,
-    @DatabaseTable('sales_user_junction') private readonly salesUserJunctionDb: DatabaseService<CreateSalesJunction>,
+    @DatabaseTable('sales_user_junction') private readonly salesUser: DatabaseService<SalesUserJunction>,
 
     private http: HttpService) { }
 
@@ -294,7 +292,7 @@ export class SalesService {
   fetchInvitationResponse(salesCode: string, period: Period) {
     Logger.debug(`fetchInvitationResponse() salesCode: ${salesCode}`, APP);
 
-    return this.salesuser.findByPeriod({ columnName: "sales_code", columnvalue: salesCode, period: Interval(period) }).pipe(
+    return this.salesUser.findByPeriod({ columnName: "sales_code", columnvalue: salesCode, period: Interval(period) }).pipe(
       catchError(error => { throw new BadRequestException(error.message) }),
       map(salesuser => {
         if (salesuser.length === 0) throw new NotFoundException("no Account found");
@@ -309,7 +307,7 @@ export class SalesService {
       switchMap(salesCommission =>
         lastValueFrom(this.junctiondb.find({ "sales_code": String(salesCode), }))
           .then(res => { return [salesCommission, res[res.length - 1]] })),
-      switchMap(async ([salesCommission, res]) => { await this.salesuser.save({ sales_code: salesCode }); return [salesCommission, res] }),
+      switchMap(async ([salesCommission, res]) => { await this.salesUser.save({ sales_code: salesCode }); return [salesCommission, res] }),
       switchMap(([salesCommission, res]) =>
         this.junctiondb.save({ sales_code: salesCode, commission_amount: salesCommission["commission"], dues: (Number(res['dues']) + Number(salesCommission["commission"])) })
 
@@ -335,33 +333,32 @@ export class SalesService {
   fetchEarnigReport(yearMonthDto: YearMonthDto) {
     Logger.debug(`fetchCommissionReport() year: [${yearMonthDto.year}]`)
 
-    const reportData=[]
-  return from(fetchmonths((yearMonthDto.year))).pipe(
-    concatMap(async( month: number) => {
-      return await lastValueFrom(this.junctiondb.fetchByYear({columnName: 'sales_code', columnvalue: yearMonthDto.salesCode, year: yearMonthDto.year, month: month.toString() }))
-      .then(async salesJunctionDoc=> {
-       const paid_amount=salesJunctionDoc.map(doc=>doc.paid_amount)
-       const total_paid_amount=paid_amount.reduce((next,prev)=> next + prev,0)
-       const date = salesJunctionDoc.map(doc=>{if(doc.paid_amount > 0) return doc.created_date})
-       const paid_on = date.filter((res) => res) 
-       await this.fetchSignup(yearMonthDto.year,month,yearMonthDto)
-       .then(signup => {
-         reportData.push({"total_paid_amount":total_paid_amount,"month": month-1,"hsa_sing_up": signup, "paid_on": paid_on[0],'total_dues': Number(salesJunctionDoc[salesJunctionDoc.length-1]?.dues)})
-        }).catch(error=> {throw new NotFoundException(error.message)})
-       return reportData
+    const reportData = []
+    return from(fetchmonths((yearMonthDto.year))).pipe(
+      concatMap(async (month: number) => {
+        return await lastValueFrom(this.junctiondb.fetchByYear({ columnName: 'sales_code', columnvalue: yearMonthDto.salesCode, year: yearMonthDto.year, month: month.toString() }))
+          .then(async salesJunctionDoc => {
+            const paid_amount = salesJunctionDoc.map(doc => doc.paid_amount)
+            const total_paid_amount = paid_amount.reduce((next, prev) => next + prev, 0)
+            const date = salesJunctionDoc.map(doc => { if (doc.paid_amount > 0) return doc.created_date })
+            const paid_on = date.filter((res) => res)
+            await this.fetchSignup(yearMonthDto.year, month, yearMonthDto)
+              .then(signup => {
+                reportData.push({ "total_paid_amount": total_paid_amount, "month": month - 1, "hsa_sing_up": signup, "paid_on": paid_on[0], 'total_dues': Number(salesJunctionDoc[salesJunctionDoc.length - 1]?.dues) })
+              }).catch(error => { throw new NotFoundException(error.message) })
+            return reportData
           })
-
       })
     )
 
   }
 
-async fetchSignup(year,month,yearMonthDto: YearMonthDto){
-  Logger.debug(`fetchSignup() year: [${year}] month: [${month}] salesCode:[${yearMonthDto.salesCode}]`, APP);
+  async fetchSignup(year, month, yearMonthDto: YearMonthDto) {
+    Logger.debug(`fetchSignup() year: [${year}] month: [${month}] salesCode:[${yearMonthDto.salesCode}]`, APP);
 
-   return await lastValueFrom(this.salesUserJunctionDb.fetchByYear({columnName: 'sales_code', columnvalue: yearMonthDto.salesCode, year: yearMonthDto.year, month: (month-1).toString() }))
-   .then(userJunctionDoc=> {return userJunctionDoc.length})
-   .catch(error=>{throw new UnprocessableEntityException(error.message)})
- }
+    return await lastValueFrom(this.salesUser.fetchByYear({ columnName: 'sales_code', columnvalue: yearMonthDto.salesCode, year: yearMonthDto.year, month: (month - 1).toString() }))
+      .then(userJunctionDoc => { return userJunctionDoc.length })
+      .catch(error => { throw new UnprocessableEntityException(error.message) })
+  }
 }
-  
+

@@ -240,7 +240,7 @@ export class AdminService {
   };
 
   login(logindto: LoginDTO) {
-    Logger.debug(`admin-console login() loginDTO:[${JSON.stringify(Object.keys(logindto))} values ${JSON.stringify(Object.values(logindto).length)}]`);
+    Logger.debug(`admin-console login() loginDTO:[${JSON.stringify(Object.keys(logindto))}}] UserLoginDTO:[${JSON.stringify(logindto)}]`);
 
     logindto.fedoApp = FEDO_APP;
     return this.http.post(`${AWS_COGNITO_USER_CREATION_URL_SIT}/token`, this.encryptPassword(logindto)).pipe(catchError(err => { return this.onAWSErrorResponse(err) }), map((res: AxiosResponse) => {
@@ -253,14 +253,16 @@ export class AdminService {
     Logger.debug(`admin-console forgotPassword() forgotPasswordDTO:[${JSON.stringify(forgotPasswordDTO,)}]`);
 
     forgotPasswordDTO.fedoApp = FEDO_APP
-    return this.http.post(`${AWS_COGNITO_USER_CREATION_URL_SIT}/password/otp/`, forgotPasswordDTO).pipe(catchError(err => {console.log(err); return this.onAWSErrorResponse(err) }), map((res: AxiosResponse) => res.data));
+    const passcode = this.encryptPassword(forgotPasswordDTO);
+    return this.http.post(`${AWS_COGNITO_USER_CREATION_URL_SIT}/password/otp/`, passcode).pipe(catchError(err => {console.log(err); return this.onAWSErrorResponse(err) }), map((res: AxiosResponse) => res.data));
   }
 
   confirmForgotPassword(confirmForgotPasswordDTO: ConfirmForgotPasswordDTO) {
     Logger.debug(`admin-console confirmForgotPassword() confirmForgotPasswordDTO:[${JSON.stringify(confirmForgotPasswordDTO,)}]`);
 
     confirmForgotPasswordDTO.fedoApp = FEDO_APP
-    return this.http.patch(`${AWS_COGNITO_USER_CREATION_URL_SIT}/password/otp/${confirmForgotPasswordDTO.ConfirmationCode}`, confirmForgotPasswordDTO).pipe(catchError(err => { return this.onHTTPErrorResponse(err) }), map(_res => []));
+    const passcode = this.encryptPassword(confirmForgotPasswordDTO);
+    return this.http.patch(`${AWS_COGNITO_USER_CREATION_URL_SIT}/password/otp/${confirmForgotPasswordDTO.ConfirmationCode}`, passcode).pipe(catchError(err => { return this.onHTTPErrorResponse(err) }), map(_res => []));
   }
 
   private readonly onAWSErrorResponse = async (err) => {

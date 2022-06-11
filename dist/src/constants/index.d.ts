@@ -22,6 +22,7 @@ export declare const STATIC_IMAGES: string;
 export declare const STATIC_IMAGES_PROFILE: string;
 export declare const AWS_COGNITO_USER_CREATION_URL_SIT: string;
 export declare const PUBLIC_KEY: string;
+export declare const PRIVATE_KEY: string;
 export declare class ZwitchHttpBody {
     [key: string]: any;
 }

@@ -26,7 +26,12 @@ exports.LoginDTO = LoginDTO;
 class ForgotPasswordDTO {
 }
 __decorate([
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", String)
+], ForgotPasswordDTO.prototype, "ClientId", void 0);
+__decorate([
     (0, class_validator_1.IsNotEmpty)(),
+    (0, class_validator_1.IsAlphanumeric)(),
     __metadata("design:type", String)
 ], ForgotPasswordDTO.prototype, "username", void 0);
 exports.ForgotPasswordDTO = ForgotPasswordDTO;
@@ -35,15 +40,24 @@ class ConfirmForgotPasswordDTO {
 __decorate([
     (0, class_validator_1.IsOptional)(),
     __metadata("design:type", String)
+], ConfirmForgotPasswordDTO.prototype, "ClientId", void 0);
+__decorate([
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", String)
 ], ConfirmForgotPasswordDTO.prototype, "ConfirmationCode", void 0);
+__decorate([
+    (0, class_validator_1.IsNotEmpty)(),
+    __metadata("design:type", String)
+], ConfirmForgotPasswordDTO.prototype, "password", void 0);
 __decorate([
     (0, class_validator_1.IsNotEmpty)(),
     __metadata("design:type", String)
 ], ConfirmForgotPasswordDTO.prototype, "username", void 0);
 __decorate([
-    (0, class_validator_1.IsNotEmpty)(),
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsString)(),
     __metadata("design:type", String)
-], ConfirmForgotPasswordDTO.prototype, "password", void 0);
+], ConfirmForgotPasswordDTO.prototype, "fedoApp", void 0);
 exports.ConfirmForgotPasswordDTO = ConfirmForgotPasswordDTO;
 var PeriodicityAdmin;
 (function (PeriodicityAdmin) {

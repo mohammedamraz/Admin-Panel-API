@@ -1,5 +1,5 @@
 
-import { IsEnum, IsNotEmpty, IsOptional } from 'class-validator';
+import { IsAlphanumeric, IsEnum, IsNotEmpty, IsOptional, IsString } from 'class-validator';
 import { Periodicity } from 'src/routes/sales/dto/create-sale.dto';
 
 export class LoginDTO {
@@ -12,21 +12,19 @@ export class LoginDTO {
 }
 
 export class ForgotPasswordDTO {
-  fedoApp: string;
-  @IsNotEmpty()
-  username: string;
+  @IsOptional() ClientId: string;
+	@IsNotEmpty()
+	@IsAlphanumeric()
+	username: string;
+	fedoApp: string;
 }
 
 export class ConfirmForgotPasswordDTO {
-  fedoApp: string;
-  @IsOptional()
-  ConfirmationCode: string;
-
-  @IsNotEmpty()
-  username: string;
-
-  @IsNotEmpty()
-  password: string;
+  @IsOptional() ClientId: string;
+	@IsOptional() ConfirmationCode: string;
+	@IsNotEmpty() password: string;
+	@IsNotEmpty() username: string;
+	@IsOptional() @IsString() fedoApp: string;
 }
 
 export enum PeriodicityAdmin {

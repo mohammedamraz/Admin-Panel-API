@@ -5,14 +5,16 @@ export declare class LoginDTO {
     password: string;
 }
 export declare class ForgotPasswordDTO {
-    fedoApp: string;
+    ClientId: string;
     username: string;
+    fedoApp: string;
 }
 export declare class ConfirmForgotPasswordDTO {
-    fedoApp: string;
+    ClientId: string;
     ConfirmationCode: string;
-    username: string;
     password: string;
+    username: string;
+    fedoApp: string;
 }
 export declare enum PeriodicityAdmin {
     MONTH = "monthly",
