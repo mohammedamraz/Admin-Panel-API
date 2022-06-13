@@ -86,8 +86,8 @@ __decorate([
     __metadata("design:returntype", void 0)
 ], SalesController.prototype, "createSalesPartner", null);
 __decorate([
-    (0, common_1.Post)(':sales_code/addCommission'),
-    __param(0, (0, common_1.Param)('sales_code')),
+    (0, common_1.Post)(':salesCode/add-commission'),
+    __param(0, (0, common_1.Param)('salesCode')),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", void 0)
@@ -122,7 +122,7 @@ __decorate([
     __metadata("design:returntype", void 0)
 ], SalesController.prototype, "fetchAllSalesPartnersByDate", null);
 __decorate([
-    (0, common_1.Get)(':id/sales_junction'),
+    (0, common_1.Get)(':id/sales-junction'),
     __param(0, (0, common_1.Param)('id')),
     __param(1, (0, common_1.Query)()),
     __metadata("design:type", Function),
@@ -132,17 +132,15 @@ __decorate([
 __decorate([
     (0, common_1.Patch)(':id/image'),
     (0, common_1.UseInterceptors)((0, platform_express_1.FileInterceptor)('file', {
-        storage: (0, multer_1.diskStorage)({
-            _destination: constants_1.STATIC_IMAGES_PROFILE,
+        storage: (0, multer_1.diskStorage)({ _destination: constants_1.STATIC_IMAGES_PROFILE,
             get destination() {
                 return this._destination;
             },
             set destination(value) {
                 this._destination = value;
             },
-            filename: helper_1.editFileName,
-        }),
-        fileFilter: helper_1.imageFileFilter,
+            filename: helper_1.editFileName }),
+        fileFilter: helper_1.imageFileFilter
     })),
     __param(0, (0, common_1.Param)('id')),
     __param(1, (0, common_1.UploadedFile)()),
@@ -151,7 +149,7 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], SalesController.prototype, "uploadImage", null);
 __decorate([
-    (0, common_1.Get)(':salesCode/invatationResponse'),
+    (0, common_1.Get)(':salesCode/invatation-response'),
     __param(0, (0, common_1.Param)('salesCode')),
     __param(1, (0, common_1.Query)()),
     __metadata("design:type", Function),
@@ -174,7 +172,7 @@ __decorate([
     __metadata("design:returntype", void 0)
 ], SalesController.prototype, "changeBankDetailsVerificationStatus", null);
 __decorate([
-    (0, common_1.Patch)(':id/updateCustomer'),
+    (0, common_1.Patch)(':id/update-customer'),
     __param(0, (0, common_1.Param)('id')),
     __param(1, (0, common_1.Body)()),
     __metadata("design:type", Function),
