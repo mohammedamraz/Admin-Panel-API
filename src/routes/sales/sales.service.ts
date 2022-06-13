@@ -55,9 +55,10 @@ export class SalesService {
   }
 
   fetchSalesPartnerByMobileNumber(mobile: string) {
-    Logger.debug(`fetchSalesPartnerByUserId() id: [${JSON.stringify(mobile)}]`, APP);
+    Logger.debug(`fetchSalesPartnerByMobileNumber() id: [${JSON.stringify(mobile)}]`, APP);
 
-    return from(lastValueFrom(this.db.find({ mobile: mobile }).pipe(catchError(err => { throw new UnprocessableEntityException(err.message) }), map((res) => {
+    return from(lastValueFrom(this.db.find({ mobile: mobile }).pipe(catchError(err => { throw new UnprocessableEntityException(err.message) }),
+     map((res) => {
       if (res[0] != null) throw new NotFoundException(`sales partner already present with same phone number`)
       return res
     }))));
@@ -99,21 +100,23 @@ export class SalesService {
   deleteSalesPartner(id: string) {
     Logger.debug(`deleteSalesPartner id: [${id}]`, APP);
 
-    return this.db.find({ id: id }).pipe(map(res => {
-      if (res[0] === null) throw new NotFoundException(`Sales Partner Not Found`)
-      if (res[0].is_active.toString() === "false") throw new NotFoundException(`Sales Partner Not Found`)
+    return this.db.find({ id: id }).pipe(catchError(err => { throw new UnprocessableEntityException(err.message) }),
+    (map(res => {
+      if (res[0] == null) throw new NotFoundException(`Sales Partner Not Found`)
+      if (res[0].is_active.toString() == "false") throw new NotFoundException(`Sales Partner Not Found`)
       return lastValueFrom(this.db.findandUpdate({ columnName: 'id', columnvalue: id, quries: { "is_active": "false" } }).pipe(catchError(err => { throw new BadRequestException() }), map(doc => { return doc })))
-    }))
+    })))
   }
 
-  updateSalesPartner(id: number, updateSalesPartnerDto: UpdateSalesPartner) {
+  updateSalesPartner(id: string, updateSalesPartnerDto: UpdateSalesPartner) {
     Logger.debug(`updateSalesPartner() id: [${id}], body: [${JSON.stringify(updateSalesPartnerDto)}]`, APP,);
 
-    return this.db.find({ id: id }).pipe(map(res => {
-      if (res[0] === null) throw new NotFoundException(`Sales Partner Not Found`)
-      if (res[0].is_active === false) throw new NotFoundException(`Sales Partner Not Found`)
+    return this.db.find({ id: id }).pipe(catchError(err => { throw new UnprocessableEntityException(err.message) }),
+    (map(res => {
+      if (res[0] == null) throw new NotFoundException(`Sales Partner Not Found`)
+      if (res[0].is_active == false) throw new NotFoundException(`Sales Partner Not Found`)
       return lastValueFrom(this.db.findByIdandUpdate({ id: String(id), quries: updateSalesPartnerDto }).pipe(catchError(err => { throw new BadRequestException() }), map(doc => { return doc })))
-    }))
+    })))
 
   }
 

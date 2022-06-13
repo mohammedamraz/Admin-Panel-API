@@ -160,10 +160,10 @@ __decorate([
 ], SalesController.prototype, "fetchInvitationResponse", null);
 __decorate([
     (0, common_1.Patch)(':id'),
-    __param(0, (0, common_1.Param)('id', common_1.ParseIntPipe)),
+    __param(0, (0, common_1.Param)('id')),
     __param(1, (0, common_1.Body)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Number, create_sale_dto_1.UpdateSalesPartner]),
+    __metadata("design:paramtypes", [String, create_sale_dto_1.UpdateSalesPartner]),
     __metadata("design:returntype", void 0)
 ], SalesController.prototype, "updateSalesPartner", null);
 __decorate([

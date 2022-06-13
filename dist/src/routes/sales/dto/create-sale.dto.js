@@ -17,25 +17,14 @@ exports.CreateSalesJunction = CreateSalesJunction;
 class CreateSalesPartner {
 }
 __decorate([
+    (0, class_validator_1.IsPhoneNumber)(),
     (0, class_validator_1.IsNotEmpty)(),
     __metadata("design:type", String)
 ], CreateSalesPartner.prototype, "mobile", void 0);
 __decorate([
     (0, class_validator_1.IsNotEmpty)(),
-    __metadata("design:type", String)
-], CreateSalesPartner.prototype, "location", void 0);
-__decorate([
-    (0, class_validator_1.IsEmail)(),
-    __metadata("design:type", String)
-], CreateSalesPartner.prototype, "email", void 0);
-__decorate([
-    (0, class_validator_1.IsNotEmpty)(),
     __metadata("design:type", Number)
 ], CreateSalesPartner.prototype, "commission", void 0);
-__decorate([
-    (0, class_validator_1.IsNotEmpty)(),
-    __metadata("design:type", Boolean)
-], CreateSalesPartner.prototype, "profile_confirmation", void 0);
 exports.CreateSalesPartner = CreateSalesPartner;
 class CreateSalesPartnerRequest {
 }

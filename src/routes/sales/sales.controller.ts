@@ -92,7 +92,7 @@ export class SalesController {
     }
 
     @Patch(':id')
-    updateSalesPartner(@Param('id', ParseIntPipe) id: number, @Body() updateSalesPartnerDto: UpdateSalesPartner) {
+    updateSalesPartner(@Param('id') id: string, @Body() updateSalesPartnerDto: UpdateSalesPartner) {
         Logger.debug(`updateSalesPartner() id: [${id}] DTO:${JSON.stringify(updateSalesPartnerDto,)}`, APP);
 
         return this.salesService.updateSalesPartner(id, updateSalesPartnerDto);

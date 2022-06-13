@@ -52,7 +52,7 @@ let SalesService = class SalesService {
             return createSalesJunction;
     }
     fetchSalesPartnerByMobileNumber(mobile) {
-        common_1.Logger.debug(`fetchSalesPartnerByUserId() id: [${JSON.stringify(mobile)}]`, APP);
+        common_1.Logger.debug(`fetchSalesPartnerByMobileNumber() id: [${JSON.stringify(mobile)}]`, APP);
         return (0, rxjs_1.from)((0, rxjs_1.lastValueFrom)(this.db.find({ mobile: mobile }).pipe((0, rxjs_1.catchError)(err => { throw new common_1.UnprocessableEntityException(err.message); }), (0, rxjs_1.map)((res) => {
             if (res[0] != null)
                 throw new common_1.NotFoundException(`sales partner already present with same phone number`);
@@ -89,23 +89,23 @@ let SalesService = class SalesService {
     }
     deleteSalesPartner(id) {
         common_1.Logger.debug(`deleteSalesPartner id: [${id}]`, APP);
-        return this.db.find({ id: id }).pipe((0, rxjs_1.map)(res => {
-            if (res[0] === null)
+        return this.db.find({ id: id }).pipe((0, rxjs_1.catchError)(err => { throw new common_1.UnprocessableEntityException(err.message); }), ((0, rxjs_1.map)(res => {
+            if (res[0] == null)
                 throw new common_1.NotFoundException(`Sales Partner Not Found`);
-            if (res[0].is_active.toString() === "false")
+            if (res[0].is_active.toString() == "false")
                 throw new common_1.NotFoundException(`Sales Partner Not Found`);
             return (0, rxjs_1.lastValueFrom)(this.db.findandUpdate({ columnName: 'id', columnvalue: id, quries: { "is_active": "false" } }).pipe((0, rxjs_1.catchError)(err => { throw new common_1.BadRequestException(); }), (0, rxjs_1.map)(doc => { return doc; })));
-        }));
+        })));
     }
     updateSalesPartner(id, updateSalesPartnerDto) {
         common_1.Logger.debug(`updateSalesPartner() id: [${id}], body: [${JSON.stringify(updateSalesPartnerDto)}]`, APP);
-        return this.db.find({ id: id }).pipe((0, rxjs_1.map)(res => {
-            if (res[0] === null)
+        return this.db.find({ id: id }).pipe((0, rxjs_1.catchError)(err => { throw new common_1.UnprocessableEntityException(err.message); }), ((0, rxjs_1.map)(res => {
+            if (res[0] == null)
                 throw new common_1.NotFoundException(`Sales Partner Not Found`);
-            if (res[0].is_active === false)
+            if (res[0].is_active == false)
                 throw new common_1.NotFoundException(`Sales Partner Not Found`);
             return (0, rxjs_1.lastValueFrom)(this.db.findByIdandUpdate({ id: String(id), quries: updateSalesPartnerDto }).pipe((0, rxjs_1.catchError)(err => { throw new common_1.BadRequestException(); }), (0, rxjs_1.map)(doc => { return doc; })));
-        }));
+        })));
     }
     fetchAllSalesPartnersByDate(params) {
         common_1.Logger.debug(`fetchAllSalesPartnersByDate() params:[${JSON.stringify(params)}] `, APP);
