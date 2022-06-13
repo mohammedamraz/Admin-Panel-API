@@ -102,7 +102,7 @@ export class createAccount {
 }
 
 export class createPaidAmountDto {
-  @IsNotEmpty() paid_amount: number;
+  @IsNotEmpty()@IsNumber() paid_amount: number;
   @IsNotEmpty() salesCode:string; 
   account_holder_name:string;
   account_number:string;

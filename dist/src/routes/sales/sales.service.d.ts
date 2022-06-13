@@ -36,7 +36,7 @@ export declare class SalesService {
     };
     uploadImage(id: string, fileName: string): Promise<CreateSalesPartnerModel[]>;
     updateImageById(id: string, updateSalesPartnerDto: object): Promise<CreateSalesPartnerModel[]>;
-    fetchSalesBySalesCode(sales_code: string): import("rxjs").Observable<CreateSalesPartnerModel>;
+    fetchSalesBySalesCode(salesCode: string): import("rxjs").Observable<CreateSalesPartnerModel>;
     fetchCommisionBySalesCode(salesCode: string): import("rxjs").Observable<CreateSalesJunction>;
     changeBankDetailsVerificationSatatus(id: number): import("rxjs").Observable<import("rxjs").Observable<CreateSalesPartnerModel[]>>;
     fetchEarnings(salesCode: string, period: Period): import("rxjs").Observable<import("./dto/create-sale.dto").EarningResponse>;

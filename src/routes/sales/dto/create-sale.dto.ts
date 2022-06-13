@@ -35,21 +35,28 @@ export class CreateSalesPartner {
 }
 
 export class CreateSalesPartnerRequest {
+
     @IsNotEmpty()
     sales_code: string;
+
     @IsNotEmpty()
     request_id: string;
+
     id: string;
 }
 
 export class CreateWithdrawn {
+
     id: string;
     @IsNotEmpty()
     created_date: Date;
+
     @IsNotEmpty()
     updated_date: Date;
+
     @IsNotEmpty()
     sp_id: string;
+
     @IsNotEmpty()
     paid_amount: number;
 }
@@ -86,14 +93,19 @@ export enum Is_active {
 }
 
 export class ZQueryParamsDto {
+
     @IsOptional()
     name?: string;
+
     @IsOptional()
     date?: string;
+
     @IsOptional()
     number_of_pages?: number;
+
     @IsOptional()
     number_of_rows?: number;
+
     @IsOptional()
     @IsEnum(Is_active)
     is_active: Is_active;
@@ -101,6 +113,7 @@ export class ZQueryParamsDto {
 
 
 export enum Periodicity {
+
     DAILY = 'daily',
     WEEKLY = 'weekly',
     MONTHLY = 'monthly',
@@ -148,6 +161,7 @@ export class YearMonthDto {
     @MinLength(4, { message: 'Enter only 4 digit value of year, This is too short', })
     @MaxLength(4, { message: 'Enter only 4 digit value of year, This is too long', })
     year: string;
+
     @IsNotEmpty()
     salesCode: string;
 

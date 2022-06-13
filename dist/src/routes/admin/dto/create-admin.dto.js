@@ -72,6 +72,7 @@ class createPaidAmountDto {
 }
 __decorate([
     (0, class_validator_1.IsNotEmpty)(),
+    (0, class_validator_1.IsNumber)(),
     __metadata("design:type", Number)
 ], createPaidAmountDto.prototype, "paid_amount", void 0);
 __decorate([
