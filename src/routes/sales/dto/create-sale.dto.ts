@@ -84,7 +84,9 @@ export class UpdateSalesPartner {
     sales_code: string;
     block_account: boolean;
     profile_confirmation: boolean;
-    customer_id: string
+    customer_id: string;
+    mobile:phoneNumber;
+    email:Email;
 
 }
 export enum Is_active {

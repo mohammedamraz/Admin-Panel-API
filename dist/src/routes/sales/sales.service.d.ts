@@ -11,6 +11,7 @@ export declare class SalesService {
     constructor(db: DatabaseService<CreateSalesPartnerModel>, invitationJunctiondb: DatabaseService<CreateSalesInvitationJunction>, junctiondb: DatabaseService<CreateSalesJunction>, salesUser: DatabaseService<SalesUserJunction>, http: HttpService);
     createSalesPartner(createSalesPartner: CreateSalesPartner): import("rxjs").Observable<CreateSalesPartnerModel[]>;
     createInvitation(createSalesPartner: CreateSalesPartner, createSalesJunction: CreateSalesJunction[]): import("rxjs").Observable<CreateSalesPartnerModel[]> | CreateSalesJunction[];
+    updateSalesPartnerWithSalesCode(id: string, updateSalesPartnerDto: UpdateSalesPartner): import("rxjs").Observable<Promise<CreateSalesPartnerModel[]>>;
     fetchSalesPartnerByMobileNumber(mobile: string): import("rxjs").Observable<CreateSalesPartnerModel[]>;
     fetchSalesPartnerByUserId(id: string): import("rxjs").Observable<CreateSalesPartnerModel[]>;
     fetchSalesPartnerById(id: string): import("rxjs").Observable<CreateSalesPartnerModel[]>;

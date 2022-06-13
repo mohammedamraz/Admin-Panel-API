@@ -40,7 +40,7 @@ export class SalesService {
       createSalesPartner.id = doc[0].id;
       return this.junctiondb.save({ sales_code: createSalesPartner.sales_code }).pipe(catchError(err => { throw new BadRequestException(err.message) }), map(doc => doc)) }),
     switchMap(doc => this.createInvitation(createSalesPartner, doc)),
-    switchMap(doc => this.updateSalesPartner(salesId, <UpdateSalesPartner>{ sales_code: createSalesPartner.sales_code })),
+    switchMap(doc => this.updateSalesPartnerWithSalesCode(salesId, <UpdateSalesPartner>{ sales_code: createSalesPartner.sales_code })),
     switchMap(doc => this.fetchSalesPartnerById(createSalesPartner.id.toString()))
   )
   }
@@ -55,6 +55,17 @@ export class SalesService {
 
     else return createSalesJunction;
 
+  }
+
+  updateSalesPartnerWithSalesCode(id: string, updateSalesPartnerDto: UpdateSalesPartner) {
+    Logger.debug(`updateSalesPartner() id: [${id}], body: [${JSON.stringify(updateSalesPartnerDto)}]`, APP,);   
+
+    return this.db.find({ id: id }).pipe(
+      catchError(err => { throw new UnprocessableEntityException(err.message) }),
+      (map(res => { return lastValueFrom(this.db.findByIdandUpdate({ id: id, quries: updateSalesPartnerDto }).pipe(
+        catchError(err => { throw new BadRequestException(err.message) }),
+         map(doc => doc )))
+    })))
   }
 
   fetchSalesPartnerByMobileNumber(mobile: string) {
@@ -84,8 +95,8 @@ export class SalesService {
     return from(lastValueFrom(this.db.find({ id: id }).pipe(
       catchError(err => { throw new UnprocessableEntityException(err.message) }), 
       map((res) => {
-        if (res[0] === null) throw new NotFoundException(`Sales Partner Not Found`);
-        if (res[0].is_active === false) throw new NotFoundException(`Sales Partner Not Found`);
+        if (res[0] == null) throw new NotFoundException(`Sales Partner Not Found`);
+        if (res[0].is_active == false) throw new NotFoundException(`Sales Partner Not Found`);
         return res;
     }))));
   }
@@ -96,8 +107,8 @@ export class SalesService {
     return from(lastValueFrom(this.db.find({ sales_code: id }).pipe(
       catchError(err => { throw new UnprocessableEntityException(err.message) }), 
       map((res) => {
-        if (res[0] === null) throw new NotFoundException(`Sales Partner Not Found`);
-        if (res[0].is_active === false) throw new NotFoundException(`Sales Partner Not Found`);
+        if (res[0] == null) throw new NotFoundException(`Sales Partner Not Found`);
+        if (res[0].is_active == false) throw new NotFoundException(`Sales Partner Not Found`);
         return res;
     }))));
   }
@@ -111,20 +122,22 @@ export class SalesService {
       if (res[0] == null) throw new NotFoundException(`Sales Partner Not Found`)
       if (res[0].is_active.toString() == "false") throw new NotFoundException(`Sales Partner Not Found`)
       return lastValueFrom(this.db.findandUpdate({ columnName: 'id', columnvalue: id, quries: { is_active: false } }).pipe(
-        catchError(err => { throw new BadRequestException() }),
+        catchError(err => { throw new BadRequestException(err.message) }),
        map(doc => doc )))
     })))
   }
 
   updateSalesPartner(id: string, updateSalesPartnerDto: UpdateSalesPartner) {
-    Logger.debug(`updateSalesPartner() id: [${id}], body: [${JSON.stringify(updateSalesPartnerDto)}]`, APP,);
+    Logger.debug(`updateSalesPartner() id: [${id}], body: [${JSON.stringify(updateSalesPartnerDto)}]`, APP,);   
 
     return this.db.find({ id: id }).pipe(catchError(err => { throw new UnprocessableEntityException(err.message) }),
     (map(res => {
       if (res[0] == null) throw new NotFoundException(`Sales Partner Not Found`)
       if (res[0].is_active == false) throw new NotFoundException(`Sales Partner Not Found`)
-      return lastValueFrom(this.db.findByIdandUpdate({ id: String(id), quries: updateSalesPartnerDto }).pipe(
-        catchError(err => { throw new BadRequestException() }),
+      if (updateSalesPartnerDto.name.length==0) delete updateSalesPartnerDto.name
+      if (updateSalesPartnerDto.location.length==0) delete updateSalesPartnerDto.location
+      return lastValueFrom(this.db.findByIdandUpdate({ id: id, quries: updateSalesPartnerDto }).pipe(
+        catchError(err => { throw new BadRequestException(err.message) }),
          map(doc => doc )))
     })))
   }
@@ -186,9 +199,9 @@ export class SalesService {
     return this.invitationJunctiondb.fetchAll().pipe(
       map(async (doc, index: Number) => {
         for (let i = 0; i <= doc.length - 1; i++)
-          await lastValueFrom(this.db.find({ sales_code: doc[i].sp_id }).pipe(map(res => { contents.push(res[0]) })))
-
-        return contents
+          await lastValueFrom(this.db.find({ sales_code: doc[i].sp_id }).pipe(
+            map(res => { contents.push(res[0]) })))
+            return contents
       }))
   else if (params.date == undefined) return [];
   else return this.fetchCommissionFromJunctionDb(params).pipe(
