@@ -45,6 +45,10 @@ let SalesController = class SalesController {
         common_1.Logger.debug(`fetchEarnings()salesCode: [${salesCode}] `, APP);
         return this.salesService.fetchEarnings(salesCode, period);
     }
+    fetchALLSalesPartners() {
+        common_1.Logger.debug(`fetchALLSalesPartners()`, APP);
+        return this.salesService.fetchALLSalesPartners();
+    }
     fetchAllSalesPartnersByDate(params) {
         common_1.Logger.debug(`fetchAllSalesPartnersByDate() params:${JSON.stringify(params)}`, APP);
         return this.salesService.fetchAllSalesPartnersByDate(params);
@@ -114,6 +118,12 @@ __decorate([
     __metadata("design:paramtypes", [String, create_sale_dto_1.Period]),
     __metadata("design:returntype", void 0)
 ], SalesController.prototype, "fetchEarnings", null);
+__decorate([
+    (0, common_1.Get)(),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", []),
+    __metadata("design:returntype", void 0)
+], SalesController.prototype, "fetchALLSalesPartners", null);
 __decorate([
     (0, common_1.Get)(),
     __param(0, (0, common_1.Query)()),

@@ -51,6 +51,13 @@ export class SalesController {
     }
 
     @Get()
+    fetchALLSalesPartners() {
+        Logger.debug(`fetchALLSalesPartners()`, APP);
+
+        return this.salesService.fetchALLSalesPartners();
+    }
+
+    @Get()
     fetchAllSalesPartnersByDate(@Query() params: ZQueryParamsDto) {
         Logger.debug(`fetchAllSalesPartnersByDate() params:${JSON.stringify(params)}`, APP);
 

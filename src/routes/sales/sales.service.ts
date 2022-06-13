@@ -360,5 +360,14 @@ export class SalesService {
       .then(userJunctionDoc => { return userJunctionDoc.length })
       .catch(error => { throw new UnprocessableEntityException(error.message) })
   }
+
+  fetchALLSalesPartners() {
+    Logger.debug(`fetchALLSalesPartners()`, APP);
+
+    return this.db.fetchAll().pipe(
+      map(res => res),
+      catchError(error => { throw new BadRequestException(error.message) })
+    );
+  }
 }
 

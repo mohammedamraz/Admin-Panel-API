@@ -315,6 +315,10 @@ let SalesService = class SalesService {
             .then(userJunctionDoc => { return userJunctionDoc.length; })
             .catch(error => { throw new common_1.UnprocessableEntityException(error.message); });
     }
+    fetchALLSalesPartners() {
+        common_1.Logger.debug(`fetchALLSalesPartners()`, APP);
+        return this.db.fetchAll().pipe((0, rxjs_1.map)(res => res), (0, rxjs_1.catchError)(error => { throw new common_1.BadRequestException(error.message); }));
+    }
 };
 SalesService = __decorate([
     (0, common_1.Injectable)(),
