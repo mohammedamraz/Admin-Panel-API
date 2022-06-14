@@ -45,7 +45,14 @@ export class SalesController {
 
   return this.salesService.fetchEarnings(salesCode, period);
   }
+  
+  @Get(':id/sales-junction')
+  fetchAllSalesPartnersFromJunctionByDate(@Param('id') id: string, @Query() params: ZQueryParamsDto) {
+  Logger.debug(`fetchAllSalesPartnersFromJunctionByDate() id: [${id}] params:${JSON.stringify(params)}`, APP);
 
+  return this.salesService.fetchAllSalesPartnersFromJunctionByDate(id, params)
+  }
+  
   @Get()
   fetchAllSalesPartnersByDate(@Query() params: ZQueryParamsDto) {
   Logger.debug(`fetchAllSalesPartnersByDate() params:${JSON.stringify(params)}`, APP);
@@ -53,12 +60,6 @@ export class SalesController {
   return this.salesService.fetchAllSalesPartnersByDate(params)
   }
 
-  @Get(':id/sales-junction')
-  fetchAllSalesPartnersFromJunctionByDate(@Param('id') id: string, @Query() params: ZQueryParamsDto) {
-  Logger.debug(`fetchAllSalesPartnersFromJunctionByDate() id: [${id}] params:${JSON.stringify(params)}`, APP);
-
-  return this.salesService.fetchAllSalesPartnersFromJunctionByDate(id, params)
-  }
 
   @Patch(':id/image')
   @UseInterceptors(FileInterceptor('file', {
@@ -103,7 +104,7 @@ export class SalesController {
 
   @Patch(':id/update-customer')
   updateUserIdInSales(@Param('id') id: string, @Body() updateSalesPartnerDto: UpdateSalesPartner) {
-  Logger.debug(`updateCustomerIdInSales() id: [${id}] DTO:${JSON.stringify(updateSalesPartnerDto,)}`, APP);
+  Logger.debug(`updateUserIdInSales() id: [${id}] DTO:${JSON.stringify(updateSalesPartnerDto,)}`, APP);
 
   return this.salesService.updateUserIdInSales(id, updateSalesPartnerDto);
   }

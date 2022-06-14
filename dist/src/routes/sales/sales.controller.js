@@ -45,13 +45,13 @@ let SalesController = class SalesController {
         common_1.Logger.debug(`fetchEarnings()salesCode: [${salesCode}] `, APP);
         return this.salesService.fetchEarnings(salesCode, period);
     }
-    fetchAllSalesPartnersByDate(params) {
-        common_1.Logger.debug(`fetchAllSalesPartnersByDate() params:${JSON.stringify(params)}`, APP);
-        return this.salesService.fetchAllSalesPartnersByDate(params);
-    }
     fetchAllSalesPartnersFromJunctionByDate(id, params) {
         common_1.Logger.debug(`fetchAllSalesPartnersFromJunctionByDate() id: [${id}] params:${JSON.stringify(params)}`, APP);
         return this.salesService.fetchAllSalesPartnersFromJunctionByDate(id, params);
+    }
+    fetchAllSalesPartnersByDate(params) {
+        common_1.Logger.debug(`fetchAllSalesPartnersByDate() params:${JSON.stringify(params)}`, APP);
+        return this.salesService.fetchAllSalesPartnersByDate(params);
     }
     async uploadImage(id, file) {
         common_1.Logger.debug(`UploadImage: ${file}`, APP);
@@ -70,7 +70,7 @@ let SalesController = class SalesController {
         return this.salesService.changeBankDetailsVerificationSatatus(id);
     }
     updateUserIdInSales(id, updateSalesPartnerDto) {
-        common_1.Logger.debug(`updateCustomerIdInSales() id: [${id}] DTO:${JSON.stringify(updateSalesPartnerDto)}`, APP);
+        common_1.Logger.debug(`updateUserIdInSales() id: [${id}] DTO:${JSON.stringify(updateSalesPartnerDto)}`, APP);
         return this.salesService.updateUserIdInSales(id, updateSalesPartnerDto);
     }
     fetchEarnigReport(yearMonthDto) {
@@ -115,13 +115,6 @@ __decorate([
     __metadata("design:returntype", void 0)
 ], SalesController.prototype, "fetchEarnings", null);
 __decorate([
-    (0, common_1.Get)(),
-    __param(0, (0, common_1.Query)()),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [create_sale_dto_1.ZQueryParamsDto]),
-    __metadata("design:returntype", void 0)
-], SalesController.prototype, "fetchAllSalesPartnersByDate", null);
-__decorate([
     (0, common_1.Get)(':id/sales-junction'),
     __param(0, (0, common_1.Param)('id')),
     __param(1, (0, common_1.Query)()),
@@ -129,6 +122,13 @@ __decorate([
     __metadata("design:paramtypes", [String, create_sale_dto_1.ZQueryParamsDto]),
     __metadata("design:returntype", void 0)
 ], SalesController.prototype, "fetchAllSalesPartnersFromJunctionByDate", null);
+__decorate([
+    (0, common_1.Get)(),
+    __param(0, (0, common_1.Query)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [create_sale_dto_1.ZQueryParamsDto]),
+    __metadata("design:returntype", void 0)
+], SalesController.prototype, "fetchAllSalesPartnersByDate", null);
 __decorate([
     (0, common_1.Patch)(':id/image'),
     (0, common_1.UseInterceptors)((0, platform_express_1.FileInterceptor)('file', {
