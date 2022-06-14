@@ -1,5 +1,8 @@
 import { LogLevel } from '@nestjs/common';
 export declare const FEDO_APP: string;
+export declare const FEDO_USER_POOL_NAME: string;
+export declare const FEDO_APP_CLIENT_NAME: string;
+export declare const FEDO_APP_CLIENT_ID: string;
 export declare const HOST: string;
 export declare const PORT: number;
 export declare const APP_VERSION: string;
@@ -19,6 +22,7 @@ export declare const STATIC_IMAGES: string;
 export declare const STATIC_IMAGES_PROFILE: string;
 export declare const AWS_COGNITO_USER_CREATION_URL_SIT: string;
 export declare const PUBLIC_KEY: string;
+export declare const PRIVATE_KEY: string;
 export declare class ZwitchHttpBody {
     [key: string]: any;
 }

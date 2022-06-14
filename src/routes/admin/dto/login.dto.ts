@@ -1,36 +1,36 @@
 
-import { IsEnum, IsNotEmpty, IsOptional } from 'class-validator';
-import { time } from 'console';
+import { IsAlphanumeric, IsEnum, IsNotEmpty, IsOptional, IsString } from 'class-validator';
 import { Periodicity } from 'src/routes/sales/dto/create-sale.dto';
 
 export class LoginDTO {
   fedoApp: string;
   @IsNotEmpty()
   username: string;
+
   @IsNotEmpty()
   password: string;
 }
 
 export class ForgotPasswordDTO {
-  fedoApp: string;
-  @IsNotEmpty()
-  username: string;
+  @IsOptional() ClientId: string;
+	@IsNotEmpty()
+	@IsAlphanumeric()
+	username: string;
+	fedoApp: string;
 }
 
 export class ConfirmForgotPasswordDTO {
-  fedoApp: string;
-  @IsOptional()
-  ConfirmationCode: string;
-  @IsNotEmpty()
-  username: string;
-  @IsNotEmpty()
-  password: string;
+  @IsOptional() ClientId: string;
+	@IsOptional() ConfirmationCode: string;
+	@IsNotEmpty() password: string;
+	@IsNotEmpty() username: string;
+	@IsOptional() @IsString() fedoApp: string;
 }
 
 export enum PeriodicityAdmin {
-  MONTH = 'month',
-  QUARTER = 'quarter',
-  YEARLY = 'year',
+  MONTH = 'monthly',
+  QUARTER = 'quarterly',
+  YEARLY = 'yearly',
 }
 
 export class PeriodRange {
@@ -45,21 +45,23 @@ export const PERIODADMIN = {
   year: 12
 }
 export const formatDate = (date) => {
-  let d = new Date(date),
-      month = '' + (d.getMonth() + 1),
-      day = '' + d.getDate(),
-      year = d.getFullYear();
+  const DATE = new Date(date);
+  let month = '' + (DATE.getMonth() + 1);
+  let day = '' + DATE.getDate();
+  const YEAR = DATE.getFullYear();
+
   if (month.length < 2) 
       month = '0' + month;
   if (day.length < 2) 
       day = '0' + day;
-  return [year, month, day].join('-');
+  return [YEAR, month, day].join('-');
 }
 export const fetchDAte = (date: Date, period: number) =>{
-  let d = new Date(date);
+  const DATE = new Date(date);
    return {
      'from': formatDate(date.setMonth((date.getMonth()) - period)), 
-     'to': formatDate(d)}}
+     'to': formatDate(DATE)}
+}
 
 export enum Stateness {
   ACTIVE = 'active',
@@ -82,17 +84,16 @@ export class State {
   period: Periodicity;
 }
 
-export const makeStateFormat = (state: State) => STATE[state.state]
+export const makeStateFormat = (state: State) => STATE[state.state];
 
 export const makeEarningDuesFormat = (name: string, earning: number, dues: number, signup: number) => ({
   name: name,
   earnings: earning,
   dues: dues,
   signups: signup
-})
+});
 
 export const averageSignup = (totalSalesPartner: number, totalSignups: number) => (totalSignups / totalSalesPartner);
 
 export const applyPerformance =(salesPartner: any[], signups: number) => salesPartner.map(salesPartner => ({...salesPartner, 
-  performance: 
-  salesPartner.signups < (signups/100)*25 ? -1 : salesPartner.signups > (signups/100)*75 ? 2 : 1 }));
+  performance: salesPartner.signups < (signups/100)*25 ? -1 : salesPartner.signups > (signups/100)*75 ? 2 : 1 }));

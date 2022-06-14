@@ -26,7 +26,12 @@ exports.LoginDTO = LoginDTO;
 class ForgotPasswordDTO {
 }
 __decorate([
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", String)
+], ForgotPasswordDTO.prototype, "ClientId", void 0);
+__decorate([
     (0, class_validator_1.IsNotEmpty)(),
+    (0, class_validator_1.IsAlphanumeric)(),
     __metadata("design:type", String)
 ], ForgotPasswordDTO.prototype, "username", void 0);
 exports.ForgotPasswordDTO = ForgotPasswordDTO;
@@ -35,21 +40,30 @@ class ConfirmForgotPasswordDTO {
 __decorate([
     (0, class_validator_1.IsOptional)(),
     __metadata("design:type", String)
+], ConfirmForgotPasswordDTO.prototype, "ClientId", void 0);
+__decorate([
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", String)
 ], ConfirmForgotPasswordDTO.prototype, "ConfirmationCode", void 0);
+__decorate([
+    (0, class_validator_1.IsNotEmpty)(),
+    __metadata("design:type", String)
+], ConfirmForgotPasswordDTO.prototype, "password", void 0);
 __decorate([
     (0, class_validator_1.IsNotEmpty)(),
     __metadata("design:type", String)
 ], ConfirmForgotPasswordDTO.prototype, "username", void 0);
 __decorate([
-    (0, class_validator_1.IsNotEmpty)(),
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsString)(),
     __metadata("design:type", String)
-], ConfirmForgotPasswordDTO.prototype, "password", void 0);
+], ConfirmForgotPasswordDTO.prototype, "fedoApp", void 0);
 exports.ConfirmForgotPasswordDTO = ConfirmForgotPasswordDTO;
 var PeriodicityAdmin;
 (function (PeriodicityAdmin) {
-    PeriodicityAdmin["MONTH"] = "month";
-    PeriodicityAdmin["QUARTER"] = "quarter";
-    PeriodicityAdmin["YEARLY"] = "year";
+    PeriodicityAdmin["MONTH"] = "monthly";
+    PeriodicityAdmin["QUARTER"] = "quarterly";
+    PeriodicityAdmin["YEARLY"] = "yearly";
 })(PeriodicityAdmin = exports.PeriodicityAdmin || (exports.PeriodicityAdmin = {}));
 class PeriodRange {
 }
@@ -65,19 +79,22 @@ exports.PERIODADMIN = {
     year: 12
 };
 const formatDate = (date) => {
-    let d = new Date(date), month = '' + (d.getMonth() + 1), day = '' + d.getDate(), year = d.getFullYear();
+    const DATE = new Date(date);
+    let month = '' + (DATE.getMonth() + 1);
+    let day = '' + DATE.getDate();
+    const YEAR = DATE.getFullYear();
     if (month.length < 2)
         month = '0' + month;
     if (day.length < 2)
         day = '0' + day;
-    return [year, month, day].join('-');
+    return [YEAR, month, day].join('-');
 };
 exports.formatDate = formatDate;
 const fetchDAte = (date, period) => {
-    let d = new Date(date);
+    const DATE = new Date(date);
     return {
         'from': (0, exports.formatDate)(date.setMonth((date.getMonth()) - period)),
-        'to': (0, exports.formatDate)(d)
+        'to': (0, exports.formatDate)(DATE)
     };
 };
 exports.fetchDAte = fetchDAte;

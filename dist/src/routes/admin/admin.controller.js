@@ -28,7 +28,7 @@ let AdminController = class AdminController {
         return this.adminService.fetchSalesPartner(period);
     }
     fetchCommissionReport(yearMonthDto) {
-        common_1.Logger.debug(`fetchCommissionReport() year: [${yearMonthDto.year}]`, APP);
+        common_1.Logger.debug(`fetchCommissionReport() yearMonthDto: [${yearMonthDto.year}]`, APP);
         return this.adminService.fetchCommissionReport(yearMonthDto);
     }
     fetchMonthlyReport(dateDTO) {
@@ -47,9 +47,9 @@ let AdminController = class AdminController {
         common_1.Logger.debug(`fetchInvitationResponses() state: [${JSON.stringify(state)}]`, APP);
         return this.adminService.fetchInvitationResponse(state);
     }
-    fetchSalesPartnerAccountDetailsBySalesCode(sales_code) {
+    fetchSalesPartnerAccountDetailsBySalesCode(salesCode) {
         common_1.Logger.debug(`fetchSalesPartnerAccountDetailsByID()`, APP);
-        return this.adminService.fetchSalesPartnerAccountDetailsBySalesCode(sales_code);
+        return this.adminService.fetchSalesPartnerAccountDetailsBySalesCode(salesCode);
     }
     sentOtpToPhoneNumber(mobileNumberDtO) {
         common_1.Logger.debug(`sentOtpToPhoneNumber() mobileNumberDtO: [${JSON.stringify(mobileNumberDtO)}]`, APP);
@@ -79,9 +79,9 @@ let AdminController = class AdminController {
         common_1.Logger.debug(`sendEmailOnIncorrectBankDetails() body: [${JSON.stringify(body)}] param: [${JSON.stringify(param)}] `, APP);
         return this.adminService.sendEmailOnIncorrectBankDetails(body, param);
     }
-    updatingPaidAmount(updateAmountdto) {
+    updatePaidAmount(updateAmountdto) {
         common_1.Logger.debug(`updatePaidAmount() updateAmountdto: [${JSON.stringify(updateAmountdto)}]`, APP);
-        return this.adminService.updatingPaidAmount(updateAmountdto);
+        return this.adminService.updatePaidAmount(updateAmountdto);
     }
     sendCreateSalesPartnerLinkToMobileAndWhatsappNumber(mobileNumberDtO) {
         common_1.Logger.debug(`sendCreateSalesPartnerLinkToMobileAndWhatsappNumber() mobileNumberDtO: [${JSON.stringify(mobileNumberDtO)}]`, APP);
@@ -89,7 +89,7 @@ let AdminController = class AdminController {
     }
 };
 __decorate([
-    (0, common_1.Get)('salesPartner'),
+    (0, common_1.Get)('sales-partner'),
     __param(0, (0, common_1.Query)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [create_sale_dto_1.Period]),
@@ -103,7 +103,7 @@ __decorate([
     __metadata("design:returntype", void 0)
 ], AdminController.prototype, "fetchCommissionReport", null);
 __decorate([
-    (0, common_1.Get)('monthlyreport/:year/:month'),
+    (0, common_1.Get)('monthly-report/:year/:month'),
     __param(0, (0, common_1.Param)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [create_admin_dto_1.DateDTO]),
@@ -116,22 +116,22 @@ __decorate([
     __metadata("design:returntype", void 0)
 ], AdminController.prototype, "fetchSalesPartnerAccountDetails", null);
 __decorate([
-    (0, common_1.Get)('commissionDispersals'),
+    (0, common_1.Get)('commission-dispersals'),
     __param(0, (0, common_1.Query)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [login_dto_1.PeriodRange]),
     __metadata("design:returntype", void 0)
 ], AdminController.prototype, "fetchCommissionDispersals", null);
 __decorate([
-    (0, common_1.Get)('invitationResponses'),
+    (0, common_1.Get)('invitation-responses'),
     __param(0, (0, common_1.Query)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [login_dto_1.State]),
     __metadata("design:returntype", void 0)
 ], AdminController.prototype, "fetchInvitationResponses", null);
 __decorate([
-    (0, common_1.Get)('sales/account-details/:sales_code'),
-    __param(0, (0, common_1.Param)('sales_code')),
+    (0, common_1.Get)('sales/account-details/:salesCode'),
+    __param(0, (0, common_1.Param)('salesCode')),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", void 0)
@@ -151,7 +151,7 @@ __decorate([
     __metadata("design:returntype", void 0)
 ], AdminController.prototype, "verifyOtp", null);
 __decorate([
-    (0, common_1.Post)('/download-link'),
+    (0, common_1.Post)('download-link'),
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [create_admin_dto_1.MobileNumberDtO]),
@@ -179,7 +179,7 @@ __decorate([
     __metadata("design:returntype", void 0)
 ], AdminController.prototype, "confirmForgotPassword", null);
 __decorate([
-    (0, common_1.Post)('/send-email/:mobileNumber'),
+    (0, common_1.Post)('send-email/:mobileNumber'),
     __param(0, (0, common_1.Body)()),
     __param(1, (0, common_1.Param)()),
     __metadata("design:type", Function),
@@ -192,7 +192,7 @@ __decorate([
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [create_admin_dto_1.createPaid]),
     __metadata("design:returntype", void 0)
-], AdminController.prototype, "updatingPaidAmount", null);
+], AdminController.prototype, "updatePaidAmount", null);
 __decorate([
     (0, common_1.Post)('/sales-link'),
     __param(0, (0, common_1.Body)()),

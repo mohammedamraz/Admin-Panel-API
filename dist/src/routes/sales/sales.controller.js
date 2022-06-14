@@ -45,17 +45,13 @@ let SalesController = class SalesController {
         common_1.Logger.debug(`fetchEarnings()salesCode: [${salesCode}] `, APP);
         return this.salesService.fetchEarnings(salesCode, period);
     }
-    fetchInvitationResponse(salesCode, period) {
-        common_1.Logger.debug(`fetchInvitationResponse()salesCode: [${salesCode}] `, APP);
-        return this.salesService.fetchInvitationResponse(salesCode, period);
+    fetchALLSalesPartners() {
+        common_1.Logger.debug(`fetchALLSalesPartners()`, APP);
+        return this.salesService.fetchALLSalesPartners();
     }
     fetchAllSalesPartnersByDate(params) {
         common_1.Logger.debug(`fetchAllSalesPartnersByDate() params:${JSON.stringify(params)}`, APP);
         return this.salesService.fetchAllSalesPartnersByDate(params);
-    }
-    fetchCommissionFromJunctionDb(params) {
-        common_1.Logger.debug(`fetchCommissionFromJunctionDb() params:${JSON.stringify(params)}`, APP);
-        return this.salesService.fetchCommissionFromJunctionDb(params);
     }
     fetchAllSalesPartnersFromJunctionByDate(id, params) {
         common_1.Logger.debug(`fetchAllSalesPartnersFromJunctionByDate() id: [${id}] params:${JSON.stringify(params)}`, APP);
@@ -64,6 +60,10 @@ let SalesController = class SalesController {
     async uploadImage(id, file) {
         common_1.Logger.debug(`UploadImage: ${file}`, APP);
         return this.salesService.uploadImage(id, file.filename);
+    }
+    fetchInvitationResponse(salesCode, period) {
+        common_1.Logger.debug(`fetchInvitationResponse()salesCode: [${salesCode}] `, APP);
+        return this.salesService.fetchInvitationResponse(salesCode, period);
     }
     updateSalesPartner(id, updateSalesPartnerDto) {
         common_1.Logger.debug(`updateSalesPartner() id: [${id}] DTO:${JSON.stringify(updateSalesPartnerDto)}`, APP);
@@ -119,13 +119,11 @@ __decorate([
     __metadata("design:returntype", void 0)
 ], SalesController.prototype, "fetchEarnings", null);
 __decorate([
-    (0, common_1.Get)(':salesCode/invatationResponse'),
-    __param(0, (0, common_1.Param)('salesCode')),
-    __param(1, (0, common_1.Query)()),
+    (0, common_1.Get)(),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String, create_sale_dto_1.Period]),
+    __metadata("design:paramtypes", []),
     __metadata("design:returntype", void 0)
-], SalesController.prototype, "fetchInvitationResponse", null);
+], SalesController.prototype, "fetchALLSalesPartners", null);
 __decorate([
     (0, common_1.Get)(),
     __param(0, (0, common_1.Query)()),
@@ -133,13 +131,6 @@ __decorate([
     __metadata("design:paramtypes", [create_sale_dto_1.ZQueryParamsDto]),
     __metadata("design:returntype", void 0)
 ], SalesController.prototype, "fetchAllSalesPartnersByDate", null);
-__decorate([
-    (0, common_1.Get)('id/id/id'),
-    __param(0, (0, common_1.Query)()),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [create_sale_dto_1.ZQueryParamsDto]),
-    __metadata("design:returntype", void 0)
-], SalesController.prototype, "fetchCommissionFromJunctionDb", null);
 __decorate([
     (0, common_1.Get)(':id/sales_junction'),
     __param(0, (0, common_1.Param)('id')),
@@ -169,6 +160,14 @@ __decorate([
     __metadata("design:paramtypes", [String, Object]),
     __metadata("design:returntype", Promise)
 ], SalesController.prototype, "uploadImage", null);
+__decorate([
+    (0, common_1.Get)(':salesCode/invatationResponse'),
+    __param(0, (0, common_1.Param)('salesCode')),
+    __param(1, (0, common_1.Query)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, create_sale_dto_1.Period]),
+    __metadata("design:returntype", void 0)
+], SalesController.prototype, "fetchInvitationResponse", null);
 __decorate([
     (0, common_1.Patch)(':id'),
     __param(0, (0, common_1.Param)('id', common_1.ParseIntPipe)),

@@ -23,18 +23,15 @@ const rxjs_1 = require("rxjs");
 const create_admin_dto_1 = require("../admin/dto/create-admin.dto");
 const APP = 'SalesService';
 let SalesService = class SalesService {
-    constructor(db, invitationJunctiondb, junctiondb, withdrawndb, salesuser, salesUserJunctionDb, http) {
+    constructor(db, invitationJunctiondb, junctiondb, salesUser, http) {
         this.db = db;
         this.invitationJunctiondb = invitationJunctiondb;
         this.junctiondb = junctiondb;
-        this.withdrawndb = withdrawndb;
-        this.salesuser = salesuser;
-        this.salesUserJunctionDb = salesUserJunctionDb;
+        this.salesUser = salesUser;
         this.http = http;
     }
     createSalesPartner(createSalesPartner) {
         common_1.Logger.debug(`createSalesPartner() DTO:${JSON.stringify(createSalesPartner)}`, APP);
-        let userId;
         let salesId;
         var todayDate;
         var today = new Date();
@@ -266,7 +263,7 @@ let SalesService = class SalesService {
     }
     fetchInvitationResponse(salesCode, period) {
         common_1.Logger.debug(`fetchInvitationResponse() salesCode: ${salesCode}`, APP);
-        return this.salesuser.findByPeriod({ columnName: "sales_code", columnvalue: salesCode, period: (0, create_sale_dto_1.Interval)(period) }).pipe((0, rxjs_1.catchError)(error => { throw new common_1.BadRequestException(error.message); }), (0, rxjs_1.map)(salesuser => {
+        return this.salesUser.findByPeriod({ columnName: "sales_code", columnvalue: salesCode, period: (0, create_sale_dto_1.Interval)(period) }).pipe((0, rxjs_1.catchError)(error => { throw new common_1.BadRequestException(error.message); }), (0, rxjs_1.map)(salesuser => {
             if (salesuser.length === 0)
                 throw new common_1.NotFoundException("no Account found");
             return { "signup": salesuser.length };
@@ -275,7 +272,7 @@ let SalesService = class SalesService {
     addCommission(salesCode) {
         common_1.Logger.debug(`addCommission() salesCode: ${salesCode}`, APP);
         return this.fetchSalesBySalesCode(salesCode).pipe((0, rxjs_1.switchMap)(salesCommission => (0, rxjs_1.lastValueFrom)(this.junctiondb.find({ "sales_code": String(salesCode), }))
-            .then(res => { console.log('dds', res); return [salesCommission, res[res.length - 1]]; })), (0, rxjs_1.switchMap)(async ([salesCommission, res]) => { await this.salesuser.save({ sales_code: salesCode }); return [salesCommission, res]; }), (0, rxjs_1.switchMap)(([salesCommission, res]) => this.junctiondb.save({ sales_code: salesCode, commission_amount: salesCommission["commission"], dues: (Number(res['dues']) + Number(salesCommission["commission"])) })));
+            .then(res => { return [salesCommission, res[res.length - 1]]; })), (0, rxjs_1.switchMap)(async ([salesCommission, res]) => { await this.salesUser.save({ sales_code: salesCode }); return [salesCommission, res]; }), (0, rxjs_1.switchMap)(([salesCommission, res]) => this.junctiondb.save({ sales_code: salesCode, commission_amount: salesCommission["commission"], dues: (Number(res['dues']) + Number(salesCommission["commission"])) })));
     }
     updateUserIdInSales(id, updateSalesPartnerDto) {
         common_1.Logger.debug(`updateSalesPartner() id: [${id}], body: [${JSON.stringify(updateSalesPartnerDto)}]`, APP);
@@ -309,15 +306,18 @@ let SalesService = class SalesService {
                     reportData.push({ "total_paid_amount": total_paid_amount, "month": month - 1, "hsa_sing_up": signup, "paid_on": paid_on[0], 'total_dues': Number((_a = salesJunctionDoc[salesJunctionDoc.length - 1]) === null || _a === void 0 ? void 0 : _a.dues) });
                 }).catch(error => { throw new common_1.NotFoundException(error.message); });
                 return reportData;
-            })
-                .catch(error => { throw new common_1.NotFoundException(error.message); });
+            });
         }));
     }
     async fetchSignup(year, month, yearMonthDto) {
         common_1.Logger.debug(`fetchSignup() year: [${year}] month: [${month}] salesCode:[${yearMonthDto.salesCode}]`, APP);
-        return await (0, rxjs_1.lastValueFrom)(this.salesUserJunctionDb.fetchByYear({ columnName: 'sales_code', columnvalue: yearMonthDto.salesCode, year: yearMonthDto.year, month: (month - 1).toString() }))
+        return await (0, rxjs_1.lastValueFrom)(this.salesUser.fetchByYear({ columnName: 'sales_code', columnvalue: yearMonthDto.salesCode, year: yearMonthDto.year, month: (month - 1).toString() }))
             .then(userJunctionDoc => { return userJunctionDoc.length; })
             .catch(error => { throw new common_1.UnprocessableEntityException(error.message); });
+    }
+    fetchALLSalesPartners() {
+        common_1.Logger.debug(`fetchALLSalesPartners()`, APP);
+        return this.db.fetchAll().pipe((0, rxjs_1.map)(res => res), (0, rxjs_1.catchError)(error => { throw new common_1.BadRequestException(error.message); }));
     }
 };
 SalesService = __decorate([
@@ -325,12 +325,8 @@ SalesService = __decorate([
     __param(0, (0, database_decorator_1.DatabaseTable)('sales_partner')),
     __param(1, (0, database_decorator_1.DatabaseTable)('sales_partner_invitation_junction')),
     __param(2, (0, database_decorator_1.DatabaseTable)('sales_commission_junction')),
-    __param(3, (0, database_decorator_1.DatabaseTable)('sales_withdrawn_amount')),
-    __param(4, (0, database_decorator_1.DatabaseTable)('sales_user_junction')),
-    __param(5, (0, database_decorator_1.DatabaseTable)('sales_user_junction')),
+    __param(3, (0, database_decorator_1.DatabaseTable)('sales_user_junction')),
     __metadata("design:paramtypes", [database_service_1.DatabaseService,
-        database_service_1.DatabaseService,
-        database_service_1.DatabaseService,
         database_service_1.DatabaseService,
         database_service_1.DatabaseService,
         database_service_1.DatabaseService,
