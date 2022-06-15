@@ -167,7 +167,7 @@ let SalesService = class SalesService {
         let contents = [];
         let contentsParams = [];
         if (Object.keys(params).length === 0)
-            return this.invitationJunctiondb.fetchAll().pipe((0, rxjs_1.map)(async (doc, index) => {
+            return this.invitationJunctiondb.fetchAllUsingId(id).pipe((0, rxjs_1.map)(async (doc, index) => {
                 for (let i = 0; i <= doc.length - 1; i++)
                     await (0, rxjs_1.lastValueFrom)(this.db.find({ sales_code: doc[i].sp_id }).pipe((0, rxjs_1.map)(res => { contents.push(res[0]); })));
                 return contents;
@@ -175,9 +175,9 @@ let SalesService = class SalesService {
         else if (params.date == undefined)
             return [];
         else
-            return this.fetchCommissionFromJunctionDb(params).pipe((0, rxjs_1.switchMap)(doc => this.invitationJunctiondb.findByConditionSales(id, this.makeDateFormat(params)).pipe((0, rxjs_1.map)(async (doc, index) => {
+            return this.fetchCommissionFromJunctionDb(params).pipe((0, rxjs_1.switchMap)(doc => this.invitationJunctiondb.findByConditionSales(id, this.makeDateFormatJunction(params)).pipe((0, rxjs_1.map)(async (doc, index) => {
                 for (let i = 0; i <= doc.length - 1; i++)
-                    await (0, rxjs_1.lastValueFrom)(this.db.find({ sales_code: doc[i].sp_id }).pipe((0, rxjs_1.map)(res => { contentsParams.push(res[0]); })));
+                    await (0, rxjs_1.lastValueFrom)(this.db.findByConditionSales(doc[i].sp_id, this.makeDateFormat(params)).pipe((0, rxjs_1.map)(res => { contentsParams.push(res[0]); })));
                 return contentsParams;
             }))));
     }
@@ -309,7 +309,7 @@ let SalesService = class SalesService {
             await this.fetchSignup(yearMonthDto.year, month, yearMonthDto)
                 .then(signup => {
                 var _a;
-                reportData.push({ "total_paid_amount": totalPaidAmount, "month": month - 1, "hsa_sing_up": signup, "paid_on": paidOn[0], 'total_dues': Number((_a = salesJunctionDoc[salesJunctionDoc.length - 1]) === null || _a === void 0 ? void 0 : _a.dues) });
+                reportData.push({ "total_paid_amount": totalPaidAmount, "month": month - 1, "hsa_sing_up": signup, "paid_on": paidOn[0], 'total_dues': (_a = salesJunctionDoc[salesJunctionDoc.length - 1]) === null || _a === void 0 ? void 0 : _a.dues });
             }).catch(error => { throw new common_1.NotFoundException(error.message); });
             return reportData;
         })));

@@ -189,19 +189,20 @@ export class SalesService {
     let contents = [];
     let contentsParams = [];
     if (Object.keys(params).length === 0)
-      return this.invitationJunctiondb.fetchAll().pipe(
+      return this.invitationJunctiondb.fetchAllUsingId(id).pipe(
         map(async (doc, index: Number) => {
           for (let i = 0; i <= doc.length - 1; i++)
             await lastValueFrom(this.db.find({ sales_code: doc[i].sp_id }).pipe(
               map(res => { contents.push(res[0]) })))
           return contents
         }))
+
     else if (params.date == undefined) return [];
     else return this.fetchCommissionFromJunctionDb(params).pipe(
-      switchMap(doc => this.invitationJunctiondb.findByConditionSales(id, this.makeDateFormat(params)).pipe(
+      switchMap(doc => this.invitationJunctiondb.findByConditionSales(id, this.makeDateFormatJunction(params)).pipe(
         map(async (doc: InvitationJunctionModel[], index: Number) => {
           for (let i = 0; i <= doc.length - 1; i++)
-            await lastValueFrom(this.db.find({ sales_code: doc[i].sp_id }).pipe(
+            await lastValueFrom(this.db.findByConditionSales(doc[i].sp_id, this.makeDateFormat(params)).pipe(
               map(res => { contentsParams.push(res[0]) })))
           return contentsParams
         }))))
@@ -362,7 +363,7 @@ export class SalesService {
           const paidOn = date.filter((res) => res)
           await this.fetchSignup(yearMonthDto.year, month, yearMonthDto)
             .then(signup => {
-              reportData.push({ "total_paid_amount": totalPaidAmount, "month": month - 1, "hsa_sing_up": signup, "paid_on": paidOn[0], 'total_dues': Number(salesJunctionDoc[salesJunctionDoc.length - 1]?.dues) })
+              reportData.push({ "total_paid_amount": totalPaidAmount, "month": month - 1, "hsa_sing_up": signup, "paid_on": paidOn[0], 'total_dues': salesJunctionDoc[salesJunctionDoc.length - 1]?.dues })
             }).catch(error => { throw new NotFoundException(error.message) })
           return reportData
         })))

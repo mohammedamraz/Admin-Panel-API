@@ -19,6 +19,7 @@ export declare class DatabaseService<T> implements DatabaseInterface<T> {
     saveMultiple(queryRequest: Array<object>): Observable<any>;
     sortObject(obj: object): {};
     fetchAll(): Observable<T[]>;
+    fetchAllUsingId(id: string): Observable<T[]>;
     findByCondition(id: number, findbyConditionParams: findByConditionParams): Observable<any>;
     findByAlphabet(findbyConditionParams: findByDateParams): Observable<T[]>;
     findByConditionSales(id: string, findbyConditionParams: findByDateParams): Observable<any>;

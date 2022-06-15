@@ -187,6 +187,13 @@ export class DatabaseService<T> implements DatabaseInterface<T> {
     return this.runQuery(query)
   }
 
+  fetchAllUsingId(id: string): Observable<T[]> {
+    Logger.debug(`fetchAll()}`, APP);
+
+    const query = `SELECT * FROM ${this.tableName} WHERE refered_by='${id}'`;
+    return this.runQuery(query)
+  }
+
   findByCondition(id: number, findbyConditionParams: findByConditionParams) {
     Logger.debug(`findByCondition(): params ${[JSON.stringify(findbyConditionParams)]}`, APP);
 
@@ -214,7 +221,6 @@ export class DatabaseService<T> implements DatabaseInterface<T> {
   }
 
 
-
   findByConditionSales(id: string, findbyConditionParams: findByDateParams) {
     Logger.debug(`findByCondition(): params ${[JSON.stringify(findbyConditionParams)]}`, APP);
 
@@ -224,11 +230,35 @@ export class DatabaseService<T> implements DatabaseInterface<T> {
     const number = params.number_of_rows * params.number_of_pages
     delete params.number_of_pages;
     delete params.name;
-    delete params.is_active
-    Object.values(params).map((params, index) => { variables.push(params), values.push((`$${index + 1}`)) })
-    const query = `SELECT * FROM ${this.tableName} WHERE refered_by='${id}' AND created_date > CURRENT_DATE - (interval '1 day' * ${values[1]})  ORDER BY created_date LIMIT  ${values[0]} OFFSET ${number}`
-    return this.runQuery(query, variables)
+    if (this.tableName == "sales_partner_invitation_junction") {
+      if (params.is_active) {
+        Object.values(params).map((params, index) => { variables.push(params), values.push((`$${index + 1}`)) })
+        const query = `SELECT * FROM ${this.tableName} WHERE refered_by='${id}'AND is_active= ${values[2]} AND created_date > CURRENT_DATE - (interval '1 day' * ${values[1]})  ORDER BY created_date LIMIT  ${values[0]} OFFSET ${number}`
+        return this.runQuery(query, variables);
+      }
+      else {
+        delete params.is_active
+        Object.values(params).map((params, index) => { variables.push(params), values.push((`$${index + 1}`)) })
+        const query = `SELECT * FROM ${this.tableName} WHERE refered_by='${id}'AND created_date > CURRENT_DATE - (interval '1 day' * ${values[1]})  ORDER BY created_date LIMIT  ${values[0]} OFFSET ${number}`
+        return this.runQuery(query, variables);
+      }
+    }
+    else {
+      if (params.is_active) {
+        Object.values(params).map((params, index) => { variables.push(params), values.push((`$${index + 1}`)) })
+        const query = `SELECT * FROM ${this.tableName} WHERE sales_code='${id}'AND is_active= ${values[2]} AND created_date > CURRENT_DATE - (interval '1 day' * ${values[1]})  ORDER BY created_date LIMIT  ${values[0]} OFFSET ${number}`
+        return this.runQuery(query, variables);
+      }
+      else {
+        delete params.is_active
+        Object.values(params).map((params, index) => { variables.push(params), values.push((`$${index + 1}`)) })
+        const query = `SELECT * FROM ${this.tableName} WHERE sales_code='${id}'AND created_date > CURRENT_DATE - (interval '1 day' * ${values[1]})  ORDER BY created_date LIMIT  ${values[0]} OFFSET ${number}`
+        return this.runQuery(query, variables);
+      }
+
+    }
   }
+
 
   findByDate(findbyConditionParams: findByDateParams): Observable<T[]> {
     Logger.debug(`find_by_date(): params ${[JSON.stringify(findbyConditionParams)]}`, APP);
@@ -267,7 +297,7 @@ export class DatabaseService<T> implements DatabaseInterface<T> {
 
   }
 
-  fetchCommissionReportByYear(year: string, month: number ): Observable<T[]>{
+  fetchCommissionReportByYear(year: string, month: number): Observable<T[]> {
     Logger.debug(`fetchCommissionReportByYear(): year ${year}`, APP);
 
     const query = `SELECT * FROM ${this.tableName} WHERE date_part('year',created_date) = ${year} AND date_part('month',created_date) = ${month}`;

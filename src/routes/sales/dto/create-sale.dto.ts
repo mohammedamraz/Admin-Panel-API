@@ -1,6 +1,6 @@
 import { Email } from "aws-sdk/clients/codecommit";
 import { phoneNumber } from "aws-sdk/clients/importexport";
-import { IsEmail, IsEnum, IsNotEmpty, IsOptional, IsPhoneNumber, IsString, MaxLength, MinLength } from "class-validator";
+import { IsEmail, IsEnum, IsNotEmpty, IsNumberString, IsOptional, IsPhoneNumber, IsString, MaxLength, MinLength } from "class-validator";
 
 export class CreateSalesJunction {
     sales_code: string;
@@ -159,7 +159,7 @@ export const makeEarningFormat = (earning: number[]): EarningResponse =>
 export class YearMonthDto {
 
     @IsNotEmpty()
-    @IsString()
+    @IsNumberString()
     @MinLength(4, { message: 'Enter only 4 digit value of year, This is too short', })
     @MaxLength(4, { message: 'Enter only 4 digit value of year, This is too long', })
     year: string;
