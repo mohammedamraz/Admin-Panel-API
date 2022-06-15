@@ -9,6 +9,13 @@ export class MobileNumberDtO {
   @IsNotEmpty()
   @IsPhoneNumber()
   phoneNumber: phoneNumber;
+}
+
+export class MobileDtO {
+
+  @IsNotEmpty()
+  @IsPhoneNumber()
+  phoneNumber: phoneNumber;
 
   @IsNotEmpty()
   @IsNumber()

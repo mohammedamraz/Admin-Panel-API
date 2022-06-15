@@ -12,6 +12,8 @@ export declare const POSTGRES_DB_URI_DB_URL: string;
 export declare const AKASH_ACCOUNTID: string;
 export declare const AKASH_AUTHTOKEN: string;
 export declare const AKASH_SERVICEID: string;
+export declare const TWILIO_PHONE_NUMBER: string;
+export declare const TWILIO_WHATSAPP_NUMBER: string;
 export declare const APP_DOWNLOAD_LINK: string;
 export declare const SALES_PARTNER_LINK: string;
 export declare const AWS_ACCESS_KEY_ID: string;

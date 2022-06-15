@@ -9,7 +9,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.fetchDues = exports.fetchmonths = exports.DateDTO = exports.YearMonthDto = exports.createPaid = exports.createPaidAmountDto = exports.createAccount = exports.sendEmailOnIncorrectBankDetailsDto = exports.AccountZwitchResponseBody = exports.User = exports.ParamDto = exports.requestDto = exports.MobileNumberAndOtpDtO = exports.MobileNumberDtO = void 0;
+exports.fetchDues = exports.fetchmonths = exports.DateDTO = exports.YearMonthDto = exports.createPaid = exports.createPaidAmountDto = exports.createAccount = exports.sendEmailOnIncorrectBankDetailsDto = exports.AccountZwitchResponseBody = exports.User = exports.ParamDto = exports.requestDto = exports.MobileNumberAndOtpDtO = exports.MobileDtO = exports.MobileNumberDtO = void 0;
 const class_validator_1 = require("class-validator");
 const class_transformer_1 = require("class-transformer");
 const common_1 = require("@nestjs/common");
@@ -20,12 +20,20 @@ __decorate([
     (0, class_validator_1.IsPhoneNumber)(),
     __metadata("design:type", String)
 ], MobileNumberDtO.prototype, "phoneNumber", void 0);
+exports.MobileNumberDtO = MobileNumberDtO;
+class MobileDtO {
+}
+__decorate([
+    (0, class_validator_1.IsNotEmpty)(),
+    (0, class_validator_1.IsPhoneNumber)(),
+    __metadata("design:type", String)
+], MobileDtO.prototype, "phoneNumber", void 0);
 __decorate([
     (0, class_validator_1.IsNotEmpty)(),
     (0, class_validator_1.IsNumber)(),
     __metadata("design:type", Number)
-], MobileNumberDtO.prototype, "commission", void 0);
-exports.MobileNumberDtO = MobileNumberDtO;
+], MobileDtO.prototype, "commission", void 0);
+exports.MobileDtO = MobileDtO;
 class MobileNumberAndOtpDtO {
 }
 __decorate([

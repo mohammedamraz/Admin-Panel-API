@@ -1,6 +1,6 @@
 import { Period } from '../sales/dto/create-sale.dto';
 import { AdminService } from './admin.service';
-import { createPaid, DateDTO, MobileNumberAndOtpDtO, MobileNumberDtO, ParamDto, requestDto, YearMonthDto } from './dto/create-admin.dto';
+import { createPaid, DateDTO, MobileDtO, MobileNumberAndOtpDtO, MobileNumberDtO, ParamDto, requestDto, YearMonthDto } from './dto/create-admin.dto';
 import { ConfirmForgotPasswordDTO, ForgotPasswordDTO, LoginDTO, PeriodRange, State } from './dto/login.dto';
 export declare class AdminController {
     private readonly adminService;
@@ -31,7 +31,7 @@ export declare class AdminController {
     confirmForgotPassword(confirmForgotPasswordDTO: ConfirmForgotPasswordDTO): import("rxjs").Observable<any[]>;
     sendEmailOnIncorrectBankDetails(body: requestDto, param: ParamDto): import("rxjs").Observable<unknown>;
     updatePaidAmount(updateAmountdto: createPaid): Promise<void>;
-    sendCreateSalesPartnerLinkToMobileAndWhatsappNumber(mobileNumberDtO: MobileNumberDtO): import("rxjs").Observable<{
+    sendCreateSalesPartnerLinkToMobileAndWhatsappNumber(mobileNumberDtO: MobileDtO): import("rxjs").Observable<{
         status: string;
     }>;
 }

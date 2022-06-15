@@ -197,13 +197,13 @@ let AdminService = class AdminService {
     }
     sentFedoAppDownloadLinkToPhoneNumber(mobileNumberDtO) {
         common_1.Logger.debug(`sentFedoAppDownloadLinkToPhoneNumber() mobileNumberDtO: [${JSON.stringify(mobileNumberDtO)}]`, APP);
-        return this.client.messages.create({ body: constants_1.APP_DOWNLOAD_LINK, from: '+19402908957', to: mobileNumberDtO.phoneNumber })
+        return this.client.messages.create({ body: constants_1.APP_DOWNLOAD_LINK, from: constants_1.TWILIO_PHONE_NUMBER, to: mobileNumberDtO.phoneNumber })
             .then(_res => ({ status: `Link ${constants_1.APP_DOWNLOAD_LINK}  send to  ${mobileNumberDtO.phoneNumber} number` }))
             .catch(err => this.onTwilioErrorResponse(err));
     }
     sentFedoAppDownloadLinkToWhatsappNumber(mobileNumberDtO) {
         common_1.Logger.debug(`sentFedoAppDownloadLinkToWhatsappNumber() mobileNumberDtO: [${JSON.stringify(mobileNumberDtO)}]`, APP);
-        return this.client.messages.create({ body: constants_1.APP_DOWNLOAD_LINK, from: 'whatsapp:+14155238886', to: `whatsapp:${mobileNumberDtO.phoneNumber}` })
+        return this.client.messages.create({ body: constants_1.APP_DOWNLOAD_LINK, from: `whatsapp:${constants_1.TWILIO_WHATSAPP_NUMBER}`, to: `whatsapp:${mobileNumberDtO.phoneNumber}` })
             .then(_res => ({ status: `Link ${constants_1.APP_DOWNLOAD_LINK}  send to  ${mobileNumberDtO.phoneNumber} whatsapp number` }))
             .catch(err => this.onTwilioErrorResponse(err));
     }
@@ -272,7 +272,7 @@ let AdminService = class AdminService {
         common_1.Logger.debug(`sendCreateSalesPartnerLinkToPhoneNumber() mobileNumberDtO: [${JSON.stringify(mobileNumberDtO)}]`, APP);
         return this.client.messages.create({
             body: `Click on Link ${constants_1.SALES_PARTNER_LINK}?mobile=${this.encryptPassword_(mobileNumberDtO.phoneNumber)}&commission=${this.encryptPassword_(mobileNumberDtO.commission)} `,
-            from: '+19402908957',
+            from: constants_1.TWILIO_PHONE_NUMBER,
             to: mobileNumberDtO.phoneNumber
         })
             .then(_res => ({ "status": `Link ${constants_1.SALES_PARTNER_LINK}  send to  ${mobileNumberDtO.phoneNumber} number` }))
@@ -282,7 +282,7 @@ let AdminService = class AdminService {
         common_1.Logger.debug(`sendCreateSalesPartnerLinkToWhatsappNumber() mobileNumberDtO: [${JSON.stringify(mobileNumberDtO)}]`, APP);
         return this.client.messages.create({
             body: `Click on Link ${constants_1.SALES_PARTNER_LINK}?mobile=${this.encryptPassword_(mobileNumberDtO.phoneNumber)}&commission=${this.encryptPassword_(mobileNumberDtO.commission)} `,
-            from: 'whatsapp:+14155238886',
+            from: `whatsapp:${constants_1.TWILIO_WHATSAPP_NUMBER}`,
             to: `whatsapp:${mobileNumberDtO.phoneNumber}`
         })
             .then(_res => ({ status: `Link ${constants_1.SALES_PARTNER_LINK}  send to  ${mobileNumberDtO.phoneNumber} whatsapp number` }))

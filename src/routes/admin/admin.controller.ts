@@ -1,7 +1,7 @@
 import { Controller, Get, Post, Body, Param, Logger, Query } from '@nestjs/common';
 import { Period } from '../sales/dto/create-sale.dto';
 import { AdminService } from './admin.service';
-import { createPaid, DateDTO, MobileNumberAndOtpDtO, MobileNumberDtO, ParamDto, requestDto, YearMonthDto } from './dto/create-admin.dto';
+import { createPaid, DateDTO, MobileDtO, MobileNumberAndOtpDtO, MobileNumberDtO, ParamDto, requestDto, YearMonthDto } from './dto/create-admin.dto';
 import { ConfirmForgotPasswordDTO, ForgotPasswordDTO, LoginDTO, PeriodRange, State } from './dto/login.dto';
 
 const APP = 'AdminController';
@@ -116,7 +116,7 @@ export class AdminController {
   }
 
   @Post('/sales-link')
-  sendCreateSalesPartnerLinkToMobileAndWhatsappNumber(@Body() mobileNumberDtO: MobileNumberDtO) {
+  sendCreateSalesPartnerLinkToMobileAndWhatsappNumber(@Body() mobileNumberDtO: MobileDtO) {
     Logger.debug(`sendCreateSalesPartnerLinkToMobileAndWhatsappNumber() mobileNumberDtO: [${JSON.stringify(mobileNumberDtO)}]`, APP);
 
     return this.adminService.sendCreateSalesPartnerLinkToMobileAndWhatsappNumber(mobileNumberDtO);

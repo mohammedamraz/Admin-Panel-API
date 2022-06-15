@@ -1,11 +1,11 @@
 /* eslint-disable max-lines */
 import { BadRequestException, ConflictException, HttpException, HttpStatus, Injectable, Logger, NotFoundException, UnauthorizedException, UnprocessableEntityException } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
-import { AKASH_ACCOUNTID, AKASH_AUTHTOKEN, AKASH_SERVICEID, APP_DOWNLOAD_LINK, AWS_COGNITO_USER_CREATION_URL_SIT, FEDO_APP, PUBLIC_KEY, SALES_PARTNER_LINK } from 'src/constants';
+import { AKASH_ACCOUNTID, AKASH_AUTHTOKEN, AKASH_SERVICEID, APP_DOWNLOAD_LINK, AWS_COGNITO_USER_CREATION_URL_SIT, FEDO_APP, PUBLIC_KEY, SALES_PARTNER_LINK, TWILIO_PHONE_NUMBER, TWILIO_WHATSAPP_NUMBER } from 'src/constants';
 import { DatabaseTable } from 'src/lib/database/database.decorator';
 import { DatabaseService } from 'src/lib/database/database.service';
 import { CreateSalesJunction, CreateSalesPartner, CreateSalesPartnerRequest, Interval, PERIOD, Period, SalesUserJunction } from '../sales/dto/create-sale.dto';
-import { AccountZwitchResponseBody, createPaid, DateDTO, fetchDues, fetchmonths, MobileNumberAndOtpDtO, MobileNumberDtO, ParamDto, requestDto, sendEmailOnIncorrectBankDetailsDto, User, YearMonthDto } from './dto/create-admin.dto';
+import { AccountZwitchResponseBody, createPaid, DateDTO, fetchDues, fetchmonths, MobileDtO, MobileNumberAndOtpDtO, MobileNumberDtO, ParamDto, requestDto, sendEmailOnIncorrectBankDetailsDto, User, YearMonthDto } from './dto/create-admin.dto';
 import { AxiosResponse } from 'axios';
 import { catchError, concatMap, from, lastValueFrom, map, of, switchMap, throwError } from 'rxjs';
 import { applyPerformance, averageSignup, ConfirmForgotPasswordDTO, fetchDAte, ForgotPasswordDTO, LoginDTO, makeEarningDuesFormat, makeStateFormat, PERIODADMIN, PeriodRange, State } from './dto/login.dto';
@@ -184,15 +184,15 @@ export class AdminService {
   sentFedoAppDownloadLinkToPhoneNumber(mobileNumberDtO: MobileNumberDtO) {
     Logger.debug(`sentFedoAppDownloadLinkToPhoneNumber() mobileNumberDtO: [${JSON.stringify(mobileNumberDtO)}]`, APP);
 
-    return this.client.messages.create({body: APP_DOWNLOAD_LINK, from: '+19402908957', to: mobileNumberDtO.phoneNumber})
+    return this.client.messages.create({body: APP_DOWNLOAD_LINK, from: TWILIO_PHONE_NUMBER, to: mobileNumberDtO.phoneNumber})
       .then(_res => ({ status: `Link ${APP_DOWNLOAD_LINK}  send to  ${mobileNumberDtO.phoneNumber} number` }))
       .catch(err => this.onTwilioErrorResponse(err));
   }
-
+w
   sentFedoAppDownloadLinkToWhatsappNumber(mobileNumberDtO: MobileNumberDtO) {
     Logger.debug(`sentFedoAppDownloadLinkToWhatsappNumber() mobileNumberDtO: [${JSON.stringify(mobileNumberDtO)}]`, APP);
 
-    return this.client.messages.create({body: APP_DOWNLOAD_LINK, from: 'whatsapp:+14155238886', to: `whatsapp:${mobileNumberDtO.phoneNumber}`})
+    return this.client.messages.create({body: APP_DOWNLOAD_LINK, from: `whatsapp:${TWILIO_WHATSAPP_NUMBER}`, to: `whatsapp:${mobileNumberDtO.phoneNumber}`})
       .then(_res => ({ status: `Link ${APP_DOWNLOAD_LINK}  send to  ${mobileNumberDtO.phoneNumber} whatsapp number` }))
       .catch(err => this.onTwilioErrorResponse(err));
   }
@@ -318,29 +318,29 @@ export class AdminService {
    
   }
 
-  sendCreateSalesPartnerLinkToPhoneNumber(mobileNumberDtO: MobileNumberDtO) {
+  sendCreateSalesPartnerLinkToPhoneNumber(mobileNumberDtO: MobileDtO) {
     Logger.debug(`sendCreateSalesPartnerLinkToPhoneNumber() mobileNumberDtO: [${JSON.stringify(mobileNumberDtO)}]`, APP);
 
     return this.client.messages.create({
         body: `Click on Link ${SALES_PARTNER_LINK}?mobile=${this.encryptPassword_(mobileNumberDtO.phoneNumber)}&commission=${this.encryptPassword_(mobileNumberDtO.commission)} `,
-        from: '+19402908957',
+        from: TWILIO_PHONE_NUMBER,
         to: mobileNumberDtO.phoneNumber})
       .then(_res => ({ "status": `Link ${SALES_PARTNER_LINK}  send to  ${mobileNumberDtO.phoneNumber} number` }))
       .catch(err => this.onTwilioErrorResponse(err));
   }
 
-  sendCreateSalesPartnerLinkToWhatsappNumber(mobileNumberDtO: MobileNumberDtO) {
+  sendCreateSalesPartnerLinkToWhatsappNumber(mobileNumberDtO: MobileDtO) {
     Logger.debug(`sendCreateSalesPartnerLinkToWhatsappNumber() mobileNumberDtO: [${JSON.stringify(mobileNumberDtO)}]`, APP);
 
     return this.client.messages.create({
         body: `Click on Link ${SALES_PARTNER_LINK}?mobile=${this.encryptPassword_(mobileNumberDtO.phoneNumber)}&commission=${this.encryptPassword_(mobileNumberDtO.commission)} `,
-        from: 'whatsapp:+14155238886',
+        from: `whatsapp:${TWILIO_WHATSAPP_NUMBER}`,
         to: `whatsapp:${mobileNumberDtO.phoneNumber}`})
       .then(_res => ({ status: `Link ${SALES_PARTNER_LINK}  send to  ${mobileNumberDtO.phoneNumber} whatsapp number` }))
       .catch(err => this.onTwilioErrorResponse(err));
   }
 
-  sendCreateSalesPartnerLinkToMobileAndWhatsappNumber(mobileNumberDtO: MobileNumberDtO) {
+  sendCreateSalesPartnerLinkToMobileAndWhatsappNumber(mobileNumberDtO: MobileDtO) {
     Logger.debug(`sendCreateSalesPartnerLinkToMobileAndWhatsappNumber() mobileNumberDtO: [${JSON.stringify(mobileNumberDtO)}]`, APP);
 
     return from(this.sendCreateSalesPartnerLinkToPhoneNumber(mobileNumberDtO)).pipe(map(_doc => this.sendCreateSalesPartnerLinkToWhatsappNumber(mobileNumberDtO)), switchMap(doc => of({ status: "Sales Partner link sent" })))

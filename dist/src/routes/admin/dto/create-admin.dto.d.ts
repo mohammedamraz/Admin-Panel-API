@@ -2,6 +2,9 @@ import { phoneNumber } from 'aws-sdk/clients/importexport';
 import { CreateSalesJunction } from 'src/routes/sales/dto/create-sale.dto';
 export declare class MobileNumberDtO {
     phoneNumber: phoneNumber;
+}
+export declare class MobileDtO {
+    phoneNumber: phoneNumber;
     commission: number;
 }
 export declare class MobileNumberAndOtpDtO {

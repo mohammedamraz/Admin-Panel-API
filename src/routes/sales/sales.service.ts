@@ -344,7 +344,8 @@ export class SalesService {
             const paid_on = date.filter((res) => res)
             await this.fetchSignup(yearMonthDto.year, month, yearMonthDto)
               .then(signup => {
-                reportData.push({ "total_paid_amount": total_paid_amount, "month": month - 1, "hsa_sing_up": signup, "paid_on": paid_on[0], 'total_dues': Number(salesJunctionDoc[salesJunctionDoc.length - 1]?.dues) })
+                console.log(salesJunctionDoc)
+                reportData.push({ "total_paid_amount": total_paid_amount, "month": month , "hsa_sing_up": signup, "paid_on": paid_on[0], 'total_dues': Number(salesJunctionDoc[salesJunctionDoc.length - 1]?.dues) })
               }).catch(error => { throw new NotFoundException(error.message) })
             return reportData
           })
