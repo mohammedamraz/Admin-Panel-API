@@ -178,7 +178,10 @@ let SalesService = class SalesService {
             return this.fetchCommissionFromJunctionDb(params).pipe((0, rxjs_1.switchMap)(doc => this.invitationJunctiondb.findByConditionSales(id, this.makeDateFormatJunction(params)).pipe((0, rxjs_1.map)(async (doc, index) => {
                 for (let i = 0; i <= doc.length - 1; i++)
                     await (0, rxjs_1.lastValueFrom)(this.db.findByConditionSales(doc[i].sp_id, this.makeDateFormat(params)).pipe((0, rxjs_1.map)(res => { contentsParams.push(res[0]); })));
-                return contentsParams;
+                const contentsParamsFinal = contentsParams.filter(result => {
+                    return result !== undefined;
+                });
+                return contentsParamsFinal;
             }))));
     }
     makeDateFormat(params) {
