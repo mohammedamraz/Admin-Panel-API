@@ -204,9 +204,9 @@ export class SalesService {
           for (let i = 0; i <= doc.length - 1; i++)
             await lastValueFrom(this.db.findByConditionSales(doc[i].sp_id, this.makeDateFormat(params)).pipe(
               map(res => { contentsParams.push(res[0]) })))
-              const contentsParamsFinal = contentsParams.filter(result => {
-                return result !== undefined;
-              });
+          const contentsParamsFinal = contentsParams.filter(result => {
+            return result !== undefined;
+          });
           return contentsParamsFinal
         }))))
   }
