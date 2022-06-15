@@ -264,7 +264,7 @@ let AdminService = class AdminService {
                 }
                 const finalRes = (_a = user_doc[0]) === null || _a === void 0 ? void 0 : _a.dues;
                 const dueCommission = Number(finalRes) - Number(res.paid_amount);
-                return this.salesJunctionDb.save({ sales_code: (_b = user_doc[0]) === null || _b === void 0 ? void 0 : _b.sales_code, paid_amount: res.paid_amount, dues: dueCommission }).pipe((0, rxjs_1.catchError)(res => { throw new common_1.BadRequestException(); }));
+                return this.salesJunctionDb.save({ sales_code: (_b = user_doc[0]) === null || _b === void 0 ? void 0 : _b.sales_code, paid_amount: res.paid_amount, dues: dueCommission }).pipe((0, rxjs_1.catchError)(err => { throw new common_1.BadRequestException(err.message); }));
             })));
         })));
     }

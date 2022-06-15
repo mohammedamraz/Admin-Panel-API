@@ -310,7 +310,7 @@ export class AdminService {
         const finalRes = user_doc[0]?.dues
         const dueCommission = Number(finalRes) - Number(res.paid_amount)
         
-        return this.salesJunctionDb.save({ sales_code: user_doc[0]?.sales_code, paid_amount: res.paid_amount, dues: dueCommission }).pipe(catchError(res=>{throw new BadRequestException()}))
+        return this.salesJunctionDb.save({ sales_code: user_doc[0]?.sales_code, paid_amount: res.paid_amount, dues: dueCommission }).pipe(catchError(err=>{throw new BadRequestException(err.message)}))
   
       })))
     })))
