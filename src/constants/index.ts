@@ -14,10 +14,10 @@ export const DEBUG_LEVEL = process.env.FEDO_HSA_SERVER_LOG_LEVEL || 'debug';
 export const APP_DOCUMENTATION = process.env.FEDO_HSA_SERVER_DOCUMENTATION || 'https://fedo.health/hsa/docs';
 export const POSTGRES_DB_URI_DB_URL = process.env.FEDO_HSA_SERVER_DB_URI || 'postgresql://postgres:akash@localhost:5432/hsa-sales';
 
-export const AKASH_ACCOUNTID = process.env.FEDO_HSA_TWILIO_ACCOUNTID || "ACb9781f5a27b7bb3d6604595deb2dff51";
-export const AKASH_AUTHTOKEN = process.env.FEDO_HSA_TWILIO_AUTHTOKEN || "32bb0b889c2a735b8bc2397084582c78";
-export const AKASH_SERVICEID = process.env.FEDO_HSA_TWILIO_SERVICEID || "VA1ca51498a0193cd7329ea36e80c37a48";
-export const TWILIO_PHONE_NUMBER = process.env.FEDO_HSA_TWILIO_PHONE_NUMBER || "19402908957";
+export const AKASH_ACCOUNTID = process.env.FEDO_HSA_TWILIO_ACCOUNTID || "AC63acdd31af3ecbf5edde92cee5062e79";
+export const AKASH_AUTHTOKEN = process.env.FEDO_HSA_TWILIO_AUTHTOKEN || "32559243c2d40e773aaf3a38c8f36854";
+export const AKASH_SERVICEID = process.env.FEDO_HSA_TWILIO_SERVICEID || "VA6bd204528e410892c7ba538d70d36ec3";
+export const TWILIO_PHONE_NUMBER = process.env.FEDO_HSA_TWILIO_PHONE_NUMBER || "+18573717053";
 export const TWILIO_WHATSAPP_NUMBER = process.env.FEDO_HSA_TWILIO_WHATSAPP_NUMBER || "+14155238886";
 
 export const APP_DOWNLOAD_LINK = process.env.FEDO_HSA_APP_DOWNLOAD_LINK || "https://play.google.com/store/apps/details?id=com.fedo.auth";

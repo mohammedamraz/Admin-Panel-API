@@ -303,7 +303,6 @@ let SalesService = class SalesService {
                 await this.fetchSignup(yearMonthDto.year, month, yearMonthDto)
                     .then(signup => {
                     var _a;
-                    console.log(salesJunctionDoc);
                     reportData.push({ "total_paid_amount": total_paid_amount, "month": month, "hsa_sing_up": signup, "paid_on": paid_on[0], 'total_dues': Number((_a = salesJunctionDoc[salesJunctionDoc.length - 1]) === null || _a === void 0 ? void 0 : _a.dues) });
                 }).catch(error => { throw new common_1.NotFoundException(error.message); });
                 return reportData;
