@@ -1,3 +1,4 @@
+/* eslint-disable max-lines */
 /* eslint-disable max-lines-per-function */
 import { BadRequestException, Injectable, Logger, NotFoundException, UnprocessableEntityException } from '@nestjs/common';
 import { DatabaseTable } from 'src/lib/database/database.decorator';
@@ -20,25 +21,25 @@ export class SalesService {
     @DatabaseTable('sales_partner_invitation_junction') private readonly invitationJunctiondb: DatabaseService<CreateSalesInvitationJunction>,
     @DatabaseTable('sales_commission_junction') private readonly junctiondb: DatabaseService<CreateSalesJunction>,
     @DatabaseTable('sales_user_junction') private readonly salesUser: DatabaseService<SalesUserJunction>,
-
     private http: HttpService) { }
 
   createSalesPartner(createSalesPartner: CreateSalesPartner) {
     Logger.debug(`createSalesPartner() DTO:${JSON.stringify(createSalesPartner,)}`, APP);
 
     let salesId
-    var todayDate: any
-    var today = new Date();
-    var dd = String(today.getDate()).padStart(2, '0');
-    var mm = String(today.getMonth() + 1).padStart(2, '0');
-    todayDate = mm + dd
     return this.fetchSalesPartnerByMobileNumber(createSalesPartner.mobile).pipe(
       switchMap(doc => fetchUserByMobileNumber(createSalesPartner.mobile)),
       switchMap(doc => {
         if (!doc[0]) return this.db.save({ name: createSalesPartner.name, location: createSalesPartner.location, commission: createSalesPartner.commission, mobile: createSalesPartner.mobile, email: createSalesPartner.email })
         else return this.db.save({ name: createSalesPartner.name, location: createSalesPartner.location, commission: createSalesPartner.commission, mobile: createSalesPartner.mobile, email: createSalesPartner.email, user_id: doc[0].fedo_id, is_hsa_account: true })
       }),
-      switchMap(doc => { salesId = doc[0].id; createSalesPartner.sales_code = "FEDSP" + todayDate + 500 + doc[0].id; createSalesPartner.id = doc[0].id; return this.junctiondb.save({ sales_code: createSalesPartner.sales_code }).pipe(catchError(err => { throw new BadRequestException(err.message) }), map(doc => doc)) }),
+      switchMap(doc => {
+        const TODAYDATE = String(new Date().getMonth() + 1).padStart(2, '0') + String(new Date().getDate()).padStart(2, '0')
+        salesId = doc[0].id;
+        createSalesPartner.sales_code = "FEDSP" + TODAYDATE + 500 + doc[0].id;
+        createSalesPartner.id = doc[0].id;
+        return this.junctiondb.save({ sales_code: createSalesPartner.sales_code }).pipe(catchError(err => { throw new BadRequestException(err.message) }), map(doc => doc))
+      }),
       switchMap(doc => this.createInvitation(createSalesPartner, doc)),
       switchMap(doc => this.updateSalesPartner(salesId, <UpdateSalesPartner>{ sales_code: createSalesPartner.sales_code })),
       switchMap(doc => this.fetchSalesPartnerById(createSalesPartner.id.toString()))
@@ -46,142 +47,168 @@ export class SalesService {
   }
 
   createInvitation(createSalesPartner: CreateSalesPartner, createSalesJunction: CreateSalesJunction[]) {
+    Logger.debug(`createInvitation() createSalesPartner:${JSON.stringify(createSalesPartner)}  createSalesJunction:${JSON.stringify(createSalesJunction)}`, APP);
 
-    if (createSalesPartner.refered_by) return this.invitationJunctiondb.save({ sp_id: createSalesPartner.sales_code, refered_by: createSalesPartner.refered_by }).pipe(
-      switchMap(_doc => this.invitationJunctiondb.find({ refered_by: createSalesPartner.refered_by })),
-      switchMap(doc => this.db.findandUpdate({ columnName: 'sales_code', columnvalue: createSalesPartner.refered_by, quries: { sales_invitation_count: doc.length } })))
+    if (createSalesPartner.refered_by)
+      return this.invitationJunctiondb.save({ sp_id: createSalesPartner.sales_code, refered_by: createSalesPartner.refered_by }).pipe(
+        switchMap(_doc => this.invitationJunctiondb.find({ refered_by: createSalesPartner.refered_by })),
+        switchMap(doc => this.db.findandUpdate({ columnName: 'sales_code', columnvalue: createSalesPartner.refered_by, quries: { sales_invitation_count: doc.length } })));
+
     else return createSalesJunction;
 
   }
 
   fetchSalesPartnerByMobileNumber(mobile: string) {
-    Logger.debug(`fetchSalesPartnerByUserId() id: [${JSON.stringify(mobile)}]`, APP);
+    Logger.debug(`fetchSalesPartnerByMobileNumber() id: [${JSON.stringify(mobile)}]`, APP);
 
-    return from(lastValueFrom(this.db.find({ mobile: mobile }).pipe(catchError(err => { throw new UnprocessableEntityException(err.message) }), map((res) => {
-      if (res[0] != null) throw new NotFoundException(`sales partner already present with same phone number`)
-      return res
-    }))));
-  }
-
-
-  fetchSalesPartnerByUserId(id: string) {
-    Logger.debug(`fetchSalesPartnerByUserId() id: [${JSON.stringify(id)}]`, APP);
-
-    return from(lastValueFrom(this.db.find({ user_id: id }).pipe(
-      catchError(err => { throw new UnprocessableEntityException(err.message) }),
+    return from(lastValueFrom(this.db.find({ mobile: mobile }).pipe(catchError(err => { throw new UnprocessableEntityException(err.message) }),
       map((res) => {
-        if (res[0] !== null) throw new NotFoundException(`user already present with same phone number`)
+        if (res[0] != null) throw new NotFoundException(`sales partner already present with same phone number`)
         return res
       }))));
   }
 
-  fetchSalesPartnerById(id: string) {
-    Logger.debug(`fetchSalesPartnerById() id: [${JSON.stringify(id)}]`, APP);
+  fetchSalesPartnerByUserId(id: string) {
+    Logger.debug(`fetchSalesPartnerByUserId() id: [${id}]`, APP);
 
-    return from(lastValueFrom(this.db.find({ id: id }).pipe(catchError(err => { throw new UnprocessableEntityException(err.message) }), map((res) => {
-      if (res[0] == null) throw new NotFoundException(`Sales Partner Not Found`)
-      if (res[0].is_active == false) throw new NotFoundException(`Sales Partner Not Found`)
-      return res
-    }))));
+    return from(lastValueFrom(this.db.find({ user_id: id }).pipe(
+      catchError(err => { throw new UnprocessableEntityException(err.message) }),
+      map((res) => {
+        if (res[0] !== null) throw new NotFoundException(`user already present with same phone number`);
+        return res;
+      }))));
+  }
+
+  fetchSalesPartnerById(id: string) {
+    Logger.debug(`fetchSalesPartnerById() id: [${id}]`, APP);
+
+    return from(lastValueFrom(this.db.find({ id: id }).pipe(
+      catchError(err => { throw new UnprocessableEntityException(err.message) }),
+      map((res) => {
+        if (res[0] == null) throw new NotFoundException(`Sales Partner Not Found`);
+        if (res[0].is_active == false) throw new NotFoundException(`Sales Partner Not Found`);
+        return res;
+      }))));
   }
 
   fetchSalesPartnerBySalesCode(id: string) {
-    Logger.debug(`fetchSalesPartnerById() id: [${JSON.stringify(id)}]`, APP);
+    Logger.debug(`fetchSalesPartnerById() id: [${id}]`, APP);
 
-    return from(lastValueFrom(this.db.find({ sales_code: id }).pipe(catchError(err => { throw new UnprocessableEntityException(err.message) }), map((res) => {
-      if (res[0] == null) throw new NotFoundException(`Sales Partner Not Found`)
-      if (res[0].is_active == false) throw new NotFoundException(`Sales Partner Not Found`)
-      return res
-    }))));
+    return from(lastValueFrom(this.db.find({ sales_code: id }).pipe(
+      catchError(err => { throw new UnprocessableEntityException(err.message) }),
+      map((res) => {
+        if (res[0] == null) throw new NotFoundException(`Sales Partner Not Found`);
+        if (res[0].is_active == false) throw new NotFoundException(`Sales Partner Not Found`);
+        return res;
+      }))));
   }
-
 
   deleteSalesPartner(id: string) {
     Logger.debug(`deleteSalesPartner id: [${id}]`, APP);
 
-    return this.db.find({ id: id }).pipe(map(res => {
-      if (res[0] === null) throw new NotFoundException(`Sales Partner Not Found`)
-      if (res[0].is_active.toString() === "false") throw new NotFoundException(`Sales Partner Not Found`)
-      return lastValueFrom(this.db.findandUpdate({ columnName: 'id', columnvalue: id, quries: { "is_active": "false" } }).pipe(catchError(err => { throw new BadRequestException() }), map(doc => { return doc })))
-    }))
+    return this.db.find({ id: id }).pipe(catchError(err => { throw new UnprocessableEntityException(err.message) }),
+      (map(res => {
+        if (res[0] == null) throw new NotFoundException(`Sales Partner Not Found`)
+        if (res[0].is_active.toString() == "false") throw new NotFoundException(`Sales Partner Not Found`)
+        return lastValueFrom(this.db.findandUpdate({ columnName: 'id', columnvalue: id, quries: { is_active: false } }).pipe(
+          catchError(err => { throw new BadRequestException(err.message) }),
+          map(doc => doc)))
+      })))
   }
 
-  updateSalesPartner(id: number, updateSalesPartnerDto: UpdateSalesPartner) {
+  updateSalesPartner(id: string, updateSalesPartnerDto: UpdateSalesPartner) {
     Logger.debug(`updateSalesPartner() id: [${id}], body: [${JSON.stringify(updateSalesPartnerDto)}]`, APP,);
 
-    return this.db.find({ id: id }).pipe(map(res => {
-      if (res[0] === null) throw new NotFoundException(`Sales Partner Not Found`)
-      if (res[0].is_active === false) throw new NotFoundException(`Sales Partner Not Found`)
-      return lastValueFrom(this.db.findByIdandUpdate({ id: String(id), quries: updateSalesPartnerDto }).pipe(catchError(err => { throw new BadRequestException() }), map(doc => { return doc })))
-    }))
-
+    return this.db.find({ id: id }).pipe(catchError(err => { throw new UnprocessableEntityException(err.message) }),
+      (map(res => {
+        if (res[0] == null) throw new NotFoundException(`Sales Partner Not Found`)
+        if (res[0].is_active == false) throw new NotFoundException(`Sales Partner Not Found`)
+        if (updateSalesPartnerDto?.name?.length == 0) delete updateSalesPartnerDto.name
+        if (updateSalesPartnerDto?.location?.length == 0) delete updateSalesPartnerDto.location
+        return lastValueFrom(this.db.findByIdandUpdate({ id: id, quries: updateSalesPartnerDto }).pipe(
+          catchError(err => { throw new BadRequestException(err.message) }),
+          map(doc => doc)))
+      })))
   }
 
   fetchAllSalesPartnersByDate(params: ZQueryParamsDto) {
     Logger.debug(`fetchAllSalesPartnersByDate() params:[${JSON.stringify(params)}] `, APP);
-    if (Object.keys(params).length == 0) return this.db.fetchAll()
-    else {
-      if (params.date === undefined) return this.db.findByAlphabet(params).pipe(map(doc => { return doc }))
-      else return this.fetchCommissionFromJunctionDb(params).pipe(switchMap(doc => { return this.db.findByDate(this.makeDateFormat(params)) }))
-    }
+
+    if (Object.keys(params).length === 0)
+      return this.db.fetchAll();
+    else if (params.date === undefined) return this.db.findByAlphabet(params).pipe(map(doc => doc))
+    else return this.fetchCommissionFromJunctionDb(params).pipe(
+      switchMap(_doc => this.db.findByDate(this.makeDateFormat(params))))
   }
 
   fetchCommissionFromJunctionDb(ZQueryParamsDto: ZQueryParamsDto) {
     Logger.debug(`fetchCommissionFromJunctionDb() params:[${JSON.stringify(ZQueryParamsDto)}] `, APP);
 
     let arrays = [];
-    return this.junctiondb.findByDate(this.makeDateFormatJunction(ZQueryParamsDto)).pipe(switchMap(async (doc: any) => {
-      let salesceode = []
-      for (let j = 0; j <= doc.length - 1; j++) {
-        for (let i = 0; i <= arrays.length; i++) {
-          if (arrays.length == 0) { arrays.push({ commission_amount: doc[j].commission_amount, sales_code: doc[j].sales_code, total_signups: 1 }); break }
-
-          if (doc[j].sales_code == arrays[i]?.sales_code) {
-            arrays[i].commission_amount = arrays[i].commission_amount + doc[j].commission_amount;
-            arrays[i].total_signups = arrays[i].total_signups + 1
-            break
+    return this.junctiondb.findByDate(this.makeDateFormatJunction(ZQueryParamsDto)).pipe(
+      switchMap(async (doc: any) => {
+        let salesceode = [];
+        for (let j = 0; j <= doc.length - 1; j++) {
+          for (let i = 0; i <= arrays.length; i++) {
+            if (arrays.length === 0)
+              arrays.push({
+                commission_amount: doc[j].commission_amount,
+                sales_code: doc[j].sales_code,
+                total_signups: 1
+              });
+            if (doc[j].sales_code === arrays[i]?.sales_code) {
+              arrays[i].commission_amount = arrays[i].commission_amount + doc[j].commission_amount;
+              arrays[i].total_signups = arrays[i].total_signups + 1;
+            }
           }
-        }
-        for (let i = 0; i <= arrays.length - 1; i++) {
-          salesceode.push(arrays[i]?.sales_code)
-        }
-        if (!salesceode.includes(doc[j].sales_code)) {
-          arrays.push({ commission_amount: doc[j].commission_amount, sales_code: doc[j].sales_code, total_signups: 1 })
-        } else {
+          for (let i = 0; i <= arrays.length - 1; i++)
+            salesceode.push(arrays[i]?.sales_code);
 
+          if (!salesceode.includes(doc[j].sales_code))
+            arrays.push({
+              commission_amount: doc[j].commission_amount,
+              sales_code: doc[j].sales_code,
+              total_signups: 1
+            });
         }
-      }
-      for (var k = 0; k <= arrays.length - 1; k++) {
-        await lastValueFrom(this.db.findandUpdate({ columnName: 'sales_code', columnvalue: arrays[k].sales_code, quries: { total_commission: arrays[k].commission_amount, total_signups: arrays[k].total_signups } }));
-      }
-    })
-    )
+        for (let k = 0; k <= arrays.length - 1; k++)
+          await lastValueFrom(this.db.findandUpdate({
+            columnName: 'sales_code',
+            columnvalue: arrays[k].sales_code,
+            quries: {
+              total_commission: arrays[k].commission_amount,
+              total_signups: arrays[k].total_signups
+            }
+          }));
+      }))
   }
-
-
 
   fetchAllSalesPartnersFromJunctionByDate(id: string, params: ZQueryParamsDto) {
     Logger.debug(`fetchAllSalesPartnersByDate() id: [${id}] params:[${JSON.stringify(params)}] `, APP);
-    let contents = []
-    let contentsParams = []
 
-    if (Object.keys(params).length == 0) return this.invitationJunctiondb.fetchAll().pipe(
-      map(async (doc, index: Number) => {
-        for (let i = 0; i <= doc.length - 1; i++)
-          await lastValueFrom(this.db.find({ sales_code: doc[i].sp_id }).pipe(map(res => { contents.push(res[0]) })))
-
-        return contents
-      }))
-    else if (params.date == undefined) return []
-    else return this.fetchCommissionFromJunctionDb(params).pipe(switchMap(doc => {
-      return this.invitationJunctiondb.findByConditionSales(id, this.makeDateFormat(params)).pipe(
-        map(async (doc: InvitationJunctionModel[], index: Number) => {
-          for (let i = 0; i <= doc.length - 1; i++) {
-            await lastValueFrom(this.db.find({ sales_code: doc[i].sp_id }).pipe(map(res => { contentsParams.push(res[0]) })))
-          }
-          return contentsParams
+    let contents = [];
+    let contentsParams = [];
+    if (Object.keys(params).length === 0)
+      return this.invitationJunctiondb.fetchAllUsingId(id).pipe(
+        map(async (doc, index: Number) => {
+          for (let i = 0; i <= doc.length - 1; i++)
+            await lastValueFrom(this.db.find({ sales_code: doc[i].sp_id }).pipe(
+              map(res => { contents.push(res[0]) })))
+          return contents
         }))
-    }))
+
+    else if (params.date == undefined) return [];
+    else return this.fetchCommissionFromJunctionDb(params).pipe(
+      switchMap(doc => this.invitationJunctiondb.findByConditionSales(id, this.makeDateFormatJunction(params)).pipe(
+        map(async (doc: InvitationJunctionModel[], index: Number) => {
+          for (let i = 0; i <= doc.length - 1; i++)
+            await lastValueFrom(this.db.findByConditionSales(doc[i].sp_id, this.makeDateFormat(params)).pipe(
+              map(res => { contentsParams.push(res[0]) })))
+          const contentsParamsFinal = contentsParams.filter(result => {
+            return result !== undefined;
+          });
+          return contentsParamsFinal
+        }))))
   }
 
   makeDateFormat(params: any) {
@@ -193,17 +220,16 @@ export class SalesService {
     else if (params.date === 'weekly') date = '7';
     else if (params.date === 'yearly') date = '365';
     else if (params.date === 'daily') date = '1';
+    return {
 
-    const modifiedParams = {
       number_of_rows: params.number_of_rows,
       number_of_pages: params.number_of_pages,
       name: params.name,
       date: date,
       is_active: params.is_active
     };
-
-    return modifiedParams
   }
+
   makeDateFormatJunction(params: any) {
     Logger.debug(`makeDateFormatJunction() params:[${JSON.stringify(params)}] `, APP);
 
@@ -220,13 +246,10 @@ export class SalesService {
       name: params.name,
       date: date,
       is_active: params.is_active
-
     };
     delete modifiedParams.is_active
     return modifiedParams
   }
-
-
 
   uploadImage(id: string, fileName: string) {
     Logger.debug(`uploadImage(), ${fileName},`, APP);
@@ -241,14 +264,15 @@ export class SalesService {
   updateImageById(id: string, updateSalesPartnerDto: object) {
     Logger.debug(`updateImageById() id: ${id} Body: ${JSON.stringify(updateSalesPartnerDto)}`, APP);
 
-    return lastValueFrom(this.db.findByIdandUpdate({ id: id, quries: updateSalesPartnerDto }).pipe(map(res => { return res }), catchError(error => { throw new BadRequestException(error.message) })))
-
+    return lastValueFrom(this.db.findByIdandUpdate({ id: id, quries: updateSalesPartnerDto }).pipe(
+      map(res => res),
+      catchError(error => { throw new BadRequestException(error.message) })))
   }
 
-  fetchSalesBySalesCode(sales_code: string) {
-    Logger.debug(`fetchSalesBySalesCode sales_code:${sales_code}`, APP);
+  fetchSalesBySalesCode(salesCode: string) {
+    Logger.debug(`fetchSalesBySalesCode sales_code:${salesCode}`, APP);
 
-    return this.db.find({ sales_code: sales_code }).pipe(
+    return this.db.find({ sales_code: salesCode }).pipe(
       switchMap(res => {
         if (res.length === 0) throw new NotFoundException("sales partner not found")
         return res
@@ -259,7 +283,7 @@ export class SalesService {
   fetchCommisionBySalesCode(salesCode: string) {
     Logger.debug(`fetchCommisionBySalesCode sales_code:${salesCode}`, APP);
 
-    return this.junctiondb.find({ 'sales_code': salesCode }).pipe(
+    return this.junctiondb.find({ sales_code: salesCode }).pipe(
       map(res => {
         if (res.length === 0) throw new NotFoundException("sales partner not found")
         return res[res.length - 1]
@@ -305,52 +329,47 @@ export class SalesService {
 
     return this.fetchSalesBySalesCode(salesCode).pipe(
       switchMap(salesCommission =>
-        lastValueFrom(this.junctiondb.find({ "sales_code": String(salesCode), }))
+        lastValueFrom(this.junctiondb.find({ "sales_code": String(salesCode) }))
           .then(res => { return [salesCommission, res[res.length - 1]] })),
       switchMap(async ([salesCommission, res]) => { await this.salesUser.save({ sales_code: salesCode }); return [salesCommission, res] }),
       switchMap(([salesCommission, res]) =>
         this.junctiondb.save({ sales_code: salesCode, commission_amount: salesCommission["commission"], dues: (Number(res['dues']) + Number(salesCommission["commission"])) })
-
-      )
-
-    )
+      ))
   }
+
   updateUserIdInSales(id: string, updateSalesPartnerDto: UpdateSalesPartner) {
     Logger.debug(`updateSalesPartner() id: [${id}], body: [${JSON.stringify(updateSalesPartnerDto)}]`, APP,);
 
-    return this.db.find({ id: id }).pipe(switchMap(res => {
-      if (res.length == 0) throw new NotFoundException(`Sales Partner Not Found`)
-      else return findUserByCustomerId(updateSalesPartnerDto.customer_id).pipe(map((userDoc) => {
-        if (userDoc.length == 0) throw new NotFoundException("User not found")
-        else if (userDoc[0].userreference_id === updateSalesPartnerDto.customer_id) {
-
-          return lastValueFrom(this.db.findByIdandUpdate({ id: id, quries: { user_id: userDoc[0].fedo_id } }).pipe(catchError(err => { throw new BadRequestException(err.message) }), map(doc => { return doc })))
-        }
+    return this.db.find({ id: id }).pipe(catchError(err => { throw new UnprocessableEntityException(err.message) }),
+      switchMap(res => {
+        if (res.length === 0) throw new NotFoundException(`Sales Partner Not Found`);
+        else return findUserByCustomerId(updateSalesPartnerDto.customer_id).pipe(map((userDoc) => {
+          if (userDoc.length === 0) throw new NotFoundException("User not found");
+          else if (userDoc[0].userreference_id === updateSalesPartnerDto.customer_id)
+            return lastValueFrom(this.db.findByIdandUpdate({ id: id, quries: { user_id: userDoc[0].fedo_id } }).pipe(
+              catchError(err => { throw new BadRequestException(err.message) }),
+              map(doc => doc)))
+        }))
       }))
-    }))
   }
 
   fetchEarnigReport(yearMonthDto: YearMonthDto) {
-    Logger.debug(`fetchCommissionReport() year: [${yearMonthDto.year}]`)
+    Logger.debug(`fetchCommissionReport() year: [${yearMonthDto.year}]`);
 
     const reportData = []
     return from(fetchmonths((yearMonthDto.year))).pipe(
-      concatMap(async (month: number) => {
-        return await lastValueFrom(this.junctiondb.fetchByYear({ columnName: 'sales_code', columnvalue: yearMonthDto.salesCode, year: yearMonthDto.year, month: month.toString() }))
-          .then(async salesJunctionDoc => {
-            const paid_amount = salesJunctionDoc.map(doc => doc.paid_amount)
-            const total_paid_amount = paid_amount.reduce((next, prev) => next + prev, 0)
-            const date = salesJunctionDoc.map(doc => { if (doc.paid_amount > 0) return doc.created_date })
-            const paid_on = date.filter((res) => res)
-            await this.fetchSignup(yearMonthDto.year, month, yearMonthDto)
-              .then(signup => {
-                reportData.push({ "total_paid_amount": total_paid_amount, "month": month , "hsa_sing_up": signup, "paid_on": paid_on[0], 'total_dues': Number(salesJunctionDoc[salesJunctionDoc.length - 1]?.dues) })
-              }).catch(error => { throw new NotFoundException(error.message) })
-            return reportData
-          })
-      })
-    )
-
+      concatMap(async (month: number) => await lastValueFrom(this.junctiondb.fetchByYear({ columnName: 'sales_code', columnvalue: yearMonthDto.salesCode, year: yearMonthDto.year, month: month.toString() }))
+        .then(async salesJunctionDoc => {
+          const paidAmount = salesJunctionDoc.map(doc => doc.paid_amount)
+          const totalPaidAmount = paidAmount.reduce((next, prev) => next + prev, 0)
+          const date = salesJunctionDoc.map(doc => { if (doc.paid_amount > 0) return doc.created_date })
+          const paidOn = date.filter((res) => res)
+          await this.fetchSignup(yearMonthDto.year, month, yearMonthDto)
+            .then(signup => {
+              reportData.push({ "total_paid_amount": totalPaidAmount, "month": month - 1, "hsa_sing_up": signup, "paid_on": paidOn[0], 'total_dues': salesJunctionDoc[salesJunctionDoc.length - 1]?.dues })
+            }).catch(error => { throw new NotFoundException(error.message) })
+          return reportData
+        })))
   }
 
   async fetchSignup(year, month, yearMonthDto: YearMonthDto) {

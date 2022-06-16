@@ -1,6 +1,6 @@
 import { Email } from "aws-sdk/clients/codecommit";
 import { phoneNumber } from "aws-sdk/clients/importexport";
-import { IsEmail, IsEnum, IsNotEmpty, IsOptional, IsString, MaxLength, MinLength } from "class-validator";
+import { IsEmail, IsEnum, IsNotEmpty, IsNumberString, IsOptional, IsPhoneNumber, IsString, MaxLength, MinLength } from "class-validator";
 
 export class CreateSalesJunction {
     sales_code: string;
@@ -17,11 +17,10 @@ export class CreateSalesPartner {
 
     id: number;
     name: string;
+    @IsPhoneNumber()
     @IsNotEmpty()
     mobile: phoneNumber;
-    @IsNotEmpty()
     location: string;
-    @IsEmail()
     email: Email;
     @IsNotEmpty()
     commission: number;
@@ -32,26 +31,32 @@ export class CreateSalesPartner {
     refered_by: string;
     block_account: boolean;
     is_hsa_account: boolean;
-    @IsNotEmpty()
     profile_confirmation: boolean;
 }
 
 export class CreateSalesPartnerRequest {
+
     @IsNotEmpty()
     sales_code: string;
+
     @IsNotEmpty()
     request_id: string;
+
     id: string;
 }
 
 export class CreateWithdrawn {
+
     id: string;
     @IsNotEmpty()
     created_date: Date;
+
     @IsNotEmpty()
     updated_date: Date;
+
     @IsNotEmpty()
     sp_id: string;
+
     @IsNotEmpty()
     paid_amount: number;
 }
@@ -79,7 +84,9 @@ export class UpdateSalesPartner {
     sales_code: string;
     block_account: boolean;
     profile_confirmation: boolean;
-    customer_id: string
+    customer_id: string;
+    mobile:phoneNumber;
+    email:Email;
 
 }
 export enum Is_active {
@@ -88,14 +95,19 @@ export enum Is_active {
 }
 
 export class ZQueryParamsDto {
+
     @IsOptional()
     name?: string;
+
     @IsOptional()
     date?: string;
+
     @IsOptional()
     number_of_pages?: number;
+
     @IsOptional()
     number_of_rows?: number;
+
     @IsOptional()
     @IsEnum(Is_active)
     is_active: Is_active;
@@ -103,6 +115,7 @@ export class ZQueryParamsDto {
 
 
 export enum Periodicity {
+
     DAILY = 'daily',
     WEEKLY = 'weekly',
     MONTHLY = 'monthly',
@@ -146,10 +159,11 @@ export const makeEarningFormat = (earning: number[]): EarningResponse =>
 export class YearMonthDto {
 
     @IsNotEmpty()
-    @IsString()
+    @IsNumberString()
     @MinLength(4, { message: 'Enter only 4 digit value of year, This is too short', })
     @MaxLength(4, { message: 'Enter only 4 digit value of year, This is too long', })
     year: string;
+
     @IsNotEmpty()
     salesCode: string;
 

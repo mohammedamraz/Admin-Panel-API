@@ -386,7 +386,7 @@ w
     
     let performance =[]
     return lastValueFrom(from(createSalesPartner).pipe(
-      switchMap(salesDoc => lastValueFrom(this.fetchSignupforPerformace(salesDoc, dateDTO)).then(doc => performance.push(doc)))))
+      switchMap(salesDoc => { console.log('dona', salesDoc);return lastValueFrom(this.fetchSignupforPerformace(salesDoc, dateDTO)).then(doc => performance.push(doc))})))
       .then(_doc => applyPerformance(performance, averageSignup(createSalesPartner.length, performance.reduce((acc, curr) => acc += curr.signups, 0))) )
 
   }

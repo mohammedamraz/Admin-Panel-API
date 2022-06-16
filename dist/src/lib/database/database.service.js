@@ -142,6 +142,11 @@ let DatabaseService = class DatabaseService {
         const query = `SELECT * FROM ${this.tableName}`;
         return this.runQuery(query);
     }
+    fetchAllUsingId(id) {
+        common_1.Logger.debug(`fetchAll()}`, APP);
+        const query = `SELECT * FROM ${this.tableName} WHERE refered_by='${id}'`;
+        return this.runQuery(query);
+    }
     findByCondition(id, findbyConditionParams) {
         common_1.Logger.debug(`findByCondition(): params ${[JSON.stringify(findbyConditionParams)]}`, APP);
         let params = (0, database_interface_1.findByConditionParamsAlign)(findbyConditionParams);
@@ -171,10 +176,32 @@ let DatabaseService = class DatabaseService {
         const number = params.number_of_rows * params.number_of_pages;
         delete params.number_of_pages;
         delete params.name;
-        delete params.is_active;
-        Object.values(params).map((params, index) => { variables.push(params), values.push((`$${index + 1}`)); });
-        const query = `SELECT * FROM ${this.tableName} WHERE refered_by='${id}' AND created_date > CURRENT_DATE - (interval '1 day' * ${values[1]})  ORDER BY created_date LIMIT  ${values[0]} OFFSET ${number}`;
-        return this.runQuery(query, variables);
+        if (this.tableName == "sales_partner_invitation_junction") {
+            if (params.is_active) {
+                Object.values(params).map((params, index) => { variables.push(params), values.push((`$${index + 1}`)); });
+                const query = `SELECT * FROM ${this.tableName} WHERE refered_by='${id}'AND is_active= ${values[2]} AND created_date > CURRENT_DATE - (interval '1 day' * ${values[1]})  ORDER BY created_date LIMIT  ${values[0]} OFFSET ${number}`;
+                return this.runQuery(query, variables);
+            }
+            else {
+                delete params.is_active;
+                Object.values(params).map((params, index) => { variables.push(params), values.push((`$${index + 1}`)); });
+                const query = `SELECT * FROM ${this.tableName} WHERE refered_by='${id}'AND created_date > CURRENT_DATE - (interval '1 day' * ${values[1]})  ORDER BY created_date LIMIT  ${values[0]} OFFSET ${number}`;
+                return this.runQuery(query, variables);
+            }
+        }
+        else {
+            if (params.is_active) {
+                Object.values(params).map((params, index) => { variables.push(params), values.push((`$${index + 1}`)); });
+                const query = `SELECT * FROM ${this.tableName} WHERE sales_code='${id}'AND is_active= ${values[2]} AND created_date > CURRENT_DATE - (interval '1 day' * ${values[1]})  ORDER BY created_date LIMIT  ${values[0]} OFFSET ${number}`;
+                return this.runQuery(query, variables);
+            }
+            else {
+                delete params.is_active;
+                Object.values(params).map((params, index) => { variables.push(params), values.push((`$${index + 1}`)); });
+                const query = `SELECT * FROM ${this.tableName} WHERE sales_code='${id}'AND created_date > CURRENT_DATE - (interval '1 day' * ${values[1]})  ORDER BY created_date LIMIT  ${values[0]} OFFSET ${number}`;
+                return this.runQuery(query, variables);
+            }
+        }
     }
     findByDate(findbyConditionParams) {
         common_1.Logger.debug(`find_by_date(): params ${[JSON.stringify(findbyConditionParams)]}`, APP);
