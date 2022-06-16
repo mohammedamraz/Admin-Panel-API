@@ -327,7 +327,7 @@ let AdminService = class AdminService {
     fetchCommissionReportforSalesPartner(createSalesPartner, dateDTO) {
         common_1.Logger.debug(`fetchCommissionReportforSalesPartner() createSalesPartner: [${JSON.stringify(createSalesPartner)}]`, APP);
         let performance = [];
-        return (0, rxjs_1.lastValueFrom)((0, rxjs_1.from)(createSalesPartner).pipe((0, rxjs_1.switchMap)(salesDoc => (0, rxjs_1.lastValueFrom)(this.fetchSignupforPerformace(salesDoc, dateDTO)).then(doc => performance.push(doc)))))
+        return (0, rxjs_1.lastValueFrom)((0, rxjs_1.from)(createSalesPartner).pipe((0, rxjs_1.switchMap)(salesDoc => { console.log('dona', salesDoc); return (0, rxjs_1.lastValueFrom)(this.fetchSignupforPerformace(salesDoc, dateDTO)).then(doc => performance.push(doc)); })))
             .then(_doc => (0, login_dto_1.applyPerformance)(performance, (0, login_dto_1.averageSignup)(createSalesPartner.length, performance.reduce((acc, curr) => acc += curr.signups, 0))));
     }
     fetchSignupforPerformace(createSalesPartner, dateDTO) {
