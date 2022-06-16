@@ -5,113 +5,118 @@ import { SalesService } from './sales.service';
 import { diskStorage } from 'multer';
 import { STATIC_IMAGES_PROFILE } from 'src/constants';
 import { editFileName, imageFileFilter } from 'src/constants/helper';
+import { SalesCommissionService } from './sales-commission.service';
 
 const APP = 'SalesController';
 @Controller()
 export class SalesController {
-  constructor(private readonly salesService: SalesService) { }
+  constructor(private readonly salesService: SalesService, private readonly salesCommissionService: SalesCommissionService) { }
 
   @Post()
   createSalesPartner(@Body() createSalesPartner: CreateSalesPartner) {
-  Logger.debug(`createSalesPartner() DTO:${JSON.stringify(createSalesPartner,)}`, APP);
+    Logger.debug(`createSalesPartner() DTO:${JSON.stringify(createSalesPartner,)}`, APP);
 
-  return this.salesService.createSalesPartner(createSalesPartner)
+    return this.salesService.createSalesPartner(createSalesPartner)
   }
 
-  @Post(':salesCode/add-commission')
-  addCommission(@Param('salesCode') salesCode: string) {
-  Logger.debug(`addCommission() salesCode: [${salesCode}] `, APP);
-
-  return this.salesService.addCommission(salesCode);
-  }
 
   @Delete(':id')
   deleteSalesPartner(@Param('id') id: string) {
-  Logger.debug(`deleteSalesPartner() id: [${id}]`, APP);
+    Logger.debug(`deleteSalesPartner() id: [${id}]`, APP);
 
-  return this.salesService.deleteSalesPartner(id);
+    return this.salesService.deleteSalesPartner(id);
   }
 
   @Get(':id')
   fetchSalesPartnerById(@Param('id') id: string) {
-  Logger.debug(`fetchSalesPartnerById() id: [${id}]`, APP);
+    Logger.debug(`fetchSalesPartnerById() id: [${id}]`, APP);
 
-  return this.salesService.fetchSalesPartnerById(id);
+    return this.salesService.fetchSalesPartnerById(id);
   }
 
-  @Get(':salesCode/earning')
-  fetchEarnings(@Param('salesCode') salesCode: string, @Query() period: Period) {
-  Logger.debug(`fetchEarnings()salesCode: [${salesCode}] `, APP);
 
-  return this.salesService.fetchEarnings(salesCode, period);
-  }
   @Get(':id/sales-junction')
   fetchAllSalesPartnersFromJunctionByDate(@Param('id') id: string, @Query() params: ZQueryParamsDto) {
-  Logger.debug(`fetchAllSalesPartnersFromJunctionByDate() id: [${id}] params:${JSON.stringify(params)}`, APP);
+    Logger.debug(`fetchAllSalesPartnersFromJunctionByDate() id: [${id}] params:${JSON.stringify(params)}`, APP);
 
-  return this.salesService.fetchAllSalesPartnersFromJunctionByDate(id, params)
+    return this.salesService.fetchAllSalesPartnersFromJunctionByDate(id, params)
   }
-  
+
   @Get()
   fetchAllSalesPartnersByDate(@Query() params: ZQueryParamsDto) {
-  Logger.debug(`fetchAllSalesPartnersByDate() params:${JSON.stringify(params)}`, APP);
+    Logger.debug(`fetchAllSalesPartnersByDate() params:${JSON.stringify(params)}`, APP);
 
-  return this.salesService.fetchAllSalesPartnersByDate(params)
+    return this.salesService.fetchAllSalesPartnersByDate(params)
   }
-
-
-  @Patch(':id/image')
-  @UseInterceptors(FileInterceptor('file', {
-  storage: diskStorage({_destination: STATIC_IMAGES_PROFILE,
-      get destination() {
-          return this._destination;
-      },
-      set destination(value) {
-          this._destination = value;
-      },
-      filename: editFileName}),
-  fileFilter: imageFileFilter
-  }))
-  async uploadImage(@Param('id') id: string, @UploadedFile() file) {
-  Logger.debug(`UploadImage: ${file}`, APP);
-
-  return this.salesService.uploadImage(id, file.filename);
-  }
-
-  @Get(':salesCode/invatation-response')
-  fetchInvitationResponse(@Param('salesCode') salesCode: string, @Query() period: Period) {
-  Logger.debug(`fetchInvitationResponse()salesCode: [${salesCode}] `, APP);
-
-  return this.salesService.fetchInvitationResponse(salesCode, period);
-  }
-
-    
 
   @Patch(':id')
   updateSalesPartner(@Param('id') id: string, @Body() updateSalesPartnerDto: UpdateSalesPartner) {
-    Logger.debug(`updateSalesPartner() id: [${id}] DTO:${JSON.stringify(updateSalesPartnerDto,)}`, APP);
+    Logger.debug(`updateSalesPartner() id: [${id}] updateSalesPartnerDto :${JSON.stringify(updateSalesPartnerDto,)}`, APP);
 
-  return this.salesService.updateSalesPartner(id, updateSalesPartnerDto);
+    return this.salesService.updateSalesPartner(id, updateSalesPartnerDto);
   }
 
-  @Patch('bank-details-verification/:id')
-  changeBankDetailsVerificationStatus(@Param('id', ParseIntPipe) id: number) {
-  Logger.debug(`changeBankDetailsVerificationSatatus() id:[${id}] `, APP);
+  @Patch(':id/image')
+  @UseInterceptors(FileInterceptor('file', {
+    storage: diskStorage({
+      _destination: STATIC_IMAGES_PROFILE,
+      get destination() {
+        return this._destination;
+      },
+      set destination(value) {
+        this._destination = value;
+      },
+      filename: editFileName
+    }),
+    fileFilter: imageFileFilter
+  }))
 
-  return this.salesService.changeBankDetailsVerificationSatatus(id);
+  async uploadImage(@Param('id') id: string, @UploadedFile() file) {
+    Logger.debug(`UploadImage: ${file}`, APP);
+
+    return this.salesService.uploadImage(id, file.filename);
   }
 
   @Patch(':id/update-customer')
   updateUserIdInSales(@Param('id') id: string, @Body() updateSalesPartnerDto: UpdateSalesPartner) {
-  Logger.debug(`updateUserIdInSales() id: [${id}] DTO:${JSON.stringify(updateSalesPartnerDto,)}`, APP);
+    Logger.debug(`updateUserIdInSales() id: [${id}] DTO:${JSON.stringify(updateSalesPartnerDto,)}`, APP);
 
-  return this.salesService.updateUserIdInSales(id, updateSalesPartnerDto);
+    return this.salesService.updateUserIdInSales(id, updateSalesPartnerDto);
   }
+
+  @Post(':salesCode/add-commission')
+  addCommission(@Param('salesCode') salesCode: string) {
+    Logger.debug(`addCommission() salesCode: [${salesCode}] `, APP);
+
+    return this.salesCommissionService.addCommission(salesCode);
+  }
+
+  @Get(':salesCode/earning')
+  fetchEarnings(@Param('salesCode') salesCode: string, @Query() period: Period) {
+    Logger.debug(`fetchEarnings()salesCode: [${salesCode}] `, APP);
+
+    return this.salesCommissionService.fetchEarnings(salesCode, period);
+  }
+
+  @Get(':salesCode/invatation-response')
+  fetchInvitationResponse(@Param('salesCode') salesCode: string, @Query() period: Period) {
+    Logger.debug(`fetchInvitationResponse()salesCode: [${salesCode}] `, APP);
+
+    return this.salesCommissionService.fetchInvitationResponse(salesCode, period);
+  }
+
+  @Patch('bank-details-verification/:id')
+  changeBankDetailsVerificationStatus(@Param('id', ParseIntPipe) id: number) {
+    Logger.debug(`changeBankDetailsVerificationSatatus() id:[${id}] `, APP);
+
+    return this.salesCommissionService.changeBankDetailsVerificationSatatus(id);
+  }
+
 
   @Get(':salesCode/earning-report/:year')
   fetchEarnigReport(@Param() yearMonthDto: YearMonthDto) {
-  Logger.debug(`fetchEarnigReport() year: [${yearMonthDto.year}`, APP);
+    Logger.debug(`fetchEarnigReport() year: [${yearMonthDto.year}`, APP);
 
-  return this.salesService.fetchEarnigReport(yearMonthDto);
+    return this.salesCommissionService.fetchEarnigReport(yearMonthDto);
   }
 }

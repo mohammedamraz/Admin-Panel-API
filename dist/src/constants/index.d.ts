@@ -20,6 +20,7 @@ export declare const SES_SOURCE_EMAIL: string;
 export declare const SES_SOURCE_SUPPORT_EMAIL: string;
 export declare const STATIC_IMAGES: string;
 export declare const STATIC_IMAGES_PROFILE: string;
+export declare const FEDO_HSA_USER_CONNECTION_URL: string;
 export declare const AWS_COGNITO_USER_CREATION_URL_SIT: string;
 export declare const PUBLIC_KEY: string;
 export declare const PRIVATE_KEY: string;

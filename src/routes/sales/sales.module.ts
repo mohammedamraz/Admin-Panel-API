@@ -3,10 +3,11 @@ import { SalesService } from './sales.service';
 import { SalesController } from './sales.controller';
 import { DatabaseModule } from 'src/lib/database/database.module';
 import { HttpModule } from '@nestjs/axios';
+import { SalesCommissionService } from './sales-commission.service';
 
 
 @Module({
-  imports:[
+  imports: [
     DatabaseModule.forFeature({ tableName: 'sales_partner' }),
     DatabaseModule.forFeature({ tableName: 'sales_commission_junction' }),
     DatabaseModule.forFeature({ tableName: 'sales_partner_invitation_junction' }),
@@ -18,6 +19,6 @@ import { HttpModule } from '@nestjs/axios';
       maxRedirects: 5,
     }),],
   controllers: [SalesController],
-  providers: [SalesService]
+  providers: [SalesService, SalesCommissionService]
 })
-export class SalesModule {}
+export class SalesModule { }

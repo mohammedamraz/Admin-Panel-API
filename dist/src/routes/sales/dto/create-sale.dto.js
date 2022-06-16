@@ -99,6 +99,7 @@ var Periodicity;
     Periodicity["QUARTERLY"] = "quarterly";
     Periodicity["HALF_YEARLY"] = "halfyearly";
     Periodicity["YEARLY"] = "yearly";
+    Periodicity["DECADE"] = "decade";
 })(Periodicity = exports.Periodicity || (exports.Periodicity = {}));
 class UpdateImageDTO {
 }

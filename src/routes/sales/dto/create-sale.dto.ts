@@ -122,6 +122,7 @@ export enum Periodicity {
     QUARTERLY = 'quarterly',
     HALF_YEARLY = 'halfyearly',
     YEARLY = 'yearly',
+    DECADE = 'decade'
 }
 
 export class UpdateImageDTO {

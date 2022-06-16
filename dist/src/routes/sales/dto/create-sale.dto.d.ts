@@ -79,7 +79,8 @@ export declare enum Periodicity {
     MONTHLY = "monthly",
     QUARTERLY = "quarterly",
     HALF_YEARLY = "halfyearly",
-    YEARLY = "yearly"
+    YEARLY = "yearly",
+    DECADE = "decade"
 }
 export declare class UpdateImageDTO {
     user_image: string;
@@ -99,7 +100,7 @@ export declare class EarningResponse {
     earnedAmount: number;
     paidAmount: number;
 }
-export declare const Interval: (period: Period) => string;
+export declare const Interval: (period: Period) => any;
 export declare const makeEarningFormat: (earning: number[]) => EarningResponse;
 export declare class YearMonthDto {
     year: string;

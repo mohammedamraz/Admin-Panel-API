@@ -12,6 +12,7 @@ const sales_service_1 = require("./sales.service");
 const sales_controller_1 = require("./sales.controller");
 const database_module_1 = require("../../lib/database/database.module");
 const axios_1 = require("@nestjs/axios");
+const sales_commission_service_1 = require("./sales-commission.service");
 let SalesModule = class SalesModule {
 };
 SalesModule = __decorate([
@@ -28,7 +29,7 @@ SalesModule = __decorate([
             }),
         ],
         controllers: [sales_controller_1.SalesController],
-        providers: [sales_service_1.SalesService]
+        providers: [sales_service_1.SalesService, sales_commission_service_1.SalesCommissionService]
     })
 ], SalesModule);
 exports.SalesModule = SalesModule;

@@ -169,7 +169,7 @@ let DatabaseService = class DatabaseService {
         return this.runQuery(query);
     }
     findByConditionSales(id, findbyConditionParams) {
-        common_1.Logger.debug(`findByCondition(): params ${[JSON.stringify(findbyConditionParams)]}`, APP);
+        common_1.Logger.debug(`findByConditionSales(): params ${[JSON.stringify(findbyConditionParams)]}`, APP);
         let params = findbyConditionParams;
         let variables = [];
         let values = [];
