@@ -1,6 +1,6 @@
 import { AccountZwitchResponseBody, createAccount, User } from "src/routes/admin/dto/create-admin.dto";
 import { HttpService } from '@nestjs/axios';
-import { AxiosResponse } from 'axios';
+import { AxiosResponse, AxiosError } from 'axios';
 import { catchError, map, throwError } from "rxjs";
 import { extname } from "path";
 import { BadRequestException, NotFoundException, UnauthorizedException, UnprocessableEntityException } from "@nestjs/common";
@@ -52,8 +52,9 @@ export const imageFileFilter = (req, file, callback) => {
 
 	callback(null, true);
 };
-const onHTTPErrorResponse = async (err) => {
-	console.log('dasdasdfasdf', err)
+const onHTTPErrorResponse = async (err: AxiosError) => {
+	console.log('dasdasdfasdf', err.code)
+	if (err.code === 'ECONNREFUSED') throw new UnprocessableEntityException('Please check your server connection');
 	if (err.response.data.statusCode === 401) throw new UnauthorizedException(err.response.data.message);
 	if (err.response.data.statusCode === 422) throw new UnprocessableEntityException(err.response.data.error.message);
 	if (err.response.data.statusCode === 404) throw new NotFoundException(err.response.data.message);

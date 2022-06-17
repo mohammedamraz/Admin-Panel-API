@@ -331,7 +331,7 @@ export class DatabaseService<T> implements DatabaseInterface<T> {
   }
 
   fetchBetweenRange(date: DateRangeParams): Observable<T[]> {
-    Logger.debug(`fetchByMonth(): date ${[JSON.stringify(date)]}`, APP);
+    Logger.debug(`fetchBetweenRange(): date ${[JSON.stringify(date)]}`, APP);
 
     const query = `SELECT * FROM ${this.tableName} WHERE ((created_date between '${date.from}' and '${date.to}'))`;
     return this.runQuery(query);

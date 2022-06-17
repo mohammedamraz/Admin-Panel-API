@@ -43,7 +43,9 @@ const imageFileFilter = (req, file, callback) => {
 };
 exports.imageFileFilter = imageFileFilter;
 const onHTTPErrorResponse = async (err) => {
-    console.log('dasdasdfasdf', err);
+    console.log('dasdasdfasdf', err.code);
+    if (err.code === 'ECONNREFUSED')
+        throw new common_1.UnprocessableEntityException('Please check your server connection');
     if (err.response.data.statusCode === 401)
         throw new common_1.UnauthorizedException(err.response.data.message);
     if (err.response.data.statusCode === 422)
