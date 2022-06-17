@@ -74,9 +74,9 @@ __decorate([
 ], PeriodRange.prototype, "period", void 0);
 exports.PeriodRange = PeriodRange;
 exports.PERIODADMIN = {
-    month: 1,
-    quarter: 3,
-    year: 12
+    monthly: 1,
+    quarterly: 3,
+    yearly: 12
 };
 const formatDate = (date) => {
     const DATE = new Date(date);

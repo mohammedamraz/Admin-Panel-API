@@ -25,9 +25,9 @@ export declare class PeriodRange {
     period: PeriodicityAdmin;
 }
 export declare const PERIODADMIN: {
-    month: number;
-    quarter: number;
-    year: number;
+    monthly: number;
+    quarterly: number;
+    yearly: number;
 };
 export declare const formatDate: (date: any) => string;
 export declare const fetchDAte: (date: Date, period: number) => {

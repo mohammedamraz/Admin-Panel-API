@@ -217,7 +217,7 @@ let DatabaseService = class DatabaseService {
         return this.runQuery(query);
     }
     fetchBetweenRange(date) {
-        common_1.Logger.debug(`fetchByMonth(): date ${[JSON.stringify(date)]}`, APP);
+        common_1.Logger.debug(`fetchBetweenRange(): date ${[JSON.stringify(date)]}`, APP);
         const query = `SELECT * FROM ${this.tableName} WHERE ((created_date between '${date.from}' and '${date.to}'))`;
         return this.runQuery(query);
     }
