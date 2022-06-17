@@ -13,7 +13,6 @@ export declare class SalesController {
     updateSalesPartner(id: string, updateSalesPartnerDto: UpdateSalesPartner): import("rxjs").Observable<Promise<import("../../lib/config/model/sales.model").CreateSalesPartnerModel[]>>;
     uploadImage(id: string, file: any): Promise<import("rxjs").Observable<import("../../lib/config/model/sales.model").CreateSalesPartnerModel[]>>;
     updateUserIdInSales(id: string, updateSalesPartnerDto: UpdateSalesPartner): import("rxjs").Observable<Promise<import("../../lib/config/model/sales.model").CreateSalesPartnerModel[]>>;
-    addCommission(salesCode: string): import("rxjs").Observable<import("./dto/create-sale.dto").CreateSalesJunction[]>;
     fetchEarnings(salesCode: string, period: Period): import("rxjs").Observable<import("./dto/create-sale.dto").EarningResponse>;
     fetchInvitationResponse(salesCode: string, period: Period): import("rxjs").Observable<{
         signup: number;

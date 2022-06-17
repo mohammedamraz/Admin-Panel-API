@@ -84,13 +84,6 @@ export class SalesController {
     return this.salesService.updateUserIdInSales(id, updateSalesPartnerDto);
   }
 
-  @Post(':salesCode/add-commission')
-  addCommission(@Param('salesCode') salesCode: string) {
-    Logger.debug(`addCommission() salesCode: [${salesCode}] `, APP);
-
-    return this.salesCommissionService.addCommission(salesCode);
-  }
-
   @Get(':salesCode/earning')
   fetchEarnings(@Param('salesCode') salesCode: string, @Query() period: Period) {
     Logger.debug(`fetchEarnings()salesCode: [${salesCode}] `, APP);
@@ -107,9 +100,9 @@ export class SalesController {
 
   @Patch('bank-details-verification/:id')
   changeBankDetailsVerificationStatus(@Param('id', ParseIntPipe) id: number) {
-    Logger.debug(`changeBankDetailsVerificationSatatus() id:[${id}] `, APP);
+    Logger.debug(`changeBankDetailsVerificationStatus() id:[${id}] `, APP);
 
-    return this.salesCommissionService.changeBankDetailsVerificationSatatus(id);
+    return this.salesCommissionService.changeBankDetailsVerificationStatus(id);
   }
 
 

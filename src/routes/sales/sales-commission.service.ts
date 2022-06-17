@@ -66,8 +66,8 @@ export class SalesCommissionService {
             }))
     }
 
-    changeBankDetailsVerificationSatatus(id: number) {
-        Logger.debug(`changeBankDetailsVerificationSatatus() id: [${id}] `, APP);
+    changeBankDetailsVerificationStatus(id: number) {
+        Logger.debug(`changeBankDetailsVerificationStatus() id: [${id}] `, APP);
 
         return (this.db.find({ id: id })).pipe(
             catchError(err => { (err); throw new UnprocessableEntityException(err.message) }),
