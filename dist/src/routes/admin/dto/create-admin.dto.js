@@ -113,6 +113,9 @@ const fetchmonths = (year) => {
     common_1.Logger.debug(`fetchmonths() year: [${year}]`);
     let month = [];
     let i = 0;
+    if (new Date().getFullYear() < parseInt(year)) {
+        throw new common_1.BadRequestException();
+    }
     if (new Date().getFullYear().toString() === year) {
         for (i = new Date().getMonth() + 1; i > 0; i--)
             month.push(i);
