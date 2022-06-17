@@ -7,23 +7,23 @@ const path_1 = require("path");
 const common_1 = require("@nestjs/common");
 const index_1 = require("./index");
 const fetchUser = (userId) => {
-    return new axios_1.HttpService().get(`http://0.0.0.0:35000/users/${userId}`).pipe((0, rxjs_1.catchError)(err => onHTTPErrorResponse(err)), (0, rxjs_1.map)((res) => res.data));
+    return new axios_1.HttpService().get(`${index_1.FEDO_HSA_USER_CONNECTION_URL}${userId}`).pipe((0, rxjs_1.catchError)(err => onHTTPErrorResponse(err)), (0, rxjs_1.map)((res) => res.data));
 };
 exports.fetchUser = fetchUser;
 const fetchAccount = (userId, accountId) => {
-    return new axios_1.HttpService().get(`http://0.0.0.0:35000/users/${userId}/accounts/${accountId}`).pipe((0, rxjs_1.catchError)(err => onHTTPErrorResponse(err)), (0, rxjs_1.map)((res) => res.data));
+    return new axios_1.HttpService().get(`${index_1.FEDO_HSA_USER_CONNECTION_URL}${userId}/accounts/${accountId}`).pipe((0, rxjs_1.catchError)(err => onHTTPErrorResponse(err)), (0, rxjs_1.map)((res) => res.data));
 };
 exports.fetchAccount = fetchAccount;
 const fetchUserByMobileNumber = (phoneNumber) => {
-    return new axios_1.HttpService().get(`http://0.0.0.0:35000/users/${phoneNumber}/phoneNumber`).pipe((0, rxjs_1.catchError)(err => onHTTPErrorResponse(err)), (0, rxjs_1.map)((res) => res.data));
+    return new axios_1.HttpService().get(`${index_1.FEDO_HSA_USER_CONNECTION_URL}${phoneNumber}/phoneNumber`).pipe((0, rxjs_1.catchError)(err => onHTTPErrorResponse(err)), (0, rxjs_1.map)((res) => res.data));
 };
 exports.fetchUserByMobileNumber = fetchUserByMobileNumber;
 const fetchAccountBySalesCode = (salesCode) => {
-    return new axios_1.HttpService().get(`http://0.0.0.0:35000/users/${salesCode}/accounts`).pipe((0, rxjs_1.catchError)(err => onHTTPErrorResponse(err)), (0, rxjs_1.map)((res) => res.data));
+    return new axios_1.HttpService().get(`${index_1.FEDO_HSA_USER_CONNECTION_URL}${salesCode}/accounts`).pipe((0, rxjs_1.catchError)(err => onHTTPErrorResponse(err)), (0, rxjs_1.map)((res) => res.data));
 };
 exports.fetchAccountBySalesCode = fetchAccountBySalesCode;
 const findUserByCustomerId = (id) => {
-    return new axios_1.HttpService().get(`http://0.0.0.0:35000/users/customer/${id}`).pipe((0, rxjs_1.catchError)(err => onHTTPErrorResponse(err)), (0, rxjs_1.map)((res) => res.data));
+    return new axios_1.HttpService().get(`${index_1.FEDO_HSA_USER_CONNECTION_URL}customer/${id}`).pipe((0, rxjs_1.catchError)(err => onHTTPErrorResponse(err)), (0, rxjs_1.map)((res) => res.data));
 };
 exports.findUserByCustomerId = findUserByCustomerId;
 const editFileName = (req, file, callback) => {

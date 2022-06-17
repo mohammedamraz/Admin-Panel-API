@@ -20,18 +20,16 @@ const sales_service_1 = require("./sales.service");
 const multer_1 = require("multer");
 const constants_1 = require("../../constants");
 const helper_1 = require("../../constants/helper");
+const sales_commission_service_1 = require("./sales-commission.service");
 const APP = 'SalesController';
 let SalesController = class SalesController {
-    constructor(salesService) {
+    constructor(salesService, salesCommissionService) {
         this.salesService = salesService;
+        this.salesCommissionService = salesCommissionService;
     }
     createSalesPartner(createSalesPartner) {
         common_1.Logger.debug(`createSalesPartner() DTO:${JSON.stringify(createSalesPartner)}`, APP);
         return this.salesService.createSalesPartner(createSalesPartner);
-    }
-    addCommission(salesCode) {
-        common_1.Logger.debug(`addCommission() salesCode: [${salesCode}] `, APP);
-        return this.salesService.addCommission(salesCode);
     }
     deleteSalesPartner(id) {
         common_1.Logger.debug(`deleteSalesPartner() id: [${id}]`, APP);
@@ -41,10 +39,6 @@ let SalesController = class SalesController {
         common_1.Logger.debug(`fetchSalesPartnerById() id: [${id}]`, APP);
         return this.salesService.fetchSalesPartnerById(id);
     }
-    fetchEarnings(salesCode, period) {
-        common_1.Logger.debug(`fetchEarnings()salesCode: [${salesCode}] `, APP);
-        return this.salesService.fetchEarnings(salesCode, period);
-    }
     fetchAllSalesPartnersFromJunctionByDate(id, params) {
         common_1.Logger.debug(`fetchAllSalesPartnersFromJunctionByDate() id: [${id}] params:${JSON.stringify(params)}`, APP);
         return this.salesService.fetchAllSalesPartnersFromJunctionByDate(id, params);
@@ -53,29 +47,37 @@ let SalesController = class SalesController {
         common_1.Logger.debug(`fetchAllSalesPartnersByDate() params:${JSON.stringify(params)}`, APP);
         return this.salesService.fetchAllSalesPartnersByDate(params);
     }
+    updateSalesPartner(id, updateSalesPartnerDto) {
+        common_1.Logger.debug(`updateSalesPartner() id: [${id}] updateSalesPartnerDto :${JSON.stringify(updateSalesPartnerDto)}`, APP);
+        return this.salesService.updateSalesPartner(id, updateSalesPartnerDto);
+    }
     async uploadImage(id, file) {
         common_1.Logger.debug(`UploadImage: ${file}`, APP);
         return this.salesService.uploadImage(id, file.filename);
-    }
-    fetchInvitationResponse(salesCode, period) {
-        common_1.Logger.debug(`fetchInvitationResponse()salesCode: [${salesCode}] `, APP);
-        return this.salesService.fetchInvitationResponse(salesCode, period);
-    }
-    updateSalesPartner(id, updateSalesPartnerDto) {
-        common_1.Logger.debug(`updateSalesPartner() id: [${id}] DTO:${JSON.stringify(updateSalesPartnerDto)}`, APP);
-        return this.salesService.updateSalesPartner(id, updateSalesPartnerDto);
-    }
-    changeBankDetailsVerificationStatus(id) {
-        common_1.Logger.debug(`changeBankDetailsVerificationSatatus() id:[${id}] `, APP);
-        return this.salesService.changeBankDetailsVerificationSatatus(id);
     }
     updateUserIdInSales(id, updateSalesPartnerDto) {
         common_1.Logger.debug(`updateUserIdInSales() id: [${id}] DTO:${JSON.stringify(updateSalesPartnerDto)}`, APP);
         return this.salesService.updateUserIdInSales(id, updateSalesPartnerDto);
     }
+    addCommission(salesCode) {
+        common_1.Logger.debug(`addCommission() salesCode: [${salesCode}] `, APP);
+        return this.salesCommissionService.addCommission(salesCode);
+    }
+    fetchEarnings(salesCode, period) {
+        common_1.Logger.debug(`fetchEarnings()salesCode: [${salesCode}] `, APP);
+        return this.salesCommissionService.fetchEarnings(salesCode, period);
+    }
+    fetchInvitationResponse(salesCode, period) {
+        common_1.Logger.debug(`fetchInvitationResponse()salesCode: [${salesCode}] `, APP);
+        return this.salesCommissionService.fetchInvitationResponse(salesCode, period);
+    }
+    changeBankDetailsVerificationStatus(id) {
+        common_1.Logger.debug(`changeBankDetailsVerificationSatatus() id:[${id}] `, APP);
+        return this.salesCommissionService.changeBankDetailsVerificationSatatus(id);
+    }
     fetchEarnigReport(yearMonthDto) {
         common_1.Logger.debug(`fetchEarnigReport() year: [${yearMonthDto.year}`, APP);
-        return this.salesService.fetchEarnigReport(yearMonthDto);
+        return this.salesCommissionService.fetchEarnigReport(yearMonthDto);
     }
 };
 __decorate([
@@ -85,13 +87,6 @@ __decorate([
     __metadata("design:paramtypes", [create_sale_dto_1.CreateSalesPartner]),
     __metadata("design:returntype", void 0)
 ], SalesController.prototype, "createSalesPartner", null);
-__decorate([
-    (0, common_1.Post)(':salesCode/add-commission'),
-    __param(0, (0, common_1.Param)('salesCode')),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String]),
-    __metadata("design:returntype", void 0)
-], SalesController.prototype, "addCommission", null);
 __decorate([
     (0, common_1.Delete)(':id'),
     __param(0, (0, common_1.Param)('id')),
@@ -106,14 +101,6 @@ __decorate([
     __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", void 0)
 ], SalesController.prototype, "fetchSalesPartnerById", null);
-__decorate([
-    (0, common_1.Get)(':salesCode/earning'),
-    __param(0, (0, common_1.Param)('salesCode')),
-    __param(1, (0, common_1.Query)()),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String, create_sale_dto_1.Period]),
-    __metadata("design:returntype", void 0)
-], SalesController.prototype, "fetchEarnings", null);
 __decorate([
     (0, common_1.Get)(':id/sales-junction'),
     __param(0, (0, common_1.Param)('id')),
@@ -130,16 +117,26 @@ __decorate([
     __metadata("design:returntype", void 0)
 ], SalesController.prototype, "fetchAllSalesPartnersByDate", null);
 __decorate([
+    (0, common_1.Patch)(':id'),
+    __param(0, (0, common_1.Param)('id')),
+    __param(1, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, create_sale_dto_1.UpdateSalesPartner]),
+    __metadata("design:returntype", void 0)
+], SalesController.prototype, "updateSalesPartner", null);
+__decorate([
     (0, common_1.Patch)(':id/image'),
     (0, common_1.UseInterceptors)((0, platform_express_1.FileInterceptor)('file', {
-        storage: (0, multer_1.diskStorage)({ _destination: constants_1.STATIC_IMAGES_PROFILE,
+        storage: (0, multer_1.diskStorage)({
+            _destination: constants_1.STATIC_IMAGES_PROFILE,
             get destination() {
                 return this._destination;
             },
             set destination(value) {
                 this._destination = value;
             },
-            filename: helper_1.editFileName }),
+            filename: helper_1.editFileName
+        }),
         fileFilter: helper_1.imageFileFilter
     })),
     __param(0, (0, common_1.Param)('id')),
@@ -149,6 +146,29 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], SalesController.prototype, "uploadImage", null);
 __decorate([
+    (0, common_1.Patch)(':id/update-customer'),
+    __param(0, (0, common_1.Param)('id')),
+    __param(1, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, create_sale_dto_1.UpdateSalesPartner]),
+    __metadata("design:returntype", void 0)
+], SalesController.prototype, "updateUserIdInSales", null);
+__decorate([
+    (0, common_1.Post)(':salesCode/add-commission'),
+    __param(0, (0, common_1.Param)('salesCode')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", void 0)
+], SalesController.prototype, "addCommission", null);
+__decorate([
+    (0, common_1.Get)(':salesCode/earning'),
+    __param(0, (0, common_1.Param)('salesCode')),
+    __param(1, (0, common_1.Query)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, create_sale_dto_1.Period]),
+    __metadata("design:returntype", void 0)
+], SalesController.prototype, "fetchEarnings", null);
+__decorate([
     (0, common_1.Get)(':salesCode/invatation-response'),
     __param(0, (0, common_1.Param)('salesCode')),
     __param(1, (0, common_1.Query)()),
@@ -157,28 +177,12 @@ __decorate([
     __metadata("design:returntype", void 0)
 ], SalesController.prototype, "fetchInvitationResponse", null);
 __decorate([
-    (0, common_1.Patch)(':id'),
-    __param(0, (0, common_1.Param)('id')),
-    __param(1, (0, common_1.Body)()),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String, create_sale_dto_1.UpdateSalesPartner]),
-    __metadata("design:returntype", void 0)
-], SalesController.prototype, "updateSalesPartner", null);
-__decorate([
     (0, common_1.Patch)('bank-details-verification/:id'),
     __param(0, (0, common_1.Param)('id', common_1.ParseIntPipe)),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Number]),
     __metadata("design:returntype", void 0)
 ], SalesController.prototype, "changeBankDetailsVerificationStatus", null);
-__decorate([
-    (0, common_1.Patch)(':id/update-customer'),
-    __param(0, (0, common_1.Param)('id')),
-    __param(1, (0, common_1.Body)()),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String, create_sale_dto_1.UpdateSalesPartner]),
-    __metadata("design:returntype", void 0)
-], SalesController.prototype, "updateUserIdInSales", null);
 __decorate([
     (0, common_1.Get)(':salesCode/earning-report/:year'),
     __param(0, (0, common_1.Param)()),
@@ -188,7 +192,7 @@ __decorate([
 ], SalesController.prototype, "fetchEarnigReport", null);
 SalesController = __decorate([
     (0, common_1.Controller)(),
-    __metadata("design:paramtypes", [sales_service_1.SalesService])
+    __metadata("design:paramtypes", [sales_service_1.SalesService, sales_commission_service_1.SalesCommissionService])
 ], SalesController);
 exports.SalesController = SalesController;
 //# sourceMappingURL=sales.controller.js.map

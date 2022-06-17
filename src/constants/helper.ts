@@ -4,36 +4,36 @@ import { AxiosResponse } from 'axios';
 import { catchError, map, throwError } from "rxjs";
 import { extname } from "path";
 import { BadRequestException, NotFoundException, UnauthorizedException, UnprocessableEntityException } from "@nestjs/common";
-import { PUBLIC_KEY } from "src/constants/index";
+import { FEDO_HSA_USER_CONNECTION_URL, PUBLIC_KEY } from "src/constants/index";
 
 export const fetchUser = (userId: string) => {
 
-	return new HttpService().get(`http://0.0.0.0:35000/users/${userId}`).pipe(
+	return new HttpService().get(`${FEDO_HSA_USER_CONNECTION_URL}${userId}`).pipe(
 		catchError(err => onHTTPErrorResponse(err)),
 		map((res: AxiosResponse) => <User[]>res.data))
 }
 export const fetchAccount = (userId: string, accountId: string) => {
 
-	return new HttpService().get(`http://0.0.0.0:35000/users/${userId}/accounts/${accountId}`).pipe(
+	return new HttpService().get(`${FEDO_HSA_USER_CONNECTION_URL}${userId}/accounts/${accountId}`).pipe(
 		catchError(err => onHTTPErrorResponse(err)),
 		map((res: AxiosResponse) => <AccountZwitchResponseBody>res.data))
 }
 export const fetchUserByMobileNumber = (phoneNumber: string) => {
 
-	return new HttpService().get(`http://0.0.0.0:35000/users/${phoneNumber}/phoneNumber`).pipe(
+	return new HttpService().get(`${FEDO_HSA_USER_CONNECTION_URL}${phoneNumber}/phoneNumber`).pipe(
 		catchError(err => onHTTPErrorResponse(err)),
 		map((res: AxiosResponse) => <User[]>res.data),
 	)
 }
 export const fetchAccountBySalesCode = (salesCode: string) => {
 
-	return new HttpService().get(`http://0.0.0.0:35000/users/${salesCode}/accounts`).pipe(
+	return new HttpService().get(`${FEDO_HSA_USER_CONNECTION_URL}${salesCode}/accounts`).pipe(
 		catchError(err => onHTTPErrorResponse(err)),
 		map((res: AxiosResponse) => <createAccount[]>res.data))
 }
 export const findUserByCustomerId = (id: string) => {
 
-	return new HttpService().get(`http://0.0.0.0:35000/users/customer/${id}`).pipe(
+	return new HttpService().get(`${FEDO_HSA_USER_CONNECTION_URL}customer/${id}`).pipe(
 		catchError(err => onHTTPErrorResponse(err)),
 		map((res: AxiosResponse) => <createAccount[]>res.data))
 }
