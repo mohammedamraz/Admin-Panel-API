@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.APP_ROUTES = exports.debugLevel = exports.ZwitchHttpBody = exports.PRIVATE_KEY = exports.PUBLIC_KEY = exports.AWS_COGNITO_USER_CREATION_URL_SIT = exports.FEDO_HSA_USER_CONNECTION_URL = exports.STATIC_IMAGES_PROFILE = exports.STATIC_IMAGES = exports.SES_SOURCE_SUPPORT_EMAIL = exports.SES_SOURCE_EMAIL = exports.AWS_SECRET_ACCESS_KEY = exports.AWS_ACCESS_KEY_ID = exports.SALES_PARTNER_LINK = exports.APP_DOWNLOAD_LINK = exports.TWILIO_WHATSAPP_NUMBER = exports.TWILIO_PHONE_NUMBER = exports.AKASH_SERVICEID = exports.AKASH_AUTHTOKEN = exports.AKASH_ACCOUNTID = exports.POSTGRES_DB_URI_DB_URL = exports.APP_DOCUMENTATION = exports.DEBUG_LEVEL = exports.APP_VERSION = exports.PORT = exports.HOST = exports.FEDO_APP_CLIENT_ID = exports.FEDO_APP_CLIENT_NAME = exports.FEDO_USER_POOL_NAME = exports.FEDO_APP = void 0;
+exports.APP_ROUTES = exports.debugLevel = exports.ZwitchHttpBody = exports.PRIVATE_KEY = exports.PUBLIC_KEY = exports.AWS_COGNITO_USER_CREATION_URL_SIT = exports.FEDO_HSA_USER_CONNECTION_URL = exports.STATIC_IMAGES_PROFILE = exports.STATIC_IMAGES = exports.SES_SOURCE_SUPPORT_EMAIL = exports.SES_SOURCE_EMAIL = exports.AWS_SECRET_ACCESS_KEY = exports.AWS_ACCESS_KEY_ID = exports.SALES_PARTNER_NOTIFICATION = exports.SALES_PARTNER_LINK = exports.APP_DOWNLOAD_LINK = exports.TWILIO_WHATSAPP_NUMBER = exports.TWILIO_PHONE_NUMBER = exports.AKASH_SERVICEID = exports.AKASH_AUTHTOKEN = exports.AKASH_ACCOUNTID = exports.POSTGRES_DB_URI_DB_URL = exports.APP_DOCUMENTATION = exports.DEBUG_LEVEL = exports.APP_VERSION = exports.PORT = exports.HOST = exports.FEDO_APP_CLIENT_ID = exports.FEDO_APP_CLIENT_NAME = exports.FEDO_USER_POOL_NAME = exports.FEDO_APP = void 0;
 const package_json_1 = __importDefault(require("../../package.json"));
 exports.FEDO_APP = process.env.FEDO_APP || 'HSA_DEV';
 exports.FEDO_USER_POOL_NAME = process.env.FEDO_USER_POOL_NAME || 'HSA-SALES-ADMIN';
@@ -22,6 +22,7 @@ exports.TWILIO_PHONE_NUMBER = process.env.FEDO_HSA_TWILIO_PHONE_NUMBER || "+1857
 exports.TWILIO_WHATSAPP_NUMBER = process.env.FEDO_HSA_TWILIO_WHATSAPP_NUMBER || "+14155238886";
 exports.APP_DOWNLOAD_LINK = process.env.FEDO_HSA_APP_DOWNLOAD_LINK || "https://play.google.com/store/apps/details?id=com.fedo.auth";
 exports.SALES_PARTNER_LINK = process.env.FEDO_HSA_SALES_PARTNER_LINK || "http://0.0.0.0:35000/sales-partner";
+exports.SALES_PARTNER_NOTIFICATION = process.env.FEDO_HSA_SALES_PARTNER_NOTIFICATION || "SALES PARTNER APPROVED";
 exports.AWS_ACCESS_KEY_ID = process.env.FEDO_HSA_AWS_ACCESS_KEY_ID || 'AKIAWVJICQ3FDBOB6CGC';
 exports.AWS_SECRET_ACCESS_KEY = process.env.FEDO_HSA_AWS_SECRET_ACCESS_KEY || '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';
 exports.SES_SOURCE_EMAIL = process.env.FEDO_COMM_SERVER_AWS_SES_SOURCE_EMAIL || "FEDO HSA <hsa@fedo.ai>";

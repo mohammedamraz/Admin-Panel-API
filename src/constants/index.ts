@@ -12,6 +12,7 @@ export const PORT = parseInt(process.env.FEDO_HSA_SERVER_PORT, 10) || 36000;
 export const APP_VERSION = packageJson.version;
 export const DEBUG_LEVEL = process.env.FEDO_HSA_SERVER_LOG_LEVEL || 'debug';
 export const APP_DOCUMENTATION = process.env.FEDO_HSA_SERVER_DOCUMENTATION || 'https://fedo.health/hsa/docs';
+// export const POSTGRES_DB_URI_DB_URL = process.env.FEDO_HSA_SERVER_DB_URI || 'postgresql://postgres:akash@localhost:5432/hsa-sales';
 export const POSTGRES_DB_URI_DB_URL = process.env.FEDO_HSA_SERVER_DB_URI || 'postgresql://postgres:Fedo@1234@localhost:5432/HSA_Sales';
 
 export const AKASH_ACCOUNTID = process.env.FEDO_HSA_TWILIO_ACCOUNTID || "AC63acdd31af3ecbf5edde92cee5062e79";
@@ -22,6 +23,8 @@ export const TWILIO_WHATSAPP_NUMBER = process.env.FEDO_HSA_TWILIO_WHATSAPP_NUMBE
 
 export const APP_DOWNLOAD_LINK = process.env.FEDO_HSA_APP_DOWNLOAD_LINK || "https://play.google.com/store/apps/details?id=com.fedo.auth";
 export const SALES_PARTNER_LINK = process.env.FEDO_HSA_SALES_PARTNER_LINK || "http://0.0.0.0:35000/sales-partner";
+export const SALES_PARTNER_NOTIFICATION = process.env.FEDO_HSA_SALES_PARTNER_NOTIFICATION || "SALES PARTNER APPROVED";
+
 
 export const AWS_ACCESS_KEY_ID = process.env.FEDO_HSA_AWS_ACCESS_KEY_ID || 'AKIAWVJICQ3FDBOB6CGC';
 export const AWS_SECRET_ACCESS_KEY = process.env.FEDO_HSA_AWS_SECRET_ACCESS_KEY || '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';

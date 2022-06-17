@@ -55,6 +55,10 @@ let AdminController = class AdminController {
         common_1.Logger.debug(`sendCreateSalesPartnerLinkToMobileAndWhatsappNumber() mobileNumberDtO: [${JSON.stringify(mobileNumberDtO)}]`, APP);
         return this.adminService.sendCreateSalesPartnerLinkToMobileAndWhatsappNumber(mobileNumberDtO);
     }
+    sendNotificationToSalesPartnerOnMobileAndWhatsappNumber(mobileNumberDtO) {
+        common_1.Logger.debug(`sendCreateSalesPartnerLinkToMobileAndWhatsappNumber() mobileNumberDtO: [${JSON.stringify(mobileNumberDtO)}]`, APP);
+        return this.adminService.sendNotificationToSalesPartnerOnMobileAndWhatsappNumber(mobileNumberDtO);
+    }
     fetchSalesPartner(period) {
         common_1.Logger.debug(`fetchSalesPartner() period: [${JSON.stringify(period)}]`, APP);
         return this.adminService.fetchSalesPartner(period);
@@ -145,6 +149,13 @@ __decorate([
     __metadata("design:paramtypes", [create_admin_dto_1.MobileDtO]),
     __metadata("design:returntype", void 0)
 ], AdminController.prototype, "sendCreateSalesPartnerLinkToMobileAndWhatsappNumber", null);
+__decorate([
+    (0, common_1.Post)('notification'),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [create_admin_dto_1.MobileDtO]),
+    __metadata("design:returntype", void 0)
+], AdminController.prototype, "sendNotificationToSalesPartnerOnMobileAndWhatsappNumber", null);
 __decorate([
     (0, common_1.Get)('sales-partner'),
     __param(0, (0, common_1.Query)()),

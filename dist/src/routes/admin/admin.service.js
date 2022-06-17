@@ -337,6 +337,30 @@ let AdminService = class AdminService {
         return await (0, rxjs_1.lastValueFrom)(this.salesUserJunctionDb.fetchCommissionReportByYear(year, month))
             .then(userJunctionDoc => { return userJunctionDoc.length; }).catch(error => { throw new common_1.UnprocessableEntityException(error.message); });
     }
+    sendNotificationToSalesPartnerOnMobile(mobileNumberDtO) {
+        common_1.Logger.debug(`sendCreateSalesPartnerLinkToPhoneNumber() mobileNumberDtO: [${JSON.stringify(mobileNumberDtO)}]`, APP);
+        return this.client.messages.create({
+            body: `Click on Link ${constants_1.SALES_PARTNER_NOTIFICATION}?mobile=${this.encryptPassword_(mobileNumberDtO.phoneNumber)}&commission=${this.encryptPassword_(mobileNumberDtO.commission)}`,
+            from: constants_1.TWILIO_PHONE_NUMBER,
+            to: mobileNumberDtO.phoneNumber
+        })
+            .then(_res => ({ "status": `Link ${constants_1.SALES_PARTNER_NOTIFICATION}  send to  ${mobileNumberDtO.phoneNumber} number` }))
+            .catch(err => this.onTwilioErrorResponse(err));
+    }
+    sendNotificationToSalesPartnerOnWhatsappNumber(mobileNumberDtO) {
+        common_1.Logger.debug(`sendCreateSalesPartnerLinkToWhatsappNumber() mobileNumberDtO: [${JSON.stringify(mobileNumberDtO)}]`, APP);
+        return this.client.messages.create({
+            body: `Click on Link ${constants_1.SALES_PARTNER_NOTIFICATION}?mobile=${this.encryptPassword_(mobileNumberDtO.phoneNumber)}&commission=${this.encryptPassword_(mobileNumberDtO.commission)} `,
+            from: `whatsapp:${constants_1.TWILIO_WHATSAPP_NUMBER}`,
+            to: `whatsapp:${mobileNumberDtO.phoneNumber}`
+        })
+            .then(_res => ({ status: `Link ${constants_1.SALES_PARTNER_NOTIFICATION}  send to  ${mobileNumberDtO.phoneNumber} whatsapp number` }))
+            .catch(err => this.onTwilioErrorResponse(err));
+    }
+    sendNotificationToSalesPartnerOnMobileAndWhatsappNumber(mobileNumberDtO) {
+        common_1.Logger.debug(`sendCreateSalesPartnerLinkToMobileAndWhatsappNumber() mobileNumberDtO: [${JSON.stringify(mobileNumberDtO)}]`, APP);
+        return (0, rxjs_1.from)(this.sendNotificationToSalesPartnerOnMobile(mobileNumberDtO)).pipe((0, rxjs_1.map)(_doc => this.sendNotificationToSalesPartnerOnWhatsappNumber(mobileNumberDtO)), (0, rxjs_1.switchMap)(doc => (0, rxjs_1.of)({ status: "Notification send on mobile and whatsapp" })));
+    }
 };
 AdminService = __decorate([
     (0, common_1.Injectable)(),

@@ -21,6 +21,9 @@ export declare class AdminController {
     sendCreateSalesPartnerLinkToMobileAndWhatsappNumber(mobileNumberDtO: MobileDtO): import("rxjs").Observable<{
         status: string;
     }>;
+    sendNotificationToSalesPartnerOnMobileAndWhatsappNumber(mobileNumberDtO: MobileDtO): import("rxjs").Observable<{
+        status: string;
+    }>;
     fetchSalesPartner(period: Period): import("rxjs").Observable<Promise<any>>;
     fetchCommissionReport(yearMonthDto: YearMonthDto): import("rxjs").Observable<any[]>;
     fetchMonthlyReport(dateDTO: DateDTO): import("rxjs").Observable<Promise<any[]>>;

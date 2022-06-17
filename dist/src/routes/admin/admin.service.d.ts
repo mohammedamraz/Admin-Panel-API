@@ -108,4 +108,9 @@ export declare class AdminService {
         signups: number;
     }>;
     fetchSignup(year: any, month: any): Promise<number>;
+    sendNotificationToSalesPartnerOnMobile(mobileNumberDtO: MobileDtO): any;
+    sendNotificationToSalesPartnerOnWhatsappNumber(mobileNumberDtO: MobileDtO): any;
+    sendNotificationToSalesPartnerOnMobileAndWhatsappNumber(mobileNumberDtO: MobileDtO): import("rxjs").Observable<{
+        status: string;
+    }>;
 }
