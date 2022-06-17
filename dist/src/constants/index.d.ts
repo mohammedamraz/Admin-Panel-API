@@ -16,6 +16,7 @@ export declare const TWILIO_PHONE_NUMBER: string;
 export declare const TWILIO_WHATSAPP_NUMBER: string;
 export declare const APP_DOWNLOAD_LINK: string;
 export declare const SALES_PARTNER_LINK: string;
+export declare const SALES_PARTNER_NOTIFICATION: string;
 export declare const AWS_ACCESS_KEY_ID: string;
 export declare const AWS_SECRET_ACCESS_KEY: string;
 export declare const SES_SOURCE_EMAIL: string;

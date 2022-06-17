@@ -66,6 +66,14 @@ export class AdminController {
 
     return this.adminService.sendCreateSalesPartnerLinkToMobileAndWhatsappNumber(mobileNumberDtO);
   }
+
+  @Post('notification')
+  sendNotificationToSalesPartnerOnMobileAndWhatsappNumber(@Body() mobileNumberDtO: MobileDtO) {
+    Logger.debug(`sendCreateSalesPartnerLinkToMobileAndWhatsappNumber() mobileNumberDtO: [${JSON.stringify(mobileNumberDtO)}]`, APP);
+
+    return this.adminService.sendNotificationToSalesPartnerOnMobileAndWhatsappNumber(mobileNumberDtO);
+  }
+
   @Get('sales-partner')
   fetchSalesPartner(@Query() period: Period) {
     Logger.debug(`fetchSalesPartner() period: [${JSON.stringify(period)}]`, APP);

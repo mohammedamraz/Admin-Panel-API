@@ -1,7 +1,7 @@
 /* eslint-disable max-lines */
 import { BadRequestException, ConflictException, HttpException, HttpStatus, Injectable, Logger, NotFoundException, UnauthorizedException, UnprocessableEntityException } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
-import { AKASH_ACCOUNTID, AKASH_AUTHTOKEN, AKASH_SERVICEID, APP_DOWNLOAD_LINK, AWS_COGNITO_USER_CREATION_URL_SIT, FEDO_APP, PUBLIC_KEY, SALES_PARTNER_LINK, TWILIO_PHONE_NUMBER, TWILIO_WHATSAPP_NUMBER } from 'src/constants';
+import { AKASH_ACCOUNTID, AKASH_AUTHTOKEN, AKASH_SERVICEID, APP_DOWNLOAD_LINK, AWS_COGNITO_USER_CREATION_URL_SIT, FEDO_APP, PUBLIC_KEY, SALES_PARTNER_LINK, SALES_PARTNER_NOTIFICATION, TWILIO_PHONE_NUMBER, TWILIO_WHATSAPP_NUMBER } from 'src/constants';
 import { DatabaseTable } from 'src/lib/database/database.decorator';
 import { DatabaseService } from 'src/lib/database/database.service';
 import { CreateSalesJunction, CreateSalesPartner, CreateSalesPartnerRequest, Interval, PERIOD, Period, SalesUserJunction } from '../sales/dto/create-sale.dto';
@@ -394,5 +394,33 @@ w
      return await lastValueFrom(this.salesUserJunctionDb.fetchCommissionReportByYear(year,month))
      .then(userJunctionDoc=> { return userJunctionDoc.length}).catch(error=>{throw new UnprocessableEntityException(error.message)})
    }
+
+   sendNotificationToSalesPartnerOnMobile(mobileNumberDtO: MobileDtO) {
+    Logger.debug(`sendCreateSalesPartnerLinkToPhoneNumber() mobileNumberDtO: [${JSON.stringify(mobileNumberDtO)}]`, APP);
+
+    return this.client.messages.create({
+        body: `Click on Link ${SALES_PARTNER_NOTIFICATION}?mobile=${this.encryptPassword_(mobileNumberDtO.phoneNumber)}&commission=${this.encryptPassword_(mobileNumberDtO.commission)}`,
+        from: TWILIO_PHONE_NUMBER,
+        to: mobileNumberDtO.phoneNumber})
+      .then(_res => ({ "status": `Link ${SALES_PARTNER_NOTIFICATION}  send to  ${mobileNumberDtO.phoneNumber} number` }))
+      .catch(err => this.onTwilioErrorResponse(err));
+  }
+
+  sendNotificationToSalesPartnerOnWhatsappNumber(mobileNumberDtO: MobileDtO) {
+    Logger.debug(`sendCreateSalesPartnerLinkToWhatsappNumber() mobileNumberDtO: [${JSON.stringify(mobileNumberDtO)}]`, APP);
+
+    return this.client.messages.create({
+        body: `Click on Link ${SALES_PARTNER_NOTIFICATION}?mobile=${this.encryptPassword_(mobileNumberDtO.phoneNumber)}&commission=${this.encryptPassword_(mobileNumberDtO.commission)} `,
+        from: `whatsapp:${TWILIO_WHATSAPP_NUMBER}`,
+        to: `whatsapp:${mobileNumberDtO.phoneNumber}`})
+      .then(_res => ({ status: `Link ${SALES_PARTNER_NOTIFICATION}  send to  ${mobileNumberDtO.phoneNumber} whatsapp number` }))
+      .catch(err => this.onTwilioErrorResponse(err));
+  }
+
+  sendNotificationToSalesPartnerOnMobileAndWhatsappNumber(mobileNumberDtO: MobileDtO) {
+    Logger.debug(`sendCreateSalesPartnerLinkToMobileAndWhatsappNumber() mobileNumberDtO: [${JSON.stringify(mobileNumberDtO)}]`, APP);
+
+    return from(this.sendNotificationToSalesPartnerOnMobile(mobileNumberDtO)).pipe(map(_doc => this.sendNotificationToSalesPartnerOnWhatsappNumber(mobileNumberDtO)), switchMap(doc => of({ status: "Notification send on mobile and whatsapp" })))
+  }
 }
 
