@@ -59,10 +59,6 @@ let SalesController = class SalesController {
         common_1.Logger.debug(`updateUserIdInSales() id: [${id}] DTO:${JSON.stringify(updateSalesPartnerDto)}`, APP);
         return this.salesService.updateUserIdInSales(id, updateSalesPartnerDto);
     }
-    addCommission(salesCode) {
-        common_1.Logger.debug(`addCommission() salesCode: [${salesCode}] `, APP);
-        return this.salesCommissionService.addCommission(salesCode);
-    }
     fetchEarnings(salesCode, period) {
         common_1.Logger.debug(`fetchEarnings()salesCode: [${salesCode}] `, APP);
         return this.salesCommissionService.fetchEarnings(salesCode, period);
@@ -72,8 +68,8 @@ let SalesController = class SalesController {
         return this.salesCommissionService.fetchInvitationResponse(salesCode, period);
     }
     changeBankDetailsVerificationStatus(id) {
-        common_1.Logger.debug(`changeBankDetailsVerificationSatatus() id:[${id}] `, APP);
-        return this.salesCommissionService.changeBankDetailsVerificationSatatus(id);
+        common_1.Logger.debug(`changeBankDetailsVerificationStatus() id:[${id}] `, APP);
+        return this.salesCommissionService.changeBankDetailsVerificationStatus(id);
     }
     fetchEarnigReport(yearMonthDto) {
         common_1.Logger.debug(`fetchEarnigReport() year: [${yearMonthDto.year}`, APP);
@@ -153,13 +149,6 @@ __decorate([
     __metadata("design:paramtypes", [String, create_sale_dto_1.UpdateSalesPartner]),
     __metadata("design:returntype", void 0)
 ], SalesController.prototype, "updateUserIdInSales", null);
-__decorate([
-    (0, common_1.Post)(':salesCode/add-commission'),
-    __param(0, (0, common_1.Param)('salesCode')),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String]),
-    __metadata("design:returntype", void 0)
-], SalesController.prototype, "addCommission", null);
 __decorate([
     (0, common_1.Get)(':salesCode/earning'),
     __param(0, (0, common_1.Param)('salesCode')),
