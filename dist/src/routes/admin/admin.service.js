@@ -179,11 +179,7 @@ let AdminService = class AdminService {
     }
     sentOtpToPhoneNumber(mobileNumberDtO) {
         common_1.Logger.debug(`sentOtpToPhoneNumber() mobileNumberDtO: [${JSON.stringify(mobileNumberDtO)}]`, APP);
-        return this.client.verify.services(constants_1.AKASH_SERVICEID)
-            .verifications
-            .create({ to: mobileNumberDtO.phoneNumber, channel: 'sms', locale: 'en' })
-            .then(_res => ({ status: `OTP Send to ${mobileNumberDtO.phoneNumber} number` }))
-            .catch(err => this.onTwilioErrorResponse(err));
+        return this.client.verify.services(constants_1.AKASH_SERVICEID).verifications.create({ to: mobileNumberDtO.phoneNumber, channel: 'sms', locale: 'en' }).then(_res => ({ status: `OTP Send to ${mobileNumberDtO.phoneNumber} number` })).catch(err => this.onTwilioErrorResponse(err));
     }
     verifyOtp(mobileNumberAndOtpDtO) {
         common_1.Logger.debug(`verifyOtp() mobileNumberAndOtpDtO: [${JSON.stringify(mobileNumberAndOtpDtO)}]`, APP);
@@ -192,20 +188,17 @@ let AdminService = class AdminService {
             if (!verification_check.valid || verification_check.status !== 'approved')
                 throw new common_1.BadRequestException('Wrong code provided ');
             return ({ status: verification_check.status });
-        })
-            .catch(err => this.onTwilioErrorResponse(err));
+        }).catch(err => this.onTwilioErrorResponse(err));
     }
     sentFedoAppDownloadLinkToPhoneNumber(mobileNumberDtO) {
         common_1.Logger.debug(`sentFedoAppDownloadLinkToPhoneNumber() mobileNumberDtO: [${JSON.stringify(mobileNumberDtO)}]`, APP);
         return this.client.messages.create({ body: constants_1.APP_DOWNLOAD_LINK, from: constants_1.TWILIO_PHONE_NUMBER, to: mobileNumberDtO.phoneNumber })
-            .then(_res => ({ status: `Link ${constants_1.APP_DOWNLOAD_LINK}  send to  ${mobileNumberDtO.phoneNumber} number` }))
-            .catch(err => this.onTwilioErrorResponse(err));
+            .then(_res => ({ status: `Link ${constants_1.APP_DOWNLOAD_LINK}  send to  ${mobileNumberDtO.phoneNumber} number` })).catch(err => this.onTwilioErrorResponse(err));
     }
     sentFedoAppDownloadLinkToWhatsappNumber(mobileNumberDtO) {
         common_1.Logger.debug(`sentFedoAppDownloadLinkToWhatsappNumber() mobileNumberDtO: [${JSON.stringify(mobileNumberDtO)}]`, APP);
         return this.client.messages.create({ body: constants_1.APP_DOWNLOAD_LINK, from: `whatsapp:${constants_1.TWILIO_WHATSAPP_NUMBER}`, to: `whatsapp:${mobileNumberDtO.phoneNumber}` })
-            .then(_res => ({ status: `Link ${constants_1.APP_DOWNLOAD_LINK}  send to  ${mobileNumberDtO.phoneNumber} whatsapp number` }))
-            .catch(err => this.onTwilioErrorResponse(err));
+            .then(_res => ({ status: `Link ${constants_1.APP_DOWNLOAD_LINK}  send to  ${mobileNumberDtO.phoneNumber} whatsapp number` })).catch(err => this.onTwilioErrorResponse(err));
     }
     sentFedoAppDownloadLinkToMobileAndWhatsappNumber(mobileNumberDtO) {
         common_1.Logger.debug(`sentFedoAppDownloadLinkToMobileAndWhatsappNumber() mobileNumberDtO: [${JSON.stringify(mobileNumberDtO)}]`, APP);
@@ -262,6 +255,7 @@ let AdminService = class AdminService {
                 if (user_doc.length < 0) {
                     throw new common_1.BadRequestException();
                 }
+                ;
                 const finalRes = (_a = user_doc[0]) === null || _a === void 0 ? void 0 : _a.dues;
                 const dueCommission = Number(finalRes) - Number(res.paid_amount);
                 return this.salesJunctionDb.save({ sales_code: (_b = user_doc[0]) === null || _b === void 0 ? void 0 : _b.sales_code, paid_amount: res.paid_amount, dues: dueCommission }).pipe((0, rxjs_1.catchError)(res => { throw new common_1.BadRequestException(); }));
@@ -271,7 +265,7 @@ let AdminService = class AdminService {
     sendCreateSalesPartnerLinkToPhoneNumber(mobileNumberDtO) {
         common_1.Logger.debug(`sendCreateSalesPartnerLinkToPhoneNumber() mobileNumberDtO: [${JSON.stringify(mobileNumberDtO)}]`, APP);
         return this.client.messages.create({
-            body: `Click on Link ${constants_1.SALES_PARTNER_LINK}?mobile=${this.encryptPassword_(mobileNumberDtO.phoneNumber)}&commission=${this.encryptPassword_(mobileNumberDtO.commission)} `,
+            body: `Click on Link ${constants_1.SALES_PARTNER_LINK}?mobile=${this.encryptPassword_(mobileNumberDtO.phoneNumber)}&commission=${this.encryptPassword_(mobileNumberDtO.commission)}`,
             from: constants_1.TWILIO_PHONE_NUMBER,
             to: mobileNumberDtO.phoneNumber
         })
@@ -341,8 +335,7 @@ let AdminService = class AdminService {
     async fetchSignup(year, month) {
         common_1.Logger.debug(`fetchSignup() year: [${year}] month: [${month}]`, APP);
         return await (0, rxjs_1.lastValueFrom)(this.salesUserJunctionDb.fetchCommissionReportByYear(year, month))
-            .then(userJunctionDoc => { return userJunctionDoc.length; })
-            .catch(error => { throw new common_1.UnprocessableEntityException(error.message); });
+            .then(userJunctionDoc => { return userJunctionDoc.length; }).catch(error => { throw new common_1.UnprocessableEntityException(error.message); });
     }
 };
 AdminService = __decorate([

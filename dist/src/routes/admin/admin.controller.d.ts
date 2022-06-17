@@ -5,20 +5,7 @@ import { ConfirmForgotPasswordDTO, ForgotPasswordDTO, LoginDTO, PeriodRange, Sta
 export declare class AdminController {
     private readonly adminService;
     constructor(adminService: AdminService);
-    fetchSalesPartner(period: Period): import("rxjs").Observable<Promise<any>>;
-    fetchCommissionReport(yearMonthDto: YearMonthDto): import("rxjs").Observable<any[]>;
-    fetchMonthlyReport(dateDTO: DateDTO): import("rxjs").Observable<Promise<any[]>>;
-    fetchSalesPartnerAccountDetails(): import("rxjs").Observable<Promise<any[]>>;
-    fetchCommissionDispersals(period: PeriodRange): import("rxjs").Observable<{
-        thisMonth: number;
-        previousMonth: number;
-    }>;
-    fetchInvitationResponses(state: State): import("rxjs").Observable<Promise<{
-        signups: any;
-    }>>;
-    fetchSalesPartnerAccountDetailsBySalesCode(salesCode: string): import("rxjs").Observable<Promise<any[]>>;
     sentOtpToPhoneNumber(mobileNumberDtO: MobileNumberDtO): any;
-    verifyOtp(mobileNumberAndOtpDtO: MobileNumberAndOtpDtO): any;
     sentFedoAppDownloadLinkToMobileAndWhatsappNumber(mobileNumberDtO: MobileNumberDtO): import("rxjs").Observable<{
         status: string;
     }>;
@@ -34,4 +21,17 @@ export declare class AdminController {
     sendCreateSalesPartnerLinkToMobileAndWhatsappNumber(mobileNumberDtO: MobileDtO): import("rxjs").Observable<{
         status: string;
     }>;
+    fetchSalesPartner(period: Period): import("rxjs").Observable<Promise<any>>;
+    fetchCommissionReport(yearMonthDto: YearMonthDto): import("rxjs").Observable<any[]>;
+    fetchMonthlyReport(dateDTO: DateDTO): import("rxjs").Observable<Promise<any[]>>;
+    fetchSalesPartnerAccountDetails(): import("rxjs").Observable<Promise<any[]>>;
+    fetchCommissionDispersals(period: PeriodRange): import("rxjs").Observable<{
+        thisMonth: number;
+        previousMonth: number;
+    }>;
+    fetchInvitationResponses(state: State): import("rxjs").Observable<Promise<{
+        signups: any;
+    }>>;
+    fetchSalesPartnerAccountDetailsBySalesCode(salesCode: string): import("rxjs").Observable<Promise<any[]>>;
+    verifyOtp(mobileNumberAndOtpDtO: MobileNumberAndOtpDtO): any;
 }

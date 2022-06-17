@@ -163,38 +163,29 @@ export class AdminService {
   sentOtpToPhoneNumber(mobileNumberDtO: MobileNumberDtO) {
     Logger.debug(`sentOtpToPhoneNumber() mobileNumberDtO: [${JSON.stringify(mobileNumberDtO)}]`, APP);
 
-    return this.client.verify.services(AKASH_SERVICEID)
-      .verifications
-      .create({to: mobileNumberDtO.phoneNumber, channel: 'sms', locale: 'en'})
-      .then(_res => ({ status: `OTP Send to ${mobileNumberDtO.phoneNumber} number` }))
-      .catch(err => this.onTwilioErrorResponse(err));
+    return this.client.verify.services(AKASH_SERVICEID).verifications.create({to: mobileNumberDtO.phoneNumber, channel: 'sms', locale: 'en'}).then(_res => ({ status: `OTP Send to ${mobileNumberDtO.phoneNumber} number` })).catch(err => this.onTwilioErrorResponse(err));
   }
 
   verifyOtp(mobileNumberAndOtpDtO: MobileNumberAndOtpDtO) {
     Logger.debug(`verifyOtp() mobileNumberAndOtpDtO: [${JSON.stringify(mobileNumberAndOtpDtO)}]`, APP);
 
     return this.client.verify.services(AKASH_SERVICEID).verificationChecks.create({ to: mobileNumberAndOtpDtO.phoneNumber, code: mobileNumberAndOtpDtO.otp.toString() })
-      .then(verification_check => {
-        if (!verification_check.valid || verification_check.status !== 'approved')
-          throw new BadRequestException('Wrong code provided ');
-        return ({ status: verification_check.status })})
-      .catch(err => this.onTwilioErrorResponse(err));
+      .then(verification_check => {if (!verification_check.valid || verification_check.status !== 'approved') throw new BadRequestException('Wrong code provided ');
+        return ({ status: verification_check.status })}).catch(err => this.onTwilioErrorResponse(err));
   }
 
   sentFedoAppDownloadLinkToPhoneNumber(mobileNumberDtO: MobileNumberDtO) {
     Logger.debug(`sentFedoAppDownloadLinkToPhoneNumber() mobileNumberDtO: [${JSON.stringify(mobileNumberDtO)}]`, APP);
 
     return this.client.messages.create({body: APP_DOWNLOAD_LINK, from: TWILIO_PHONE_NUMBER, to: mobileNumberDtO.phoneNumber})
-      .then(_res => ({ status: `Link ${APP_DOWNLOAD_LINK}  send to  ${mobileNumberDtO.phoneNumber} number` }))
-      .catch(err => this.onTwilioErrorResponse(err));
+      .then(_res => ({ status: `Link ${APP_DOWNLOAD_LINK}  send to  ${mobileNumberDtO.phoneNumber} number` })).catch(err => this.onTwilioErrorResponse(err));
   }
 w
   sentFedoAppDownloadLinkToWhatsappNumber(mobileNumberDtO: MobileNumberDtO) {
     Logger.debug(`sentFedoAppDownloadLinkToWhatsappNumber() mobileNumberDtO: [${JSON.stringify(mobileNumberDtO)}]`, APP);
 
     return this.client.messages.create({body: APP_DOWNLOAD_LINK, from: `whatsapp:${TWILIO_WHATSAPP_NUMBER}`, to: `whatsapp:${mobileNumberDtO.phoneNumber}`})
-      .then(_res => ({ status: `Link ${APP_DOWNLOAD_LINK}  send to  ${mobileNumberDtO.phoneNumber} whatsapp number` }))
-      .catch(err => this.onTwilioErrorResponse(err));
+      .then(_res => ({ status: `Link ${APP_DOWNLOAD_LINK}  send to  ${mobileNumberDtO.phoneNumber} whatsapp number` })).catch(err => this.onTwilioErrorResponse(err));
   }
 
   sentFedoAppDownloadLinkToMobileAndWhatsappNumber(mobileNumberDtO: MobileNumberDtO) {
@@ -298,31 +289,24 @@ w
   }
 
   async updatePaidAmount(updateAmountdto: createPaid) {
-
     Logger.debug(`updatePaidAmount() updateAmountdto: [${JSON.stringify(updateAmountdto)}]`, APP);
     
     await lastValueFrom(from(updateAmountdto['data']).pipe(map(res => {
-      
       return  lastValueFrom(this.salesJunctionDb.find({ "sales_code": res.salesCode }).pipe(switchMap(doc => {
-        const sort_doc = Math.max(...doc.map(user => parseInt(user['id'].toString())))
+        const sort_doc = Math.max(...doc.map(user => parseInt(user['id'].toString())));
         const user_doc = doc.filter(item => item['id'] == sort_doc);
-        if(user_doc.length<0){ throw new BadRequestException()}
-        const finalRes = user_doc[0]?.dues
-        const dueCommission = Number(finalRes) - Number(res.paid_amount)
-        
+        if(user_doc.length<0){ throw new BadRequestException()};
+        const finalRes = user_doc[0]?.dues;
+        const dueCommission = Number(finalRes) - Number(res.paid_amount);
         return this.salesJunctionDb.save({ sales_code: user_doc[0]?.sales_code, paid_amount: res.paid_amount, dues: dueCommission }).pipe(catchError(res=>{throw new BadRequestException()}))
-  
-      })))
-    })))
- 
-   
+      })))})));
   }
 
   sendCreateSalesPartnerLinkToPhoneNumber(mobileNumberDtO: MobileDtO) {
     Logger.debug(`sendCreateSalesPartnerLinkToPhoneNumber() mobileNumberDtO: [${JSON.stringify(mobileNumberDtO)}]`, APP);
 
     return this.client.messages.create({
-        body: `Click on Link ${SALES_PARTNER_LINK}?mobile=${this.encryptPassword_(mobileNumberDtO.phoneNumber)}&commission=${this.encryptPassword_(mobileNumberDtO.commission)} `,
+        body: `Click on Link ${SALES_PARTNER_LINK}?mobile=${this.encryptPassword_(mobileNumberDtO.phoneNumber)}&commission=${this.encryptPassword_(mobileNumberDtO.commission)}`,
         from: TWILIO_PHONE_NUMBER,
         to: mobileNumberDtO.phoneNumber})
       .then(_res => ({ "status": `Link ${SALES_PARTNER_LINK}  send to  ${mobileNumberDtO.phoneNumber} number` }))
@@ -377,8 +361,7 @@ w
   fetchMonthlyReport(dateDTO: DateDTO){
     Logger.debug(`fetchMonthlyReport() date: [${JSON.stringify(dateDTO)}]`, APP);
 
-    return this.salesDb.fetchAll().pipe(
-      map(salesDb => this.fetchCommissionReportforSalesPartner(salesDb, dateDTO)))
+    return this.salesDb.fetchAll().pipe(map(salesDb => this.fetchCommissionReportforSalesPartner(salesDb, dateDTO)))
   }
 
   fetchCommissionReportforSalesPartner(createSalesPartner:CreateSalesPartner[], dateDTO: DateDTO){
@@ -409,7 +392,7 @@ w
     Logger.debug(`fetchSignup() year: [${year}] month: [${month}]`, APP);
 
      return await lastValueFrom(this.salesUserJunctionDb.fetchCommissionReportByYear(year,month))
-     .then(userJunctionDoc=> { return userJunctionDoc.length})
-     .catch(error=>{throw new UnprocessableEntityException(error.message)})
+     .then(userJunctionDoc=> { return userJunctionDoc.length}).catch(error=>{throw new UnprocessableEntityException(error.message)})
    }
 }
+
