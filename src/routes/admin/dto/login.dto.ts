@@ -63,7 +63,7 @@ export const fetchDAte = (date: Date, period: number) =>{
      'to': formatDate(DATE)}
 }
 
-export enum Stateness {
+export enum States {
   ACTIVE = 'active',
   INACTIVE = 'inactive',
   ALL = 'all',
@@ -76,8 +76,8 @@ export const STATE = {
 }
 export class State {
   @IsNotEmpty()
-  @IsEnum(Stateness)
-  state: Stateness;
+  @IsEnum(States)
+  state: States;
 
   @IsNotEmpty()
   @IsEnum(Periodicity)

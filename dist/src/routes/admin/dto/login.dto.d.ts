@@ -34,7 +34,7 @@ export declare const fetchDAte: (date: Date, period: number) => {
     from: string;
     to: string;
 };
-export declare enum Stateness {
+export declare enum States {
     ACTIVE = "active",
     INACTIVE = "inactive",
     ALL = "all"
@@ -45,7 +45,7 @@ export declare const STATE: {
     ALL: any;
 };
 export declare class State {
-    state: Stateness;
+    state: States;
     period: Periodicity;
 }
 export declare const makeStateFormat: (state: State) => any;

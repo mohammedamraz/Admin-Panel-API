@@ -9,7 +9,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.applyPerformance = exports.averageSignup = exports.makeEarningDuesFormat = exports.makeStateFormat = exports.State = exports.STATE = exports.Stateness = exports.fetchDAte = exports.formatDate = exports.PERIODADMIN = exports.PeriodRange = exports.PeriodicityAdmin = exports.ConfirmForgotPasswordDTO = exports.ForgotPasswordDTO = exports.LoginDTO = void 0;
+exports.applyPerformance = exports.averageSignup = exports.makeEarningDuesFormat = exports.makeStateFormat = exports.State = exports.STATE = exports.States = exports.fetchDAte = exports.formatDate = exports.PERIODADMIN = exports.PeriodRange = exports.PeriodicityAdmin = exports.ConfirmForgotPasswordDTO = exports.ForgotPasswordDTO = exports.LoginDTO = void 0;
 const class_validator_1 = require("class-validator");
 const create_sale_dto_1 = require("../../sales/dto/create-sale.dto");
 class LoginDTO {
@@ -98,12 +98,12 @@ const fetchDAte = (date, period) => {
     };
 };
 exports.fetchDAte = fetchDAte;
-var Stateness;
-(function (Stateness) {
-    Stateness["ACTIVE"] = "active";
-    Stateness["INACTIVE"] = "inactive";
-    Stateness["ALL"] = "all";
-})(Stateness = exports.Stateness || (exports.Stateness = {}));
+var States;
+(function (States) {
+    States["ACTIVE"] = "active";
+    States["INACTIVE"] = "inactive";
+    States["ALL"] = "all";
+})(States = exports.States || (exports.States = {}));
 exports.STATE = {
     active: true,
     inactive: false,
@@ -113,7 +113,7 @@ class State {
 }
 __decorate([
     (0, class_validator_1.IsNotEmpty)(),
-    (0, class_validator_1.IsEnum)(Stateness),
+    (0, class_validator_1.IsEnum)(States),
     __metadata("design:type", String)
 ], State.prototype, "state", void 0);
 __decorate([
