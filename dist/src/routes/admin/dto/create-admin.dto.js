@@ -102,7 +102,7 @@ class YearMonthDto {
 }
 __decorate([
     (0, class_validator_1.IsNotEmpty)(),
-    (0, class_validator_1.IsNumberString)(),
+    (0, class_validator_1.IsString)(),
     (0, class_validator_1.MinLength)(4, { message: 'Enter only 4 digit value of year, This is too short' }),
     (0, class_validator_1.MaxLength)(4, { message: 'Enter only 4 digit value of year, This is too long' }),
     __metadata("design:type", String)
@@ -112,7 +112,6 @@ class DateDTO extends YearMonthDto {
 }
 __decorate([
     (0, class_validator_1.IsNotEmpty)(),
-    (0, class_validator_1.IsNumberString)(),
     (0, class_validator_1.MinLength)(2, { message: 'Enter only 2 digit value of month, This is too short' }),
     (0, class_validator_1.MaxLength)(2, { message: 'Enter only 2 digit value of month, This is too long' }),
     __metadata("design:type", String)
@@ -122,6 +121,9 @@ const fetchmonths = (year) => {
     common_1.Logger.debug(`fetchmonths() year: [${year}]`);
     let month = [];
     let i = 0;
+    if (new Date().getFullYear() < parseInt(year)) {
+        throw new common_1.BadRequestException();
+    }
     if (new Date().getFullYear().toString() === year) {
         for (i = new Date().getMonth() + 1; i > 0; i--)
             month.push(i);
