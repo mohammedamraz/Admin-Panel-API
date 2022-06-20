@@ -171,7 +171,7 @@ export class SalesService {
               total_commission: arrays[k].commission_amount,
               total_signups: arrays[k].total_signups
             }
-          }));
+          }).pipe(catchError(err=>{throw new UnprocessableEntityException(err.message)})));
       }))
   }
 
@@ -199,7 +199,7 @@ export class SalesService {
           return contentsParams.filter(result => {
             return result !== undefined;
           });
-        }))))
+        }),catchError(err => { throw new UnprocessableEntityException(err.message) }))))
   }
 
   makeDateFormatJunction(params: any) {

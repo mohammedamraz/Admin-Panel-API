@@ -144,7 +144,7 @@ let SalesService = class SalesService {
                         total_commission: arrays[k].commission_amount,
                         total_signups: arrays[k].total_signups
                     }
-                }));
+                }).pipe((0, rxjs_1.catchError)(err => { throw new common_1.UnprocessableEntityException(err.message); })));
         }));
     }
     fetchAllSalesPartnersFromJunctionByDate(id, params) {
@@ -166,7 +166,7 @@ let SalesService = class SalesService {
                 return contentsParams.filter(result => {
                     return result !== undefined;
                 });
-            }))));
+            }), (0, rxjs_1.catchError)(err => { throw new common_1.UnprocessableEntityException(err.message); }))));
     }
     makeDateFormatJunction(params) {
         common_1.Logger.debug(`makeDateFormatJunction() params:[${JSON.stringify(params)}] `, APP);
