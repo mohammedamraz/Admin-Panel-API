@@ -47,6 +47,10 @@ let SalesController = class SalesController {
         common_1.Logger.debug(`fetchAllSalesPartnersByDate() params:${JSON.stringify(params)}`, APP);
         return this.salesService.fetchAllSalesPartnersByDate(params);
     }
+    fetchSalesPartnerByMobileNumber(mobileDTO) {
+        common_1.Logger.debug(`fetchSalesPartnerByMobileNumber() mobileNumber: [${mobileDTO}`, APP);
+        return this.salesService.fetchSalesCodeByMobileNumber(mobileDTO.mobile);
+    }
     updateSalesPartner(id, updateSalesPartnerDto) {
         common_1.Logger.debug(`updateSalesPartner() id: [${id}] updateSalesPartnerDto :${JSON.stringify(updateSalesPartnerDto)}`, APP);
         return this.salesService.updateSalesPartner(id, updateSalesPartnerDto);
@@ -112,6 +116,13 @@ __decorate([
     __metadata("design:paramtypes", [create_sale_dto_1.ZQueryParamsDto]),
     __metadata("design:returntype", void 0)
 ], SalesController.prototype, "fetchAllSalesPartnersByDate", null);
+__decorate([
+    (0, common_1.Get)('login/:mobile'),
+    __param(0, (0, common_1.Param)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [create_sale_dto_1.LoginDTO]),
+    __metadata("design:returntype", void 0)
+], SalesController.prototype, "fetchSalesPartnerByMobileNumber", null);
 __decorate([
     (0, common_1.Patch)(':id'),
     __param(0, (0, common_1.Param)('id')),

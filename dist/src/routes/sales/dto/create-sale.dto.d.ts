@@ -73,6 +73,9 @@ export declare class ZQueryParamsDto {
     number_of_rows?: number;
     is_active: Is_active;
 }
+export declare class LoginDTO {
+    mobile: string;
+}
 export declare enum Periodicity {
     DAILY = "daily",
     WEEKLY = "weekly",

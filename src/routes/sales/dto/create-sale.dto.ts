@@ -113,6 +113,12 @@ export class ZQueryParamsDto {
     is_active: Is_active;
 }
 
+export class LoginDTO{
+    @IsNotEmpty()
+    mobile: string;}
+
+
+
 
 export enum Periodicity {
 

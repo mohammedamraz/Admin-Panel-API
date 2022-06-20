@@ -78,6 +78,14 @@ let SalesService = class SalesService {
             return res;
         }))));
     }
+    fetchSalesCodeByMobileNumber(mobile) {
+        common_1.Logger.debug(`fetchSalesPartnerById() id: [${mobile}]`, APP);
+        return (0, rxjs_1.from)((0, rxjs_1.lastValueFrom)(this.db.find({ mobile: mobile }).pipe((0, rxjs_1.catchError)(err => { throw new common_1.UnprocessableEntityException(err.message); }), (0, rxjs_1.map)((res) => {
+            if (res[0] == null || res[0].is_active == false)
+                throw new common_1.NotFoundException(`Sales Partner Not Found`);
+            return res;
+        }))));
+    }
     fetchSalesPartnerBySalesCode(id) {
         common_1.Logger.debug(`fetchSalesPartnerById() id: [${id}]`, APP);
         return (0, rxjs_1.from)((0, rxjs_1.lastValueFrom)(this.db.find({ sales_code: id }).pipe((0, rxjs_1.catchError)(err => { throw new common_1.UnprocessableEntityException(err.message); }), (0, rxjs_1.map)((res) => {

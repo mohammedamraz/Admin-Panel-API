@@ -13,6 +13,7 @@ export declare class SalesService {
     createInvitation(createSalesPartner: CreateSalesPartner, createSalesJunction: CreateSalesJunction[]): import("rxjs").Observable<CreateSalesPartnerModel[]> | CreateSalesJunction[];
     fetchSalesPartnerByMobileNumber(mobile: string): import("rxjs").Observable<CreateSalesPartnerModel[]>;
     fetchSalesPartnerById(id: string): import("rxjs").Observable<CreateSalesPartnerModel[]>;
+    fetchSalesCodeByMobileNumber(mobile: string): import("rxjs").Observable<CreateSalesPartnerModel[]>;
     fetchSalesPartnerBySalesCode(id: string): import("rxjs").Observable<CreateSalesPartnerModel[]>;
     deleteSalesPartner(id: string): import("rxjs").Observable<Promise<CreateSalesPartnerModel[]>>;
     updateSalesPartner(id: string, updateSalesPartnerDto: UpdateSalesPartner): import("rxjs").Observable<Promise<CreateSalesPartnerModel[]>>;
