@@ -248,6 +248,19 @@ let SalesService = class SalesService {
                 }));
         }));
     }
+    fetchEarnigReportByMonth(salesYearMonth) {
+        common_1.Logger.debug(`fetchEarnigReportByMonth() salesYearMonth: [${JSON.stringify(salesYearMonth)}]`, APP);
+        return this.db.find({ sales_code: salesYearMonth.salesCode }).pipe((0, rxjs_1.switchMap)(doc => {
+            if (doc.length == 0)
+                throw new common_1.NotFoundException("Sales Partner Not Record Found");
+            return this.fetchAccountfromHSA(doc[0], salesYearMonth);
+        }));
+    }
+    fetchAccountfromHSA(createSalesPartnerModel, salesYearMonth) {
+        common_1.Logger.debug(`fetchAccountfromHSA() createSalesPartnerModel: [${JSON.stringify(createSalesPartnerModel)}]`, APP);
+        let salesUser = [];
+        return (0, helper_1.fetchAccountBySalesCode)(createSalesPartnerModel.sales_code).pipe((0, rxjs_1.map)(doc => doc.map(doc => { doc['commission'] = createSalesPartnerModel.commission; return doc; })), (0, rxjs_1.map)(doc => doc.filter(doc => { const date = new Date(doc.date); return date.getMonth() === (parseInt(salesYearMonth.month) - 1) && date.getFullYear() === parseInt(salesYearMonth.year); })));
+    }
 };
 SalesService = __decorate([
     (0, common_1.Injectable)(),

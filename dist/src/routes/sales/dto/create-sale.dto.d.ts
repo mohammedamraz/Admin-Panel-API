@@ -109,3 +109,6 @@ export declare class YearMonthDto {
 export declare class LoginDTO {
     mobileNumber: string;
 }
+export declare class SalesYearMonth extends YearMonthDto {
+    month: string;
+}

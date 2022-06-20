@@ -3,9 +3,9 @@
 import { BadRequestException, Injectable, Logger, NotFoundException, UnprocessableEntityException } from '@nestjs/common';
 import { DatabaseTable } from 'src/lib/database/database.decorator';
 import { DatabaseService } from 'src/lib/database/database.service';
-import { CreateSalesInvitationJunction, CreateSalesJunction, CreateSalesPartner, SalesUserJunction, UpdateImageDTO, UpdateSalesPartner, ZQueryParamsDto } from './dto/create-sale.dto';
+import { CreateSalesInvitationJunction, CreateSalesJunction, CreateSalesPartner, Interval, makeEarningFormat, Period, SalesUserJunction, SalesYearMonth, UpdateImageDTO, UpdateSalesPartner, YearMonthDto, ZQueryParamsDto } from './dto/create-sale.dto';
 import { HttpService } from '@nestjs/axios';
-import { fetchUserByMobileNumber, findUserByCustomerId } from 'src/constants/helper';
+import { fetchAccountBySalesCode, fetchUserByMobileNumber, findUserByCustomerId } from 'src/constants/helper';
 import { CreateSalesPartnerModel } from 'src/lib/config/model/sales.model';
 import { InvitationJunctionModel } from './dto/invitation-junction.model';
 import { catchError, from, identity, lastValueFrom, map, switchMap } from 'rxjs';
@@ -288,5 +288,25 @@ export class SalesService {
           }))
       }))
   }
+
+  fetchEarnigReportByMonth(salesYearMonth: SalesYearMonth) {
+    Logger.debug(`fetchEarnigReportByMonth() salesYearMonth: [${JSON.stringify(salesYearMonth)}]`, APP);
+
+    return this.db.find({ sales_code: salesYearMonth.salesCode }).pipe(
+      switchMap(doc =>{
+        if(doc.length == 0) throw new NotFoundException("Sales Partner Not Record Found")
+        return this.fetchAccountfromHSA(doc[0], salesYearMonth)}))
+  }
+
+  fetchAccountfromHSA(createSalesPartnerModel: CreateSalesPartnerModel, salesYearMonth: SalesYearMonth){
+    Logger.debug(`fetchAccountfromHSA() createSalesPartnerModel: [${JSON.stringify(createSalesPartnerModel)}]`, APP);
+
+    let salesUser =[];
+    return fetchAccountBySalesCode(createSalesPartnerModel.sales_code).pipe(
+      map(doc =>doc.map(doc => {doc['commission'] = createSalesPartnerModel.commission; return doc }) ),
+      map( doc => doc.filter(doc =>{  const date = new Date(doc.date); return date.getMonth() === (parseInt(salesYearMonth.month) - 1) && date.getFullYear() === parseInt(salesYearMonth.year)}))) 
+
+  }
+
 }
 

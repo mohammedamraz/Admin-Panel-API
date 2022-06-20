@@ -1,4 +1,4 @@
-import { AccountZwitchResponseBody, createAccount, User } from "src/routes/admin/dto/create-admin.dto";
+import { AccountShort, AccountZwitchResponseBody, createAccount, User } from "src/routes/admin/dto/create-admin.dto";
 import { HttpService } from '@nestjs/axios';
 import { AxiosResponse, AxiosError } from 'axios';
 import { catchError, map, throwError } from "rxjs";
@@ -29,7 +29,7 @@ export const fetchAccountBySalesCode = (salesCode: string) => {
 
 	return new HttpService().get(`${FEDO_HSA_USER_CONNECTION_URL}${salesCode}/accounts`).pipe(
 		catchError(err => onHTTPErrorResponse(err)),
-		map((res: AxiosResponse) => <createAccount[]>res.data))
+		map((res: AxiosResponse) => <AccountShort[]>res.data))
 }
 export const findUserByCustomerId = (id: string) => {
 

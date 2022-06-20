@@ -60,6 +60,12 @@ export class User {
 
 }
 
+export class AccountShort{
+  name: string;
+  date: string;
+  mobile: string;
+}
+
 export class AccountZwitchResponseBody {
 
   id: string;

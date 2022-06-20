@@ -1,4 +1,4 @@
-import { CreateSalesPartner, LoginDTO, Period, UpdateSalesPartner, YearMonthDto, ZQueryParamsDto } from './dto/create-sale.dto';
+import { CreateSalesPartner, LoginDTO, Period, SalesYearMonth, UpdateSalesPartner, YearMonthDto, ZQueryParamsDto } from './dto/create-sale.dto';
 import { SalesService } from './sales.service';
 import { SalesCommissionService } from './sales-commission.service';
 export declare class SalesController {
@@ -18,6 +18,7 @@ export declare class SalesController {
         signup: number;
     }>;
     changeBankDetailsVerificationStatus(id: number): import("rxjs").Observable<import("rxjs").Observable<import("../../lib/config/model/sales.model").CreateSalesPartnerModel[]>>;
+    fetchEarnigReportByMonth(salesYearMonth: SalesYearMonth): import("rxjs").Observable<import("../admin/dto/create-admin.dto").AccountShort[]>;
     fetchEarnigReport(yearMonthDto: YearMonthDto): import("rxjs").Observable<any[]>;
     fetchSalesPartnerByMobileNumber(mobileNumber: LoginDTO): import("rxjs").Observable<import("../../lib/config/model/sales.model").CreateSalesPartnerModel[]>;
 }

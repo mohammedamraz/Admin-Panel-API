@@ -1,5 +1,5 @@
 import { DatabaseService } from 'src/lib/database/database.service';
-import { CreateSalesInvitationJunction, CreateSalesJunction, CreateSalesPartner, UpdateSalesPartner, ZQueryParamsDto } from './dto/create-sale.dto';
+import { CreateSalesInvitationJunction, CreateSalesJunction, CreateSalesPartner, SalesYearMonth, UpdateSalesPartner, ZQueryParamsDto } from './dto/create-sale.dto';
 import { HttpService } from '@nestjs/axios';
 import { CreateSalesPartnerModel } from 'src/lib/config/model/sales.model';
 export declare class SalesService {
@@ -44,4 +44,6 @@ export declare class SalesService {
     updateImageById(id: string, updateSalesPartnerDto: object): import("rxjs").Observable<CreateSalesPartnerModel[]>;
     fetchCommisionBySalesCode(salesCode: string): import("rxjs").Observable<CreateSalesJunction>;
     updateUserIdInSales(id: string, updateSalesPartnerDto: UpdateSalesPartner): import("rxjs").Observable<Promise<CreateSalesPartnerModel[]>>;
+    fetchEarnigReportByMonth(salesYearMonth: SalesYearMonth): import("rxjs").Observable<import("../admin/dto/create-admin.dto").AccountShort[]>;
+    fetchAccountfromHSA(createSalesPartnerModel: CreateSalesPartnerModel, salesYearMonth: SalesYearMonth): import("rxjs").Observable<import("../admin/dto/create-admin.dto").AccountShort[]>;
 }

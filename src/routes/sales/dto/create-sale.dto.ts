@@ -174,3 +174,8 @@ export class LoginDTO{
     @IsNotEmpty()
     mobileNumber: string;
 }
+export class SalesYearMonth extends YearMonthDto {
+    @IsNotEmpty()
+    @IsNumberString()
+    month: string;
+}
