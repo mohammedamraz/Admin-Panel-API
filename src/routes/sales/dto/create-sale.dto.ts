@@ -169,3 +169,8 @@ export class YearMonthDto {
     salesCode: string;
 
 }
+
+export class LoginDTO{
+    @IsNotEmpty()
+    mobileNumber: string;
+}
