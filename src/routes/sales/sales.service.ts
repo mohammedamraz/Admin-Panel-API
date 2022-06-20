@@ -374,7 +374,10 @@ export class SalesService {
   fetchEarnigReportByMonth(salesYearMonth: SalesYearMonth) {
     Logger.debug(`fetchEarnigReportByMonth() salesYearMonth: [${JSON.stringify(salesYearMonth)}]`, APP);
 
-    return this.db.find({ sales_code: salesYearMonth.salesCode }).pipe(switchMap(doc => this.fetchAccountfromHSA(doc[0], salesYearMonth)))
+    return this.db.find({ sales_code: salesYearMonth.salesCode }).pipe(
+      switchMap(doc =>{
+        if(doc.length == 0) throw new NotFoundException("Sales Partner Not Record Found")
+        return this.fetchAccountfromHSA(doc[0], salesYearMonth)}))
   }
 
   fetchAccountfromHSA(createSalesPartnerModel: CreateSalesPartnerModel, salesYearMonth: SalesYearMonth){
