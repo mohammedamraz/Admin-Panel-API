@@ -30,6 +30,11 @@ export declare class User {
     kycschedule: string;
     mobile: phoneNumber;
 }
+export declare class AccountShort {
+    name: string;
+    date: string;
+    mobile: string;
+}
 export declare class AccountZwitchResponseBody {
     id: string;
     object: string;

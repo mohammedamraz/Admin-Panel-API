@@ -1,5 +1,5 @@
 import { DatabaseService } from 'src/lib/database/database.service';
-import { CreateSalesInvitationJunction, CreateSalesJunction, CreateSalesPartner, Period, SalesUserJunction, UpdateSalesPartner, YearMonthDto, ZQueryParamsDto } from './dto/create-sale.dto';
+import { CreateSalesInvitationJunction, CreateSalesJunction, CreateSalesPartner, Period, SalesUserJunction, SalesYearMonth, UpdateSalesPartner, YearMonthDto, ZQueryParamsDto } from './dto/create-sale.dto';
 import { HttpService } from '@nestjs/axios';
 import { CreateSalesPartnerModel } from 'src/lib/config/model/sales.model';
 export declare class SalesService {
@@ -10,7 +10,7 @@ export declare class SalesService {
     private http;
     constructor(db: DatabaseService<CreateSalesPartnerModel>, invitationJunctiondb: DatabaseService<CreateSalesInvitationJunction>, junctiondb: DatabaseService<CreateSalesJunction>, salesUser: DatabaseService<SalesUserJunction>, http: HttpService);
     createSalesPartner(createSalesPartner: CreateSalesPartner): import("rxjs").Observable<CreateSalesPartnerModel[]>;
-    createInvitation(createSalesPartner: CreateSalesPartner, createSalesJunction: CreateSalesJunction[]): CreateSalesJunction[] | import("rxjs").Observable<CreateSalesPartnerModel[]>;
+    createInvitation(createSalesPartner: CreateSalesPartner, createSalesJunction: CreateSalesJunction[]): import("rxjs").Observable<CreateSalesPartnerModel[]> | CreateSalesJunction[];
     fetchSalesPartnerByMobileNumber(mobile: string): import("rxjs").Observable<CreateSalesPartnerModel[]>;
     fetchSalesPartnerByUserId(id: string): import("rxjs").Observable<CreateSalesPartnerModel[]>;
     fetchSalesPartnerById(id: string): import("rxjs").Observable<CreateSalesPartnerModel[]>;
@@ -48,4 +48,6 @@ export declare class SalesService {
     fetchEarnigReport(yearMonthDto: YearMonthDto): import("rxjs").Observable<any[]>;
     fetchSignup(year: any, month: any, yearMonthDto: YearMonthDto): Promise<number>;
     fetchALLSalesPartners(): import("rxjs").Observable<CreateSalesPartnerModel[]>;
+    fetchEarnigReportByMonth(salesYearMonth: SalesYearMonth): import("rxjs").Observable<import("../admin/dto/create-admin.dto").AccountShort[]>;
+    fetchAccountfromHSA(createSalesPartnerModel: CreateSalesPartnerModel, salesYearMonth: SalesYearMonth): import("rxjs").Observable<import("../admin/dto/create-admin.dto").AccountShort[]>;
 }

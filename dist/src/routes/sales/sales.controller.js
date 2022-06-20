@@ -81,6 +81,10 @@ let SalesController = class SalesController {
         common_1.Logger.debug(`fetchEarnigReport() year: [${yearMonthDto.year}`, APP);
         return this.salesService.fetchEarnigReport(yearMonthDto);
     }
+    fetchEarnigReportByMonth(salesYearMonth) {
+        common_1.Logger.debug(`fetchEarnigReportByMonth() year: [${salesYearMonth.year}] month: [${salesYearMonth.month}]`, APP);
+        return this.salesService.fetchEarnigReportByMonth(salesYearMonth);
+    }
 };
 __decorate([
     (0, common_1.Post)(),
@@ -198,6 +202,13 @@ __decorate([
     __metadata("design:paramtypes", [create_sale_dto_1.YearMonthDto]),
     __metadata("design:returntype", void 0)
 ], SalesController.prototype, "fetchEarnigReport", null);
+__decorate([
+    (0, common_1.Get)(':salesCode/earning-report/:year/:month'),
+    __param(0, (0, common_1.Param)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [create_sale_dto_1.SalesYearMonth]),
+    __metadata("design:returntype", void 0)
+], SalesController.prototype, "fetchEarnigReportByMonth", null);
 SalesController = __decorate([
     (0, common_1.Controller)(),
     __metadata("design:paramtypes", [sales_service_1.SalesService])
