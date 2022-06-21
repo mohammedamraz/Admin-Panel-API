@@ -142,12 +142,12 @@ export class Period {
 }
 
 export const PERIOD = {
-    daily: '1 day',
-    weekly: '1 week',
-    monthly: '1 months',
-    quarterly: '3 months',
-    halfyearly: '6 months',
-    yearly: '12 months'
+    daily: '1',
+    weekly: '7',
+    monthly: '30',
+    quarterly: '90',
+    halfyearly: '180',
+    yearly: '365'
 }
 
 export class EarningResponse {

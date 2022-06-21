@@ -85,10 +85,10 @@ export interface MONTHYEAR {
 }
 export declare const fetchMonthYear: (MONTHYEAR: MONTHYEAR) => MONTHYEAR;
 export interface fetchByYearAndMonthParams {
-    year: string;
-    month: string;
     columnName: string;
     columnvalue: string;
+    year: string;
+    month: string;
 }
 export interface DatabaseInterface<T> {
     tableName: string;
