@@ -296,13 +296,13 @@ w
     Logger.debug(`updatePaidAmount() updateAmountdto: [${JSON.stringify(updateAmountdto)}]`, APP);
     
     await lastValueFrom(from(updateAmountdto['data']).pipe(map(res => {
-      return  lastValueFrom(this.salesJunctionDb.find({ "sales_code": res.salesCode }).pipe(switchMap(doc => {
+      return lastValueFrom(this.salesJunctionDb.find({ "sales_code": res.salesCode }).pipe(map(doc => {
+        
         const sort_doc = Math.max(...doc.map(user => parseInt(user['id'].toString())));
         const user_doc = doc.filter(item => item['id'] == sort_doc);
-        if(user_doc.length<0){ throw new BadRequestException()};
         const finalRes = user_doc[0]?.dues;
         const dueCommission = Number(finalRes) - Number(res.paid_amount);
-        return this.salesJunctionDb.save({ sales_code: user_doc[0]?.sales_code, paid_amount: res.paid_amount, dues: dueCommission }).pipe(catchError(res=>{throw new BadRequestException()}))
+        if (user_doc.length!=0) return this.salesJunctionDb.save({ sales_code: user_doc[0]?.sales_code, paid_amount: res.paid_amount, dues: dueCommission })
       })))})));
   }
 
