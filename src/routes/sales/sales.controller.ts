@@ -49,6 +49,13 @@ export class SalesController {
     return this.salesService.fetchAllSalesPartnersByDate(params)
   }
 
+  @Get('login/:mobile')
+  fetchSalesPartnerByMobileNumber(@Param() mobileDTO: LoginDTO) {
+    Logger.debug(`fetchSalesPartnerByMobileNumber() mobileNumber: [${mobileDTO}`, APP);
+    
+    return this.salesService.fetchSalesCodeByMobileNumber(mobileDTO.mobile);
+  }
+
   @Patch(':id')
   updateSalesPartner(@Param('id') id: string, @Body() updateSalesPartnerDto: UpdateSalesPartner) {
     Logger.debug(`updateSalesPartner() id: [${id}] updateSalesPartnerDto :${JSON.stringify(updateSalesPartnerDto,)}`, APP);
@@ -119,12 +126,5 @@ export class SalesController {
     Logger.debug(`fetchEarnigReport() year: [${yearMonthDto.year}`, APP);
 
     return this.salesCommissionService.fetchEarnigReport(yearMonthDto);
-  }
-
-  @Get('login/:mobileNumber')
-  fetchSalesPartnerByMobileNumber(@Param() mobileNumber: LoginDTO) {
-    Logger.debug(`fetchSalesPartnerByMobileNumber() mobileNumber: [${mobileNumber}`, APP);
-
-    return this.salesService.fetchSalesPartnerByMobileNumber(mobileNumber.mobileNumber);
   }
 }

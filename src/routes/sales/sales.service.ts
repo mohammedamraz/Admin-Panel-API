@@ -95,6 +95,17 @@ export class SalesService {
       }))));
   }
 
+  fetchSalesCodeByMobileNumber(mobile: string) {
+    Logger.debug(`fetchSalesPartnerById() id: [${mobile}]`, APP);
+
+    return from(lastValueFrom(this.db.find({ mobile: mobile }).pipe(
+      catchError(err => { throw new UnprocessableEntityException(err.message) }),
+      map((res) => {
+        if (res[0] == null || res[0].is_active == false) throw new NotFoundException(`Sales Partner Not Found`);
+        return res;
+      }))));
+  }
+
   fetchSalesPartnerBySalesCode(id: string) {
     Logger.debug(`fetchSalesPartnerById() id: [${id}]`, APP);
 
@@ -171,7 +182,7 @@ export class SalesService {
               total_commission: arrays[k].commission_amount,
               total_signups: arrays[k].total_signups
             }
-          }));
+          }).pipe(catchError(err=>{throw new UnprocessableEntityException(err.message)})));
       }))
   }
 
@@ -199,7 +210,7 @@ export class SalesService {
           return contentsParams.filter(result => {
             return result !== undefined;
           });
-        }))))
+        }),catchError(err => { throw new UnprocessableEntityException(err.message) }))))
   }
 
   makeDateFormatJunction(params: any) {

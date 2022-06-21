@@ -133,9 +133,11 @@ let AdminService = class AdminService {
     }
     fetchSalesPartnerSignups(createSalesJunction, createSalesPartner, period) {
         common_1.Logger.debug(`fetchSalesPartnerSignups() createSalesJunction: [${JSON.stringify(createSalesJunction)}],  CreateSalesPartner: [${JSON.stringify(createSalesPartner)}], period: [${JSON.stringify(period)}]`, APP);
-        return this.salesuser.find({ sales_code: createSalesPartner.sales_code }).pipe((0, rxjs_1.map)(doc => ({ totalCommission: createSalesJunction.reduce((acc, curr) => acc += curr.commission_amount, 0),
+        return this.salesuser.find({ sales_code: createSalesPartner.sales_code }).pipe((0, rxjs_1.map)(doc => ({
+            totalCommission: createSalesJunction.reduce((acc, curr) => acc += curr.commission_amount, 0),
             name: createSalesPartner.name,
-            signups: doc.length })));
+            signups: doc.length
+        })));
     }
     async fetchUser(createSalesPartner) {
         common_1.Logger.debug(`fetchUser() createSalesPartner: ${JSON.stringify(createSalesPartner)}`, APP);
@@ -230,7 +232,6 @@ let AdminService = class AdminService {
         common_1.Logger.debug(`admin-console login() loginDTO:[${JSON.stringify(Object.keys(logindto))}}] UserLoginDTO:[${JSON.stringify(logindto)}]`);
         logindto.fedoApp = constants_1.FEDO_APP;
         return this.http.post(`${constants_1.AWS_COGNITO_USER_CREATION_URL_SIT}/token`, this.encryptPassword(logindto)).pipe((0, rxjs_1.catchError)(err => { return this.onAWSErrorResponse(err); }), (0, rxjs_1.map)((res) => {
-            console.log("asdcadzfc", res.data);
             if (!res.data)
                 throw new common_1.BadRequestException();
             return { jwtToken: res.data.idToken.jwtToken, refreshToken: res.data.refreshToken, accessToken: res.data.accessToken.jwtToken };

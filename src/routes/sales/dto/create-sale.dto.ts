@@ -113,6 +113,12 @@ export class ZQueryParamsDto {
     is_active: Is_active;
 }
 
+export class LoginDTO{
+    @IsNotEmpty()
+    mobile: string;}
+
+
+
 
 export enum Periodicity {
 
@@ -170,10 +176,7 @@ export class YearMonthDto {
 
 }
 
-export class LoginDTO{
-    @IsNotEmpty()
-    mobileNumber: string;
-}
+
 export class SalesYearMonth extends YearMonthDto {
     @IsNotEmpty()
     @IsNumberString()

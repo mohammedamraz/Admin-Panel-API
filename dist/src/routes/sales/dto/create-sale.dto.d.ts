@@ -73,6 +73,9 @@ export declare class ZQueryParamsDto {
     number_of_rows?: number;
     is_active: Is_active;
 }
+export declare class LoginDTO {
+    mobile: string;
+}
 export declare enum Periodicity {
     DAILY = "daily",
     WEEKLY = "weekly",
@@ -105,9 +108,6 @@ export declare const makeEarningFormat: (earning: number[]) => EarningResponse;
 export declare class YearMonthDto {
     year: string;
     salesCode: string;
-}
-export declare class LoginDTO {
-    mobileNumber: string;
 }
 export declare class SalesYearMonth extends YearMonthDto {
     month: string;

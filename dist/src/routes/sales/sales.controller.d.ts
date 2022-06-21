@@ -10,6 +10,7 @@ export declare class SalesController {
     fetchSalesPartnerById(id: string): import("rxjs").Observable<import("../../lib/config/model/sales.model").CreateSalesPartnerModel[]>;
     fetchAllSalesPartnersFromJunctionByDate(id: string, params: ZQueryParamsDto): any[] | import("rxjs").Observable<Promise<any[]>>;
     fetchAllSalesPartnersByDate(params: ZQueryParamsDto): import("rxjs").Observable<import("../../lib/config/model/sales.model").CreateSalesPartnerModel[]>;
+    fetchSalesPartnerByMobileNumber(mobileDTO: LoginDTO): import("rxjs").Observable<import("../../lib/config/model/sales.model").CreateSalesPartnerModel[]>;
     updateSalesPartner(id: string, updateSalesPartnerDto: UpdateSalesPartner): import("rxjs").Observable<Promise<import("../../lib/config/model/sales.model").CreateSalesPartnerModel[]>>;
     uploadImage(id: string, file: any): Promise<import("rxjs").Observable<import("../../lib/config/model/sales.model").CreateSalesPartnerModel[]>>;
     updateUserIdInSales(id: string, updateSalesPartnerDto: UpdateSalesPartner): import("rxjs").Observable<Promise<import("../../lib/config/model/sales.model").CreateSalesPartnerModel[]>>;
@@ -20,5 +21,4 @@ export declare class SalesController {
     changeBankDetailsVerificationStatus(id: number): import("rxjs").Observable<import("rxjs").Observable<import("../../lib/config/model/sales.model").CreateSalesPartnerModel[]>>;
     fetchEarnigReportByMonth(salesYearMonth: SalesYearMonth): import("rxjs").Observable<import("../admin/dto/create-admin.dto").AccountShort[]>;
     fetchEarnigReport(yearMonthDto: YearMonthDto): import("rxjs").Observable<any[]>;
-    fetchSalesPartnerByMobileNumber(mobileNumber: LoginDTO): import("rxjs").Observable<import("../../lib/config/model/sales.model").CreateSalesPartnerModel[]>;
 }
