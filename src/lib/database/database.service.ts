@@ -330,7 +330,7 @@ export class DatabaseService<T> implements DatabaseInterface<T> {
   }
 
   fetchCommissionReportByYear(year: string, month: number): Observable<T[]> {
-    Logger.debug(`fetchCommissionReportByYear(): year ${year}`, APP);
+    Logger.debug(`fetchCommissionReportByYear(): year ${year} month ${month}`, APP);
 
     let variables = [];
     let values = []

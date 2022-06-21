@@ -242,7 +242,7 @@ let DatabaseService = class DatabaseService {
         return this.runQuery(query, variables);
     }
     fetchCommissionReportByYear(year, month) {
-        common_1.Logger.debug(`fetchCommissionReportByYear(): year ${year}`, APP);
+        common_1.Logger.debug(`fetchCommissionReportByYear(): year ${year} month ${month}`, APP);
         let variables = [];
         let values = [];
         Object.values({ year: year, month: month }).map((params, index) => { variables.push(params), values.push((`$${index + 1}`)); });

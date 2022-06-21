@@ -302,20 +302,33 @@ let AdminService = class AdminService {
         return (0, rxjs_1.from)((0, create_admin_dto_1.fetchmonths)((yearMonthDto.year))).pipe((0, rxjs_1.concatMap)(async (month) => {
             return await (0, rxjs_1.lastValueFrom)(this.salesJunctionDb.fetchCommissionReportByYear(yearMonthDto.year, month))
                 .then(async (salesJunctionDoc) => {
-                await this.fetchSignup(yearMonthDto.year, month).then(signup => {
-                    reportData.push({
-                        total_paid_amount: salesJunctionDoc.reduce((next, prev) => next += prev.paid_amount, 0),
-                        month: month,
-                        total_dues: (0, create_admin_dto_1.fetchDues)(salesJunctionDoc),
-                        hsa_sing_up: signup,
-                        paid_on: salesJunctionDoc.map(doc => { if (doc.paid_amount > 0)
-                            return doc.created_date; }).filter((res) => res)[0]
-                    });
+                const paidAmount = salesJunctionDoc.map(doc => doc.paid_amount);
+                const totalPaidAmount = paidAmount.reduce((next, prev) => next + prev, 0);
+                const date = salesJunctionDoc.map(doc => { if (doc.paid_amount > 0)
+                    return doc.created_date; });
+                const paidOn = date.filter((res) => res);
+                await this.fetchSignup(yearMonthDto.year, month - 1).then(signup => {
+                    if (month === (0, create_admin_dto_1.fetchmonths)((yearMonthDto.year))[0] && month !== 12)
+                        this.fetchSignup(yearMonthDto.year, month)
+                            .then(doc => reportData.push({ "month": month, "hsa_sign_up": doc, "dues": (0, create_admin_dto_1.fetchDues)(salesJunctionDoc) }));
+                    if (month === 12) {
+                        (0, rxjs_1.lastValueFrom)(this.salesJunctionDb.fetchCommissionReportByYear(yearMonthDto.year, month))
+                            .then(salesJunctionDoc => {
+                            var _a;
+                            reportData.push({
+                                total_paid_amount: salesJunctionDoc.reduce((next, pre) => next + pre.paid_amount, 0),
+                                month: 12, hsa_sign_up: signup, paid_on: (_a = salesJunctionDoc.filter(doc => { if (doc.paid_amount > 0)
+                                    return doc; })[0]) === null || _a === void 0 ? void 0 : _a.created_date
+                            });
+                        });
+                    }
+                    if (month - 1 !== 0)
+                        reportData.push({ "total_paid_amount": totalPaidAmount, "month": month - 1, "hsa_sign_up": signup, "paid_on": paidOn[0] });
                 }).catch(error => { throw new common_1.NotFoundException(error.message); });
                 return reportData;
             })
                 .catch(error => { throw new common_1.NotFoundException(error.message); })
-                .then(_doc => reportData);
+                .then(_doc => reportData.sort((a, b) => (a.month < b.month) ? 1 : ((b.month < a.month) ? -1 : 0)));
         }));
     }
     fetchMonthlyReport(dateDTO) {
@@ -325,7 +338,7 @@ let AdminService = class AdminService {
     fetchCommissionReportforSalesPartner(createSalesPartner, dateDTO) {
         common_1.Logger.debug(`fetchCommissionReportforSalesPartner() createSalesPartner: [${JSON.stringify(createSalesPartner)}]`, APP);
         let performance = [];
-        return (0, rxjs_1.lastValueFrom)((0, rxjs_1.from)(createSalesPartner).pipe((0, rxjs_1.switchMap)(salesDoc => { console.log('dona', salesDoc); return (0, rxjs_1.lastValueFrom)(this.fetchSignupforPerformace(salesDoc, dateDTO)).then(doc => performance.push(doc)); })))
+        return (0, rxjs_1.lastValueFrom)((0, rxjs_1.from)(createSalesPartner).pipe((0, rxjs_1.switchMap)(salesDoc => { return (0, rxjs_1.lastValueFrom)(this.fetchSignupforPerformace(salesDoc, dateDTO)).then(doc => performance.push(doc)); })))
             .then(_doc => (0, login_dto_1.applyPerformance)(performance, (0, login_dto_1.averageSignup)(createSalesPartner.length, performance.reduce((acc, curr) => acc += curr.signups, 0))));
     }
     fetchSignupforPerformace(createSalesPartner, dateDTO) {
