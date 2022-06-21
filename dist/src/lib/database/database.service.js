@@ -198,28 +198,48 @@ let DatabaseService = class DatabaseService {
     }
     findByPeriod(findByPeriodParams) {
         common_1.Logger.debug(`findByPeriod(): params ${[JSON.stringify(findByPeriodParams)]}`, APP);
-        const query = `SELECT * FROM ${this.tableName} WHERE ${findByPeriodParams.columnName} = '${findByPeriodParams.columnvalue}' AND created_date > CURRENT_DATE - INTERVAL '${findByPeriodParams.period}'  ORDER BY ${"created_date"} DESC`;
-        return this.runQuery(query);
+        let variables = [];
+        let values = [];
+        let params = findByPeriodParams;
+        delete findByPeriodParams.columnName;
+        Object.values(params).map((params, index) => { variables.push(params), values.push((`$${index + 1}`)); });
+        const query = `SELECT * FROM ${this.tableName} WHERE sales_code = ${values[0]} AND created_date > CURRENT_DATE - (interval '1 day' * ${values[1]})  ORDER BY ${"created_date"} DESC`;
+        return this.runQuery(query, variables);
     }
     fetchAllByPeriod(period) {
         common_1.Logger.debug(`fetchAllByPeriod(): params ${[JSON.stringify(period)]}`, APP);
-        const query = `SELECT * FROM ${this.tableName} WHERE created_date > CURRENT_DATE - INTERVAL '${period}'`;
-        return this.runQuery(query);
+        let variables = [];
+        let values = [];
+        Object.values({ period: period }).map((params, index) => { variables.push(params), values.push((`$${index + 1}`)); });
+        const query = `SELECT * FROM ${this.tableName} WHERE created_date > CURRENT_DATE - (interval '1 day' * ${values[0]})`;
+        return this.runQuery(query, variables);
     }
     fetchCommissionReportByYear(year, month) {
         common_1.Logger.debug(`fetchCommissionReportByYear(): year ${year}`, APP);
-        const query = `SELECT * FROM ${this.tableName} WHERE date_part('year',created_date) = ${year} AND date_part('month',created_date) = ${month}`;
-        return this.runQuery(query);
+        let variables = [];
+        let values = [];
+        Object.values({ year: year, month: month }).map((params, index) => { variables.push(params), values.push((`$${index + 1}`)); });
+        const query = `SELECT * FROM ${this.tableName} WHERE date_part('year',created_date) = ${values[0]} AND date_part('month',created_date) = ${values[1]}`;
+        return this.runQuery(query, variables);
     }
     fetchByYear(obj) {
         common_1.Logger.debug(`fetchByYear(): params ${[JSON.stringify(obj)]}`, APP);
-        const query = `SELECT * FROM ${this.tableName} WHERE  ${obj.columnName} = '${obj.columnvalue}' AND date_part('year',created_date) = ${obj.year} AND date_part('month',created_date) = ${obj.month} `;
-        return this.runQuery(query);
+        let variables = [];
+        let values = [];
+        let params = obj;
+        Object.values(params).map((params, index) => { variables.push(params), values.push((`$${index + 1}`)); });
+        const query = `SELECT * FROM ${this.tableName} WHERE  ${values[0]} = ${values[1]} AND date_part('year',created_date) = ${values[2]} AND date_part('month',created_date) = ${values[3]} `;
+        return this.runQuery(query, variables);
     }
     fetchBetweenRange(date) {
         common_1.Logger.debug(`fetchBetweenRange(): date ${[JSON.stringify(date)]}`, APP);
-        const query = `SELECT * FROM ${this.tableName} WHERE ((created_date between '${date.from}' and '${date.to}'))`;
-        return this.runQuery(query);
+        let variables = [];
+        let values = [];
+        let params = date;
+        Object.values(params).map((params, index) => { variables.push(params), values.push((`$${index + 1}`)); });
+        console.log('sadfasd', values, variables);
+        const query = `SELECT * FROM ${this.tableName} WHERE ((created_date between ${values[0]} and ${values[1]}))`;
+        return this.runQuery(query, variables);
     }
 };
 DatabaseService = __decorate([

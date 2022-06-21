@@ -321,7 +321,11 @@ let SalesService = class SalesService {
     }
     fetchEarnigReportByMonth(salesYearMonth) {
         common_1.Logger.debug(`fetchEarnigReportByMonth() salesYearMonth: [${JSON.stringify(salesYearMonth)}]`, APP);
-        return this.db.find({ sales_code: salesYearMonth.salesCode }).pipe((0, rxjs_1.switchMap)(doc => this.fetchAccountfromHSA(doc[0], salesYearMonth)));
+        return this.db.find({ sales_code: salesYearMonth.salesCode }).pipe((0, rxjs_1.switchMap)(doc => {
+            if (doc.length == 0)
+                throw new common_1.NotFoundException("Sales Partner Not Record Found");
+            return this.fetchAccountfromHSA(doc[0], salesYearMonth);
+        }));
     }
     fetchAccountfromHSA(createSalesPartnerModel, salesYearMonth) {
         common_1.Logger.debug(`fetchAccountfromHSA() createSalesPartnerModel: [${JSON.stringify(createSalesPartnerModel)}]`, APP);
