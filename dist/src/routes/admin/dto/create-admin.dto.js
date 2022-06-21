@@ -122,7 +122,7 @@ const fetchmonths = (year) => {
     let month = [];
     let i = 0;
     if (new Date().getFullYear() < parseInt(year)) {
-        throw new common_1.BadRequestException();
+        throw new common_1.BadRequestException("Invalid Year Selected");
     }
     if (new Date().getFullYear().toString() === year) {
         for (i = new Date().getMonth() + 1; i > 0; i--)
@@ -137,13 +137,13 @@ const fetchmonths = (year) => {
 };
 exports.fetchmonths = fetchmonths;
 const fetchDues = (createSalesJunction) => {
-    common_1.Logger.debug(`fetchDues() createSalesJunction: [${createSalesJunction}]`);
-    const don = createSalesJunction.reduce((acc, curr) => {
+    common_1.Logger.debug(`fetchDues() createSalesJunction: [${JSON.stringify(createSalesJunction)}]`);
+    const due = createSalesJunction.reduce((acc, curr) => {
         const index = acc.findIndex(x => x.sales_code === curr.sales_code);
         index === -1 ? acc.push({ sales_code: curr.sales_code, dues: [curr.dues] }) : acc[index].dues.push(curr.dues);
         return acc;
-    }, []).map(salesCode => ({ sales_code: salesCode.sales_code, dues: Math.max(...salesCode.dues) }));
-    return don.reduce((acc, curr) => acc += curr.dues, 0);
+    }, []).map(salesCode => ({ sales_code: salesCode.sales_code, dues: salesCode.dues[salesCode.dues.length - 1] }));
+    return due.reduce((acc, curr) => acc += curr.dues, 0);
 };
 exports.fetchDues = fetchDues;
 //# sourceMappingURL=create-admin.dto.js.map

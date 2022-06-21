@@ -234,7 +234,7 @@ let DatabaseService = class DatabaseService {
         return this.runQuery(query);
     }
     fetchCommissionReportByYear(year, month) {
-        common_1.Logger.debug(`fetchCommissionReportByYear(): year ${year}`, APP);
+        common_1.Logger.debug(`fetchCommissionReportByYear(): year ${year} month ${month}`, APP);
         const query = `SELECT * FROM ${this.tableName} WHERE date_part('year',created_date) = ${year} AND date_part('month',created_date) = ${month}`;
         return this.runQuery(query);
     }

@@ -146,7 +146,7 @@ export const fetchmonths = (year: string) => {
 
   let month = [];
   let i = 0;
-  if (new Date().getFullYear() < parseInt(year)) { throw new BadRequestException() }
+  if (new Date().getFullYear() < parseInt(year)) { throw new BadRequestException("Invalid Year Selected") }
   if (new Date().getFullYear().toString() === year) {
     for (i = new Date().getMonth() + 1; i > 0; i--)
       month.push(i)
@@ -159,13 +159,15 @@ export const fetchmonths = (year: string) => {
   }
 }
 export const fetchDues = (createSalesJunction: CreateSalesJunction[]) => {
-  Logger.debug(`fetchDues() createSalesJunction: [${createSalesJunction}]`);
+  Logger.debug(`fetchDues() createSalesJunction: [${JSON.stringify(createSalesJunction)}]`);
 
-  const don = createSalesJunction.reduce((acc, curr) => {
+  const due = createSalesJunction.reduce((acc, curr) => {
+    // console.log("acc",acc, "curr",curr)
     const index = acc.findIndex(x => x.sales_code === curr.sales_code);
     index === -1 ? acc.push({ sales_code: curr.sales_code, dues: [curr.dues] }) : acc[index].dues.push(curr.dues);
     return acc
-  }, []).map(salesCode => ({ sales_code: salesCode.sales_code, dues: Math.max(...salesCode.dues) }));
+  }, []).map(salesCode => ({ sales_code: salesCode.sales_code, dues: salesCode.dues[salesCode.dues.length -1] }));
 
-  return don.reduce((acc, curr) => acc += curr.dues, 0)
+  return due.reduce((acc, curr) => acc += curr.dues, 0)
+  
 }
