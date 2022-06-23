@@ -34,7 +34,7 @@ let AdminService = class AdminService {
         this.salesUserJunctionDb = salesUserJunctionDb;
         this.templateService = templateService;
         this.http = http;
-        this.client = require('twilio')(constants_1.AKASH_ACCOUNTID, constants_1.AKASH_AUTHTOKEN);
+        this.client = require('twilio')(constants_1.AMRAZ_ACCOUNTID, constants_1.AMRAZ_AUTHTOKEN);
         this.onTwilioErrorResponse = async (err) => {
             common_1.Logger.debug('onTwilioErrorResponse(), ' + err, APP);
             if (err.status === 400)
@@ -181,16 +181,21 @@ let AdminService = class AdminService {
     }
     sentOtpToPhoneNumber(mobileNumberDtO) {
         common_1.Logger.debug(`sentOtpToPhoneNumber() mobileNumberDtO: [${JSON.stringify(mobileNumberDtO)}]`, APP);
-        return this.client.verify.services(constants_1.AKASH_SERVICEID).verifications.create({ to: mobileNumberDtO.phoneNumber, channel: 'sms', locale: 'en' }).then(_res => ({ status: `OTP Send to ${mobileNumberDtO.phoneNumber} number` })).catch(err => this.onTwilioErrorResponse(err));
+        return this.client.verify.services(constants_1.AMRAZ_SERVICEID)
+            .verifications
+            .create({ to: mobileNumberDtO.phoneNumber, channel: 'sms', locale: 'en' })
+            .then(_res => ({ status: `OTP Send to ${mobileNumberDtO.phoneNumber} number` }))
+            .catch(err => this.onTwilioErrorResponse(err));
     }
     verifyOtp(mobileNumberAndOtpDtO) {
         common_1.Logger.debug(`verifyOtp() mobileNumberAndOtpDtO: [${JSON.stringify(mobileNumberAndOtpDtO)}]`, APP);
-        return this.client.verify.services(constants_1.AKASH_SERVICEID).verificationChecks.create({ to: mobileNumberAndOtpDtO.phoneNumber, code: mobileNumberAndOtpDtO.otp.toString() })
+        return this.client.verify.services(constants_1.AMRAZ_SERVICEID).verificationChecks.create({ to: mobileNumberAndOtpDtO.phoneNumber, code: mobileNumberAndOtpDtO.otp.toString() })
             .then(verification_check => {
             if (!verification_check.valid || verification_check.status !== 'approved')
                 throw new common_1.BadRequestException('Wrong code provided ');
             return ({ status: verification_check.status });
-        }).catch(err => this.onTwilioErrorResponse(err));
+        })
+            .catch(err => this.onTwilioErrorResponse(err));
     }
     sentFedoAppDownloadLinkToPhoneNumber(mobileNumberDtO) {
         common_1.Logger.debug(`sentFedoAppDownloadLinkToPhoneNumber() mobileNumberDtO: [${JSON.stringify(mobileNumberDtO)}]`, APP);
