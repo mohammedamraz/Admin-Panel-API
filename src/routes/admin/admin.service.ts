@@ -1,7 +1,7 @@
 /* eslint-disable max-lines */
 import { BadRequestException, ConflictException, HttpException, HttpStatus, Injectable, Logger, NotFoundException, UnauthorizedException, UnprocessableEntityException } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
-import { AKASH_ACCOUNTID, AKASH_AUTHTOKEN, AKASH_SERVICEID, APP_DOWNLOAD_LINK, AWS_COGNITO_USER_CREATION_URL_SIT, FEDO_APP, PUBLIC_KEY, SALES_PARTNER_LINK } from 'src/constants';
+import { AMRAZ_ACCOUNTID, AMRAZ_AUTHTOKEN, AMRAZ_SERVICEID, APP_DOWNLOAD_LINK, AWS_COGNITO_USER_CREATION_URL_SIT, FEDO_APP, PUBLIC_KEY, SALES_PARTNER_LINK } from 'src/constants';
 import { DatabaseTable } from 'src/lib/database/database.decorator';
 import { DatabaseService } from 'src/lib/database/database.service';
 import { CreateSalesJunction, CreateSalesPartner, CreateSalesPartnerRequest, Interval, PERIOD, Period, SalesUserJunction } from '../sales/dto/create-sale.dto';
@@ -25,7 +25,7 @@ export class AdminService {
     private readonly templateService: TemplateService,
     private http: HttpService) { }
 
-  client = require('twilio')(AKASH_ACCOUNTID, AKASH_AUTHTOKEN);
+  client = require('twilio')(AMRAZ_ACCOUNTID, AMRAZ_AUTHTOKEN);
   salesPartnerRequestDetails: any;
   salesPartnerDetails: any;
   salesParterEmail: any;
@@ -168,7 +168,7 @@ export class AdminService {
   sentOtpToPhoneNumber(mobileNumberDtO: MobileNumberDtO) {
     Logger.debug(`sentOtpToPhoneNumber() mobileNumberDtO: [${JSON.stringify(mobileNumberDtO)}]`, APP);
 
-    return this.client.verify.services(AKASH_SERVICEID)
+    return this.client.verify.services(AMRAZ_SERVICEID)
       .verifications
       .create({ to: mobileNumberDtO.phoneNumber, channel: 'sms', locale: 'en' })
       .then(_res => ({ status: `OTP Send to ${mobileNumberDtO.phoneNumber} number` }))
@@ -178,7 +178,7 @@ export class AdminService {
   verifyOtp(mobileNumberAndOtpDtO: MobileNumberAndOtpDtO) {
     Logger.debug(`verifyOtp() mobileNumberAndOtpDtO: [${JSON.stringify(mobileNumberAndOtpDtO)}]`, APP);
 
-    return this.client.verify.services(AKASH_SERVICEID).verificationChecks.create({ to: mobileNumberAndOtpDtO.phoneNumber, code: mobileNumberAndOtpDtO.otp.toString() })
+    return this.client.verify.services(AMRAZ_SERVICEID).verificationChecks.create({ to: mobileNumberAndOtpDtO.phoneNumber, code: mobileNumberAndOtpDtO.otp.toString() })
       .then(verification_check => {
         if (!verification_check.valid || verification_check.status !== 'approved')
           throw new BadRequestException('Wrong code provided ');
