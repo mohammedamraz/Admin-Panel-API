@@ -266,7 +266,7 @@ let AdminService = class AdminService {
     sendCreateSalesPartnerLinkToPhoneNumber(mobileNumberDtO) {
         common_1.Logger.debug(`sendCreateSalesPartnerLinkToPhoneNumber() mobileNumberDtO: [${JSON.stringify(mobileNumberDtO)}]`, APP);
         return this.client.messages.create({
-            body: `Click on Link ${constants_1.SALES_PARTNER_LINK}?mobile=${this.encryptPassword_(mobileNumberDtO.phoneNumber)}&commission=${this.encryptPassword_(mobileNumberDtO.commission)}`,
+            body: `Click on Link ${constants_1.SALES_PARTNER_LINK}?query=${this.encryptPassword_(JSON.stringify(mobileNumberDtO))}`,
             from: constants_1.TWILIO_PHONE_NUMBER,
             to: mobileNumberDtO.phoneNumber
         })
@@ -276,7 +276,7 @@ let AdminService = class AdminService {
     sendCreateSalesPartnerLinkToWhatsappNumber(mobileNumberDtO) {
         common_1.Logger.debug(`sendCreateSalesPartnerLinkToWhatsappNumber() mobileNumberDtO: [${JSON.stringify(mobileNumberDtO)}]`, APP);
         return this.client.messages.create({
-            body: `Click on Link ${constants_1.SALES_PARTNER_LINK}?mobile=${this.encryptPassword_(mobileNumberDtO.phoneNumber)}&commission=${this.encryptPassword_(mobileNumberDtO.commission)} `,
+            body: `Click on Link ${constants_1.SALES_PARTNER_LINK}?query=${this.encryptPassword_(JSON.stringify(mobileNumberDtO))}`,
             from: `whatsapp:${constants_1.TWILIO_WHATSAPP_NUMBER}`,
             to: `whatsapp:${mobileNumberDtO.phoneNumber}`
         })
@@ -354,7 +354,7 @@ let AdminService = class AdminService {
     sendNotificationToSalesPartnerOnMobile(mobileNumberDtO) {
         common_1.Logger.debug(`sendCreateSalesPartnerLinkToPhoneNumber() mobileNumberDtO: [${JSON.stringify(mobileNumberDtO)}]`, APP);
         return this.client.messages.create({
-            body: `Click on Link ${constants_1.SALES_PARTNER_NOTIFICATION}?mobile=${this.encryptPassword_(mobileNumberDtO.phoneNumber)}&commission=${this.encryptPassword_(mobileNumberDtO.commission)}`,
+            body: `Click on Link ${constants_1.SALES_PARTNER_NOTIFICATION}?query=${this.encryptPassword_(JSON.stringify(mobileNumberDtO))}`,
             from: constants_1.TWILIO_PHONE_NUMBER,
             to: mobileNumberDtO.phoneNumber
         })
@@ -364,7 +364,7 @@ let AdminService = class AdminService {
     sendNotificationToSalesPartnerOnWhatsappNumber(mobileNumberDtO) {
         common_1.Logger.debug(`sendCreateSalesPartnerLinkToWhatsappNumber() mobileNumberDtO: [${JSON.stringify(mobileNumberDtO)}]`, APP);
         return this.client.messages.create({
-            body: `Click on Link ${constants_1.SALES_PARTNER_NOTIFICATION}?mobile=${this.encryptPassword_(mobileNumberDtO.phoneNumber)}&commission=${this.encryptPassword_(mobileNumberDtO.commission)} `,
+            body: `Click on Link ${constants_1.SALES_PARTNER_NOTIFICATION}?query=${this.encryptPassword_(JSON.stringify(mobileNumberDtO))}`,
             from: `whatsapp:${constants_1.TWILIO_WHATSAPP_NUMBER}`,
             to: `whatsapp:${mobileNumberDtO.phoneNumber}`
         })

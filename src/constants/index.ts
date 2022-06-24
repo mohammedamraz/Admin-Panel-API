@@ -12,13 +12,13 @@ export const PORT = parseInt(process.env.FEDO_HSA_SERVER_PORT, 10) || 36000;
 export const APP_VERSION = packageJson.version;
 export const DEBUG_LEVEL = process.env.FEDO_HSA_SERVER_LOG_LEVEL || 'debug';
 export const APP_DOCUMENTATION = process.env.FEDO_HSA_SERVER_DOCUMENTATION || 'https://fedo.health/hsa/docs';
-export const POSTGRES_DB_URI_DB_URL = process.env.FEDO_HSA_SERVER_DB_URI || 'postgresql://postgres:Fedo@1234@localhost:5432/HSA_Sales';
+export const POSTGRES_DB_URI_DB_URL = process.env.FEDO_HSA_SERVER_DB_URI || 'postgresql://postgres:akash@localhost:5432/hsa-sales';
 // export const POSTGRES_DB_URI_DB_URL = process.env.FEDO_HSA_SERVER_DB_URI || 'postgresql://postgres:Fedo@1234@localhost:5432/HSA_Sales';
 
-export const AKASH_ACCOUNTID = process.env.FEDO_HSA_TWILIO_ACCOUNTID || "AC63acdd31af3ecbf5edde92cee5062e79";
-export const AKASH_AUTHTOKEN = process.env.FEDO_HSA_TWILIO_AUTHTOKEN || "32559243c2d40e773aaf3a38c8f36854";
-export const AKASH_SERVICEID = process.env.FEDO_HSA_TWILIO_SERVICEID || "VA6bd204528e410892c7ba538d70d36ec3";
-export const TWILIO_PHONE_NUMBER = process.env.FEDO_HSA_TWILIO_PHONE_NUMBER || "+18573717053";
+export const AKASH_ACCOUNTID = process.env.FEDO_HSA_TWILIO_ACCOUNTID || "ACee7f5c43cad32fd3a589999f12548b19";
+export const AKASH_AUTHTOKEN = process.env.FEDO_HSA_TWILIO_AUTHTOKEN || "3a02e7cc85cc1f8b5ca011fd39c40c0e";
+export const AKASH_SERVICEID = process.env.FEDO_HSA_TWILIO_SERVICEID || "MG3666ac1bc807c89812d74330f898c7e7";
+export const TWILIO_PHONE_NUMBER = process.env.FEDO_HSA_TWILIO_PHONE_NUMBER || "+19784806237";
 export const TWILIO_WHATSAPP_NUMBER = process.env.FEDO_HSA_TWILIO_WHATSAPP_NUMBER || "+14155238886";
 
 export const APP_DOWNLOAD_LINK = process.env.FEDO_HSA_APP_DOWNLOAD_LINK || "https://play.google.com/store/apps/details?id=com.fedo.auth";
