@@ -1,1 +1,0 @@
-export declare const CONFIG_MODULE_OPTIONS = "CONFIG_MODULE_OPTIONS";
