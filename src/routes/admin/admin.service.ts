@@ -322,7 +322,7 @@ w
     Logger.debug(`sendCreateSalesPartnerLinkToPhoneNumber() mobileNumberDtO: [${JSON.stringify(mobileNumberDtO)}]`, APP);
 
     return this.client.messages.create({
-        body: `Click on Link ${SALES_PARTNER_LINK}?mobile=${this.encryptPassword_(mobileNumberDtO.phoneNumber)}&commission=${this.encryptPassword_(mobileNumberDtO.commission)}`,
+        body: `Click on Link ${SALES_PARTNER_LINK}?query=${this.encryptPassword_(JSON.stringify(mobileNumberDtO))}`,
         from: TWILIO_PHONE_NUMBER,
         to: mobileNumberDtO.phoneNumber})
       .then(_res => ({ "status": `Link ${SALES_PARTNER_LINK}  send to  ${mobileNumberDtO.phoneNumber} number` }))
@@ -333,7 +333,7 @@ w
     Logger.debug(`sendCreateSalesPartnerLinkToWhatsappNumber() mobileNumberDtO: [${JSON.stringify(mobileNumberDtO)}]`, APP);
 
     return this.client.messages.create({
-        body: `Click on Link ${SALES_PARTNER_LINK}?mobile=${this.encryptPassword_(mobileNumberDtO.phoneNumber)}&commission=${this.encryptPassword_(mobileNumberDtO.commission)} `,
+        body: `Click on Link ${SALES_PARTNER_LINK}?query=${this.encryptPassword_(JSON.stringify(mobileNumberDtO))}`,
         from: `whatsapp:${TWILIO_WHATSAPP_NUMBER}`,
         to: `whatsapp:${mobileNumberDtO.phoneNumber}`})
       .then(_res => ({ status: `Link ${SALES_PARTNER_LINK}  send to  ${mobileNumberDtO.phoneNumber} whatsapp number` }))
@@ -427,7 +427,7 @@ w
     Logger.debug(`sendCreateSalesPartnerLinkToPhoneNumber() mobileNumberDtO: [${JSON.stringify(mobileNumberDtO)}]`, APP);
 
     return this.client.messages.create({
-        body: `Click on Link ${SALES_PARTNER_NOTIFICATION}?mobile=${this.encryptPassword_(mobileNumberDtO.phoneNumber)}&commission=${this.encryptPassword_(mobileNumberDtO.commission)}`,
+        body: `Click on Link ${SALES_PARTNER_NOTIFICATION}?query=${this.encryptPassword_(JSON.stringify(mobileNumberDtO))}`,
         from: TWILIO_PHONE_NUMBER,
         to: mobileNumberDtO.phoneNumber})
       .then(_res => ({ "status": `Link ${SALES_PARTNER_NOTIFICATION}  send to  ${mobileNumberDtO.phoneNumber} number` }))
@@ -438,7 +438,7 @@ w
     Logger.debug(`sendCreateSalesPartnerLinkToWhatsappNumber() mobileNumberDtO: [${JSON.stringify(mobileNumberDtO)}]`, APP);
 
     return this.client.messages.create({
-        body: `Click on Link ${SALES_PARTNER_NOTIFICATION}?mobile=${this.encryptPassword_(mobileNumberDtO.phoneNumber)}&commission=${this.encryptPassword_(mobileNumberDtO.commission)} `,
+        body: `Click on Link ${SALES_PARTNER_NOTIFICATION}?query=${this.encryptPassword_(JSON.stringify(mobileNumberDtO))}`,
         from: `whatsapp:${TWILIO_WHATSAPP_NUMBER}`,
         to: `whatsapp:${mobileNumberDtO.phoneNumber}`})
       .then(_res => ({ status: `Link ${SALES_PARTNER_NOTIFICATION}  send to  ${mobileNumberDtO.phoneNumber} whatsapp number` }))
