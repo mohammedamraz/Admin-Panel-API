@@ -12,7 +12,7 @@ export const PORT = parseInt(process.env.FEDO_HSA_SALES_SERVER_PORT, 10) || 3600
 export const APP_VERSION = packageJson.version;
 export const DEBUG_LEVEL = process.env.FEDO_HSA_SALES_SERVER_LOG_LEVEL || 'debug';
 export const APP_DOCUMENTATION = process.env.FEDO_HSA_SERVER_DOCUMENTATION || 'https://fedo.health/hsa/docs';
-export const POSTGRES_DB_URI_DB_URL = process.env.FEDO_HSA_SALES_SERVER_DB_URI || 'postgresql://postgres:ban0Malik@localhost:5432/fedo-hsa';
+export const POSTGRES_DB_URI_DB_URL = process.env.FEDO_HSA_SALES_SERVER_DB_URI || 'postgresql://postgres:admin@localhost:5432/fedo-sales';
 
 export const AMRAZ_AUTHTOKEN = process.env.FEDO_HSA_SALES_TWILIO_AUTHTOKEN || "3a02e7cc85cc1f8b5ca011fd39c40c0e";
 export const AMRAZ_SERVICEID = process.env.FEDO_HSA_SALES_TWILIO_SERVICEID || "VAe2d6baceed7fe5b04fc546d4fa3560f8";
