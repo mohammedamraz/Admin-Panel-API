@@ -4,7 +4,7 @@ import { AxiosResponse, AxiosError } from 'axios';
 import { catchError, map, throwError } from "rxjs";
 import { extname } from "path";
 import { BadRequestException, NotFoundException, UnauthorizedException, UnprocessableEntityException } from "@nestjs/common";
-import { FEDO_HSA_USER_CONNECTION_URL, PUBLIC_KEY } from "src/constants/index";
+import { FEDO_HSA_USER_CONNECTION_URL, PRIVATE_KEY, PUBLIC_KEY } from "src/constants/index";
 
 export const fetchUser = (userId: string) => {
 
@@ -70,3 +70,13 @@ export const encryptPassword = (password) => {
 	var encryptedString = key_public.encrypt(password, 'base64')
 	return encryptedString
 }
+
+
+export const decryptPassword = (encryptedPassword) => {
+    const NodeRSA = require('node-rsa');
+    var private_key = PRIVATE_KEY
+    let key_private = new NodeRSA(private_key)
+    var decryptedString = key_private.decrypt(encryptedPassword, 'utf8')
+    return JSON.parse(decryptedString)
+  
+  }

@@ -267,9 +267,11 @@ export class SalesService {
   updateImageById(id: string, updateSalesPartnerDto: object) {
     Logger.debug(`updateImageById() id: ${id} Body: ${JSON.stringify(updateSalesPartnerDto)}`, APP);
 
-    return this.db.findByIdandUpdate({ id: id, quries: updateSalesPartnerDto }).pipe(
-      map(res => res),
-      catchError(error => { throw new BadRequestException(error.message) }))
+    return this.db.find({ id: id }).pipe(
+      map(res => {
+        if (res.length == 0) throw new NotFoundException('sales partner not found')
+        return this.db.findByIdandUpdate({ id: id, quries: updateSalesPartnerDto })
+      }))
   }
 
   fetchCommisionBySalesCode(salesCode: string) {

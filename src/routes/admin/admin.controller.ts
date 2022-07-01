@@ -1,4 +1,5 @@
-import { Controller, Get, Post, Body, Param, Logger, Query } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Logger, Query, UseInterceptors } from '@nestjs/common';
+import { LoggingInterceptor } from 'src/interceptors/interceptor';
 import { Period } from '../sales/dto/create-sale.dto';
 import { AdminService } from './admin.service';
 import { createPaid, DateDTO, MobileDtO, MobileNumberAndOtpDtO, MobileNumberDtO, ParamDto, requestDto, YearMonthDto } from './dto/create-admin.dto';
@@ -6,6 +7,7 @@ import { ConfirmForgotPasswordDTO, ForgotPasswordDTO, LoginDTO, PeriodRange, Sta
 
 const APP = 'AdminController';
 @Controller()
+@UseInterceptors(LoggingInterceptor)
 export class AdminController {
   constructor(private readonly adminService: AdminService) {}
 
