@@ -250,7 +250,7 @@ w
 
     logindto.fedoApp = FEDO_APP;
     return this.http.post(`${AWS_COGNITO_USER_CREATION_URL_SIT}/token`, this.encryptPassword(logindto)).pipe(catchError(err => { return this.onAWSErrorResponse(err) }), map((res: AxiosResponse) => {
-      if (!res.data) throw new BadRequestException()
+      if (!res.data) throw new UnauthorizedException()
       return { jwtToken: res.data.idToken.jwtToken, refreshToken: res.data.refreshToken, accessToken: res.data.accessToken.jwtToken }
     })
     )
