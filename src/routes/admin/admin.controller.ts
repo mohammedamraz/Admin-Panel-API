@@ -7,7 +7,7 @@ import { ConfirmForgotPasswordDTO, ForgotPasswordDTO, LoginDTO, PeriodRange, Sta
 
 const APP = 'AdminController';
 @Controller()
-@UseInterceptors(LoggingInterceptor)
+
 export class AdminController {
   constructor(private readonly adminService: AdminService) {}
 
@@ -28,6 +28,7 @@ export class AdminController {
   }
 
   @Post('login') 
+  @UseInterceptors(LoggingInterceptor)
   login(@Body() Logindto: LoginDTO) {
     Logger.debug(`login() UserLoginDTO:[${JSON.stringify(Logindto)}]`);
 
@@ -35,6 +36,7 @@ export class AdminController {
   }
 
   @Post('password')
+  @UseInterceptors(LoggingInterceptor)
   forgotPassword(@Body() forgotPasswordDTO: ForgotPasswordDTO) {
     Logger.debug(`forgotPassword() forgotPasswordDTO:[${JSON.stringify(forgotPasswordDTO,)}]`,);
 
@@ -42,6 +44,7 @@ export class AdminController {
   }
 
   @Post('password/otp')
+  @UseInterceptors(LoggingInterceptor)
   confirmForgotPassword(@Body() confirmForgotPasswordDTO: ConfirmForgotPasswordDTO,) {
     Logger.debug(`confirmForgotPassword() confirmForgotPasswordDTO:[${JSON.stringify(confirmForgotPasswordDTO,)}]`,);
 

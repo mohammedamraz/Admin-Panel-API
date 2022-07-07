@@ -91,7 +91,8 @@ export class UpdateSalesPartner {
 }
 export enum Is_active {
     TRUE = 'true',
-    FALSE = 'false'
+    FALSE = 'false',
+    ALL = ''
 }
 
 export class ZQueryParamsDto {
