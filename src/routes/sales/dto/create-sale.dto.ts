@@ -1,6 +1,6 @@
 import { Email } from "aws-sdk/clients/codecommit";
 import { phoneNumber } from "aws-sdk/clients/importexport";
-import { IsEmail, IsEnum, IsNotEmpty, IsNumberString, IsOptional, IsPhoneNumber, IsString, MaxLength, MinLength } from "class-validator";
+import { IsEmail, IsEnum, IsMobilePhone, IsNotEmpty, IsNumberString, IsOptional, IsPhoneNumber, IsString, MaxLength, MinLength } from "class-validator";
 
 export class CreateSalesJunction {
     sales_code: string;
@@ -116,7 +116,10 @@ export class ZQueryParamsDto {
 
 export class LoginDTO{
     @IsNotEmpty()
-    mobile: string;}
+    @IsPhoneNumber()
+    mobile: string;
+}
+
 
 
 
