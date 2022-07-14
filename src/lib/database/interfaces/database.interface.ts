@@ -105,7 +105,7 @@ export interface DateRangeParams {
 export interface fetchByYearAndMonthParams {
   year: string;
   month: string;
-  columnName: string;
+  // columnName: string;
   columnvalue: string;
 }
 export interface findByConditionParams {
@@ -140,7 +140,7 @@ export const fetchMonthYear = (MONTHYEAR: MONTHYEAR) => {
 }
 
 export interface fetchByYearAndMonthParams {
-  columnName: string;
+  // columnName: string;
   columnvalue: string;
   year: string;
   month: string;

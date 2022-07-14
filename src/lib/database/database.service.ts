@@ -346,7 +346,7 @@ export class DatabaseService<T> implements DatabaseInterface<T> {
     let values = []
     let params = obj
     Object.values(params).map((params, index) => { variables.push(params), values.push((`$${index + 1}`)) });
-    const query = `SELECT * FROM ${this.tableName} WHERE  ${values[0]} = ${values[1]} AND date_part('year',created_date) = ${values[2]} AND date_part('month',created_date) = ${values[3]} `;
+    const query = `SELECT * FROM ${this.tableName} WHERE  sales_code = ${values[0]} AND date_part('year',created_date) = ${values[1]} AND date_part('month',created_date) = ${values[2]} `;
     return this.runQuery(query, variables);
   }
   

@@ -405,14 +405,14 @@ w
   fetchSignupforPerformace(createSalesPartner: CreateSalesPartner, dateDTO: DateDTO) {
     Logger.debug(`fetchSignupAndPerformace() createSalesPartner: [${JSON.stringify(createSalesPartner)}]`, APP);
 
-    return this.salesJunctionDb.fetchByYear({ columnName: "sales_code", columnvalue: createSalesPartner.sales_code, year: dateDTO.year, month: dateDTO.month }).pipe(
+    return this.salesJunctionDb.fetchByYear({  columnvalue: createSalesPartner.sales_code, year: dateDTO.year, month: dateDTO.month }).pipe(
       switchMap(salesJunctionDoc => this.fetchSignUpsforPerformance(createSalesPartner, salesJunctionDoc, dateDTO)))
   }
 
   fetchSignUpsforPerformance(createSalesPartner: CreateSalesPartner, createSalesJunction: CreateSalesJunction[], dateDTO: DateDTO) {
     Logger.debug(`fetchSignUpsforPerformance() createSalesJunction: [${JSON.stringify(createSalesJunction)}]`, APP);
 
-    return this.salesuser.fetchByYear({ columnName: "sales_code", columnvalue: createSalesPartner.sales_code, year: dateDTO.year, month: dateDTO.month }).pipe(
+    return this.salesuser.fetchByYear({  columnvalue: createSalesPartner.sales_code, year: dateDTO.year, month: dateDTO.month }).pipe(
       map(doc => makeEarningDuesFormat(createSalesPartner.name, createSalesJunction.reduce((acc, curr) => acc += curr.commission_amount, 0), !createSalesJunction[createSalesJunction.length - 1] ? 0 : createSalesJunction[createSalesJunction.length - 1].dues, doc.length)))
   }
 

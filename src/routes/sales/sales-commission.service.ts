@@ -84,7 +84,7 @@ export class SalesCommissionService {
         const reportData = []
         return from(fetchmonths((yearMonthDto.year))).pipe(
             concatMap(async (month: number) => {
-                return await lastValueFrom(this.junctiondb.fetchByYear({ columnName: 'sales_code', columnvalue: yearMonthDto.salesCode, year: yearMonthDto.year, month: month.toString() }))
+                return await lastValueFrom(this.junctiondb.fetchByYear({ columnvalue: yearMonthDto.salesCode, year: yearMonthDto.year, month: month.toString() }))
                     .then(async salesJunctionDoc => {
                         const paidAmount = salesJunctionDoc.map(doc => doc.paid_amount)
                         const totalPaidAmount = paidAmount.reduce((next, prev) => next + prev, 0)
@@ -97,7 +97,7 @@ export class SalesCommissionService {
                                 if (month === fetchmonths((yearMonthDto.year))[0] && month !== 12) this.fetchSignup(yearMonthDto.year, month, yearMonthDto)
                                     .then(doc => reportData.push({ "month": month, "hsa_sign_up": doc, "dues": totalDues }))
                                 if (month === 12) {
-                                    lastValueFrom(this.junctiondb.fetchByYear({ columnName: 'sales_code', columnvalue: yearMonthDto.salesCode, year: (parseInt(yearMonthDto.year) + 1).toString(), month: '1' }))
+                                    lastValueFrom(this.junctiondb.fetchByYear({ columnvalue: yearMonthDto.salesCode, year: (parseInt(yearMonthDto.year) + 1).toString(), month: '1' }))
                                         .then(salesJunctionDoc => {
                                             reportData.push({
                                                 total_paid_amount: salesJunctionDoc.reduce((next, pre) => next + pre.paid_amount, 0),
@@ -113,7 +113,7 @@ export class SalesCommissionService {
 
     async fetchSignup(year, month, yearMonthDto: YearMonthDto) {
         Logger.debug(`fetchSignup() year: [${year}] month: [${month}] salesCode:[${yearMonthDto.salesCode}]`, APP);
-        return await lastValueFrom(this.salesUser.fetchByYear({ columnName: 'sales_code', columnvalue: yearMonthDto.salesCode, year: yearMonthDto.year, month: month }))
+        return await lastValueFrom(this.salesUser.fetchByYear({  columnvalue: yearMonthDto.salesCode, year: yearMonthDto.year, month: month }))
             .then(userJunctionDoc => { return userJunctionDoc.length })
             .catch(error => { throw new UnprocessableEntityException(error.message) })
     }
