@@ -282,29 +282,6 @@ export class DatabaseService<T> implements DatabaseInterface<T> {
     }
   }
 
-  // has to be changed
-  // findByPeriod(findByPeriodParams: findByPeriodParams): Observable<T[]> {
-  //   Logger.debug(`findByPeriod(): params ${[JSON.stringify(findByPeriodParams)]}`, APP);
-
-  //   let variables = [];
-  //   let values = []
-  //   let params = findByPeriodParams
-  //   delete findByPeriodParams.columnName
-  //   Object.values(params).map((params, index) => { variables.push(params), values.push((`$${index + 1}`)) })
-  //   console.log("dfsdfsfdxfcsdxfcsdzx",values,variables)
-    // console.log(`SELECT * FROM ${this.tableName} WHERE sales_code = '${values[0]}' AND created_date > CURRENT_DATE - INTERVAL '${values[1]}'  ORDER BY ${"created_date"} DESC`);
-    
-    
-  //   const query = `SELECT * FROM ${this.tableName} WHERE sales_code = ${values[0]} AND created_date > CURRENT_DATE - (INTERVAL '${values[1]}')  ORDER BY ${"created_date"} DESC`;
-  //   return this.runQuery(query,variables);
-  // }
-  
-  // findByPeriod(findByPeriodParams: findByPeriodParams): Observable<T[]> {
-  //   Logger.debug(`findByPeriod(): params ${[JSON.stringify(findByPeriodParams)]}`, APP);
-
-  //   const query = `SELECT * FROM ${this.tableName} WHERE ${findByPeriodParams.columnName} = '${findByPeriodParams.columnvalue}' AND created_date > CURRENT_DATE - INTERVAL '${findByPeriodParams.period}'  ORDER BY ${"created_date"} DESC`;
-  //   return this.runQuery(query);
-  // }
 
   findByPeriod(findByPeriodParams: findByPeriodParams): Observable<T[]> {
     Logger.debug(`findByPeriod(): params ${[JSON.stringify(findByPeriodParams)]}`, APP);
