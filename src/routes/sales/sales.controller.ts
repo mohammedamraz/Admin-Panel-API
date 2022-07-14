@@ -50,8 +50,8 @@ export class SalesController {
   }
 
   @Get('login/:mobile')
-  fetchSalesPartnerByMobileNumber(@Param() mobileDTO: LoginDTO) {
-    Logger.debug(`fetchSalesPartnerByMobileNumber() mobileNumber: [${mobileDTO}`, APP);
+  fetchSalesCodeByMobileNumber(@Param() mobileDTO: LoginDTO) {
+    Logger.debug(`fetchSalesCodeByMobileNumber() mobileNumber: [${mobileDTO}`, APP);
     
     return this.salesService.fetchSalesCodeByMobileNumber(mobileDTO.mobile);
   }
@@ -127,4 +127,11 @@ export class SalesController {
 
     return this.salesCommissionService.fetchEarnigReport(yearMonthDto);
   }
+
+  @Get('check/:mobile')
+  fetchSalesPartnerByMobileNumber(@Param() mobileDTO: LoginDTO) {
+    Logger.debug(`fetchSalesPartnerByMobileNumber() mobileNumber: [${JSON.stringify(mobileDTO)}`, APP);
+    return this.salesService.fetchSalesPartnerByMobileNumber(mobileDTO.mobile);
+  }
+  
 }
