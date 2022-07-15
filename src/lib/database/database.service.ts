@@ -203,7 +203,6 @@ export class DatabaseService<T> implements DatabaseInterface<T> {
     const number = params.numberOfRows * params.pageNumber
     delete params.pageNumber;
     Object.values(params).map((params, index) => { variables.push(params), values.push((`$${index + 1}`)) })
-    console.log(values, variables);
     const query = `SELECT * FROM ${this.tableName} WHERE account_id=${id} AND created_date >= ${values[0]} AND created_date <= ${values[1]} ORDER BY ${values[2]} LIMIT  ${values[3]} OFFSET ${number} `
     return this.runQuery(query, variables)
   }

@@ -53,7 +53,6 @@ export const imageFileFilter = (req, file, callback) => {
 	callback(null, true);
 };
 const onHTTPErrorResponse = async (err: AxiosError) => {
-	console.log('dasdasdfasdf', err.code)
 	if (err.code === 'ECONNREFUSED') throw new UnprocessableEntityException('Please check your server connection');
 	if (err.response.data.statusCode === 401) throw new UnauthorizedException(err.response.data.message);
 	if (err.response.data.statusCode === 422) throw new UnprocessableEntityException(err.response.data.error.message);

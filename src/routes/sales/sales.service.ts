@@ -79,7 +79,6 @@ export class SalesService {
 
     return this.db.find({ mobile: mobile }).pipe(catchError(err => { throw new UnprocessableEntityException(err.message) }),
       map((res) => {
-        console.log("findout",res[0])
         if (res[0] != null) throw new NotFoundException(`sales partner already present with same phone number`);
         return res
       }));

@@ -168,7 +168,6 @@ export const fetchDues = (createSalesJunction: CreateSalesJunction[]) => {
   Logger.debug(`fetchDues() createSalesJunction: [${JSON.stringify(createSalesJunction)}]`);
 
   const due = createSalesJunction.reduce((acc, curr) => {
-    // console.log("acc",acc, "curr",curr)
     const index = acc.findIndex(x => x.sales_code === curr.sales_code);
     index === -1 ? acc.push({ sales_code: curr.sales_code, dues: [curr.dues] }) : acc[index].dues.push(curr.dues);
     return acc

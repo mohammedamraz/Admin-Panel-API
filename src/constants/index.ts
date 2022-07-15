@@ -20,7 +20,10 @@ export const AMRAZ_ACCOUNTID = process.env.FEDO_HSA_SALES_TWILIO_ACCOUNTID || "A
 export const TWILIO_PHONE_NUMBER = process.env.FEDO_HSA_SALES_TWILIO_PHONE_NUMBER || "+14172615393";
 export const TWILIO_WHATSAPP_NUMBER = process.env.FEDO_HSA_SALES_TWILIO_WHATSAPP_NUMBER || "+14155238886";
 
-export const APP_DOWNLOAD_LINK = process.env.FEDO_HSA_APP_DOWNLOAD_LINK || "https://play.google.com/store/apps/details?id=com.fedo.auth";
+export const GUPSHUP_OTP_VERIFICATION=process.env.GUPSHUP_OTP_VERIFICATION_URL || 'https://enterprise.smsgupshup.com/GatewayAPI/rest?userid=2000213582&password=WiZKqcraG&method=TWO_FACTOR_AUTH&v=1.1';
+export const GUPSHUP_OTP_MESSAGE_FORMAT=process.env.GUPSHUP_OTP_MESSAGE_FORMAT_URL || '&msg=%25code%25 Is%20Your%20OTP%20-%20FEDO&format=text&otpCodeLength=6&otpCodeType=NUMERIC'
+
+export const APP_DOWNLOAD_LINK = process.env.FEDO_HSA_APP_DOWNLOAD_LINK || "https://play.google.com/store/apps/details?id=ai.fedo.app";
 export const SALES_PARTNER_LINK = process.env.FEDO_HSA_SALES_PARTNER_LINK || "http://0.0.0.0:35000/sales-partner";
 export const SALES_PARTNER_NOTIFICATION = process.env.FEDO_HSA_SALES_PARTNER_NOTIFICATION || "SALES PARTNER APPROVED";
 
