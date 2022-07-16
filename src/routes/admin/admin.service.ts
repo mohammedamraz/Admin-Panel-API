@@ -169,9 +169,11 @@ export class AdminService {
     Logger.debug(`sentOtpToPhoneNumber() mobileNumberDtO: [${JSON.stringify(mobileNumberDtO)}]`, APP);
 
     return this.http.post(`${GUPSHUP_OTP_VERIFICATION}&phone_no=${mobileNumberDtO.phoneNumber}${GUPSHUP_OTP_MESSAGE_FORMAT}`,).pipe(
-      catchError(err => { return err }),
+      catchError(err => {
+        return err;
+      }),
       map(doc => {
-      return doc['data']
+        return { status: doc['data'] }
       })
     )
   }
@@ -184,9 +186,9 @@ export class AdminService {
       map(doc => {
         var data = doc['data'].split(' ');
         if (data[0] === "success") {
-         return doc['data'];
+          return { status: doc['data'] };
         } else {
-         throw new HttpException({ status: data[2], error: data.slice(4, 9).join(' '), }, HttpStatus.BAD_REQUEST);
+          throw new HttpException({ status: data[2], error: data.slice(4, 9).join(' '), }, HttpStatus.BAD_REQUEST);
         }
       })
     )
@@ -195,14 +197,14 @@ export class AdminService {
   sentFedoAppDownloadLinkToPhoneNumber(mobileNumberDtO: MobileNumberDtO) {
     Logger.debug(`sentFedoAppDownloadLinkToPhoneNumber() mobileNumberDtO: [${JSON.stringify(mobileNumberDtO)}]`, APP);
 
-    return this.client.messages.create({body: APP_DOWNLOAD_LINK, from: TWILIO_PHONE_NUMBER, to: mobileNumberDtO.phoneNumber})
+    return this.client.messages.create({ body: APP_DOWNLOAD_LINK, from: TWILIO_PHONE_NUMBER, to: mobileNumberDtO.phoneNumber })
       .then(_res => ({ status: `Link ${APP_DOWNLOAD_LINK}  send to  ${mobileNumberDtO.phoneNumber} number` })).catch(err => this.onTwilioErrorResponse(err));
   }
 
   sentFedoAppDownloadLinkToWhatsappNumber(mobileNumberDtO: MobileNumberDtO) {
     Logger.debug(`sentFedoAppDownloadLinkToWhatsappNumber() mobileNumberDtO: [${JSON.stringify(mobileNumberDtO)}]`, APP);
 
-    return this.client.messages.create({body: APP_DOWNLOAD_LINK, from: `whatsapp:${TWILIO_WHATSAPP_NUMBER}`, to: `whatsapp:${mobileNumberDtO.phoneNumber}`})
+    return this.client.messages.create({ body: APP_DOWNLOAD_LINK, from: `whatsapp:${TWILIO_WHATSAPP_NUMBER}`, to: `whatsapp:${mobileNumberDtO.phoneNumber}` })
       .then(_res => ({ status: `Link ${APP_DOWNLOAD_LINK}  send to  ${mobileNumberDtO.phoneNumber} whatsapp number` })).catch(err => this.onTwilioErrorResponse(err));
   }
 
@@ -314,22 +316,24 @@ export class AdminService {
 
     await lastValueFrom(from(updateAmountdto['data']).pipe(map(res => {
       return lastValueFrom(this.salesJunctionDb.find({ "sales_code": res.salesCode }).pipe(map(doc => {
-        
+
         const sort_doc = Math.max(...doc.map(user => parseInt(user['id'].toString())));
         const user_doc = doc.filter(item => item['id'] == sort_doc);
         const finalRes = user_doc[0]?.dues;
         const dueCommission = Number(finalRes) - Number(res.paid_amount);
-        if (user_doc.length!=0) return this.salesJunctionDb.save({ sales_code: user_doc[0]?.sales_code, paid_amount: res.paid_amount, dues: dueCommission })
-      })))})));
+        if (user_doc.length != 0) return this.salesJunctionDb.save({ sales_code: user_doc[0]?.sales_code, paid_amount: res.paid_amount, dues: dueCommission })
+      })))
+    })));
   }
 
   sendCreateSalesPartnerLinkToPhoneNumber(mobileNumberDtO: MobileDtO) {
     Logger.debug(`sendCreateSalesPartnerLinkToPhoneNumber() mobileNumberDtO: [${JSON.stringify(mobileNumberDtO)}]`, APP);
 
     return this.client.messages.create({
-        body: `Click on Link ${SALES_PARTNER_LINK}?query=${this.encryptPassword_(JSON.stringify(mobileNumberDtO))}`,
-        from: TWILIO_PHONE_NUMBER,
-        to: mobileNumberDtO.phoneNumber})
+      body: `Click on Link ${SALES_PARTNER_LINK}?query=${this.encryptPassword_(JSON.stringify(mobileNumberDtO))}`,
+      from: TWILIO_PHONE_NUMBER,
+      to: mobileNumberDtO.phoneNumber
+    })
       .then(_res => ({ "status": `Link ${SALES_PARTNER_LINK}  send to  ${mobileNumberDtO.phoneNumber} number` }))
       .catch(err => this.onTwilioErrorResponse(err));
   }
@@ -338,9 +342,10 @@ export class AdminService {
     Logger.debug(`sendCreateSalesPartnerLinkToWhatsappNumber() mobileNumberDtO: [${JSON.stringify(mobileNumberDtO)}]`, APP);
 
     return this.client.messages.create({
-        body: `Click on Link ${SALES_PARTNER_LINK}?query=${this.encryptPassword_(JSON.stringify(mobileNumberDtO))}`,
-        from: `whatsapp:${TWILIO_WHATSAPP_NUMBER}`,
-        to: `whatsapp:${mobileNumberDtO.phoneNumber}`})
+      body: `Click on Link ${SALES_PARTNER_LINK}?query=${this.encryptPassword_(JSON.stringify(mobileNumberDtO))}`,
+      from: `whatsapp:${TWILIO_WHATSAPP_NUMBER}`,
+      to: `whatsapp:${mobileNumberDtO.phoneNumber}`
+    })
       .then(_res => ({ status: `Link ${SALES_PARTNER_LINK}  send to  ${mobileNumberDtO.phoneNumber} whatsapp number` }))
       .catch(err => this.onTwilioErrorResponse(err));
   }
@@ -363,35 +368,38 @@ export class AdminService {
 
     const reportData = []
     return from(fetchmonths((yearMonthDto.year))).pipe(
-      concatMap(async( month: number) => {
-        return await lastValueFrom(this.salesJunctionDb.fetchCommissionReportByYear(yearMonthDto.year,month))
-        .then(async salesJunctionDoc=> {
-          const paidAmount = salesJunctionDoc.map(doc => doc.paid_amount)
-          const totalPaidAmount = paidAmount.reduce((next, prev) => next + prev, 0)
-          const date = salesJunctionDoc.map(doc => { if (doc.paid_amount > 0) return doc.created_date })
-          const paidOn = date.filter((res) => res)
-         await this.fetchSignup(yearMonthDto.year,month-1).then(signup => {
-          if (month === fetchmonths((yearMonthDto.year))[0] && month !== 12) this.fetchSignup(yearMonthDto.year, month)
-          .then(doc => reportData.push({ "month": month, "hsa_sign_up": doc, "dues": fetchDues(salesJunctionDoc) }))
-          
-          if (month === 12) {
-          lastValueFrom(this.salesJunctionDb.fetchCommissionReportByYear(yearMonthDto.year,month))
-              .then(salesJunctionDoc => {
-                  reportData.push({
+      concatMap(async (month: number) => {
+        return await lastValueFrom(this.salesJunctionDb.fetchCommissionReportByYear(yearMonthDto.year, month))
+          .then(async salesJunctionDoc => {
+            const paidAmount = salesJunctionDoc.map(doc => doc.paid_amount)
+            const totalPaidAmount = paidAmount.reduce((next, prev) => next + prev, 0)
+            const date = salesJunctionDoc.map(doc => { if (doc.paid_amount > 0) return doc.created_date })
+            const paidOn = date.filter((res) => res)
+            await this.fetchSignup(yearMonthDto.year, month - 1).then(signup => {
+              if (month === fetchmonths((yearMonthDto.year))[0] && month !== 12) this.fetchSignup(yearMonthDto.year, month)
+                .then(doc => reportData.push({ "month": month, "hsa_sign_up": doc, "dues": fetchDues(salesJunctionDoc) }))
+
+              if (month === 12) {
+                lastValueFrom(this.salesJunctionDb.fetchCommissionReportByYear(yearMonthDto.year, month))
+                  .then(salesJunctionDoc => {
+                    reportData.push({
                       total_paid_amount: salesJunctionDoc.reduce((next, pre) => next + pre.paid_amount, 0),
                       month: 12, hsa_sign_up: signup, paid_on: salesJunctionDoc.filter(doc => { if (doc.paid_amount > 0) return doc })[0]?.created_date
+                    })
                   })
-              })} 
-          if (month - 1 !== 0) reportData.push({ "total_paid_amount": totalPaidAmount, "month": month - 1, "hsa_sign_up": signup, "paid_on": paidOn[0]})
-          }).catch(error=> {throw new NotFoundException(error.message)})
+              }
+              if (month - 1 !== 0) reportData.push({ "total_paid_amount": totalPaidAmount, "month": month - 1, "hsa_sign_up": signup, "paid_on": paidOn[0] })
+            }).catch(error => { throw new NotFoundException(error.message) })
 
-         return reportData})
-        .catch(error=> {throw new NotFoundException(error.message)})
-        .then(_doc => reportData.sort((a, b) => (a.month < b.month) ? 1 : ((b.month < a.month) ? -1 : 0)))}))
-      }
-  
+            return reportData
+          })
+          .catch(error => { throw new NotFoundException(error.message) })
+          .then(_doc => reportData.sort((a, b) => (a.month < b.month) ? 1 : ((b.month < a.month) ? -1 : 0)))
+      }))
+  }
 
-  fetchMonthlyReport(dateDTO: DateDTO){
+
+  fetchMonthlyReport(dateDTO: DateDTO) {
     Logger.debug(`fetchMonthlyReport() date: [${JSON.stringify(dateDTO)}]`, APP);
 
     return this.salesDb.fetchAll().pipe(map(salesDb => this.fetchCommissionReportforSalesPartner(salesDb, dateDTO)))
@@ -402,39 +410,40 @@ export class AdminService {
 
     let performance = []
     return lastValueFrom(from(createSalesPartner).pipe(
-      switchMap(salesDoc => { return lastValueFrom(this.fetchSignupforPerformace(salesDoc, dateDTO)).then(doc => performance.push(doc))})))
-      .then(_doc => applyPerformance(performance, averageSignup(createSalesPartner.length, performance.reduce((acc, curr) => acc += curr.signups, 0))) )
+      switchMap(salesDoc => { return lastValueFrom(this.fetchSignupforPerformace(salesDoc, dateDTO)).then(doc => performance.push(doc)) })))
+      .then(_doc => applyPerformance(performance, averageSignup(createSalesPartner.length, performance.reduce((acc, curr) => acc += curr.signups, 0))))
 
   }
 
   fetchSignupforPerformace(createSalesPartner: CreateSalesPartner, dateDTO: DateDTO) {
     Logger.debug(`fetchSignupAndPerformace() createSalesPartner: [${JSON.stringify(createSalesPartner)}]`, APP);
 
-    return this.salesJunctionDb.fetchByYear({  columnvalue: createSalesPartner.sales_code, year: dateDTO.year, month: dateDTO.month }).pipe(
+    return this.salesJunctionDb.fetchByYear({ columnvalue: createSalesPartner.sales_code, year: dateDTO.year, month: dateDTO.month }).pipe(
       switchMap(salesJunctionDoc => this.fetchSignUpsforPerformance(createSalesPartner, salesJunctionDoc, dateDTO)))
   }
 
   fetchSignUpsforPerformance(createSalesPartner: CreateSalesPartner, createSalesJunction: CreateSalesJunction[], dateDTO: DateDTO) {
     Logger.debug(`fetchSignUpsforPerformance() createSalesJunction: [${JSON.stringify(createSalesJunction)}]`, APP);
 
-    return this.salesuser.fetchByYear({  columnvalue: createSalesPartner.sales_code, year: dateDTO.year, month: dateDTO.month }).pipe(
+    return this.salesuser.fetchByYear({ columnvalue: createSalesPartner.sales_code, year: dateDTO.year, month: dateDTO.month }).pipe(
       map(doc => makeEarningDuesFormat(createSalesPartner.name, createSalesJunction.reduce((acc, curr) => acc += curr.commission_amount, 0), !createSalesJunction[createSalesJunction.length - 1] ? 0 : createSalesJunction[createSalesJunction.length - 1].dues, doc.length)))
   }
 
   async fetchSignup(year, month) {
     Logger.debug(`fetchSignup() year: [${year}] month: [${month}]`, APP);
 
-     return await lastValueFrom(this.salesUserJunctionDb.fetchCommissionReportByYear(year,month))
-     .then(userJunctionDoc=> { return userJunctionDoc.length}).catch(error=>{throw new UnprocessableEntityException(error.message)})
-   }
+    return await lastValueFrom(this.salesUserJunctionDb.fetchCommissionReportByYear(year, month))
+      .then(userJunctionDoc => { return userJunctionDoc.length }).catch(error => { throw new UnprocessableEntityException(error.message) })
+  }
 
-   sendNotificationToSalesPartnerOnMobile(mobileNumberDtO: MobileDtO) {
+  sendNotificationToSalesPartnerOnMobile(mobileNumberDtO: MobileDtO) {
     Logger.debug(`sendCreateSalesPartnerLinkToPhoneNumber() mobileNumberDtO: [${JSON.stringify(mobileNumberDtO)}]`, APP);
 
     return this.client.messages.create({
-        body: `Click on Link ${SALES_PARTNER_NOTIFICATION}?query=${this.encryptPassword_(JSON.stringify(mobileNumberDtO))}`,
-        from: TWILIO_PHONE_NUMBER,
-        to: mobileNumberDtO.phoneNumber})
+      body: `Click on Link ${SALES_PARTNER_NOTIFICATION}?query=${this.encryptPassword_(JSON.stringify(mobileNumberDtO))}`,
+      from: TWILIO_PHONE_NUMBER,
+      to: mobileNumberDtO.phoneNumber
+    })
       .then(_res => ({ "status": `Link ${SALES_PARTNER_NOTIFICATION}  send to  ${mobileNumberDtO.phoneNumber} number` }))
       .catch(err => this.onTwilioErrorResponse(err));
   }
@@ -443,9 +452,10 @@ export class AdminService {
     Logger.debug(`sendCreateSalesPartnerLinkToWhatsappNumber() mobileNumberDtO: [${JSON.stringify(mobileNumberDtO)}]`, APP);
 
     return this.client.messages.create({
-        body: `Click on Link ${SALES_PARTNER_NOTIFICATION}?query=${this.encryptPassword_(JSON.stringify(mobileNumberDtO))}`,
-        from: `whatsapp:${TWILIO_WHATSAPP_NUMBER}`,
-        to: `whatsapp:${mobileNumberDtO.phoneNumber}`})
+      body: `Click on Link ${SALES_PARTNER_NOTIFICATION}?query=${this.encryptPassword_(JSON.stringify(mobileNumberDtO))}`,
+      from: `whatsapp:${TWILIO_WHATSAPP_NUMBER}`,
+      to: `whatsapp:${mobileNumberDtO.phoneNumber}`
+    })
       .then(_res => ({ status: `Link ${SALES_PARTNER_NOTIFICATION}  send to  ${mobileNumberDtO.phoneNumber} whatsapp number` }))
       .catch(err => this.onTwilioErrorResponse(err));
   }
