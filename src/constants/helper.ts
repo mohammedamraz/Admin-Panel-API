@@ -26,11 +26,12 @@ export const fetchUserByMobileNumber = (phoneNumber: string) => {
 	)
 }
 export const fetchAccountBySalesCode = (salesCode: string) => {
-
+	
 	return new HttpService().get(`${FEDO_HSA_USER_CONNECTION_URL}${salesCode}/accounts`).pipe(
 		catchError(err => onHTTPErrorResponse(err)),
 		map((res: AxiosResponse) => <AccountShort[]>res.data))
 }
+
 export const findUserByCustomerId = (id: string) => {
 
 	return new HttpService().get(`${FEDO_HSA_USER_CONNECTION_URL}customer/${id}`).pipe(
