@@ -53,6 +53,7 @@ export class SalesController {
   fetchSalesCodeByMobileNumber(@Param() mobileDTO: LoginDTO) {
     Logger.debug(`fetchSalesCodeByMobileNumber() mobileNumber: [${mobileDTO}`, APP);
     
+
     return this.salesService.fetchSalesCodeByMobileNumber(mobileDTO.mobile);
   }
 
@@ -119,7 +120,12 @@ export class SalesController {
     return this.salesService.fetchEarnigReportByMonth(salesYearMonth);
     }
 
-
+  //   @Get('customer/:id')
+  //   findUserByCustomerId(@Param('id') id: string) {
+  //     Logger.debug(`fetchAccountsBySalesCode() id: [${id}]`, APP);
+      
+  //     return this.salesService.findUserByCustomerId(id)
+  // }
 
   @Get(':salesCode/earning-report/:year')
   fetchEarnigReport(@Param() yearMonthDto: YearMonthDto) {
@@ -132,6 +138,12 @@ export class SalesController {
   fetchSalesPartnerByMobileNumber(@Param() mobileDTO: LoginDTO) {
     Logger.debug(`fetchSalesPartnerByMobileNumber() mobileNumber: [${JSON.stringify(mobileDTO)}`, APP);
     return this.salesService.fetchSalesPartnerByMobileNumber(mobileDTO.mobile);
+  }
+  @Get('customer/:id')
+  fetchuserbyCustomerId(@Param('id') id: string) {
+    Logger.debug(`fetchSalesPartnerById() id: [${id}]`, APP);
+
+    return this.salesService.fetchuserbyCustomerId(id);
   }
   
 }

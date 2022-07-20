@@ -9,6 +9,7 @@ import { fetchAccountBySalesCode, fetchUserByMobileNumber, findUserByCustomerId 
 import { CreateSalesPartnerModel } from 'src/lib/config/model/sales.model';
 import { InvitationJunctionModel } from './dto/invitation-junction.model';
 import { catchError, from, identity, lastValueFrom, map, switchMap } from 'rxjs';
+import { doc } from 'prettier';
 
 const APP = 'SalesService';
 
@@ -105,6 +106,13 @@ export class SalesService {
         return res;
       }))));
   }
+  findUserByCustomerId(id: string) {
+    Logger.debug(`findUserByMobileNumber() id: [${JSON.stringify(id)}]`, APP);
+    return from(lastValueFrom(this.db.find({ userreference_id: id }).pipe(catchError(err => { throw new UnprocessableEntityException(err.message) }), map((res) => {
+      if (res.length != 0 ) if(res[0].is_active.toString() == "false") return []
+       return res
+      }))));
+    }
 
   fetchSalesPartnerBySalesCode(id: string) {
     Logger.debug(`fetchSalesPartnerById() id: [${id}]`, APP);
@@ -318,6 +326,23 @@ export class SalesService {
     return fetchAccountBySalesCode(createSalesPartnerModel.sales_code).pipe(
       map(doc =>doc.map(doc => {doc['commission'] = createSalesPartnerModel.commission; return doc }) ),
       map( doc => doc.filter(doc =>{  const date = new Date(doc.date); return date.getMonth() === (parseInt(salesYearMonth.month) - 1) && date.getFullYear() === parseInt(salesYearMonth.year)}))) 
+
+  }
+  fetchuserbyCustomerId(id: string){
+    Logger.debug(`fetchuserbyCustomerId id:${id}`, APP);
+
+    return findUserByCustomerId(id).pipe(
+      
+     
+      map(doc=>{if(doc.length==0) throw new NotFoundException()
+      else return doc}),
+      
+      )
+
+    // let salesUser =[];
+    // return fetchAccountBySalesCode(createSalesPartnerModel.sales_code).pipe(
+    //   map(doc =>doc.map(doc => {doc['commission'] = createSalesPartnerModel.commission; return doc }) ),
+    //   map( doc => doc.filter(doc =>{  const date = new Date(doc.date); return date.getMonth() === (parseInt(salesYearMonth.month) - 1) && date.getFullYear() === parseInt(salesYearMonth.year)}))) 
 
   }
 
