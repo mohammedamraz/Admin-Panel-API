@@ -28,7 +28,7 @@ export const GUPSHUP_OTP_VERIFICATION=process.env.GUPSHUP_OTP_VERIFICATION_URL |
 export const GUPSHUP_OTP_MESSAGE_FORMAT=process.env.GUPSHUP_OTP_MESSAGE_FORMAT_URL || '&msg=%25code%25 Is%20Your%20OTP%20-%20FEDO&format=text&otpCodeLength=6&otpCodeType=NUMERIC'
 
 export const APP_DOWNLOAD_LINK = process.env.FEDO_HSA_APP_DOWNLOAD_LINK || "https://play.google.com/store/apps/details?id=ai.fedo.app";
-export const SALES_PARTNER_LINK = process.env.FEDO_HSA_SALES_PARTNER_LINK || "http://0.0.0.0:35000/sales-partner";
+export const SALES_PARTNER_LINK = process.env.FEDO_HSA_SALES_PARTNER_LINK || "https://localhost:5080/sales-signup";
 export const SALES_PARTNER_NOTIFICATION = process.env.FEDO_HSA_SALES_PARTNER_NOTIFICATION || "SALES PARTNER APPROVED";
 
 export const AWS_ACCESS_KEY_ID = process.env.FEDO_HSA_SALES_AWS_ACCESS_KEY_ID || 'AKIAWVJICQ3FDBOB6CGC';

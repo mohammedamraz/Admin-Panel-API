@@ -330,7 +330,7 @@ export class AdminService {
     Logger.debug(`sendCreateSalesPartnerLinkToPhoneNumber() mobileNumberDtO: [${JSON.stringify(mobileNumberDtO)}]`, APP);
 
     return this.client.messages.create({
-      body: `Click on Link ${SALES_PARTNER_LINK}?query=${this.encryptPassword_(JSON.stringify(mobileNumberDtO))}`,
+      body: `Click on Link ${SALES_PARTNER_LINK}?query=${encodeURIComponent(this.encryptPassword_(JSON.stringify(mobileNumberDtO)))}`,
       from: TWILIO_PHONE_NUMBER,
       to: mobileNumberDtO.phoneNumber
     })
@@ -342,7 +342,7 @@ export class AdminService {
     Logger.debug(`sendCreateSalesPartnerLinkToWhatsappNumber() mobileNumberDtO: [${JSON.stringify(mobileNumberDtO)}]`, APP);
 
     return this.client.messages.create({
-      body: `Click on Link ${SALES_PARTNER_LINK}?query=${this.encryptPassword_(JSON.stringify(mobileNumberDtO))}`,
+      body: `Click on Link ${SALES_PARTNER_LINK}?query=${encodeURIComponent(this.encryptPassword_(JSON.stringify(mobileNumberDtO)))}`,
       from: `whatsapp:${TWILIO_WHATSAPP_NUMBER}`,
       to: `whatsapp:${mobileNumberDtO.phoneNumber}`
     })
