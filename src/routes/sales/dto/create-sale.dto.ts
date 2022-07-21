@@ -32,6 +32,7 @@ export class CreateSalesPartner {
     block_account: boolean;
     is_hsa_account: boolean;
     profile_confirmation: boolean;
+    sign_up_approved:boolean;
 }
 
 export class CreateSalesPartnerRequest {

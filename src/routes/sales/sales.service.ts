@@ -48,7 +48,7 @@ export class SalesService {
     if (userId?.length < 1) {
       return this.db.save({
         name: createSalesPartner.name, location: createSalesPartner.location, commission: createSalesPartner.commission,
-        mobile: createSalesPartner.mobile, email: createSalesPartner.email
+        mobile: createSalesPartner.mobile, email: createSalesPartner.email,sign_up_approved:createSalesPartner.sign_up_approved
       }).pipe(
         catchError(err => { throw new UnprocessableEntityException(err.message) }),
         map(res => res))
