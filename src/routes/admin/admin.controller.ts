@@ -2,7 +2,7 @@ import { Controller, Get, Post, Body, Param, Logger, Query, UseInterceptors } fr
 import { LoggingInterceptor } from 'src/interceptors/interceptor';
 import { Period } from '../sales/dto/create-sale.dto';
 import { AdminService } from './admin.service';
-import { createPaid, DateDTO, MobileDtO, MobileNumberAndOtpDtO, MobileNumberDtO, ParamDto, requestDto, YearMonthDto } from './dto/create-admin.dto';
+import { createPaid, DateDTO, MobileDtO, MobileNumberAndOtpDtO, MobileNumberDtO, ParamDto, requestDto, sendEmailOnCreationOfDirectSalesPartner, YearMonthDto } from './dto/create-admin.dto';
 import { ConfirmForgotPasswordDTO, ForgotPasswordDTO, LoginDTO, PeriodRange, State } from './dto/login.dto';
 
 const APP = 'AdminController';
@@ -63,6 +63,13 @@ export class AdminController {
     Logger.debug(`updatePaidAmount() updateAmountdto: [${JSON.stringify(updateAmountdto)}]`, APP);
 
     return this.adminService.updatePaidAmount(updateAmountdto)
+  }
+
+  @Post('send-email/direct/sales')
+  sendEmailOnCreationOfDirectSalesPartner(@Body() content: sendEmailOnCreationOfDirectSalesPartner) {
+    Logger.debug(`sendEmailOnCreationOfDirectSalesPartner() mobileNumberDtO: [${JSON.stringify(content)}], `, APP);
+
+    return this.adminService.sendEmailOnCreationOfDirectSalesPartner(content);
   }
 
   @Post('sales-link')

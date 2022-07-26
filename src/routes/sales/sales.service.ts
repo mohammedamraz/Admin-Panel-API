@@ -56,7 +56,7 @@ export class SalesService {
     else {
       return this.db.save({
         name: createSalesPartner.name, location: createSalesPartner.location, commission: createSalesPartner.commission,
-        mobile: createSalesPartner.mobile, email: createSalesPartner.email, user_id: userId, is_hsa_account: true
+        mobile: createSalesPartner.mobile, email: createSalesPartner.email, user_id: userId, is_hsa_account: true,sign_up_approved:createSalesPartner.sign_up_approved
       }).pipe(
         catchError(err => { throw new UnprocessableEntityException(err.message) }),
         map(res => res))
@@ -142,7 +142,7 @@ export class SalesService {
 
     return this.db.find({ id: id }).pipe(catchError(err => { throw new UnprocessableEntityException(err.message) }),
       (map(res => {
-        if (res[0] == null || res[0].is_active == false) throw new NotFoundException(`Sales Partner Not Found`);
+        if (res[0] == null ) throw new NotFoundException(`Sales Partner Not Found`);
         if (updateSalesPartnerDto?.name?.length == 0) delete updateSalesPartnerDto.name
         if (updateSalesPartnerDto?.location?.length == 0) delete updateSalesPartnerDto.location
         return lastValueFrom(this.db.findByIdandUpdate({ id: id, quries: updateSalesPartnerDto }).pipe(

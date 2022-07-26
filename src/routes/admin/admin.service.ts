@@ -5,7 +5,7 @@ import { AMRAZ_ACCOUNTID, AMRAZ_AUTHTOKEN, APP_DOWNLOAD_LINK, AWS_COGNITO_USER_C
 import { DatabaseTable } from 'src/lib/database/database.decorator';
 import { DatabaseService } from 'src/lib/database/database.service';
 import { CreateSalesJunction, CreateSalesPartner, CreateSalesPartnerRequest, Interval, PERIOD, Period, SalesUserJunction } from '../sales/dto/create-sale.dto';
-import { AccountZwitchResponseBody, createPaid, DateDTO, fetchDues, fetchmonths, MobileDtO, MobileNumberAndOtpDtO, MobileNumberDtO, ParamDto, requestDto, sendEmailOnIncorrectBankDetailsDto, User, YearMonthDto } from './dto/create-admin.dto';
+import { AccountZwitchResponseBody, createPaid, DateDTO, fetchDues, fetchmonths, MobileDtO, MobileNumberAndOtpDtO, MobileNumberDtO, ParamDto, requestDto, sendEmailOnCreationOfDirectSalesPartner, sendEmailOnIncorrectBankDetailsDto, User, YearMonthDto } from './dto/create-admin.dto';
 import { AxiosResponse } from 'axios';
 import { catchError, concatMap, from, lastValueFrom, map, of, switchMap, throwError } from 'rxjs';
 import { applyPerformance, averageSignup, ConfirmForgotPasswordDTO, fetchDAte, ForgotPasswordDTO, LoginDTO, makeEarningDuesFormat, makeStateFormat, PERIODADMIN, PeriodRange, State } from './dto/login.dto';
@@ -238,6 +238,12 @@ export class AdminService {
             .then(_res => this.templateService.sendEmailOnIncorrectBankDetailsToHsaEmail(<EmailDTO>{ toAddresses: ["support@fedo.health"] }, <sendEmailOnIncorrectBankDetailsDto>{ name: this.salesPartnerDetails?.name, message: body.message, request_id: doc[0].request_id }))
             .catch(err => { throw new BadRequestException(err) })
       }))
+  }
+
+  sendEmailOnCreationOfDirectSalesPartner(body: sendEmailOnCreationOfDirectSalesPartner){
+    Logger.debug(`sendEmailOnCreationOfDirectSalesPartner() body: [${JSON.stringify(body)}]`, APP);
+
+    return this.templateService.sendEmailOnCreationOfDirectSalesPartner(body)
   }
 
   private readonly onTwilioErrorResponse = async (err) => {

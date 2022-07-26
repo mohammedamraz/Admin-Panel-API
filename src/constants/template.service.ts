@@ -5,7 +5,7 @@ import AWS from 'aws-sdk';
 import { Injectable, Logger } from '@nestjs/common';
 import { EmailDTO, TypeDTO } from 'src/routes/admin/dto/template.dto'
 import { AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, SES_SOURCE_EMAIL, SES_SOURCE_SUPPORT_EMAIL, STATIC_IMAGES } from 'src/constants';
-import { sendEmailOnIncorrectBankDetailsDto } from 'src/routes/admin/dto/create-admin.dto';
+import { sendEmailOnCreationOfDirectSalesPartner, sendEmailOnIncorrectBankDetailsDto } from 'src/routes/admin/dto/create-admin.dto';
 
 const APP = "TemplateService";
 @Injectable()
@@ -177,6 +177,48 @@ export class TemplateService {
                 Subject: {
                     Charset: "UTF-8",
                     Data: "Acknowledgement - Support Request"
+                }
+            }
+        };
+        return this.sendMailAsPromised(params, ses)
+    }
+
+    sendEmailOnCreationOfDirectSalesPartner( content: sendEmailOnCreationOfDirectSalesPartner) {
+        Logger.debug(`sendEmailOnCreationOfDirectSalesPartner(), DTO: ${JSON.stringify(content)}`, APP);
+
+        const ses = new AWS.SES({ apiVersion: '2010-12-01' });
+        const params = {
+            Destination: {
+                ToAddresses: [content.toAddresses]
+            },
+            Source: SES_SOURCE_SUPPORT_EMAIL,
+            Message: {
+                Body: {
+                    Html: {
+                        Charset: "UTF-8",
+                        Data: `<html lang="en"> 
+                        <head> <link href="https://fonts.googleapis.com/css?family=Montserrat:400,700&display=swap" rel="stylesheet" type="text/css"></head> 
+                        <body style="font-family:'Montserrat',sans-serif;">
+                           <div style="display:grid;justify-items:center;">
+                              <img src="https://fedo-file-server.s3.ap-south-1.amazonaws.com/images/logo.png"" width="25%" style="width:2%,max-width: 2%;" /> 
+                           </div>
+                           <div style="display: grid;">
+                           <p>Dear Admin, <br><br><b>${content.name}</b> has signed up directly from the Sales Partner application.<br></p>
+                             <p>You may review the details and approve/reject the sign up.</p><br>
+                             <p>When you approve, do not forget to set commission for the new comer.</p><br>
+                             <p>Regards,<br>Team Fedo<br></p>
+                           </div>
+                          </body> 
+                        </html>`
+                    },
+                    Text: {
+                        Charset: "UTF-8",
+                        Data: `Direct Sign Up`
+                    }
+                },
+                Subject: {
+                    Charset: "UTF-8",
+                    Data: `Sales Partner: Direct Sign Up by ${content.name}`
                 }
             }
         };

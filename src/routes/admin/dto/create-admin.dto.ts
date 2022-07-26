@@ -90,6 +90,17 @@ export class sendEmailOnIncorrectBankDetailsDto {
   request_id: string;
 }
 
+export class sendEmailOnCreationOfDirectSalesPartner {
+  name?: string;
+  email?: string;
+  // @IsNotEmpty()
+  message?: string[];
+
+  request_id?: string;
+  toAddresses?: string;
+}
+
+
 export class createAccount {
 
   id: string;
