@@ -89,7 +89,8 @@ export class SalesCommissionService {
                         const paidAmount = salesJunctionDoc.map(doc => doc.paid_amount)
                         const totalPaidAmount = paidAmount.reduce((next, prev) => next + prev, 0)
                         const dues = salesJunctionDoc.map(doc => doc.dues)
-                        const totalDues = dues.reduce((next, prev) => next + prev, 0)
+                        
+                        const totalDues = dues[dues.length-1]
                         const date = salesJunctionDoc.map(doc => { if (doc.paid_amount > 0) return doc.created_date })
                         const paidOn = date.filter((res) => res)
                         await this.fetchSignup(yearMonthDto.year, month - 1, yearMonthDto)
