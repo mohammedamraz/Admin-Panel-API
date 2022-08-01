@@ -98,6 +98,12 @@ export class sendEmailOnCreationOfDirectSalesPartner {
 
   request_id?: string;
   toAddresses?: string;
+  mobile?:string;
+  
+  city?:string
+  messages?:string
+  existingcustomer?:string;
+
 }
 
 

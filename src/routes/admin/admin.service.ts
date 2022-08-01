@@ -246,6 +246,14 @@ export class AdminService {
     return this.templateService.sendEmailOnCreationOfDirectSalesPartner(body)
   }
 
+  sendEmailOnGreivanceRegressal(body: sendEmailOnCreationOfDirectSalesPartner){
+    Logger.debug(`sendEmailOnGreivanceRegressal() body: [${JSON.stringify(body)}]`, APP);
+
+    return this.templateService.sendEmailOnGreivanceRegressal(body)
+  }
+
+  
+
   private readonly onTwilioErrorResponse = async (err) => {
     Logger.debug('onTwilioErrorResponse(), ' + err, APP);
     if (err.status === 400) throw new BadRequestException(err.message)

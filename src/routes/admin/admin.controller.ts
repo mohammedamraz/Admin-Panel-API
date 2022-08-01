@@ -72,6 +72,13 @@ export class AdminController {
     return this.adminService.sendEmailOnCreationOfDirectSalesPartner(content);
   }
 
+  @Post('send-email/greivance/regressal')
+  sendEmailOnGreivanceRegressal(@Body() content: sendEmailOnCreationOfDirectSalesPartner) {
+    Logger.debug(`sendEmailOnGreivanceRegressal() mobileNumberDtO: [${JSON.stringify(content)}], `, APP);
+
+    return this.adminService.sendEmailOnGreivanceRegressal(content);
+  }
+
   @Post('sales-link')
   sendCreateSalesPartnerLinkToMobileAndWhatsappNumber(@Body() mobileNumberDtO: MobileDtO) {
     Logger.debug(`sendCreateSalesPartnerLinkToMobileAndWhatsappNumber() mobileNumberDtO: [${JSON.stringify(mobileNumberDtO)}]`, APP);
