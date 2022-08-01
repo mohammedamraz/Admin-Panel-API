@@ -3,6 +3,7 @@ import { phoneNumber } from "aws-sdk/clients/importexport";
 import { IsEmail, IsEnum, IsMobilePhone, IsNotEmpty, IsNumberString, IsOptional, IsPhoneNumber, IsString, MaxLength, MinLength } from "class-validator";
 
 export class CreateSalesJunction {
+    sl_no : number;
     sales_code: string;
     commission_amount: number;
     paid_amount: number;
@@ -10,7 +11,9 @@ export class CreateSalesJunction {
     updated_date: Date;
     dues: number;
     total_count: number;
-
+    remarks: string;
+    payout : Date;
+    status : string;
 }
 
 export class CreateSalesPartner {
@@ -22,6 +25,7 @@ export class CreateSalesPartner {
     mobile: phoneNumber;
     location: string;
     email: Email;
+    // remarks:string;
     @IsNotEmpty()
     commission: number;
     user_id: number;
@@ -33,6 +37,7 @@ export class CreateSalesPartner {
     is_hsa_account: boolean;
     profile_confirmation: boolean;
     sign_up_approved:boolean;
+    
 }
 
 export class CreateSalesPartnerRequest {
