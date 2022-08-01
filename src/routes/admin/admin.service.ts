@@ -352,15 +352,13 @@ export class AdminService {
         account_holder_name: accountDoc.name,
         account_number: accountDoc.account_number,
         ifsc_code: accountDoc.ifsc_code,
-
-        bank: accountDoc.bank_name,
-        
+        bank: accountDoc.bank_name,   
         sales_code: saleDoc.sales_code,
-       
-        remarks: salesJunctionDoc[0].remarks,
+        remarks: salesJunctionDoc[0].payout.toLocaleString('default', { month: 'long' }) + '  payout',
         payout: salesJunctionDoc[0].payout,
-        status: salesJunctionDoc[0].status,
+        status: salesJunctionDoc[0].dues === 0 ? 'paid':'unpaid',
         commission_amount: salesJunctionDoc.pop().dues,
+
       };
     });
   }
@@ -435,6 +433,7 @@ export class AdminService {
         bank: accountDoc.bank_name,
         sales_code: saleDoc.sales_code,
         commission_amount: salesJunctionDoc.pop().dues,
+
       };
     });
   }
