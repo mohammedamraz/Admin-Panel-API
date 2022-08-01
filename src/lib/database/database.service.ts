@@ -7,6 +7,9 @@ import { DatabaseFeatureOptions, DatabaseInterface, findAllParamsandUpdate, find
 const APP = "DatabaseService"
 @Injectable()
 export class DatabaseService<T> implements DatabaseInterface<T> {
+  remarks(arg0: string, remarks: any) {
+    throw new Error('Method not implemented.');
+  }
   tableName: string;
 
   constructor(
