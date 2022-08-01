@@ -8,29 +8,27 @@ export declare class SalesService {
     private readonly withdrawndb;
     private http;
     constructor(db: DatabaseService<CreateSalesPartner>, invitationJunctiondb: DatabaseService<CreateSalesInvitationJunction>, junctiondb: DatabaseService<CreateSalesJunction>, withdrawndb: DatabaseService<CreateWithdrawn>, http: HttpService);
-    createSalesPartner(createSalesPartner: CreateSalesPartner): import("rxjs").Observable<CreateSalesPartner[]>;
-    createInvitation(createSalesPartner: CreateSalesPartner, createSalesJunction: CreateSalesJunction[]): import("rxjs").Observable<CreateSalesPartner[]> | CreateSalesJunction[];
-    fetchSalesPartnerByMobileNumber(mobile: string): import("rxjs").Observable<CreateSalesPartner[]>;
-    fetchSalesPartnerByUserId(id: string): import("rxjs").Observable<CreateSalesPartner[]>;
-    fetchSalesPartnerById(id: string): import("rxjs").Observable<CreateSalesPartner[]>;
-    deleteSalesPartner(id: string): import("rxjs").Observable<Promise<CreateSalesPartner[]>>;
-    updateSalesPartner(id: string, updateSalesPartnerDto: UpdateSalesPartner): import("rxjs").Observable<Promise<CreateSalesPartner[]>>;
-    fetchAllSalesPartnersByDate(params: ZQueryParamsDto): import("rxjs").Observable<CreateSalesPartner[]>;
-    fetchAllSalesPartnersFromJunctionByDate(id: string, params: ZQueryParamsDto): any[] | import("rxjs").Observable<any>;
+    createSalesPartner(createSalesPartner: CreateSalesPartner): any;
+    createInvitation(createSalesPartner: CreateSalesPartner, createSalesJunction: CreateSalesJunction[]): any;
+    fetchSalesPartnerByMobileNumber(mobile: string): any;
+    fetchSalesPartnerByUserId(id: string): any;
+    fetchSalesPartnerById(id: string): any;
+    deleteSalesPartner(id: string): any;
+    updateSalesPartner(id: string, updateSalesPartnerDto: UpdateSalesPartner): any;
+    fetchAllSalesPartnersByDate(params: ZQueryParamsDto): any;
+    fetchAllSalesPartnersFromJunctionByDate(id: string, params: ZQueryParamsDto): any;
     makeDateFormat(params: any): {
         number_of_rows: any;
         number_of_pages: any;
         name: any;
         date: string;
     };
-    uploadImage(id: string, fileName: string): Promise<CreateSalesPartner[]>;
-    updateImageById(id: string, updateSalesPartnerDto: object): Promise<CreateSalesPartner[]>;
-    fetchSalesBySalesCode(sales_code: string): import("rxjs").Observable<CreateSalesPartner>;
-    fetchCommisionBySalesCode(salesCode: string): import("rxjs").Observable<CreateSalesJunction>;
-    paymentCalculation(salesCode: string): import("rxjs").Observable<CreateSalesJunction[]>;
-    changeBankDetailsVerificationSatatus(id: number): import("rxjs").Observable<import("rxjs").Observable<CreateSalesPartner[]>>;
-    fetchEarnings(salesCode: string, period: Period): import("rxjs").Observable<import("./dto/create-sale.dto").EarningResponse>;
-    fetchInvitationResponse(salesCode: string): import("rxjs").Observable<{
-        signup: number;
-    }>;
+    uploadImage(id: string, fileName: string): any;
+    updateImageById(id: string, updateSalesPartnerDto: object): any;
+    fetchSalesBySalesCode(sales_code: string): any;
+    fetchCommisionBySalesCode(salesCode: string): any;
+    paymentCalculation(salesCode: string): any;
+    changeBankDetailsVerificationSatatus(id: number): any;
+    fetchEarnings(salesCode: string, period: Period): any;
+    fetchInvitationResponse(salesCode: string): any;
 }

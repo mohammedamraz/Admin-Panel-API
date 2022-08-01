@@ -8,8 +8,11 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
+var _a, _b;
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.makeEarningFormat = exports.Interval = exports.EarningResponse = exports.PERIOD = exports.Period = exports.UpdateImageDTO = exports.Periodicity = exports.ZQueryParamsDto = exports.UpdateSalesPartner = exports.CreateSalesInvitationJunction = exports.CreateWithdrawn = exports.CreateSalesPartnerRequest = exports.CreateSalesPartner = exports.CreateSalesJunction = void 0;
+const codecommit_1 = require("aws-sdk/clients/codecommit");
+const importexport_1 = require("aws-sdk/clients/importexport");
 const class_validator_1 = require("class-validator");
 class CreateSalesJunction {
 }
@@ -18,11 +21,11 @@ class CreateSalesPartner {
 }
 __decorate([
     (0, class_validator_1.IsNotEmpty)(),
-    __metadata("design:type", String)
+    __metadata("design:type", typeof (_a = typeof importexport_1.phoneNumber !== "undefined" && importexport_1.phoneNumber) === "function" ? _a : Object)
 ], CreateSalesPartner.prototype, "mobile", void 0);
 __decorate([
     (0, class_validator_1.IsEmail)(),
-    __metadata("design:type", String)
+    __metadata("design:type", typeof (_b = typeof codecommit_1.Email !== "undefined" && codecommit_1.Email) === "function" ? _b : Object)
 ], CreateSalesPartner.prototype, "email", void 0);
 __decorate([
     (0, class_validator_1.IsNotEmpty)(),

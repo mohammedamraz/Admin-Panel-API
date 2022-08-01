@@ -11,6 +11,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 var __param = (this && this.__param) || function (paramIndex, decorator) {
     return function (target, key) { decorator(target, key, paramIndex); }
 };
+var _a;
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.SalesService = void 0;
 const common_1 = require("@nestjs/common");
@@ -201,8 +202,7 @@ SalesService = __decorate([
     __metadata("design:paramtypes", [database_service_1.DatabaseService,
         database_service_1.DatabaseService,
         database_service_1.DatabaseService,
-        database_service_1.DatabaseService,
-        axios_1.HttpService])
+        database_service_1.DatabaseService, typeof (_a = typeof axios_1.HttpService !== "undefined" && axios_1.HttpService) === "function" ? _a : Object])
 ], SalesService);
 exports.SalesService = SalesService;
 //# sourceMappingURL=sales.service.js.map

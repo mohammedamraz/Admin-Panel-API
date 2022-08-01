@@ -8,16 +8,18 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
+var _a, _b;
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.createPaid = exports.createPaidAmountDto = exports.createAccount = exports.sendEmailOnIncorrectBankDetailsDto = exports.AccountZwitchResponseBody = exports.User = exports.ParamDto = exports.requestDto = exports.MobileNumberAndOtpDtO = exports.MobileNumberDtO = void 0;
 const class_validator_1 = require("class-validator");
+const importexport_1 = require("aws-sdk/clients/importexport");
 const class_transformer_1 = require("class-transformer");
 class MobileNumberDtO {
 }
 __decorate([
     (0, class_validator_1.IsNotEmpty)(),
     (0, class_validator_1.IsPhoneNumber)(),
-    __metadata("design:type", String)
+    __metadata("design:type", typeof (_a = typeof importexport_1.phoneNumber !== "undefined" && importexport_1.phoneNumber) === "function" ? _a : Object)
 ], MobileNumberDtO.prototype, "phoneNumber", void 0);
 exports.MobileNumberDtO = MobileNumberDtO;
 class MobileNumberAndOtpDtO {
@@ -25,7 +27,7 @@ class MobileNumberAndOtpDtO {
 __decorate([
     (0, class_validator_1.IsNotEmpty)(),
     (0, class_validator_1.IsPhoneNumber)(),
-    __metadata("design:type", String)
+    __metadata("design:type", typeof (_b = typeof importexport_1.phoneNumber !== "undefined" && importexport_1.phoneNumber) === "function" ? _b : Object)
 ], MobileNumberAndOtpDtO.prototype, "phoneNumber", void 0);
 __decorate([
     (0, class_validator_1.IsNotEmpty)(),
