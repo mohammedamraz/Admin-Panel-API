@@ -9,6 +9,7 @@ import { RouterModule } from '@nestjs/core';
 import { APP_ROUTES } from './constants/routes';
 import { SalesModule } from './routes/sales/sales.module';
 import { AdminModule } from './routes/admin/admin.module';
+import { VideoToVitalsModule } from './video-to-vitals/video-to-vitals.module';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { AdminModule } from './routes/admin/admin.module';
     }),
     SalesModule,
     AdminModule,
+    VideoToVitalsModule,
     
   ],
   controllers: [AppController],
