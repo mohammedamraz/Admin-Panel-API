@@ -17,22 +17,22 @@ export class VideoToVitalsService {
     private http: HttpService,
   ) {}
 
-  createPilot(createVideoToVitalDto: CreateVideoToVitalDto) {
-    Logger.debug(`createPilot() createVideoToVitalDto:${JSON.stringify(createVideoToVitalDto,)}`, APP);
+  createPilot(createVideoToVitalDto: CreateVideoToVitalDto,filename:string) {
+    Logger.debug(`createPilot() createVideoToVitalDto:${JSON.stringify(createVideoToVitalDto,)} filename:${filename}`, APP);
 
-   return this.fetchPilotByOrgName(createVideoToVitalDto.organization_name).pipe(
-    map(doc=>{
-      if (doc.length==0){
-        return doc;
-      }
-      else
-       {
-       throw new ConflictException('pilot alreay exist')
-      }}),
-    catchError(err =>{throw new UnprocessableEntityException(err.message)}),
-    map(doc =>this.videoToVitalsDb.save(createVideoToVitalDto)),
-    switchMap(doc=>doc) 
-    
+    return this.fetchPilotByOrgName(createVideoToVitalDto.organization_name).pipe(
+      map(doc=>{
+        if (doc.length==0){
+          createVideoToVitalDto.logo_image =filename
+          return this.videoToVitalsDb.save(createVideoToVitalDto).pipe(
+            map(res=>{return res})
+          );
+        }
+        else{
+         throw new ConflictException('pilot alreay exist')
+        }
+      }),
+      switchMap(res=>res)   
     ) 
   }
 

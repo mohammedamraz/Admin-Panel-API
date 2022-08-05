@@ -1,6 +1,10 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Logger, ParseIntPipe } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Logger, ParseIntPipe, UseInterceptors, UploadedFile } from '@nestjs/common';
 import { VideoToVitalsService } from './video-to-vitals.service';
 import { CreateVideoToVitalDto } from './dto/create-video-to-vital.dto';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { diskStorage } from 'multer';
+import { STATIC_IMAGES_PROFILE } from 'src/constants';
+import { editFileName, imageFileFilter } from 'src/constants/helper';
 
 const APP= "VideoToVitalsController"
 @Controller()
@@ -8,10 +12,23 @@ export class VideoToVitalsController {
   constructor(private readonly videoToVitalsService: VideoToVitalsService) {}
 
   @Post()
-  createPilot(@Body() createVideoToVitalDto: CreateVideoToVitalDto) {
-    Logger.debug(`createPilot() DTO:${JSON.stringify(createVideoToVitalDto,)}`, APP);
+  @UseInterceptors(FileInterceptor('file', {
+    storage: diskStorage({
+      _destination: STATIC_IMAGES_PROFILE,
+      get destination() {
+        return this._destination;
+      },
+      set destination(value) {
+        this._destination = value;
+      },
+      filename: editFileName
+    }),
+    fileFilter: imageFileFilter
+  }))
+  createPilot(@Body() createVideoToVitalDto: CreateVideoToVitalDto, @UploadedFile() file) {
+    Logger.debug(`createPilot() createVideoToVitalDto:${JSON.stringify(createVideoToVitalDto)} file:${file}`, APP);
     
-    return this.videoToVitalsService.createPilot(createVideoToVitalDto);
+    return this.videoToVitalsService.createPilot(createVideoToVitalDto,file?.filename);
   }
 
   @Get()

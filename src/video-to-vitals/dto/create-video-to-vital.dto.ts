@@ -1,4 +1,4 @@
-import { IsBoolean, IsEmail, IsMobilePhone, IsNotEmpty, isNotEmpty, IsString } from "class-validator";
+import { IsBoolean, IsEmail, IsMobilePhone, IsNotEmpty, isNotEmpty, IsOptional, IsString } from "class-validator";
 
 export class CreateVideoToVitalDto {
         @IsNotEmpty()
@@ -15,7 +15,9 @@ export class CreateVideoToVitalDto {
         @IsString()
         @IsMobilePhone()
         organization_admin_mobile:string;
+        @IsOptional()
         fedo_score:boolean;
+        @IsOptional()
         logo_image:string;
 }
 
