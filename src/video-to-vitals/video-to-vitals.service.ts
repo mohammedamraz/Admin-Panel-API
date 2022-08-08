@@ -3,7 +3,7 @@ import { BadRequestException, ConflictException, HttpException, Injectable, Logg
 import { catchError, map, switchMap } from 'rxjs';
 import { DatabaseTable } from 'src/lib/database/database.decorator';
 import { DatabaseService } from 'src/lib/database/database.service';
-import { CreateVideoToVitalDto } from './dto/create-video-to-vital.dto';
+import { CreateVideoToVitalDto, UpdateImageDTO } from './dto/create-video-to-vital.dto';
 import { UpdateVideoToVitalDto } from './dto/update-video-to-vital.dto';
 
 const APP = 'VideoToVitalsService'
@@ -76,11 +76,42 @@ export class VideoToVitalsService {
     )
   }
 
+
+  updateImage(id: string, fileName: string) {
+    Logger.debug(`updateImage(), ${fileName},`, APP);
+    
+    const imageDetails: UpdateImageDTO = {
+      logo_image: fileName,
+    }
+      return this.videoToVitalsDb.find({ id: id }).pipe(
+      map(res => {
+        if (res.length == 0) throw new NotFoundException('pilot not found')
+        return this.videoToVitalsDb.findByIdandUpdate({ id: id, quries: imageDetails })
+      }))
+  };
+
+
+
   // update(id: number, updateVideoToVitalDto: UpdateVideoToVitalDto) {
   //   return `This action updates a #${id} videoToVital`;
   // }
 
-  // remove(id: number) {
-  //   return `This action removes a #${id} videoToVital`;
-  // }
+  deletePilot(id: number) {
+
+    return this.videoToVitalsDb.find({ id: id }).pipe(
+      map(doc=>{
+        if (doc.length==0){
+          throw new NotFoundException('pilot not found')
+        }
+        else{
+          return this.videoToVitalsDb.findByIdAndDelete(String(id)).pipe(
+            map(doc=>{return {status: "deleted"}})
+          )
+        }
+      }),
+      switchMap(res=>res)
+
+    )
+
+  }
 }

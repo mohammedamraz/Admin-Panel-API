@@ -22,3 +22,6 @@ export class CreateVideoToVitalDto {
 }
 
 
+export class UpdateImageDTO {
+        logo_image: string;
+    }
