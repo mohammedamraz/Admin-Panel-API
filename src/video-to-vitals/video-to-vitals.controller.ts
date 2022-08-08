@@ -26,7 +26,7 @@ export class VideoToVitalsController {
     fileFilter: imageFileFilter
   }))
   createPilot(@Body() createVideoToVitalDto: CreateVideoToVitalDto, @UploadedFile() file) {
-    Logger.debug(`createPilot() createVideoToVitalDto:${JSON.stringify(createVideoToVitalDto)} file:${file}`, APP);
+    Logger.debug(`createPilot() createVideoToVitalDto:${JSON.stringify(createVideoToVitalDto)} file:${JSON.stringify(file)}`, APP);
     
     return this.videoToVitalsService.createPilot(createVideoToVitalDto,file?.filename);
   }
