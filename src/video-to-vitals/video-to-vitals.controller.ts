@@ -14,15 +14,15 @@ export class VideoToVitalsController {
   @Post()
   @UseInterceptors(FileInterceptor('file', {
     storage: diskStorage({
-      _destination: STATIC_IMAGES_PROFILE,
-      get destination() {
-        console.log("DESTINATION",this._destination )
-        return this._destination;
-       
-      },
-      set destination(value) {
-        this._destination = value;
-      },
+      _destination: STATIC_IMAGES,
+      // get destination() {
+      //   console.log("DESTINATION",this._destination )
+      //   return this._destination;
+      // },
+      // set destination(value) {
+      //   console.log("value",value)
+      //   this._destination = value;
+      // },
       filename: editFileName
     }),
     fileFilter: imageFileFilter
@@ -30,7 +30,7 @@ export class VideoToVitalsController {
   createPilot(@Body() createVideoToVitalDto: CreateVideoToVitalDto, @UploadedFile() file) {
     Logger.debug(`createPilot() createVideoToVitalDto:${JSON.stringify(createVideoToVitalDto)} file:${JSON.stringify(file)}`, APP);
     
-    return this.videoToVitalsService.createPilot(createVideoToVitalDto,file?.filename);
+    return this.videoToVitalsService.createPilot(createVideoToVitalDto,file?.path);
   }
 
   @Get()
