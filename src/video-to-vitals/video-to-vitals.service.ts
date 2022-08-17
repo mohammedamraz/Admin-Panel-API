@@ -17,13 +17,13 @@ export class VideoToVitalsService {
     private http: HttpService,
   ) {}
 
-  createPilot(createVideoToVitalDto: CreateVideoToVitalDto,filename:string) {
-    Logger.debug(`createPilot() createVideoToVitalDto:${JSON.stringify(createVideoToVitalDto,)} filename:${filename}`, APP);
+  createPilot(createVideoToVitalDto: CreateVideoToVitalDto,path:string) {
+    Logger.debug(`createPilot() createVideoToVitalDto:${JSON.stringify(createVideoToVitalDto,)} filename:${path}`, APP);
 
     return this.fetchPilotByOrgName(createVideoToVitalDto.organization_name).pipe(
       map(doc=>{
         if (doc.length==0){
-          createVideoToVitalDto.logo_image =filename
+          createVideoToVitalDto.logo_image = path
           return this.videoToVitalsDb.save(createVideoToVitalDto).pipe(
             map(res=>{return res})
           );
