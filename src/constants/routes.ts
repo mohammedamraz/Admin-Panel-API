@@ -15,7 +15,7 @@ export const APP_ROUTES = [
     module: SalesModule,
   },
   {
-    path: 'vitals/pilot',
+    path: 'vitals',
     module: VideoToVitalsModule,
   },
 ];

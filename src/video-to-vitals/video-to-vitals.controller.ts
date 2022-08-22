@@ -1,6 +1,6 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, Logger, ParseIntPipe, UseInterceptors, UploadedFile } from '@nestjs/common';
 import { VideoToVitalsService } from './video-to-vitals.service';
-import { CreateVideoToVitalDto } from './dto/create-video-to-vital.dto';
+import { AddUserDTO, CreateVideoToVitalDto } from './dto/create-video-to-vital.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { STATIC_IMAGES, STATIC_IMAGES_PROFILE } from 'src/constants';
@@ -11,7 +11,7 @@ const APP= "VideoToVitalsController"
 export class VideoToVitalsController {
   constructor(private readonly videoToVitalsService: VideoToVitalsService) {}
 
-  @Post()
+  @Post('pilot')
   @UseInterceptors(FileInterceptor('file', {
     storage: diskStorage({
       _destination: STATIC_IMAGES,
@@ -33,14 +33,51 @@ export class VideoToVitalsController {
     return this.videoToVitalsService.createPilot(createVideoToVitalDto,file?.path);
   }
 
-  @Get()
+  @Post('users')
+  addUser(@Body() addUserDTO:AddUserDTO ){
+    Logger.debug(`addUser() addUserDTO:${JSON.stringify(addUserDTO)} `, APP);
+
+   return this.videoToVitalsService.addUser(addUserDTO)
+  }
+
+  @Get('users')
+  fetchAllUsers(){
+    Logger.debug(`fetchAllUsers()`, APP);
+
+   return this.videoToVitalsService.fetchAllUsers()
+
+  }
+
+  // @Get('users/:email/:mobile')
+  // fetchAllUsersByEmailAndMobile(@Param() addUserDTO:AddUserDTO,){
+  //   Logger.debug(`fetchAllUsertByEmailAndMobile() addUserDTO:${JSON.stringify(addUserDTO)} `, APP);
+
+  //  return this.videoToVitalsService.fetchAllUsersByEmailAndMobile(addUserDTO)
+
+  // }
+
+  // @Get('users/:email')
+  // fetchAllUsersByEmail(@Param() addUserDTO:AddUserDTO,){
+  //   Logger.debug(`fetchAllUsertByEmail() addUserDTO:${JSON.stringify(addUserDTO)} `, APP);
+
+  //  return this.videoToVitalsService.fetchAllUsersByEmail(addUserDTO)
+  // }
+
+  // @Get('users/:mobile')
+  // fetchAllUsersByMobile(@Param() addUserDTO:AddUserDTO,){
+  //   Logger.debug(`fetchAllUsertByMobile() addUserDTO:${JSON.stringify(addUserDTO)} `, APP);
+
+  //  return this.videoToVitalsService.fetchAllUsersByMobile(addUserDTO)
+  // }
+
+  @Get('pilot')
   fetchAllPilot() {
     Logger.debug(`fetchAllPilot()`, APP);
 
     return this.videoToVitalsService.fetchAllPilot();
   }
 
-  @Get(':id')
+  @Get('pilot/:id')
   fetchOnePilot(@Param('id',ParseIntPipe) id: number) {
     Logger.debug(`createPilot() id:${id} `, APP);
 
@@ -52,7 +89,7 @@ export class VideoToVitalsController {
   //   return this.videoToVitalsService.update(+id, updateVideoToVitalDto);
   // }
 
-  @Patch(':id/image')
+  @Patch('pilot/:id/image')
   @UseInterceptors(FileInterceptor('file', {
     storage: diskStorage({
       _destination: STATIC_IMAGES_PROFILE,
@@ -73,7 +110,7 @@ export class VideoToVitalsController {
     return this.videoToVitalsService.updateImage(id, file.filename);
   }
 
-  @Delete(':id')
+  @Delete('pilot/:id')
   deletePilot(@Param('id', ParseIntPipe) id: number) {
     return this.videoToVitalsService.deletePilot(id);
   }
