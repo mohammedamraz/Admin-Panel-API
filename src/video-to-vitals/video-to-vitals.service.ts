@@ -11,26 +11,27 @@ const APP = 'VideoToVitalsService'
 export class VideoToVitalsService {
 
   constructor(
-    @DatabaseTable('video_to_vitals')
+    @DatabaseTable('organization')
     private readonly videoToVitalsDb: DatabaseService<CreateVideoToVitalDto>,
-    @DatabaseTable('org_users')
+    @DatabaseTable('users')
     private readonly orgUserDb: DatabaseService<AddUserDTO>,
     private http: HttpService,
   ) {}
 
-  createPilot(createVideoToVitalDto: CreateVideoToVitalDto,path:string) {
+  createOrganization(createVideoToVitalDto: CreateVideoToVitalDto,path:string) {
     Logger.debug(`createPilot() createVideoToVitalDto:${JSON.stringify(createVideoToVitalDto,)} filename:${path}`, APP);
 
     return this.fetchPilotByOrgName(createVideoToVitalDto.organization_name).pipe(
       map(doc=>{
         if (doc.length==0){
-          createVideoToVitalDto.logo_image = path
+          createVideoToVitalDto.logo = path
+          // createVideoToVitalDto.end_date = Date.now() + 
           return this.videoToVitalsDb.save(createVideoToVitalDto).pipe(
             map(res=>{return res})
           );
         }
         else{
-         throw new ConflictException('pilot alreay exist')
+         throw new ConflictException('Organization alreay exist')
         }
       }),
       switchMap(res=>res)   

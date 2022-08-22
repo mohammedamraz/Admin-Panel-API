@@ -6,27 +6,28 @@ export class CreateVideoToVitalDto {
         organization_name: string;
         @IsNotEmpty()
         @IsString()
-        organization_admin_name:string;
+        admin_name:string;
         @IsNotEmpty()  
         @IsString()
         designation:string;
         @IsNotEmpty()  
         @IsString()
         @IsEmail()
-        organization_admin_email:string;
+        organization_email:string;
         @IsNotEmpty()
         @IsString()
         @IsMobilePhone()
-        organization_admin_mobile:string;
+        organization_mobile:string;
         @IsNotEmpty()
         @IsString()
         url:string;
-        @IsNotEmpty()
-        pilot_duration:number;
+        start_date: Date;
+        end_date: Date;
         @IsOptional()
         fedo_score:boolean;
         @IsOptional()
-        logo_image:string;
+        logo:string;
+        pilot_duration: number
 }
 
 

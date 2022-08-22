@@ -6,8 +6,8 @@ import { HttpModule } from '@nestjs/axios';
 
 @Module({
   imports: [
-    DatabaseModule.forFeature({ tableName: 'video_to_vitals'}),
-    DatabaseModule.forFeature({ tableName: 'org_users'}),
+    DatabaseModule.forFeature({ tableName: 'organization'}),
+    DatabaseModule.forFeature({ tableName: 'users'}),
     HttpModule.register({
       timeout: 10000,
       maxRedirects: 5

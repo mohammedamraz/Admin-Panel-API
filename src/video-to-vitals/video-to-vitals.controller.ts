@@ -11,7 +11,7 @@ const APP= "VideoToVitalsController"
 export class VideoToVitalsController {
   constructor(private readonly videoToVitalsService: VideoToVitalsService) {}
 
-  @Post('pilot')
+  @Post('org')
   @UseInterceptors(FileInterceptor('file', {
     storage: diskStorage({
       _destination: STATIC_IMAGES,
@@ -27,10 +27,10 @@ export class VideoToVitalsController {
     }),
     fileFilter: imageFileFilter
   }))
-  createPilot(@Body() createVideoToVitalDto: CreateVideoToVitalDto, @UploadedFile() file) {
-    Logger.debug(`createPilot() createVideoToVitalDto:${JSON.stringify(createVideoToVitalDto)} file:${JSON.stringify(file)}`, APP);
+  createOrganization(@Body() createVideoToVitalDto: CreateVideoToVitalDto, @UploadedFile() file) {
+    Logger.debug(`createOrganization() createVideoToVitalDto:${JSON.stringify(createVideoToVitalDto)} file:${JSON.stringify(file)}`, APP);
     
-    return this.videoToVitalsService.createPilot(createVideoToVitalDto,file?.path);
+    return this.videoToVitalsService.createOrganization(createVideoToVitalDto,file?.path);
   }
 
   @Post('users')
