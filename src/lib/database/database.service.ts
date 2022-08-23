@@ -2,7 +2,7 @@
 import { Injectable, Logger, Type } from '@nestjs/common';
 import { Pool } from 'pg';
 import { from, Observable, of } from 'rxjs';
-import { DatabaseFeatureOptions, DatabaseInterface, findAllParamsandUpdate, findBycolumnParams, findAndUpdateParams, findByConditionParams, findByConditionParamsAlign, findByDateParams, findByIDAndUpdateParams, findParams, InsertParams, QueryParams, findByPeriodParams, DateRangeParams, fetchByYearAndMonthParams } from './interfaces/database.interface';
+import { DatabaseFeatureOptions, DatabaseInterface, findAllParamsandUpdate, findAndUpdateParams, findByConditionParams, findByConditionParamsAlign, findByDateParams, findByIDAndUpdateParams, findParams, InsertParams, QueryParams, findByPeriodParams, DateRangeParams, fetchByYearAndMonthParams } from './interfaces/database.interface';
 
 const APP = "DatabaseService"
 @Injectable()
@@ -340,6 +340,21 @@ export class DatabaseService<T> implements DatabaseInterface<T> {
     console.log('sadfasd', values, variables);
     const query = `SELECT * FROM ${this.tableName} WHERE ((created_date between ${values[0]} and ${values[1]}))`;
     return this.runQuery(query, variables);
+  }
+
+  fetchLatestFive(): Observable<T[]> {
+    Logger.debug(`fetchLatestFive()`, APP);
+    const query = `SELECT * FROM organization WHERE is_deleted = false ORDER BY id DESC LIMIT 5 `
+
+    return this.runQuery(query)
+  }
+
+  updateColumnByCondition(): Observable<T[]>{
+    Logger.debug(`updateColumnByCondition()`, APP);
+
+    const query = `UPDATE organization SET status = CASE WHEN CURRENT_DATE< end_date  THEN 'Active' ELSE 'Expired' END `
+    return this.runQuery(query)
+
   }
 
 }

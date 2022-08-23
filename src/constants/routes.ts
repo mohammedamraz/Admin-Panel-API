@@ -1,6 +1,8 @@
 import { AdminModule } from 'src/routes/admin/admin.module';
+import { ProductModule } from 'src/routes/product/product.module';
 import { SalesModule } from 'src/routes/sales/sales.module';
-import { VideoToVitalsModule } from 'src/video-to-vitals/video-to-vitals.module';
+import { UserProductJunctionModule } from 'src/routes/user-product-junction/user-product-junction.module';
+import { VideoToVitalsModule } from 'src/routes/video-to-vitals/video-to-vitals.module';
 /**
  * NOTE: Routes are picked on 'first-match'
  *       So the order is important
@@ -17,5 +19,13 @@ export const APP_ROUTES = [
   {
     path: 'vitals',
     module: VideoToVitalsModule,
+  },
+  {
+    path: 'product',
+    module: ProductModule,
+  },
+  {
+    path: 'junction',
+    module: UserProductJunctionModule,
   },
 ];
