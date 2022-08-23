@@ -127,6 +127,12 @@ export class VideoToVitalsController {
     return this.videoToVitalsService.addUser(userDTO)
   }
 
+  @Get('users/users_count/:org_id')
+  fetchUsersCountByOrgId(@Param('org_id',ParseIntPipe) org_id: number) {
+    Logger.debug(`fetchUsersCountByOrgId org_id:${org_id}`, APP);
+
+    return this.videoToVitalsService.fetchUsersCountByOrgId(org_id)
+  }
   @Get('users/latest')
   fetchFiveLatestUsers() {
     Logger.debug(`fetchFiveLatestUsers()`, APP);

@@ -415,6 +415,14 @@ export class VideoToVitalsService {
 
   }
 
+  fetchUsersCountByOrgId(org_id:number){
+    Logger.debug(`fetchUsersCountByOrgId() org_id:${org_id}} `, APP);
+
+    return this.userDb.find({org_id: org_id}).pipe(
+      map(doc=>{return { "total user for a particular organization": doc.length }})
+    )
+  }
+
   fetchAllUsers() {
     return this.userDb.fetchAll().pipe(
       catchError(err => { throw new UnprocessableEntityException(err.message) }),
