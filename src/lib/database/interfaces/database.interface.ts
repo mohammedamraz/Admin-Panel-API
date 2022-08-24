@@ -82,6 +82,8 @@ export class findByDateParams {
   number_of_pages?: number;
 
   number_of_rows?: number;
+
+  is_active: string;
 }
 
 export interface findByPeriodParams {
@@ -90,23 +92,62 @@ export interface findByPeriodParams {
   period: string;
 }
 
+export interface findBycolumnParams {
+  columnName: string;
+  columnvalue: string;
+}
+
+export interface DateRangeParams {
+  from: string;
+  to: string;
+}
+
+export interface fetchByYearAndMonthParams {
+  year: string;
+  month: string;
+  // columnName: string;
+  columnvalue: string;
+}
 export interface findByConditionParams {
-  created_date:string;
-  endcreated_date:string;
-  orderByColumnname:string;
-  pageNumber:number;
-  numberOfRows:number;
+  created_date: string;
+  endcreated_date: string;
+  orderByColumnname: string;
+  pageNumber: number;
+  numberOfRows: number;
 }
-export const findByConditionParamsAlign=(findbyConditionParams:findByConditionParams) =>{
-const params:findByConditionParams={
-  created_date: findbyConditionParams.created_date,
-  endcreated_date: findbyConditionParams.endcreated_date,
-  orderByColumnname: findbyConditionParams.orderByColumnname,
-  pageNumber: findbyConditionParams.pageNumber,
-  numberOfRows: findbyConditionParams.numberOfRows
+export const findByConditionParamsAlign = (findbyConditionParams: findByConditionParams) => {
+  const params: findByConditionParams = {
+    created_date: findbyConditionParams.created_date,
+    endcreated_date: findbyConditionParams.endcreated_date,
+    orderByColumnname: findbyConditionParams.orderByColumnname,
+    pageNumber: findbyConditionParams.pageNumber,
+    numberOfRows: findbyConditionParams.numberOfRows
+  }
+  return params
 }
-return params
+
+export interface MONTHYEAR {
+  year: number;
+  month: number;
 }
+
+export const fetchMonthYear = (MONTHYEAR: MONTHYEAR) => {
+  const params: MONTHYEAR = {
+    year: MONTHYEAR.year,
+    month: MONTHYEAR.month
+  }
+  return params
+}
+
+export interface fetchByYearAndMonthParams {
+  // columnName: string;
+  columnvalue: string;
+  year: string;
+  month: string;
+
+}
+
+
 export interface DatabaseInterface<T> {
   tableName: string;
 
@@ -161,5 +202,6 @@ Method used to creat nw row in table
    * Updated the table by given condition
    */
   findandUpdate(findAndupdateparams: findAndUpdateParams): Observable<T[]>;
+
 
 }

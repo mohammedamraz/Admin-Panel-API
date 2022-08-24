@@ -14,7 +14,7 @@ async function bootstrap() {
   await app.listen(PORT, HOST, () => {
     Logger.debug(
       `Server v${APP_VERSION} listening at http://${HOST}:${PORT}/`,
-      'FEDO-HSA-SALES-API',
+      'FEDO-HEALTH-SALES-API',
     );
   });
 }

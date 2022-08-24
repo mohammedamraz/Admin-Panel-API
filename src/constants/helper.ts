@@ -1,31 +1,40 @@
-import { AccountZwitchResponseBody, createAccount, User } from "src/routes/admin/dto/create-admin.dto";
+import { AccountShort, AccountZwitchResponseBody, createAccount, User } from "src/routes/admin/dto/create-admin.dto";
 import { HttpService } from '@nestjs/axios';
-import { AxiosResponse } from 'axios';
+import { AxiosResponse, AxiosError } from 'axios';
 import { catchError, map, throwError } from "rxjs";
 import { extname } from "path";
 import { BadRequestException, NotFoundException, UnauthorizedException, UnprocessableEntityException } from "@nestjs/common";
-export const fetchUser =(userId: string) => {
+import { FEDO_HSA_USER_CONNECTION_URL, PRIVATE_KEY, PUBLIC_KEY } from "src/constants/index";
 
-    return new HttpService().get(`http://0.0.0.0:35000/users/${userId}`).pipe(
+export const fetchUser = (userId: string) => {
+
+	return new HttpService().get(`${FEDO_HSA_USER_CONNECTION_URL}${userId}`).pipe(
 		catchError(err => onHTTPErrorResponse(err)),
 		map((res: AxiosResponse) => <User[]>res.data))
 }
-export const fetchAccount =(userId: string, accountId: string) => {
+export const fetchAccount = (userId: string, accountId: string) => {
 
-    return new HttpService().get(`http://0.0.0.0:35000/users/${userId}/accounts/${accountId}`).pipe(
+	return new HttpService().get(`${FEDO_HSA_USER_CONNECTION_URL}${userId}/accounts/${accountId}`).pipe(
 		catchError(err => onHTTPErrorResponse(err)),
 		map((res: AxiosResponse) => <AccountZwitchResponseBody>res.data))
 }
-export const fetchUserByMobileNumber =(phoneNumber: string) => {
+export const fetchUserByMobileNumber = (phoneNumber: string) => {
 
-    return new HttpService().get(`http://0.0.0.0:35000/users/${phoneNumber}/phoneNumber`).pipe(
+	return new HttpService().get(`${FEDO_HSA_USER_CONNECTION_URL}${phoneNumber}/phoneNumber`).pipe(
 		catchError(err => onHTTPErrorResponse(err)),
 		map((res: AxiosResponse) => <User[]>res.data),
-		)
+	)
 }
-export const fetchAccountBySalesCode =(salesCode: string) => {
+export const fetchAccountBySalesCode = (salesCode: string) => {
+	
+	return new HttpService().get(`${FEDO_HSA_USER_CONNECTION_URL}${salesCode}/accounts`).pipe(
+		catchError(err => onHTTPErrorResponse(err)),
+		map((res: AxiosResponse) => <AccountShort[]>res.data))
+}
 
-    return new HttpService().get(`http://0.0.0.0:35000/users/${salesCode}/accounts`).pipe(
+export const findUserByCustomerId = (id: string) => {
+
+	return new HttpService().get(`${FEDO_HSA_USER_CONNECTION_URL}customer/${id}`).pipe(
 		catchError(err => onHTTPErrorResponse(err)),
 		map((res: AxiosResponse) => <createAccount[]>res.data))
 }
@@ -39,13 +48,13 @@ export const editFileName = (req, file, callback) => {
 	callback(null, `${name}-${randomName}${fileExtName}`);
 };
 export const imageFileFilter = (req, file, callback) => {
-	if (!file.originalname.match(/\.(jpg|jpeg|png)$/)) 
+	if (!file.originalname.match(/\.(jpg|jpeg|png)$/))
 		return callback(new Error('Only image files are allowed!'), false);
-	
+
 	callback(null, true);
 };
-const onHTTPErrorResponse = async (err) => {
-	console.log('dasdasdfasdf', err)
+const onHTTPErrorResponse = async (err: AxiosError) => {
+	if (err.code === 'ECONNREFUSED') throw new UnprocessableEntityException('Please check your server connection');
 	if (err.response.data.statusCode === 401) throw new UnauthorizedException(err.response.data.message);
 	if (err.response.data.statusCode === 422) throw new UnprocessableEntityException(err.response.data.error.message);
 	if (err.response.data.statusCode === 404) throw new NotFoundException(err.response.data.message);
@@ -53,3 +62,21 @@ const onHTTPErrorResponse = async (err) => {
 	return throwError(() => err);
 };
 
+
+export const encryptPassword = (password) => {
+
+	const NodeRSA = require('node-rsa');
+	let key_public = new NodeRSA(PUBLIC_KEY)
+	var encryptedString = key_public.encrypt(password, 'base64')
+	return encryptedString
+}
+
+
+export const decryptPassword = (encryptedPassword) => {
+    const NodeRSA = require('node-rsa');
+    var private_key = PRIVATE_KEY
+    let key_private = new NodeRSA(private_key)
+    var decryptedString = key_private.decrypt(encryptedPassword, 'utf8')
+    return JSON.parse(decryptedString)
+  
+  }
