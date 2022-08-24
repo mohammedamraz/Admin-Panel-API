@@ -33,6 +33,7 @@ export class CreateOrganizationDto {
     product_id: number;
     id:number;
     status:string;
+    total_tests:number;
 }
 export class OrgDTO {
     @IsNotEmpty()
@@ -71,6 +72,7 @@ export class UpdateOrganizationDto {
     @IsOptional()
     pilot_duration: number;
     org_id:number;
+    
 }
 
 export class UserDTO {

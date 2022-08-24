@@ -18,5 +18,11 @@ export class UserProductJunctionService {
    )
   }
 
+  fetchUserProductJunctionDataByOrgId(org_id:number){
+    return this.userProductJunctionDb.find({org_id:org_id}).pipe(
+      map(doc=>doc)
+    )
+  }
+
 
 }

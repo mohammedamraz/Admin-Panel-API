@@ -1,5 +1,5 @@
 import { ConflictException, Injectable, Logger, NotFoundException, UnprocessableEntityException } from '@nestjs/common';
-import { catchError, map, switchMap } from 'rxjs';
+import { catchError, concatMap, from, lastValueFrom, map, switchMap } from 'rxjs';
 import { DatabaseTable } from 'src/lib/database/database.decorator';
 import { DatabaseService } from 'src/lib/database/database.service';
 import { CreateProductDto } from '../product/dto/create-product.dto';
@@ -29,7 +29,7 @@ export class VideoToVitalsService {
     return this.fetchOrgByUrl(createOrganizationDto.url).pipe(
       map(doc => {
         if (doc.length == 0) {
-          return this.productService.fetchProductByName(createOrganizationDto.product_name).pipe(
+          return this.productService.fetchProductByNewName(createOrganizationDto.product_name).pipe(
             map(doc => {
               delete createOrganizationDto.product_name
               return doc[0].id
@@ -265,10 +265,55 @@ export class VideoToVitalsService {
   }
 
   fetchFiveLatestOrganization() {
+    Logger.debug(`fetchFiveLatestOrganization()`, APP);
+
     return this.organizationDb.fetchLatestFive().pipe(
-      map(doc => doc)
-    )
+      catchError(err=>{
+        throw new UnprocessableEntityException(err.message)
+      }),
+      map( doc=> this.fetchotherDetails(doc))
+      );  
+    
   }
+
+  fetchotherDetails(createOrganizationDto: CreateOrganizationDto[]){
+
+    let temp:CreateOrganizationDto[]=[];
+    return lastValueFrom(from(createOrganizationDto).pipe(
+      concatMap(orgData=> {
+        return lastValueFrom(this.userProductJunctionService.fetchUserProductJunctionDataByOrgId(orgData.id))
+        .then(doc=>{
+          orgData['total_users']=doc.length;
+          orgData['total_tests']= doc.reduce((pre,acc)=>pre+acc['total_tests'],0);
+          orgData['progress']=this.fetchDate(orgData);
+          temp.push(orgData);
+          return orgData
+        }) 
+      }),
+    )).then(_doc=> temp)
+  }
+
+  fetchDate(createOrganizationDto: CreateOrganizationDto){
+
+    let countDownDate = new Date(createOrganizationDto.end_date).getTime();
+    let startDate = new Date(createOrganizationDto.start_date).getTime();
+// Update the count down every 1 second
+// Get todays date and time
+    let now = new Date().getTime();
+
+// Find the distance between now and the count down date
+    let distanceWhole = countDownDate - startDate;
+    let distanceLeft = countDownDate - now;
+
+// Time calculations for minutes and percentage progressed
+    let minutesLeft = Math.floor(distanceLeft / (1000 * 60));
+    let minutesTotal = Math.floor(distanceWhole / (1000 * 60));
+    return Math.floor(((minutesTotal - minutesLeft) / minutesTotal) * 100);
+  }
+
+
+
+
 
   fetchOrganizationById(id: number) {
     Logger.debug(`fetchOrganizationById() id:${id} `, APP);
