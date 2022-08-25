@@ -197,11 +197,11 @@ export class VideoToVitalsController {
   }
 
 
-  // @Post('login/user')
-  // loginUserByEmail(@Body() loginUserDTO: LoginUserDTO) {
-  //   Logger.debug(`loginUserByEmail()  loginUserDTO:${JSON.stringify(LoginUserDTO)} `, APP);
+  @Post('login/user')
+  loginUserByEmail(@Body() loginUserDTO: LoginUserDTO) {
+    Logger.debug(`loginUserByEmail()  loginUserDTO:${JSON.stringify(LoginUserDTO)} `, APP);
 
-  //   return this.videoToVitalsService.loginUserByEmail(loginUserDTO)
-  // }
+    return this.videoToVitalsService.loginUserByEmail(loginUserDTO)
+  }
 
 }

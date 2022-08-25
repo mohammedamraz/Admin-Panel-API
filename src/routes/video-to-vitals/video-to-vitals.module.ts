@@ -9,7 +9,6 @@ import { UserProductJunctionService } from '../user-product-junction/user-produc
 @Module({
   imports: [
     DatabaseModule.forFeature({ tableName: 'organization' }),
-    DatabaseModule.forFeature({ tableName: 'user_login' }),
     DatabaseModule.forFeature({ tableName: 'users' }),
     DatabaseModule.forFeature({ tableName: 'product' }),
     DatabaseModule.forFeature({ tableName: 'user_product_junction' }),
