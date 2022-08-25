@@ -2,6 +2,7 @@ import { BadRequestException, ConflictException, Injectable, Logger, NotFoundExc
 import { catchError, concatMap, from, lastValueFrom, map, switchMap } from 'rxjs';
 import { DatabaseTable } from 'src/lib/database/database.decorator';
 import { DatabaseService } from 'src/lib/database/database.service';
+import { SendEmailService } from 'src/send-email/send-email.service';
 import { CreateProductDto } from '../product/dto/create-product.dto';
 import { ProductService } from '../product/product.service';
 import { UserProductJunctionService } from '../user-product-junction/user-product-junction.service';
@@ -23,6 +24,7 @@ export class VideoToVitalsService {
     private readonly loginDb: DatabaseService<LoginUserDTO>,
     private readonly productService: ProductService,
     private readonly userProductJunctionService: UserProductJunctionService,
+    private readonly sendEmailService:SendEmailService,
   ) { }
 
   createOrganization(createOrganizationDto: CreateOrganizationDto, path: string) {

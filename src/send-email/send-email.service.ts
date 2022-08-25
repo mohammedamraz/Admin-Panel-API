@@ -20,7 +20,7 @@ export class SendEmailService {
   sendEmailOnCreateOrgUser(body: sendEmailOnCreationOfDirectSalesPartner){
     Logger.debug(`sendEmailOnCreateOrgUser() body: [${JSON.stringify(body)}]`, APP);
 
-    return this.templateService.sendEmailOnOrgUserCreation(body)
+    return this.templateService.sendEmailOnCreateOrgUser(body)
   }
 
 

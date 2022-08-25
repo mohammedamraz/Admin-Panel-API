@@ -382,7 +382,7 @@ export class TemplateService {
         return this.sendMailAsPromised(params, ses)
     }
 
-    sendEmailOnOrgUserCreation( content: sendEmailOnCreationOfOrgAndUser) {
+    sendEmailOnCreateOrgUser( content: sendEmailOnCreationOfOrgAndUser) {
         Logger.debug(`sendEmailOnOrgCreation(), DTO: ${JSON.stringify(content)}`, APP);
 
         const ses = new AWS.SES({ apiVersion: '2010-12-01' });

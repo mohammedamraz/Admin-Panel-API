@@ -8,7 +8,7 @@ const APP = "SendEmailController"
 export class SendEmailController {
   constructor(private readonly sendEmailService: SendEmailService) {}
 
-  @Post('send_email')
+  @Post('send_email/org')
   sendEmailOnCreateOrg(@Body() createSendEmailDto: sendEmailOnCreationOfDirectSalesPartner) {
     Logger.debug(`sendEmailOnCreateOrg() createSendEmailDto: [${JSON.stringify(createSendEmailDto)}] `, APP);
 
