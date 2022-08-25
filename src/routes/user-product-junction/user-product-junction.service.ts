@@ -24,5 +24,23 @@ export class UserProductJunctionService {
     )
   }
 
+  fetchUserProductJunctionDataByProductId(product_id:number){
+    return this.userProductJunctionDb.find({product_id:product_id}).pipe(
+      map(doc=>doc)
+    )
+  }
+
+  fetchUserProductJunctionDataByUserId(user_id:number){
+    return this.userProductJunctionDb.find({user_id:user_id}).pipe(
+      map(doc=>doc)
+    )
+  }
+
+  fetchUserProductJunctionDataByUserIdAndProductId(user_id:number,product_id:number){
+    return this.userProductJunctionDb.find({user_id:user_id,product_id:product_id}).pipe(
+      map(doc=>doc)
+    )
+  }
+
 
 }

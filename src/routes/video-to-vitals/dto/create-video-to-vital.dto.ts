@@ -34,6 +34,7 @@ export class CreateOrganizationDto {
     id:number;
     status:string;
     total_tests:number;
+    application_id:string;
 }
 export class OrgDTO {
     @IsNotEmpty()
@@ -86,7 +87,21 @@ export class UserDTO {
     @IsPhoneNumber()
     mobile: phoneNumber;
     organization_name:string;
+    product_name:string;
     org_id:number;
+    product_id:number;
+}
+
+export class VitalUserDTO {
+    id:number;
+    user_name: string;
+    designation: string;
+    email: string;
+    mobile: phoneNumber;
+    organization_name:string;
+    product_name:string;
+    org_id:number;
+    product_id:number;
 
 }
 
