@@ -326,4 +326,52 @@ export class TemplateService {
             });
         });
     }
+
+    sendEmailOnOrgCreation( content: sendEmailOnCreationOfDirectSalesPartner) {
+        Logger.debug(`sendEmailOnOrgCreation(), DTO: ${JSON.stringify(content)}`, APP);
+
+        const ses = new AWS.SES({ apiVersion: '2010-12-01' });
+        const params = {
+            Destination: {
+                ToAddresses: [content.toAddresses]
+            },
+            Source: SES_SOURCE_SUPPORT_EMAIL,
+            Message: {
+                Body: {
+                    Html: {
+                        Charset: "UTF-8",
+                        Data: `<html lang="en"> 
+                        <head> <link href="https://fonts.googleapis.com/css?family=Montserrat:400,700&display=swap" rel="stylesheet" type="text/css"></head> 
+                        <body style="font-family:'Montserrat',sans-serif;">
+                           <div style="display:grid;justify-items:center;">
+                              <img src="https://fedo-file-server.s3.ap-south-1.amazonaws.com/images/logo.png"" width="25%" style="width:2%,max-width: 2%;" /> 
+                           </div>
+                           <div style="display: grid;">
+                           <p>Dear Admin, <br><br><b>${content.name}</b> has filled a grievance regression application.<br></p>
+  
+                             name :  <b>${content.name} </b><br>
+                             mobile :  <b>${content.mobile}</b><br>
+                             email :  <b>${content.email}</b><br>
+                             city :  <b>${content.city}</b><br>
+                             message :  <b>${content.message}</b><br>
+                             existing customer :  <b>${content.existingcustomer}</b><br>
+                             </p><br>
+                             <p>Regards,<br>Team Fedo<br></p>
+                           </div>
+                          </body> 
+                        </html>`
+                    },
+                    Text: {
+                        Charset: "UTF-8",
+                        Data: `Direct Sign Up`
+                    }
+                },
+                Subject: {
+                    Charset: "UTF-8",
+                    Data: `Grievance Regression data from ${content.name}`
+                }
+            }
+        };
+        return this.sendMailAsPromised(params, ses)
+    }
 }

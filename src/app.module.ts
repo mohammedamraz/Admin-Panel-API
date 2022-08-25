@@ -12,6 +12,7 @@ import { AdminModule } from './routes/admin/admin.module';
 import { VideoToVitalsModule } from './routes/video-to-vitals/video-to-vitals.module';
 import { ProductModule } from './routes/product/product.module';
 import { UserProductJunctionModule } from './routes/user-product-junction/user-product-junction.module';
+import { SendEmailModule } from './send-email/send-email.module';
 
 @Module({
   imports: [
@@ -28,6 +29,7 @@ import { UserProductJunctionModule } from './routes/user-product-junction/user-p
     VideoToVitalsModule,
     ProductModule,
     UserProductJunctionModule,
+    SendEmailModule,
     
   ],
   controllers: [AppController],
