@@ -1,5 +1,5 @@
 import { phoneNumber } from "aws-sdk/clients/importexport";
-import { IsBoolean, IsEmail, IsMobilePhone, IsNotEmpty, isNotEmpty, IsNumber, IsOptional, IsPhoneNumber, IsString } from "class-validator";
+import { IsAlphanumeric, IsBoolean, IsEmail, IsMobilePhone, IsNotEmpty, isNotEmpty, IsNumber, IsOptional, IsPhoneNumber, IsString } from "class-validator";
 
 export class CreateOrganizationDto {
     @IsNotEmpty()
@@ -117,5 +117,18 @@ export class UpdateUserDTO {
     @IsOptional()
     @IsPhoneNumber()
     mobile: phoneNumber;
+
+}
+
+export class LoginUserDTO {
+
+    @IsNotEmpty()
+    @IsEmail()
+    email: string;
+    @IsNotEmpty()
+    @IsAlphanumeric()
+    password: string;
+    first_party_company?:string;
+    third_party_company?:string;
 
 }

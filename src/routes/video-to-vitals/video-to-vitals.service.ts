@@ -1,11 +1,11 @@
-import { ConflictException, Injectable, Logger, NotFoundException, UnprocessableEntityException } from '@nestjs/common';
+import { BadRequestException, ConflictException, Injectable, Logger, NotFoundException, UnprocessableEntityException } from '@nestjs/common';
 import { catchError, concatMap, from, lastValueFrom, map, switchMap } from 'rxjs';
 import { DatabaseTable } from 'src/lib/database/database.decorator';
 import { DatabaseService } from 'src/lib/database/database.service';
 import { CreateProductDto } from '../product/dto/create-product.dto';
 import { ProductService } from '../product/product.service';
 import { UserProductJunctionService } from '../user-product-junction/user-product-junction.service';
-import { CreateOrganizationDto, OrgDTO, UpdateOrganizationDto, UpdateUserDTO, UserDTO, VitalUserDTO } from './dto/create-video-to-vital.dto';
+import { CreateOrganizationDto, LoginUserDTO, OrgDTO, UpdateOrganizationDto, UpdateUserDTO, UserDTO, VitalUserDTO } from './dto/create-video-to-vital.dto';
 
 const APP = 'VideoToVitalsService'
 
@@ -19,6 +19,8 @@ export class VideoToVitalsService {
     private readonly userDb: DatabaseService<UserDTO>,
     @DatabaseTable('product')
     private readonly productDb: DatabaseService<CreateProductDto>,
+    @DatabaseTable('user_login')
+    private readonly loginDb: DatabaseService<LoginUserDTO>,
     private readonly productService: ProductService,
     private readonly userProductJunctionService: UserProductJunctionService,
   ) { }
@@ -41,8 +43,8 @@ export class VideoToVitalsService {
               createOrganizationDto.logo = path
               createOrganizationDto.end_date = new Date(tomorrow.setDate(tomorrow.getDate() + Number(duration)));
               createOrganizationDto.status = "Active"
-              const application_id  = createOrganizationDto.organization_email
-              createOrganizationDto.application_id = application_id.slice(0,application_id.indexOf('@'));
+              const application_id = createOrganizationDto.organization_email
+              createOrganizationDto.application_id = application_id.slice(0, application_id.indexOf('@'));
               return this.organizationDb.save(createOrganizationDto).pipe(
                 map(res => { return res })
               );
@@ -451,7 +453,7 @@ export class VideoToVitalsService {
             )
           }),
           switchMap(doc => {
-            this.userProductJunctionService.createUserProductJunction({ user_id: doc[0].id, org_id: userDTO.org_id, product_id: userDTO.product_id,total_tests:1 })
+            this.userProductJunctionService.createUserProductJunction({ user_id: doc[0].id, org_id: userDTO.org_id, product_id: userDTO.product_id, total_tests: 1 })
             return doc;
           })
 
@@ -470,10 +472,10 @@ export class VideoToVitalsService {
     )
   }
 
-  fetchAllUsersByOrgIdAndProductId(vitalUserDTO:VitalUserDTO) {
+  fetchAllUsersByOrgIdAndProductId(vitalUserDTO: VitalUserDTO) {
     Logger.debug(`fetchAllUsersByOrgIdAndProductId()`, APP);
 
-    return this.userDb.find({org_id:vitalUserDTO.org_id,product_id:2}).pipe(
+    return this.userDb.find({ org_id: vitalUserDTO.org_id, product_id: 2 }).pipe(
       catchError(err => { throw new UnprocessableEntityException(err.message) }),
       map(doc => {
         if (doc.length == 0) {
@@ -493,22 +495,22 @@ export class VideoToVitalsService {
     let temp: UserDTO[] = [];
     return lastValueFrom(from(userDTO).pipe(
       concatMap(userData => {
-        return lastValueFrom(this.userProductJunctionService.fetchUserProductJunctionDataByUserIdAndProductId(userData.id,userData.product_id))
+        return lastValueFrom(this.userProductJunctionService.fetchUserProductJunctionDataByUserIdAndProductId(userData.id, userData.product_id))
           .then(doc => {
             userData['total_tests'] = doc[0].total_tests
-            console.log("DOC",doc)
+            console.log("DOC", doc)
             temp.push(userData);
             return userData
           })
-          .catch(err=>{throw new UnprocessableEntityException(err.message)} )
+          .catch(err => { throw new UnprocessableEntityException(err.message) })
       }),
     )).then(_doc => temp)
   }
 
-  fetchFiveLatestUsersByOrgIdAndProductId(vitalUserDTO:VitalUserDTO) {
+  fetchFiveLatestUsersByOrgIdAndProductId(vitalUserDTO: VitalUserDTO) {
     Logger.debug(`fetchFiveLatestUsersByOrgIdAndProductId() vitalUserDTO:${JSON.stringify(vitalUserDTO)} `, APP);
 
-    return this.userDb.fetchLatestFiveUserByProductIdOrgId(2,vitalUserDTO.org_id,).pipe(
+    return this.userDb.fetchLatestFiveUserByProductIdOrgId(2, vitalUserDTO.org_id,).pipe(
       map(doc => this.fetchUsersotherDetails(doc))
     )
   }
@@ -608,6 +610,44 @@ export class VideoToVitalsService {
         return this.userDb.findByIdandUpdate({ id: id.toString(), quries: updateUserDTO })
       }))
 
+  }
+
+  loginUserByEmail(loginUserDTO: LoginUserDTO) {
+    Logger.debug(`loginUserByEmail() loginUserDTO:${JSON.stringify(LoginUserDTO)} `, APP);
+
+    return this.findUserByEmail(loginUserDTO).pipe(map(doc => {
+      if (doc[0].password != loginUserDTO.password) throw new BadRequestException('password incorrect')
+      else {
+        delete doc[0].password
+        return doc
+      }
+    }),
+    map(doc=>{return this.passwordGenerator()}))
+
+
+  }
+
+  findUserByEmail(loginUserDTO: LoginUserDTO) {
+    Logger.debug(`findUserByEmail() loginUserDTO:${JSON.stringify(LoginUserDTO)} `, APP);
+
+    return this.loginDb.find({ email: loginUserDTO.email }).pipe(
+      map(doc => {
+        if (doc.length == 0) throw new NotFoundException('user not found')
+        else return doc
+      })
+    )
+  }
+
+  passwordGenerator(){
+    Logger.debug(`passwordGenerator()  `, APP);
+
+    var i, key = "", characters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+    var charactersLength = characters.length;
+    for (i = 0; i < 14; i++) {
+            key += characters.substr(Math.floor((Math.random() * charactersLength) + 1), 1);
+        }
+        console.log("key",key.length);
+        return key;
   }
 
 
