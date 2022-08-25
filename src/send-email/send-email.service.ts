@@ -23,5 +23,23 @@ export class SendEmailService {
     return this.templateService.sendEmailOnOrgUserCreation(body)
   }
 
+  sendEmailOnPilotExpire(body: sendEmailOnCreationOfDirectSalesPartner){
+    Logger.debug(`sendEmailOnPilotExpire() body: [${JSON.stringify(body)}]`, APP);
+
+    return this.templateService.sendEmailOnPilotExpire(body)
+  }
+
+  sendEmailOnNotAbleToIdentifyOrganisation(body: sendEmailOnCreationOfDirectSalesPartner){
+    Logger.debug(`sendEmailOnNotAbleToIdentifyOrganisation() body: [${JSON.stringify(body)}]`, APP);
+
+    return this.templateService.sendEmailOnNotAbleToIdentifyOrganisation(body)
+  }
+
+  sendEmailToIncreaseTestsForIndividuals(body: sendEmailOnCreationOfDirectSalesPartner){
+    Logger.debug(`sendEmailToIncreaseTestsForIndividuals() body: [${JSON.stringify(body)}]`, APP);
+
+    return this.templateService.sendEmailToIncreaseTestsForIndividuals(body)
+  }
+
 
 }

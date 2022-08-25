@@ -8,18 +8,18 @@ const APP = "SendEmailController"
 export class SendEmailController {
   constructor(private readonly sendEmailService: SendEmailService) {}
 
-  @Post('send_email')
-  sendEmailOnCreateOrg(@Body() createSendEmailDto: sendEmailOnCreationOfDirectSalesPartner) {
-    Logger.debug(`sendEmailOnCreateOrg() createSendEmailDto: [${JSON.stringify(createSendEmailDto)}] `, APP);
+  // @Post('send_email')
+  // sendEmailOnCreateOrg(@Body() createSendEmailDto: sendEmailOnCreationOfDirectSalesPartner) {
+  //   Logger.debug(`sendEmailOnCreateOrg() createSendEmailDto: [${JSON.stringify(createSendEmailDto)}] `, APP);
 
-    return this.sendEmailService.sendEmailOnCreateOrg(createSendEmailDto);
-  }
+  //   return this.sendEmailService.sendEmailOnCreateOrg(createSendEmailDto);
+  // }
 
-  @Post('send_email/user')
-  sendEmailOnCreateOrgUser(@Body() createSendEmailDto: sendEmailOnCreationOfDirectSalesPartner) {
-    Logger.debug(`sendEmailOnCreateOrgUser() createSendEmailDto: [${JSON.stringify(createSendEmailDto)}] `, APP);
+  // @Post('send_email/user')
+  // sendEmailOnCreateOrgUser(@Body() createSendEmailDto: sendEmailOnCreationOfDirectSalesPartner) {
+  //   Logger.debug(`sendEmailOnCreateOrgUser() createSendEmailDto: [${JSON.stringify(createSendEmailDto)}] `, APP);
 
-    return this.sendEmailService.sendEmailOnCreateOrgUser(createSendEmailDto);
-  }
+  //   return this.sendEmailService.sendEmailToIncreaseTestsForIndividuals(createSendEmailDto);
+  // }
 
 }
