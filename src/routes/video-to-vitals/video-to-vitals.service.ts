@@ -43,6 +43,7 @@ export class VideoToVitalsService {
               createOrganizationDto.logo = path
               createOrganizationDto.end_date = new Date(tomorrow.setDate(tomorrow.getDate() + Number(duration)));
               createOrganizationDto.status = "Active"
+              createOrganizationDto.password = this.passwordGenerator()
               const application_id = createOrganizationDto.organization_email
               createOrganizationDto.application_id = application_id.slice(0, application_id.indexOf('@'));
               return this.organizationDb.save(createOrganizationDto).pipe(
@@ -430,15 +431,7 @@ export class VideoToVitalsService {
 
     return this.fetchOrgByName(userDTO.organization_name).pipe(
       map(org_doc => {
-        delete userDTO.organization_name
         return org_doc
-        // if (org_doc.length == 0) {
-        //   throw new NotFoundException('enterd third party organization name which is not exist')
-        // }
-        // else {
-        //   delete userDTO.organization_name
-        //   return org_doc
-        // }
       }),
       switchMap(org_doc => {
         userDTO.org_id = org_doc[0].id
@@ -450,6 +443,7 @@ export class VideoToVitalsService {
           switchMap(product_id => {
             userDTO.product_id = product_id
             delete userDTO.product_name
+            userDTO.password = this.passwordGenerator()
             return this.userDb.save(userDTO).pipe(
               map(doc => { return doc })
             )
@@ -614,30 +608,30 @@ export class VideoToVitalsService {
 
   }
 
-  loginUserByEmail(loginUserDTO: LoginUserDTO) {
-    Logger.debug(`loginUserByEmail() loginUserDTO:${JSON.stringify(LoginUserDTO)} `, APP);
+  // loginUserByEmail(loginUserDTO: LoginUserDTO) {
+  //   Logger.debug(`loginUserByEmail() loginUserDTO:${JSON.stringify(LoginUserDTO)} `, APP);
 
-    return this.findUserByEmail(loginUserDTO).pipe(map(doc => {
-      if (doc[0].password != loginUserDTO.password) throw new BadRequestException('password incorrect')
-      else {
-        delete doc[0].password
-        return doc
-      }
-    }))
+  //   return this.findUserByEmail(loginUserDTO).pipe(map(doc => {
+  //     if (doc[0].password != loginUserDTO.password) throw new BadRequestException('password incorrect')
+  //     else {
+  //       delete doc[0].password
+  //       return doc
+  //     }
+  //   }))
 
 
-  }
+  // }
 
-  findUserByEmail(loginUserDTO: LoginUserDTO) {
-    Logger.debug(`findUserByEmail() loginUserDTO:${JSON.stringify(LoginUserDTO)} `, APP);
+  // findUserByEmail(loginUserDTO: LoginUserDTO) {
+  //   Logger.debug(`findUserByEmail() loginUserDTO:${JSON.stringify(LoginUserDTO)} `, APP);
 
-    return this.loginDb.find({ email: loginUserDTO.email }).pipe(
-      map(doc => {
-        if (doc.length == 0) throw new NotFoundException('user not found')
-        else return doc
-      })
-    )
-  }
+  //   return this.loginDb.find({ email: loginUserDTO.email }).pipe(
+  //     map(doc => {
+  //       if (doc.length == 0) throw new NotFoundException('user not found')
+  //       else return doc
+  //     })
+  //   )
+  // }
 
   passwordGenerator(){
     Logger.debug(`passwordGenerator()  `, APP);
