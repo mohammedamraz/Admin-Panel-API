@@ -621,8 +621,7 @@ export class VideoToVitalsService {
         delete doc[0].password
         return doc
       }
-    }),
-    map(doc=>{return this.passwordGenerator()}))
+    }))
 
 
   }
@@ -646,7 +645,6 @@ export class VideoToVitalsService {
     for (i = 0; i < 14; i++) {
             key += characters.substr(Math.floor((Math.random() * charactersLength) + 1), 1);
         }
-        console.log("key",key.length);
         return key;
   }
 
