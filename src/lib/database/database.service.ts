@@ -349,6 +349,20 @@ export class DatabaseService<T> implements DatabaseInterface<T> {
     return this.runQuery(query)
   }
 
+  fetchLatestFiveByProductId(product_id:number): Observable<T[]> {
+    Logger.debug(`fetchLatestFiveByProductId()`, APP);
+    const query = `SELECT * FROM organization WHERE is_deleted = false and product_id = ${product_id} ORDER BY id DESC LIMIT 5 `
+
+    return this.runQuery(query)
+  }
+
+  fetchLatestFiveUserByProductIdOrgId(product_id:number, org_id:number): Observable<T[]> {
+    Logger.debug(`fetchLatestFiveByProductIdOrgId()`, APP);
+    const query = `SELECT * FROM users WHERE is_deleted = false and product_id = ${product_id} and org_id = ${org_id} ORDER BY id DESC LIMIT 5 `
+
+    return this.runQuery(query)
+  }
+
   updateColumnByCondition(): Observable<T[]>{
     Logger.debug(`updateColumnByCondition()`, APP);
 
