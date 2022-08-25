@@ -428,13 +428,15 @@ export class VideoToVitalsService {
 
     return this.fetchOrgByName(userDTO.organization_name).pipe(
       map(org_doc => {
-        if (org_doc.length == 0) {
-          throw new NotFoundException('enterd third party organization name which is not exist')
-        }
-        else {
-          delete userDTO.organization_name
-          return org_doc
-        }
+        delete userDTO.organization_name
+        return org_doc
+        // if (org_doc.length == 0) {
+        //   throw new NotFoundException('enterd third party organization name which is not exist')
+        // }
+        // else {
+        //   delete userDTO.organization_name
+        //   return org_doc
+        // }
       }),
       switchMap(org_doc => {
         userDTO.org_id = org_doc[0].id

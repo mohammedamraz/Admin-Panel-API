@@ -76,7 +76,7 @@ export class VideoToVitalsController {
   @Patch('org/:id/image')
   @UseInterceptors(FileInterceptor('file', {
     storage: diskStorage({
-      _destination: STATIC_IMAGES,
+      _destination:STATIC_IMAGES,
       // get destination() {
       //   return this._destination;
       // },

@@ -90,6 +90,7 @@ export class UserDTO {
     product_name:string;
     org_id:number;
     product_id:number;
+    third_party_org_name;
 }
 
 export class VitalUserDTO {
