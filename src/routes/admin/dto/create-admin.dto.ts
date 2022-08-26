@@ -113,7 +113,7 @@ export class sendEmailOnCreationOfOrgAndUser {
   organisation_admin_email? : string;
   organisation_admin_mobile? : string;
   fedo_app?: string;
-  pilot_duration? : string;
+  pilot_duration? : number;
   name?: string;
   url? : string;
   email?: string;

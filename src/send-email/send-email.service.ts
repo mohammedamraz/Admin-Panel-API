@@ -3,6 +3,8 @@ import { TemplateService } from 'src/constants/template.service';
 import { PasswordResetDTO, sendEmailOnCreationOfDirectSalesPartner } from 'src/routes/admin/dto/create-admin.dto';
 import { CreateSendEmailDto } from './dto/create-send-email.dto';
 import { UpdateSendEmailDto } from './dto/update-send-email.dto';
+import {  sendEmailOnCreationOfOrgAndUser } from 'src/routes/admin/dto/create-admin.dto';
+
 const APP = "SendEmailService"
 @Injectable()
 export class SendEmailService {
@@ -11,16 +13,16 @@ export class SendEmailService {
     private readonly templateService: TemplateService,
   ) {}
 
-  sendEmailOnCreateOrg(body: sendEmailOnCreationOfDirectSalesPartner){
+  sendEmailOnCreateOrg(body: sendEmailOnCreationOfOrgAndUser){
     Logger.debug(`sendEmailOnCreateOrg() body: [${JSON.stringify(body)}]`, APP);
 
     return this.templateService.sendEmailOnOrgCreation(body)
   }
 
-  sendEmailOnCreateOrgUser(body: sendEmailOnCreationOfDirectSalesPartner){
+  sendEmailOnCreateOrgUser(body: sendEmailOnCreationOfOrgAndUser){
     Logger.debug(`sendEmailOnCreateOrgUser() body: [${JSON.stringify(body)}]`, APP);
 
-    return this.templateService.sendEmailOnOrgUserCreation(body)
+    return this.templateService.sendEmailOnCreateOrgUser(body)
   }
 
   sendEmailOnPilotExpire(body: sendEmailOnCreationOfDirectSalesPartner){

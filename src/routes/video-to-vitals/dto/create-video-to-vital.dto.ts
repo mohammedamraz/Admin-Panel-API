@@ -35,7 +35,7 @@ export class CreateOrganizationDto {
     status:string;
     total_tests:number;
     application_id:string;
-    password:string;
+
 }
 export class OrgDTO {
     @IsNotEmpty()
@@ -92,6 +92,9 @@ export class UserDTO {
     org_id:number;
     product_id:number;
     third_party_org_name:string;
+    admin_name:string;
+    pilot_duration:number
+    organization_email:string;
     password:string;
 }
 

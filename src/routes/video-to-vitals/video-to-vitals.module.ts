@@ -20,6 +20,6 @@ import { TemplateService } from 'src/constants/template.service';
     // })
   ],
   controllers: [VideoToVitalsController],
-  providers: [VideoToVitalsService,SendEmailService,TemplateService, ProductService, UserProductJunctionService]
+  providers: [VideoToVitalsService, ProductService, UserProductJunctionService, SendEmailService, TemplateService ]
 })
 export class VideoToVitalsModule { }
