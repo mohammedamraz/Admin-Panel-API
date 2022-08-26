@@ -13,6 +13,7 @@ import { VideoToVitalsModule } from './routes/video-to-vitals/video-to-vitals.mo
 import { ProductModule } from './routes/product/product.module';
 import { UserProductJunctionModule } from './routes/user-product-junction/user-product-junction.module';
 import { SendEmailModule } from './send-email/send-email.module';
+import { OrgProductJunctionModule } from './routes/org-product-junction/org-product-junction.module';
 
 @Module({
   imports: [
@@ -30,6 +31,7 @@ import { SendEmailModule } from './send-email/send-email.module';
     ProductModule,
     UserProductJunctionModule,
     SendEmailModule,
+    OrgProductJunctionModule,
     
   ],
   controllers: [AppController],

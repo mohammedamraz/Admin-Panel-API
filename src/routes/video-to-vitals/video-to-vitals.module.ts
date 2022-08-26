@@ -11,7 +11,6 @@ import { TemplateService } from 'src/constants/template.service';
 @Module({
   imports: [
     DatabaseModule.forFeature({ tableName: 'organization' }),
-    DatabaseModule.forFeature({ tableName: 'user_login' }),
     DatabaseModule.forFeature({ tableName: 'users' }),
     DatabaseModule.forFeature({ tableName: 'product' }),
     DatabaseModule.forFeature({ tableName: 'user_product_junction' }),

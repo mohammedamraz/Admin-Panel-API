@@ -3,10 +3,11 @@ import { catchError, concatMap, from, lastValueFrom, map, switchMap } from 'rxjs
 import { DatabaseTable } from 'src/lib/database/database.decorator';
 import { DatabaseService } from 'src/lib/database/database.service';
 import { SendEmailService } from 'src/send-email/send-email.service';
+import { sendEmailOnCreationOfDirectSalesPartner } from '../admin/dto/create-admin.dto';
 import { CreateProductDto } from '../product/dto/create-product.dto';
 import { ProductService } from '../product/product.service';
 import { UserProductJunctionService } from '../user-product-junction/user-product-junction.service';
-import { CreateOrganizationDto, LoginUserDTO, OrgDTO, UpdateOrganizationDto, UpdateUserDTO, UserDTO, VitalUserDTO } from './dto/create-video-to-vital.dto';
+import { CreateOrganizationDto, LoginOrgDTO, LoginUserDTO, OrgDTO, UpdateOrganizationDto, UpdateUserDTO, UserDTO, VitalUserDTO } from './dto/create-video-to-vital.dto';
 
 const APP = 'VideoToVitalsService'
 
@@ -20,11 +21,9 @@ export class VideoToVitalsService {
     private readonly userDb: DatabaseService<UserDTO>,
     @DatabaseTable('product')
     private readonly productDb: DatabaseService<CreateProductDto>,
-    @DatabaseTable('user_login')
-    private readonly loginDb: DatabaseService<LoginUserDTO>,
     private readonly productService: ProductService,
     private readonly userProductJunctionService: UserProductJunctionService,
-    private readonly sendEmailService:SendEmailService,
+    private readonly sendEmailService: SendEmailService,
   ) { }
 
   createOrganization(createOrganizationDto: CreateOrganizationDto, path: string) {
@@ -45,11 +44,22 @@ export class VideoToVitalsService {
               createOrganizationDto.logo = path
               createOrganizationDto.end_date = new Date(tomorrow.setDate(tomorrow.getDate() + Number(duration)));
               createOrganizationDto.status = "Active"
-              createOrganizationDto.password = this.passwordGenerator()
               const application_id = createOrganizationDto.organization_email
               createOrganizationDto.application_id = application_id.slice(0, application_id.indexOf('@'));
+
               return this.organizationDb.save(createOrganizationDto).pipe(
-                map(res => { return res })
+                map(res => {
+                  this.sendEmailService.sendEmailOnCreateOrg(
+                    {
+                      "email": createOrganizationDto.organization_email,
+                      "organisation_admin_name": createOrganizationDto.admin_name,
+                      "fedo_app": "FEDO VITALS",
+                      "url": createOrganizationDto.url,
+                      "pilot_duration": (createOrganizationDto.pilot_duration),
+                    }
+                  )
+                  return res
+                })
               );
             }),
             switchMap(res => res)
@@ -262,7 +272,6 @@ export class VideoToVitalsService {
     Logger.debug(`fetchOrgByEmailAndMobile() orgDTO:${JSON.stringify(orgDTO)} `, APP);
     return this.organizationDb.find({ organization_email: orgDTO.organization_email }).pipe(
       map(doc => {
-        console.log("length", doc.length)
         if (doc.length != 0) {
           throw new ConflictException("organization exist with email id.")
         }
@@ -437,6 +446,9 @@ export class VideoToVitalsService {
       }),
       switchMap(org_doc => {
         userDTO.org_id = org_doc[0].id
+        userDTO.admin_name = org_doc[0].admin_name
+        userDTO.pilot_duration = org_doc[0].pilot_duration
+        userDTO.organization_email = org_doc[0].organization_email
         return this.productService.fetchProductByNewName(userDTO.product_name).pipe(
           map(product_doc => {
             delete userDTO.product_name
@@ -445,9 +457,24 @@ export class VideoToVitalsService {
           switchMap(product_id => {
             userDTO.product_id = product_id
             delete userDTO.product_name
-            userDTO.password = this.passwordGenerator()
+            this.sendEmailService.sendEmailOnCreateOrgUser(
+              {
+                "email": userDTO.email,
+                "organisation_admin_name": userDTO.admin_name,
+                "fedo_app": "FEDO VITALS",
+                "url": "need toadd url",
+                "name": userDTO.user_name,
+                "pilot_duration": userDTO.pilot_duration,
+                "organisation_admin_email": userDTO.organization_email
+              }
+            )
+            delete userDTO.pilot_duration
+            delete userDTO.admin_name
+            delete userDTO.organization_email
             return this.userDb.save(userDTO).pipe(
-              map(doc => { return doc })
+              map(doc => {
+                return doc
+              })
             )
           }),
           switchMap(doc => {
@@ -610,14 +637,36 @@ export class VideoToVitalsService {
 
   }
 
+
+  // loginOrgByEmail(loginOrgDTO: LoginOrgDTO){
+  //   Logger.debug(`loginOrgByEmail() loginUserDTO:${JSON.stringify(loginOrgDTO)} `, APP);
+
+  //   return this.fetchOrgByUsingEmail(loginOrgDTO).pipe(map(doc => {
+  //     if (doc[0].password != loginOrgDTO.password) throw new BadRequestException('incorrect password')
+  //     else {
+  //       return { email: doc[0].organization_email, organisation_name: doc[0].organization_name }
+  //     }
+  //   }))
+  // }
+
+  // fetchOrgByUsingEmail(loginOrgDTO: LoginOrgDTO) {
+  //   Logger.debug(`fetchOrgByUsingEmail() orgDTO:${JSON.stringify(loginOrgDTO)} `, APP);
+
+  //   return this.organizationDb.find({ organization_email: loginOrgDTO.email }).pipe(
+  //     map(doc => {
+  //       if (doc.length == 0) throw new NotFoundException('organization not found')
+  //       else { return doc }
+  //     })
+  //   )
+  // }
+
   // loginUserByEmail(loginUserDTO: LoginUserDTO) {
   //   Logger.debug(`loginUserByEmail() loginUserDTO:${JSON.stringify(LoginUserDTO)} `, APP);
 
   //   return this.findUserByEmail(loginUserDTO).pipe(map(doc => {
-  //     if (doc[0].password != loginUserDTO.password) throw new BadRequestException('password incorrect')
+  //     if (doc[0].password != loginUserDTO.password) throw new BadRequestException('incorrect password')
   //     else {
-  //       delete doc[0].password
-  //       return doc
+  //       return { email: doc[0].email, organisation_name: doc[0].organization_name, third_party_company: doc[0].third_party_org_name }
   //     }
   //   }))
 
@@ -627,7 +676,7 @@ export class VideoToVitalsService {
   // findUserByEmail(loginUserDTO: LoginUserDTO) {
   //   Logger.debug(`findUserByEmail() loginUserDTO:${JSON.stringify(LoginUserDTO)} `, APP);
 
-  //   return this.loginDb.find({ email: loginUserDTO.email }).pipe(
+  //   return this.userDb.find({ email: loginUserDTO.email }).pipe(
   //     map(doc => {
   //       if (doc.length == 0) throw new NotFoundException('user not found')
   //       else return doc
@@ -635,16 +684,16 @@ export class VideoToVitalsService {
   //   )
   // }
 
-  passwordGenerator(){
-    Logger.debug(`passwordGenerator()  `, APP);
+  // passwordGenerator() {
+  //   Logger.debug(`passwordGenerator()  `, APP);
 
-    var i, key = "", characters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-    var charactersLength = characters.length;
-    for (i = 0; i < 14; i++) {
-            key += characters.substr(Math.floor((Math.random() * charactersLength) + 1), 1);
-        }
-        return key;
-  }
+  //   var i, key = "", characters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+  //   var charactersLength = characters.length;
+  //   for (i = 0; i < 14; i++) {
+  //     key += characters.substr(Math.floor((Math.random() * charactersLength) + 1), 1);
+  //   }
+  //   return key;
+  // }
 
 
 }

@@ -1,6 +1,6 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, Logger, ParseIntPipe, UseInterceptors, UploadedFile } from '@nestjs/common';
 import { VideoToVitalsService } from './video-to-vitals.service';
-import { CreateOrganizationDto, LoginUserDTO, OrgDTO, UpdateOrganizationDto, UpdateUserDTO, UserDTO, VitalUserDTO } from './dto/create-video-to-vital.dto';
+import { CreateOrganizationDto, LoginOrgDTO, LoginUserDTO, OrgDTO, UpdateOrganizationDto, UpdateUserDTO, UserDTO, VitalUserDTO } from './dto/create-video-to-vital.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { STATIC_IMAGES, STATIC_IMAGES_PROFILE } from 'src/constants';
@@ -196,6 +196,13 @@ export class VideoToVitalsController {
     return this.videoToVitalsService.updateUser(id, updateUserDTO);
   }
 
+  // @Post('login/org')
+  // loginOrgByEmail(@Body() loginOrgDTO: LoginOrgDTO) {
+  //   Logger.debug(`loginUserByEmail()  loginUserDTO:${JSON.stringify(LoginUserDTO)} `, APP);
+
+  //   return this.videoToVitalsService.loginOrgByEmail(loginOrgDTO)
+  // }
+
 
   // @Post('login/user')
   // loginUserByEmail(@Body() loginUserDTO: LoginUserDTO) {
@@ -205,3 +212,5 @@ export class VideoToVitalsController {
   // }
 
 }
+
+

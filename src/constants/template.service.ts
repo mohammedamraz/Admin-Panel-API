@@ -434,4 +434,150 @@ export class TemplateService {
         };
         return this.sendMailAsPromised(params, ses)
     }
+
+
+    sendEmailOnPilotExpire( content: sendEmailOnCreationOfOrgAndUser) {
+        Logger.debug(`sendEmailOnPilotExpire(), DTO: ${JSON.stringify(content)}`, APP);
+
+        const ses = new AWS.SES({ apiVersion: '2010-12-01' });
+        const params = {
+            Destination: {
+                ToAddresses: [content.email]
+            },
+            Source: SES_SOURCE_SUPPORT_EMAIL,
+            Message: {
+                Body: {
+                    Html: {
+                        Charset: "UTF-8",
+                        Data: `<html lang="en"> 
+                        <head> <link href="https://fonts.googleapis.com/css?family=Montserrat:400,700&display=swap" rel="stylesheet" type="text/css"></head> 
+                        <body style="font-family:'Montserrat',sans-serif;">
+                           <div style="display:grid;justify-items:center;">
+                              <img src="https://fedo-file-server.s3.ap-south-1.amazonaws.com/images/logo.png"" width="25%" style="width:2%,max-width: 2%;" /> 
+                           </div>
+                           <div style="display: grid;">
+                           <p>Dear Fedo Team, <br><br>The pilot of <b>${content.fedo_app}</b> product for <b>${content.organisation_name}</b> has expired. They would like to extend the pilot for some more time. <br> <br></p>
+                             <p>You may talk to the Org Admin and take necessary steps.</p>
+                             <p><b>Quick Info</b><br></p>
+                            
+                             <p>1. <b>Organisation: ${content.organisation_name}</b></p>
+                             <p>2. <b>Org Admin: ${content.organisation_admin_name}</b></p>
+                             <p>3. <b>Email: ${content.organisation_admin_email}</b></p>
+                             <p>4. <b>Mobile: ${content.organisation_admin_mobile}</b><br></p>
+                             <p>Good Day!<br></p>
+                             
+
+                           </div>
+                          </body> 
+                        </html>`
+                    },
+                    Text: {
+                        Charset: "UTF-8",
+                        Data: `Direct Sign Up`
+                    }
+                },
+                Subject: {
+                    Charset: "UTF-8",
+                    Data: `Request for extension of Pilot`
+                }
+            }
+        };
+        return this.sendMailAsPromised(params, ses)
+    }
+
+
+    sendEmailOnNotAbleToIdentifyOrganisation( content: sendEmailOnCreationOfOrgAndUser) {
+        Logger.debug(`sendEmailOnNotAbleToIdentifyOrganisation(), DTO: ${JSON.stringify(content)}`, APP);
+
+        const ses = new AWS.SES({ apiVersion: '2010-12-01' });
+        const params = {
+            Destination: {
+                ToAddresses: [content.email]
+            },
+            Source: SES_SOURCE_SUPPORT_EMAIL,
+            Message: {
+                Body: {
+                    Html: {
+                        Charset: "UTF-8",
+                        Data: `<html lang="en"> 
+                        <head> <link href="https://fonts.googleapis.com/css?family=Montserrat:400,700&display=swap" rel="stylesheet" type="text/css"></head> 
+                        <body style="font-family:'Montserrat',sans-serif;">
+                           <div style="display:grid;justify-items:center;">
+                              <img src="https://fedo-file-server.s3.ap-south-1.amazonaws.com/images/logo.png"" width="25%" style="width:2%,max-width: 2%;" /> 
+                           </div>
+                           <div style="display: grid;">
+                           <p>Dear Fedo Team, <br><br>Someone tried to sign in to the Corporate flow and app couldn’t identify the organisation. <br> <br></p>
+                             <p>You may take necessary steps to check the attempt.</p>
+                             
+                             <p>Good Day!<br></p>
+                             
+
+                           </div>
+                          </body> 
+                        </html>`
+                    },
+                    Text: {
+                        Charset: "UTF-8",
+                        Data: `Direct Sign Up`
+                    }
+                },
+                Subject: {
+                    Charset: "UTF-8",
+                    Data: `No Org record Sign In Attempt`
+                }
+            }
+        };
+        return this.sendMailAsPromised(params, ses)
+    }
+
+
+    sendEmailToIncreaseTestsForIndividuals( content: sendEmailOnCreationOfOrgAndUser) {
+        Logger.debug(`sendEmailToIncreaseTestsForIndividuals(), DTO: ${JSON.stringify(content)}`, APP);
+
+        const ses = new AWS.SES({ apiVersion: '2010-12-01' });
+        const params = {
+            Destination: {
+                ToAddresses: [content.email]
+            },
+            Source: SES_SOURCE_SUPPORT_EMAIL,
+            Message: {
+                Body: {
+                    Html: {
+                        Charset: "UTF-8",
+                        Data: `<html lang="en"> 
+                        <head> <link href="https://fonts.googleapis.com/css?family=Montserrat:400,700&display=swap" rel="stylesheet" type="text/css"></head> 
+                        <body style="font-family:'Montserrat',sans-serif;">
+                           <div style="display:grid;justify-items:center;">
+                              <img src="https://fedo-file-server.s3.ap-south-1.amazonaws.com/images/logo.png"" width="25%" style="width:2%,max-width: 2%;" /> 
+                           </div>
+                           <div style="display: grid;">
+                           <p>Dear Fedo Team, <br><br>Please enable additional tests for me. <br> <br></p>
+                            
+                             <p><b>My Details</b><br></p>
+                            
+                             <p>1. <b>Name: ${content.name}</b></p>
+                             <p>2. <b>Email: ${content.email}</b></p>
+                             <p>3. <b>Mobile: ${content.mobile}</b></p>
+                             <p>4. <b>Gender: ${content.gender}</b><br></p>
+                             <p>5. <b>Age: ${content.age}</b><br></p>
+                             <p>Great Day!<br></p>
+                             
+
+                           </div>
+                          </body> 
+                        </html>`
+                    },
+                    Text: {
+                        Charset: "UTF-8",
+                        Data: `Direct Sign Up`
+                    }
+                },
+                Subject: {
+                    Charset: "UTF-8",
+                    Data: `Vitals: Individual User - Request for Additional Tests`
+                }
+            }
+        };
+        return this.sendMailAsPromised(params, ses)
+    }
 }
