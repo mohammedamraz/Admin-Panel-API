@@ -5,7 +5,7 @@ import AWS from 'aws-sdk';
 import { Injectable, Logger } from '@nestjs/common';
 import { EmailDTO, TypeDTO } from 'src/routes/admin/dto/template.dto'
 import { AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, SES_SOURCE_EMAIL, SES_SOURCE_SUPPORT_EMAIL, STATIC_IMAGES } from 'src/constants';
-import { sendEmailOnCreationOfDirectSalesPartner, sendEmailOnCreationOfOrgAndUser, sendEmailOnIncorrectBankDetailsDto } from 'src/routes/admin/dto/create-admin.dto';
+import { PasswordResetDTO, sendEmailOnCreationOfDirectSalesPartner, sendEmailOnCreationOfOrgAndUser, sendEmailOnIncorrectBankDetailsDto } from 'src/routes/admin/dto/create-admin.dto';
 
 const APP = "TemplateService";
 @Injectable()
@@ -575,6 +575,56 @@ export class TemplateService {
                 Subject: {
                     Charset: "UTF-8",
                     Data: `Vitals: Individual User - Request for Additional Tests`
+                }
+            }
+        };
+        return this.sendMailAsPromised(params, ses)
+    }
+
+
+
+    sendEmailToResetUsersPassword( content: PasswordResetDTO) {
+        Logger.debug(`sendEmailToResetUsersPassword (), DTO: ${JSON.stringify(content)}`, APP);
+
+        const ses = new AWS.SES({ apiVersion: '2010-12-01' });
+        const params = {
+            Destination: {
+                ToAddresses: [content.email]
+            },
+            Source: SES_SOURCE_SUPPORT_EMAIL,
+            Message: {
+                Body: {
+                    Html: {
+                        Charset: "UTF-8",
+                        Data: `<html lang="en"> 
+                        <head> <link href="https://fonts.googleapis.com/css?family=Montserrat:400,700&display=swap" rel="stylesheet" type="text/css"></head> 
+                        <body style="font-family:'Montserrat',sans-serif;">
+                           <div style="display:grid;justify-items:center;">
+                              <img src="https://fedo-file-server.s3.ap-south-1.amazonaws.com/images/logo.png"" width="25%" style="width:2%,max-width: 2%;" /> 
+                           </div>
+                           <div style="display: grid;">
+                           <p>Dear <b>${content.user_name}</b>, <br><br>You had requested for password change on your Fedo Account. You may click on the below link and follow the instructions to change password. <br> <br></p>
+                            
+                             <p><b>${content.url}</b><br></p>
+                            
+                             <p>If the password change attempt is not made by you, immediately report to hello@fedo.ai.</p>
+                             
+                             <p>Great Day!<br></p>
+                             <p><b>Team Fedo</b><br></p>
+                             
+
+                           </div>
+                          </body> 
+                        </html>`
+                    },
+                    Text: {
+                        Charset: "UTF-8",
+                        Data: `Direct Sign Up`
+                    }
+                },
+                Subject: {
+                    Charset: "UTF-8",
+                    Data: `Fedo Account: Change Password Request`
                 }
             }
         };

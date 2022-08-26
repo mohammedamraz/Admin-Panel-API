@@ -1,6 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { TemplateService } from 'src/constants/template.service';
-import { sendEmailOnCreationOfDirectSalesPartner } from 'src/routes/admin/dto/create-admin.dto';
+import { PasswordResetDTO, sendEmailOnCreationOfDirectSalesPartner } from 'src/routes/admin/dto/create-admin.dto';
 import { CreateSendEmailDto } from './dto/create-send-email.dto';
 import { UpdateSendEmailDto } from './dto/update-send-email.dto';
 const APP = "SendEmailService"
@@ -39,6 +39,12 @@ export class SendEmailService {
     Logger.debug(`sendEmailToIncreaseTestsForIndividuals() body: [${JSON.stringify(body)}]`, APP);
 
     return this.templateService.sendEmailToIncreaseTestsForIndividuals(body)
+  } 
+
+  sendEmailToResetUsersPassword(body: PasswordResetDTO){
+    Logger.debug(`sendEmailToResetUsersPassword() body: [${JSON.stringify(body)}]`, APP);
+
+    return this.templateService.sendEmailToResetUsersPassword(body)
   }
 
 

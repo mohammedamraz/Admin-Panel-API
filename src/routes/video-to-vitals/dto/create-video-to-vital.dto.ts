@@ -135,3 +135,15 @@ export class LoginUserDTO {
     third_party_company?:string;
 
 }
+
+
+export class LoginUserPasswordCheckDTO {
+
+    @IsNotEmpty()
+    @IsEmail()
+    email: string;
+  
+    password: string;
+    
+
+}

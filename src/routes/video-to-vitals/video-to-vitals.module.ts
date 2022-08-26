@@ -4,6 +4,8 @@ import { VideoToVitalsController } from './video-to-vitals.controller';
 import { DatabaseModule } from 'src/lib/database/database.module';
 import { ProductService } from '../product/product.service';
 import { UserProductJunctionService } from '../user-product-junction/user-product-junction.service';
+import { SendEmailService } from 'src/send-email/send-email.service';
+import { TemplateService } from 'src/constants/template.service';
 // import { HttpModule } from '@nestjs/axios';
 
 @Module({
@@ -18,6 +20,6 @@ import { UserProductJunctionService } from '../user-product-junction/user-produc
     // })
   ],
   controllers: [VideoToVitalsController],
-  providers: [VideoToVitalsService, ProductService, UserProductJunctionService]
+  providers: [VideoToVitalsService,SendEmailService,TemplateService, ProductService, UserProductJunctionService]
 })
 export class VideoToVitalsModule { }

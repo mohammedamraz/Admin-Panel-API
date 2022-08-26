@@ -1,11 +1,14 @@
 import { BadRequestException, ConflictException, Injectable, Logger, NotFoundException, UnprocessableEntityException } from '@nestjs/common';
 import { catchError, concatMap, from, lastValueFrom, map, switchMap } from 'rxjs';
+import { TemplateService } from 'src/constants/template.service';
 import { DatabaseTable } from 'src/lib/database/database.decorator';
 import { DatabaseService } from 'src/lib/database/database.service';
+import { SendEmailService } from 'src/send-email/send-email.service';
+import { PasswordResetDTO } from '../admin/dto/create-admin.dto';
 import { CreateProductDto } from '../product/dto/create-product.dto';
 import { ProductService } from '../product/product.service';
 import { UserProductJunctionService } from '../user-product-junction/user-product-junction.service';
-import { CreateOrganizationDto, LoginUserDTO, OrgDTO, UpdateOrganizationDto, UpdateUserDTO, UserDTO, VitalUserDTO } from './dto/create-video-to-vital.dto';
+import { CreateOrganizationDto, LoginUserDTO, LoginUserPasswordCheckDTO, OrgDTO, UpdateOrganizationDto, UpdateUserDTO, UserDTO, VitalUserDTO } from './dto/create-video-to-vital.dto';
 
 const APP = 'VideoToVitalsService'
 
@@ -21,6 +24,9 @@ export class VideoToVitalsService {
     private readonly productDb: DatabaseService<CreateProductDto>,
     private readonly productService: ProductService,
     private readonly userProductJunctionService: UserProductJunctionService,
+    private readonly sendEmailService: SendEmailService,
+
+    // private readonly templateService: TemplateService,
   ) { }
 
   createOrganization(createOrganizationDto: CreateOrganizationDto, path: string) {
@@ -639,6 +645,67 @@ export class VideoToVitalsService {
             key += characters.substr(Math.floor((Math.random() * charactersLength) + 1), 1);
         }
         return key;
+  }
+
+
+  
+  checkUserPasswordExistByEmail(loginUserPasswordCheckDTO: LoginUserPasswordCheckDTO) {
+    Logger.debug(`checkUserPasswordExistByEmail() loginUserPasswordCheckDTO:${JSON.stringify(loginUserPasswordCheckDTO)} `, APP);
+
+    return this.userDb.find({ email: loginUserPasswordCheckDTO.email }).pipe(
+      map(doc => {
+        if (doc.length == 0) throw new NotFoundException('user not found')
+        else return doc
+      }),
+      switchMap(doc => {
+        if (doc[0].password == null) return doc
+        else return doc
+      })
+    )
+  }
+
+  
+  saveUserPasswordExistByEmail(loginUserPasswordCheckDTO: LoginUserPasswordCheckDTO) {
+    Logger.debug(`saveUserPasswordExistByEmail() loginUserPasswordCheckDTO:${JSON.stringify(loginUserPasswordCheckDTO)} `, APP);
+
+    return this.userDb.find({ email: loginUserPasswordCheckDTO.email }).pipe(
+      map(doc => {
+        if (doc.length == 0) throw new NotFoundException('user not found')
+        else return doc
+      }),
+      switchMap(doc => {
+        return this.userDb.findandUpdate({ columnName: 'email', columnvalue: loginUserPasswordCheckDTO.email, quries: { password: loginUserPasswordCheckDTO.password } })
+      })
+    )
+  }
+
+  changeUserPasswordExistByEmail(loginUserPasswordCheckDTO: LoginUserPasswordCheckDTO) {
+    Logger.debug(`changeUserPasswordExistByEmail() loginUserPasswordCheckDTO:${JSON.stringify(loginUserPasswordCheckDTO)} `, APP);
+
+    return this.userDb.find({ email: loginUserPasswordCheckDTO.email }).pipe(
+      map(doc => {
+        if (doc.length == 0) throw new NotFoundException('user not found')
+        else return doc
+      }),
+      map(doc => {
+        if (doc[0].password == loginUserPasswordCheckDTO.password) throw new BadRequestException('Password cannot be same as the old password')
+        else return this.userDb.findandUpdate({ columnName: 'email', columnvalue: loginUserPasswordCheckDTO.email, quries: { password: loginUserPasswordCheckDTO.password } })
+      })
+    )
+  }
+
+  sendEmailToChangeUserPasswordExistByEmail(passwordResetDTO: PasswordResetDTO) {
+    Logger.debug(`sendEmailToChangeUserPasswordExistByEmail() passwordResetDTO:${JSON.stringify(passwordResetDTO)} `, APP);
+
+    return this.userDb.find({ email: passwordResetDTO.email }).pipe(
+      map(doc => {
+        if (doc.length == 0) throw new NotFoundException('user not found')
+        else return doc
+      }),
+      switchMap(doc => {
+        return this.sendEmailService.sendEmailToResetUsersPassword({user_name:doc[0].user_name,email:passwordResetDTO.email,url:"https://sample_web_site?query="+passwordResetDTO.email})
+      })
+    )
   }
 
 

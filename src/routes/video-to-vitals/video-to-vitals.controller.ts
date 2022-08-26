@@ -1,10 +1,11 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, Logger, ParseIntPipe, UseInterceptors, UploadedFile } from '@nestjs/common';
 import { VideoToVitalsService } from './video-to-vitals.service';
-import { CreateOrganizationDto, LoginUserDTO, OrgDTO, UpdateOrganizationDto, UpdateUserDTO, UserDTO, VitalUserDTO } from './dto/create-video-to-vital.dto';
+import { CreateOrganizationDto, LoginUserDTO, LoginUserPasswordCheckDTO, OrgDTO, UpdateOrganizationDto, UpdateUserDTO, UserDTO, VitalUserDTO } from './dto/create-video-to-vital.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { STATIC_IMAGES, STATIC_IMAGES_PROFILE } from 'src/constants';
 import { editFileName, imageFileFilter } from 'src/constants/helper';
+import { PasswordResetDTO } from '../admin/dto/create-admin.dto';
 
 const APP = "VideoToVitalsController"
 @Controller()
@@ -204,4 +205,34 @@ export class VideoToVitalsController {
     return this.videoToVitalsService.loginUserByEmail(loginUserDTO)
   }
 
+  @Get('check/password')
+  checkUserPasswordExistByEmail(@Body() loginUserPasswordCheckDTO: LoginUserPasswordCheckDTO) {
+    Logger.debug(`checkUserPasswordExistByEmail()  loginUserPasswordCheckDTO:${JSON.stringify(loginUserPasswordCheckDTO)} `, APP);
+
+    return this.videoToVitalsService.checkUserPasswordExistByEmail(loginUserPasswordCheckDTO)
+  }
+
+
+  @Patch('save/password')
+  saveUserPasswordExistByEmail(@Body() loginUserPasswordCheckDTO: LoginUserPasswordCheckDTO) {
+    Logger.debug(`saveUserPasswordExistByEmail()  loginUserPasswordCheckDTO:${JSON.stringify(loginUserPasswordCheckDTO)} `, APP);
+
+    return this.videoToVitalsService.saveUserPasswordExistByEmail(loginUserPasswordCheckDTO)
+  }
+
+  @Patch('change/password')
+  changeUserPasswordExistByEmail(@Body() loginUserPasswordCheckDTO: LoginUserPasswordCheckDTO) {
+    Logger.debug(`changeUserPasswordExistByEmail()  loginUserPasswordCheckDTO:${JSON.stringify(loginUserPasswordCheckDTO)} `, APP);
+
+    return this.videoToVitalsService.changeUserPasswordExistByEmail(loginUserPasswordCheckDTO)
+  }
+
+  @Post('change/password/email')
+  sendEmailToChangeUserPasswordExistByEmail(@Body() passwordResetDTO: PasswordResetDTO) {
+    Logger.debug(`sendEmailToChangeUserPasswordExistByEmail()  loginUserPasswordCheckDTO:${JSON.stringify(passwordResetDTO)} `, APP);
+
+    return this.videoToVitalsService.sendEmailToChangeUserPasswordExistByEmail(passwordResetDTO)
+  }
+
+  
 }

@@ -126,6 +126,14 @@ export class sendEmailOnCreationOfOrgAndUser {
   
 
 }
+
+export class PasswordResetDTO {
+  
+  user_name?: string;
+  email?:string;
+  url? : string;
+  
+}
 export class createAccount {
 
   id: string;
