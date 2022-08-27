@@ -3,6 +3,7 @@ import { ProductModule } from 'src/routes/product/product.module';
 import { SalesModule } from 'src/routes/sales/sales.module';
 import { UserProductJunctionModule } from 'src/routes/user-product-junction/user-product-junction.module';
 import { VideoToVitalsModule } from 'src/routes/video-to-vitals/video-to-vitals.module';
+import { SendEmailModule } from 'src/send-email/send-email.module';
 /**
  * NOTE: Routes are picked on 'first-match'
  *       So the order is important
@@ -27,5 +28,9 @@ export const APP_ROUTES = [
   {
     path: 'junction',
     module: UserProductJunctionModule,
+  },
+  {
+    path: 'notification',
+    module: SendEmailModule,
   },
 ];

@@ -91,6 +91,7 @@ export class sendEmailOnIncorrectBankDetailsDto {
 }
 
 export class sendEmailOnCreationOfDirectSalesPartner {
+  organisation_name? : string;
   name?: string;
   email?: string;
   // @IsNotEmpty()
@@ -106,7 +107,33 @@ export class sendEmailOnCreationOfDirectSalesPartner {
 
 }
 
+export class sendEmailOnCreationOfOrgAndUser {
+  organisation_name? : string;
+  organisation_admin_name? : string;
+  organisation_admin_email? : string;
+  organisation_admin_mobile? : string;
+  fedo_app?: string;
+  pilot_duration? : number;
+  name?: string;
+  url? : string;
+  email?: string;
+  gender?  : string;
+  age?: string;
+  // @IsNotEmpty()
+  
+  mobile?:string;
+  
+  
 
+}
+
+export class PasswordResetDTO {
+  
+  user_name?: string;
+  email?:string;
+  url? : string;
+  
+}
 export class createAccount {
 
   id: string;
