@@ -74,7 +74,7 @@ export class VideoToVitalsController {
     return this.videoToVitalsService.fetchOrganizationById(id);
   }
 
-  @Patch('org/:id/image')
+  @Patch('org/:id')
   @UseInterceptors(FileInterceptor('file', {
     storage: diskStorage({
       _destination:STATIC_IMAGES,
@@ -90,7 +90,7 @@ export class VideoToVitalsController {
   }))
 
   async updateOrganization(@Param('id') id: string, @Body() updateOrganizationDto: UpdateOrganizationDto, @UploadedFile() file) {
-    Logger.debug(`updateImage() id:${id} file:${file} `, APP);
+    Logger.debug(`updateOrganization() id:${id} file:${file} `, APP);
 
     return this.videoToVitalsService.updateOrganization(id, updateOrganizationDto, file?.path);
   }
@@ -139,6 +139,13 @@ export class VideoToVitalsController {
     Logger.debug(`fetchAllVitalsTestCount()`, APP);
 
     return this.videoToVitalsService.fetchAllVitalsTestCount()
+  }
+
+  @Get(':id')
+  fetchVitalsPilotById(@Param('id', ParseIntPipe) id: number) {
+    Logger.debug(`fetchVitalsPilotById() id:${id} `, APP);
+
+    return this.videoToVitalsService.fetchVitalsPilotById(id);
   }
 
   @Post('users')

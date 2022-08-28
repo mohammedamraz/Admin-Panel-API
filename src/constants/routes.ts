@@ -1,4 +1,5 @@
 import { AdminModule } from 'src/routes/admin/admin.module';
+import { IndividualUserModule } from 'src/routes/individual-user/individual-user.module';
 import { ProductModule } from 'src/routes/product/product.module';
 import { SalesModule } from 'src/routes/sales/sales.module';
 import { UserProductJunctionModule } from 'src/routes/user-product-junction/user-product-junction.module';
@@ -32,5 +33,9 @@ export const APP_ROUTES = [
   {
     path: 'notification',
     module: SendEmailModule,
+  },
+  {
+    path: 'user',
+    module: IndividualUserModule,
   },
 ];

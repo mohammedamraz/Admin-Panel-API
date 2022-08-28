@@ -89,12 +89,8 @@ export class UserDTO {
     mobile: phoneNumber;
     organization_name:string;
     product_name:string;
-    org_id:number;
     product_id:number;
     third_party_org_name:string;
-    admin_name:string;
-    pilot_duration:number
-    organization_email:string;
     password:string;
 }
 
