@@ -14,6 +14,7 @@ import { ProductModule } from './routes/product/product.module';
 import { UserProductJunctionModule } from './routes/user-product-junction/user-product-junction.module';
 import { SendEmailModule } from './send-email/send-email.module';
 import { OrgProductJunctionModule } from './routes/org-product-junction/org-product-junction.module';
+import { IndividualUserModule } from './routes/individual-user/individual-user.module';
 
 @Module({
   imports: [
@@ -32,6 +33,7 @@ import { OrgProductJunctionModule } from './routes/org-product-junction/org-prod
     UserProductJunctionModule,
     SendEmailModule,
     OrgProductJunctionModule,
+    IndividualUserModule,
     
   ],
   controllers: [AppController],

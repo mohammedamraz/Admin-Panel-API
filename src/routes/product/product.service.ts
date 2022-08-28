@@ -1,6 +1,6 @@
 import { ConflictException, Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { map, switchMap } from 'rxjs';
-import { CreateProductModel } from 'src/lib/config/model/product.model';
+// import { CreateProductModel } from 'src/lib/config/model/product.model';
 import { DatabaseTable } from 'src/lib/database/database.decorator';
 import { DatabaseService } from 'src/lib/database/database.service';
 import { CreateProductDto } from './dto/create-product.dto';
@@ -9,7 +9,7 @@ const APP = 'ProductService';
 @Injectable()
 export class ProductService {
 
-  constructor(@DatabaseTable('product') private readonly productDb: DatabaseService<CreateProductModel>) { }
+  constructor(@DatabaseTable('product') private readonly productDb: DatabaseService<CreateProductDto>) { }
 
   addProduct(createProductDto: CreateProductDto) {
     Logger.debug(`addProduct() createProductDto:${JSON.stringify(createProductDto)} }`, APP);

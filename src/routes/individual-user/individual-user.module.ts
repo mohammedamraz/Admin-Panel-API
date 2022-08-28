@@ -1,23 +1,26 @@
 import { Module } from '@nestjs/common';
-import { AdminService } from './admin.service';
-import { AdminController } from './admin.controller';
+import { IndividualUserService } from './individual-user.service';
+import { IndividualUserController } from './individual-user.controller';
+import { AdminService } from '../admin/admin.service';
 import { DatabaseModule } from 'src/lib/database/database.module';
-import { HttpModule } from '@nestjs/axios';
 import { TemplateService } from 'src/constants/template.service';
+import { HttpModule } from '@nestjs/axios/dist';
 
 @Module({
-  imports: [
+
+    imports: [
     DatabaseModule.forFeature({ tableName: 'sales_commission_junction'}),
     DatabaseModule.forFeature({ tableName: 'sales_partner'}),
     DatabaseModule.forFeature({ tableName: 'sales_partner_requests'}),
     DatabaseModule.forFeature({ tableName: 'sales_user_junction'}),
+    DatabaseModule.forFeature({ tableName: 'individual_user'}),
+    
     HttpModule.register({
       timeout: 10000,
       maxRedirects: 5
     })
   ],
-  controllers: [AdminController],
-  providers: [AdminService, TemplateService],
-  exports:[AdminService]
+  controllers: [IndividualUserController],
+  providers: [IndividualUserService,AdminService,TemplateService,]
 })
-export class AdminModule {}
+export class IndividualUserModule {}
