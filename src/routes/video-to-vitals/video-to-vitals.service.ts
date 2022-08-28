@@ -84,7 +84,7 @@ export class VideoToVitalsService {
   }
 
   fetchOrgCount() {
-    return this.organizationDb.fetchAll().pipe(
+    return this.organizationDb.find({is_deleted:false}).pipe(
       map(doc => { return { "total_organizations_count": doc.length } })
     )
   }
@@ -92,7 +92,7 @@ export class VideoToVitalsService {
   fetchAllVitalsPilot() {
     Logger.debug(`fetchAllVitalsPilot()`, APP);
 
-    return this.organizationDb.find({ product_id: 2 }).pipe(
+    return this.organizationDb.find({ product_id: 2 ,is_deleted:false}).pipe(
       catchError(err => { throw new UnprocessableEntityException(err.message) }),
       map(doc => {
         if (doc.length == 0) {
@@ -257,16 +257,7 @@ export class VideoToVitalsService {
   fetchOrgByName(organization_name: string) {
     Logger.debug(`fetchOrgByName() orgDTO:${JSON.stringify(organization_name)} `, APP);
     return this.organizationDb.find({ organization_name: organization_name }).pipe(
-      map(doc => doc
-
-        //   {
-        //   console.log("length", doc.length)
-        //   if (doc.length != 0) {
-        //     throw new ConflictException("organization exist with organization name.")
-        //   }
-        //   else { return doc }
-        // }
-      )
+      map(doc => doc),
     )
   }
 
@@ -297,7 +288,7 @@ export class VideoToVitalsService {
   fetchAllOrganization() {
     Logger.debug(`fetchAllOrganization() `, APP);
 
-    return this.organizationDb.fetchAll().pipe(
+    return this.organizationDb.find({is_deleted:false}).pipe(
       catchError(err => { throw new UnprocessableEntityException(err.message) }),
       map(doc => {
         if (doc.length == 0) {
@@ -364,7 +355,7 @@ export class VideoToVitalsService {
   fetchOrganizationById(id: number) {
     Logger.debug(`fetchOrganizationById() id:${id} `, APP);
 
-    return this.organizationDb.find({ id: id }).pipe(
+    return this.organizationDb.find({ id: id, is_deleted:false }).pipe(
       catchError(err => { throw new UnprocessableEntityException(err.message) }),
       map(doc => {
         if (doc.length == 0) {
@@ -378,9 +369,25 @@ export class VideoToVitalsService {
     )
   }
 
+  fetchVitalsPilotById(id: number) {
+    Logger.debug(`fetchVitalsPilotById() id:${id} `, APP);
+
+    return this.organizationDb.find({ id: id, is_deleted:false, product_id:2 }).pipe(
+      catchError(err => { throw new UnprocessableEntityException(err.message) }),
+      map(doc => {
+        if (doc.length == 0) {
+          throw new NotFoundException('vitals pilot not found')
+        }
+        else {
+          return doc
+        }
+      }),
+
+    )
+  }
 
   updateOrganization(id: string, updateOrganizationDto: UpdateOrganizationDto, path: string) {
-    Logger.debug(`updateImage(), ${path},`, APP);
+    Logger.debug(`updateOrganization(), ${path},`, APP);
 
 
     if (path) {
@@ -396,23 +403,37 @@ export class VideoToVitalsService {
     updateOrganizationDto.start_date = new Date(Date.now()),
       delete updateOrganizationDto.pilot_duration
 
-    return this.organizationDb.find({ id: id }).pipe(
+    return this.organizationDb.find({ id: id,is_deleted:false }).pipe(
       map(res => {
         if (res.length == 0) throw new NotFoundException('organization not found')
-        return this.organizationDb.findByIdandUpdate({ id: id, quries: updateOrganizationDto })
+       else return this.organizationDb.findByIdandUpdate({ id: id, quries: updateOrganizationDto })
       }))
   };
 
   deleteLogo(id: number) {
     Logger.debug(`deleteLogo(),id:${id},`, APP);
 
-    return this.organizationDb.findByIdandUpdate({ id: id.toString(), quries: { logo: '' } })
+    return this.organizationDb.find({ id: id, is_deleted:false }).pipe(
+      map(doc => {
+        if (doc.length == 0) {
+          throw new NotFoundException('organization not found')
+        }
+        else {
+          return this.organizationDb.findByIdandUpdate({ id: id.toString(), quries: { logo: '' } }).pipe(
+            map(doc => { return { status: "deleted" } })
+          )
+        }
+      }),
+      switchMap(res => res)
 
+    )
+
+    
   }
 
   deleteOrganizationByID(id: number) {
 
-    return this.organizationDb.find({ id: id }).pipe(
+    return this.organizationDb.find({ id: id, is_deleted:false }).pipe(
       map(doc => {
         if (doc.length == 0) {
           throw new NotFoundException('organization not found')
@@ -428,6 +449,7 @@ export class VideoToVitalsService {
     )
 
   }
+
   fetchAllVitalsTestCount() {
     Logger.debug(`fetchAllVitalsTestCount() ) `, APP);
 
@@ -447,40 +469,43 @@ export class VideoToVitalsService {
         return org_doc
       }),
       switchMap(org_doc => {
-        userDTO.org_id = org_doc[0].id
-        userDTO.admin_name = org_doc[0].admin_name
-        userDTO.pilot_duration = org_doc[0].pilot_duration
-        userDTO.organization_email = org_doc[0].organization_email
+        userDTO["org_id"] = org_doc[0].id
         return this.productService.fetchProductByNewName(userDTO.product_name).pipe(
           map(product_doc => {
             delete userDTO.product_name
-            return product_doc[0].id
-          }),
-          switchMap(product_id => {
-            userDTO.product_id = product_id
-            delete userDTO.product_name
-            this.sendEmailService.sendEmailOnCreateOrgUser(
-              {
-                "email": userDTO.email,
-                "organisation_admin_name": userDTO.admin_name,
-                "fedo_app": "FEDO VITALS",
-                "url": "need toadd url",
-                "name": userDTO.user_name,
-                "pilot_duration": userDTO.pilot_duration,
-                "organisation_admin_email": userDTO.organization_email
-              }
-            )
-            delete userDTO.pilot_duration
-            delete userDTO.admin_name
-            delete userDTO.organization_email
-            return this.userDb.save(userDTO).pipe(
-              map(doc => {
-                return doc
-              })
-            )
+            return [product_doc[0].id, org_doc]
           }),
           switchMap(doc => {
-            this.userProductJunctionService.createUserProductJunction({ user_id: doc[0].id, org_id: userDTO.org_id, product_id: userDTO.product_id, total_tests: 1 })
+            userDTO.product_id = Number(doc[0])
+            return this.userDb.save(userDTO).pipe(
+              map(userdoc => {
+                return [userdoc,doc]
+              }),
+
+              switchMap(doc=>{
+                this.sendEmailService.sendEmailOnCreateOrgUser(
+                 
+                  {
+                    "email": userDTO.email,
+                    "organisation_admin_name": doc[1][1][0].admin_name,
+                    "fedo_app": "FEDO VITALS",
+                    "url": doc[1][1][0].url,
+                    "name": userDTO.user_name,
+                    "pilot_duration": doc[1][1][0].pilot_duration,
+                    "organisation_admin_email": doc[1][1][0].organization_email
+                  }
+                )
+                return doc[0]
+              }),
+              
+            )
+
+
+          }),
+          map(doc => {
+            console.log("DOC", doc["id"])
+            doc["id"]
+            this.userProductJunctionService.createUserProductJunction({ user_id:doc["id"] , org_id: userDTO["org_id"], product_id: userDTO.product_id, total_tests: 1 })
             return doc;
           })
 
