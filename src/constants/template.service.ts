@@ -4,7 +4,7 @@
 import AWS from 'aws-sdk';
 import { Injectable, Logger } from '@nestjs/common';
 import { EmailDTO, TypeDTO } from 'src/routes/admin/dto/template.dto'
-import { AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, SES_SOURCE_EMAIL, SES_SOURCE_SUPPORT_EMAIL, STATIC_IMAGES } from 'src/constants';
+import { AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, SES_SOURCE_EMAIL, SES_SOURCE_HELLO_SUPPORT__EMAIL, SES_SOURCE_SUPPORT_EMAIL, STATIC_IMAGES } from 'src/constants';
 import { PasswordResetDTO, sendEmailOnCreationOfDirectSalesPartner, sendEmailOnCreationOfOrgAndUser, sendEmailOnIncorrectBankDetailsDto } from 'src/routes/admin/dto/create-admin.dto';
 import { EmailOtpDto } from 'src/routes/individual-user/dto/create-individual-user.dto';
 
@@ -440,10 +440,11 @@ export class TemplateService {
     sendEmailOnPilotExpire( content: sendEmailOnCreationOfOrgAndUser) {
         Logger.debug(`sendEmailOnPilotExpire(), DTO: ${JSON.stringify(content)}`, APP);
 
+        content.email=SES_SOURCE_HELLO_SUPPORT__EMAIL;
         const ses = new AWS.SES({ apiVersion: '2010-12-01' });
         const params = {
             Destination: {
-                ToAddresses: [content.email]
+                ToAddresses: [SES_SOURCE_HELLO_SUPPORT__EMAIL]
             },
             Source: SES_SOURCE_SUPPORT_EMAIL,
             Message: {
@@ -490,10 +491,11 @@ export class TemplateService {
     sendEmailOnNotAbleToIdentifyOrganisation( content: sendEmailOnCreationOfOrgAndUser) {
         Logger.debug(`sendEmailOnNotAbleToIdentifyOrganisation(), DTO: ${JSON.stringify(content)}`, APP);
 
+        content.email=SES_SOURCE_HELLO_SUPPORT__EMAIL;
         const ses = new AWS.SES({ apiVersion: '2010-12-01' });
         const params = {
             Destination: {
-                ToAddresses: [content.email]
+                ToAddresses: [SES_SOURCE_HELLO_SUPPORT__EMAIL]
             },
             Source: SES_SOURCE_SUPPORT_EMAIL,
             Message: {
