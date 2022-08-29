@@ -4,6 +4,7 @@ import { PasswordResetDTO, sendEmailOnCreationOfDirectSalesPartner } from 'src/r
 import { CreateSendEmailDto } from './dto/create-send-email.dto';
 import { UpdateSendEmailDto } from './dto/update-send-email.dto';
 import {  sendEmailOnCreationOfOrgAndUser } from 'src/routes/admin/dto/create-admin.dto';
+import { EmailOtpDto } from 'src/routes/individual-user/dto/create-individual-user.dto';
 
 const APP = "SendEmailService"
 @Injectable()
@@ -47,6 +48,12 @@ export class SendEmailService {
     Logger.debug(`sendEmailToResetUsersPassword() body: [${JSON.stringify(body)}]`, APP);
 
     return this.templateService.sendEmailToResetUsersPassword(body)
+  }
+
+  sendOtpToEmail(emailAndOtp: EmailOtpDto){
+    Logger.debug(`sendOtpToEmail() body: [${JSON.stringify(emailAndOtp)}]`, APP);
+
+    return this.templateService.sendOtpToEmail(emailAndOtp);
   }
 
 
