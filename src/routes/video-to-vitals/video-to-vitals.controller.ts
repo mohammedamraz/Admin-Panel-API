@@ -241,7 +241,7 @@ export class VideoToVitalsController {
     return this.videoToVitalsService.loginUserByEmail(loginUserDTO)
   }
 
-  @Get('user/details')
+  @Patch('user/details')
   getOrganisationDetailsOfUserByEmail(@Body() loginUserPasswordCheckDTO: LoginUserPasswordCheckDTO) {
     Logger.debug(`getOrganisationDetailsOfUserByEmail()  loginUserPasswordCheckDTO:${JSON.stringify(loginUserPasswordCheckDTO)} `, APP);
 
