@@ -30,7 +30,9 @@ export class VideoToVitalsController {
   createOrganization(@Body() createOrganizationDto: CreateOrganizationDto, @UploadedFile() file) {
     Logger.debug(`createOrganization() createOrganizationDto:${JSON.stringify(createOrganizationDto)} file:${JSON.stringify(file)}`, APP);
 
-    return this.videoToVitalsService.createOrganization(createOrganizationDto, file?.path);
+    return this.videoToVitalsService.uploadFile(file?.path)
+
+    // return this.videoToVitalsService.createOrganization(createOrganizationDto, file?.path);
   }
 
   @Get('org/count')

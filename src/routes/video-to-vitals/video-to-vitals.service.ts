@@ -8,12 +8,18 @@ import { CreateProductDto } from '../product/dto/create-product.dto';
 import { ProductService } from '../product/product.service';
 import { UserProductJunctionService } from '../user-product-junction/user-product-junction.service';
 import { CreateOrganizationDto, LoginOrgDTO, LoginUserDTO, OrgDTO, UpdateOrganizationDto, UpdateUserDTO, UserDTO, VitalUserDTO } from './dto/create-video-to-vital.dto';
+import { applicationDefault, initializeApp } from 'firebase-admin/app';
+import { GOOGLE_APPLICATION_CREDENTIALS } from 'src/constants';
+import { getStorage } from 'firebase-admin/storage';
+import { v4 as uuidv4 } from 'uuid';
+// var gcloud = require('gcloud');
+// const {Storage} = require('@google-cloud/storage');
 
 const APP = 'VideoToVitalsService'
 
 @Injectable()
 export class VideoToVitalsService {
-
+   bucket :any;
   constructor(
     @DatabaseTable('organization')
     private readonly organizationDb: DatabaseService<CreateOrganizationDto>,
@@ -24,7 +30,14 @@ export class VideoToVitalsService {
     private readonly productService: ProductService,
     private readonly userProductJunctionService: UserProductJunctionService,
     private readonly sendEmailService: SendEmailService,
-  ) { }
+  ) { 
+    initializeApp({
+      credential: applicationDefault(),
+      databaseURL: GOOGLE_APPLICATION_CREDENTIALS
+    });
+   
+    this.bucket = getStorage().bucket('gs://facial-analysis-b9fe1.appspot.com')
+  }
 
   createOrganization(createOrganizationDto: CreateOrganizationDto, path: string) {
     Logger.debug(`createOrganization() createOrganizationDto:${JSON.stringify(createOrganizationDto,)} filename:${path}`, APP);
@@ -694,6 +707,42 @@ export class VideoToVitalsService {
   //   }
   //   return key;
   // }
+
+
+
+
+// CHANGE: The path to your service account
+
+
+
+
+
+
+ async uploadFile(filename) {
+  
+ 
+
+  const metadata = {
+    metadata: {
+      // This line is very important. It's to create a download token.
+      firebaseStorageDownloadTokens: uuidv4()
+    },
+    contentType: 'image/png',
+    cacheControl: 'public, max-age=31536000',
+  };
+
+
+
+  // Uploads a local file to the bucket
+  await this.bucket.upload(filename, {
+    // Support for HTTP requests made with `Accept-Encoding: gzip`
+    gzip: true,
+    metadata: metadata,
+  });
+
+console.log(`${filename} uploaded.`);
+
+}
 
 
 }
