@@ -9,17 +9,24 @@ import { CreateProductDto } from '../product/dto/create-product.dto';
 import { ProductService } from '../product/product.service';
 import { sendEmailOnCreationOfDirectSalesPartner } from '../admin/dto/create-admin.dto';
 import { UserProductJunctionService } from '../user-product-junction/user-product-junction.service';
-import { CreateOrganizationDto, EmailConfirmationDTO, LoginUserDTO, LoginUserPasswordCheckDTO, makeuserRegistrationFormat, OrgDTO, RegisterUserDTO, UpdateOrganizationDto, UpdateUserDTO, UserDTO, VitalUserDTO } from './dto/create-video-to-vital.dto';
+// import { CreateOrganizationDto, EmailConfirmationDTO, LoginUserDTO, LoginUserPasswordCheckDTO, makeuserRegistrationFormat, OrgDTO, RegisterUserDTO, UpdateOrganizationDto, UpdateUserDTO, UserDTO, VitalUserDTO } from './dto/create-video-to-vital.dto';
 import { AWS_COGNITO_USER_CREATION_URL_SIT, FEDO_APP, PUBLIC_KEY } from 'src/constants';
 import { HttpService } from '@nestjs/axios';
 import { AxiosResponse } from 'axios';
 import { ConfirmForgotPasswordDTO, ForgotPasswordDTO } from '../admin/dto/login.dto';
+import { CreateOrganizationDto, LoginUserDTO, LoginUserPasswordCheckDTO, OrgDTO, RegisterUserDTO, UpdateOrganizationDto, UpdateUserDTO, UserDTO, VitalUserDTO } from './dto/create-video-to-vital.dto';
+import { applicationDefault, initializeApp } from 'firebase-admin/app';
+import { GOOGLE_APPLICATION_CREDENTIALS } from 'src/constants';
+import { getStorage } from 'firebase-admin/storage';
+import { v4 as uuidv4 } from 'uuid';
+// var gcloud = require('gcloud');
+// const {Storage} = require('@google-cloud/storage');
 
 const APP = 'VideoToVitalsService'
 
 @Injectable()
 export class VideoToVitalsService {
-
+   bucket :any;
   constructor(
     @DatabaseTable('organization')
     private readonly organizationDb: DatabaseService<CreateOrganizationDto>,
@@ -31,7 +38,15 @@ export class VideoToVitalsService {
     private readonly userProductJunctionService: UserProductJunctionService,
     private readonly sendEmailService: SendEmailService,
     private http: HttpService,
-  ) { }
+
+  ) { 
+    initializeApp({
+      credential: applicationDefault(),
+      databaseURL: GOOGLE_APPLICATION_CREDENTIALS
+    });
+   
+    this.bucket = getStorage().bucket('gs://facial-analysis-b9fe1.appspot.com')
+  }
 
   createOrganization(createOrganizationDto: CreateOrganizationDto, path: string) {
     Logger.debug(`createOrganization() createOrganizationDto:${JSON.stringify(createOrganizationDto,)} filename:${path}`, APP);
@@ -669,20 +684,43 @@ export class VideoToVitalsService {
 
   }
 
+  checkEmailIsPresentInUsersOrOrganisation(loginUserPasswordCheckDTO: LoginUserDTO) {
+    Logger.debug(`checkEmailIsPresentInUsersOrOrganisation() loginUserDTO:${JSON.stringify(LoginUserDTO)} `, APP);
+
+    return this.userDb.find({ email: loginUserPasswordCheckDTO.username }).pipe(
+      switchMap(doc => {
+        if (doc.length == 0){          
+        return this.organizationDb.find({organization_email:loginUserPasswordCheckDTO.username}).pipe(
+          map(doc=>{
+          if (doc.length == 0) throw new NotFoundException('user with this email is not found')
+          else return doc
+
+          })
+        )
+      }
+        else return doc
+      }),
+    )
+  }
 
 
+
+
+   user_data:any;
 
   loginUserByEmail(loginUserDTO: LoginUserDTO) {
     Logger.debug(`loginUserByEmail() loginUserDTO:${JSON.stringify(loginUserDTO)} `, APP);
 
+    
     loginUserDTO.fedoApp = FEDO_APP;
-    return this.http
+    return this.checkEmailIsPresentInUsersOrOrganisation(loginUserDTO).pipe((map(doc=>{this.user_data=doc})),
+    switchMap(doc=>{return this.http
       .post(
         `${AWS_COGNITO_USER_CREATION_URL_SIT}/token`,
         {passcode:this.encryptPassword(loginUserDTO)},
       )
       .pipe(
-        catchError((err) => {
+        catchError((err) => {          
           return this.onAWSErrorResponse(err);
         }),
         map((res: AxiosResponse) => {
@@ -691,9 +729,12 @@ export class VideoToVitalsService {
             jwtToken: res.data.idToken.jwtToken,
             refreshToken: res.data.refreshToken,
             accessToken: res.data.accessToken.jwtToken,
+            user_data:this.user_data
           };
         }),
-      );
+      );})
+    )
+      
   }
 
   private readonly onAWSErrorResponse = async (err) => {
@@ -862,5 +903,41 @@ export class VideoToVitalsService {
     return encryptedString
 
   }
+
+
+
+// CHANGE: The path to your service account
+
+
+
+
+
+
+ async uploadFile(filename) {
+  
+ 
+
+  const metadata = {
+    metadata: {
+      // This line is very important. It's to create a download token.
+      firebaseStorageDownloadTokens: uuidv4()
+    },
+    contentType: 'image/png',
+    cacheControl: 'public, max-age=31536000',
+  };
+
+
+
+  // Uploads a local file to the bucket
+  await this.bucket.upload(filename, {
+    // Support for HTTP requests made with `Accept-Encoding: gzip`
+    gzip: true,
+    metadata: metadata,
+  });
+
+console.log(`${filename} uploaded.`);
+
+}
+
 
 }
