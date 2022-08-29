@@ -687,29 +687,29 @@ export class VideoToVitalsService {
   //   )
   // }
 
-  // loginUserByEmail(loginUserDTO: LoginUserDTO) {
-  //   Logger.debug(`loginUserByEmail() loginUserDTO:${JSON.stringify(LoginUserDTO)} `, APP);
+  loginUserByEmail(loginUserDTO: LoginUserDTO) {
+    Logger.debug(`loginUserByEmail() loginUserDTO:${JSON.stringify(LoginUserDTO)} `, APP);
 
-  //   return this.findUserByEmail(loginUserDTO).pipe(map(doc => {
-  //     if (doc[0].password != loginUserDTO.password) throw new BadRequestException('incorrect password')
-  //     else {
-  //       return { email: doc[0].email, organisation_name: doc[0].organization_name, third_party_company: doc[0].third_party_org_name }
-  //     }
-  //   }))
+    return this.findUserByEmail(loginUserDTO).pipe(map(doc => {
+      if (doc[0].password != loginUserDTO.password) throw new BadRequestException('incorrect password')
+      else {
+        return { email: doc[0].email, organisation_name: doc[0].organization_name, third_party_company: doc[0].third_party_org_name }
+      }
+    }))
 
 
-  // }
+  }
 
-  // findUserByEmail(loginUserDTO: LoginUserDTO) {
-  //   Logger.debug(`findUserByEmail() loginUserDTO:${JSON.stringify(LoginUserDTO)} `, APP);
+  findUserByEmail(loginUserDTO: LoginUserDTO) {
+    Logger.debug(`findUserByEmail() loginUserDTO:${JSON.stringify(LoginUserDTO)} `, APP);
 
-  //   return this.userDb.find({ email: loginUserDTO.email }).pipe(
-  //     map(doc => {
-  //       if (doc.length == 0) throw new NotFoundException('user not found')
-  //       else return doc
-  //     })
-  //   )
-  // }
+    return this.userDb.find({ email: loginUserDTO.email }).pipe(
+      map(doc => {
+        if (doc.length == 0) throw new NotFoundException('user not found')
+        else return doc
+      })
+    )
+  }
 
   // passwordGenerator() {
   //   Logger.debug(`passwordGenerator()  `, APP);
