@@ -14,7 +14,7 @@ export class LoginDTO {
 export class ForgotPasswordDTO {
   @IsOptional() ClientId: string;
 	@IsNotEmpty()
-	@IsAlphanumeric()
+	// @IsAlphanumeric()
 	username: string;
 	fedoApp: string;
 }
