@@ -6,6 +6,7 @@ import { ProductService } from '../product/product.service';
 import { UserProductJunctionService } from '../user-product-junction/user-product-junction.service';
 import { SendEmailService } from 'src/send-email/send-email.service';
 import { TemplateService } from 'src/constants/template.service';
+import { HttpModule, HttpService } from '@nestjs/axios';
 // import { HttpModule } from '@nestjs/axios';
 
 @Module({
@@ -14,10 +15,10 @@ import { TemplateService } from 'src/constants/template.service';
     DatabaseModule.forFeature({ tableName: 'users' }),
     DatabaseModule.forFeature({ tableName: 'product' }),
     DatabaseModule.forFeature({ tableName: 'user_product_junction' }),
-    // HttpModule.register({
-    //   timeout: 10000,
-    //   maxRedirects: 5
-    // })
+    HttpModule.register({
+      timeout: 10000,
+      maxRedirects: 5
+    })
   ],
   controllers: [VideoToVitalsController],
   providers: [VideoToVitalsService, ProductService, UserProductJunctionService, SendEmailService, TemplateService ]

@@ -1,5 +1,5 @@
-import { BadRequestException, ConflictException, Injectable, Logger, NotFoundException, UnprocessableEntityException } from '@nestjs/common';
-import { catchError, concatMap, from, lastValueFrom, map, switchMap } from 'rxjs';
+import { BadRequestException, ConflictException, Injectable, Logger, NotFoundException, UnauthorizedException, UnprocessableEntityException } from '@nestjs/common';
+import { catchError, concatMap, from, lastValueFrom, map, switchMap, throwError } from 'rxjs';
 import { TemplateService } from 'src/constants/template.service';
 import { DatabaseTable } from 'src/lib/database/database.decorator';
 import { DatabaseService } from 'src/lib/database/database.service';
@@ -9,7 +9,11 @@ import { CreateProductDto } from '../product/dto/create-product.dto';
 import { ProductService } from '../product/product.service';
 import { sendEmailOnCreationOfDirectSalesPartner } from '../admin/dto/create-admin.dto';
 import { UserProductJunctionService } from '../user-product-junction/user-product-junction.service';
-import { CreateOrganizationDto, LoginUserDTO, LoginUserPasswordCheckDTO, OrgDTO, UpdateOrganizationDto, UpdateUserDTO, UserDTO, VitalUserDTO } from './dto/create-video-to-vital.dto';
+import { CreateOrganizationDto, EmailConfirmationDTO, LoginUserDTO, LoginUserPasswordCheckDTO, makeuserRegistrationFormat, OrgDTO, RegisterUserDTO, UpdateOrganizationDto, UpdateUserDTO, UserDTO, VitalUserDTO } from './dto/create-video-to-vital.dto';
+import { AWS_COGNITO_USER_CREATION_URL_SIT, FEDO_APP, PUBLIC_KEY } from 'src/constants';
+import { HttpService } from '@nestjs/axios';
+import { AxiosResponse } from 'axios';
+import { ConfirmForgotPasswordDTO, ForgotPasswordDTO } from '../admin/dto/login.dto';
 
 const APP = 'VideoToVitalsService'
 
@@ -26,6 +30,7 @@ export class VideoToVitalsService {
     private readonly productService: ProductService,
     private readonly userProductJunctionService: UserProductJunctionService,
     private readonly sendEmailService: SendEmailService,
+    private http: HttpService,
   ) { }
 
   createOrganization(createOrganizationDto: CreateOrganizationDto, path: string) {
@@ -665,62 +670,123 @@ export class VideoToVitalsService {
   }
 
 
-  // loginOrgByEmail(loginOrgDTO: LoginOrgDTO){
-  //   Logger.debug(`loginOrgByEmail() loginUserDTO:${JSON.stringify(loginOrgDTO)} `, APP);
-
-  //   return this.fetchOrgByUsingEmail(loginOrgDTO).pipe(map(doc => {
-  //     if (doc[0].password != loginOrgDTO.password) throw new BadRequestException('incorrect password')
-  //     else {
-  //       return { email: doc[0].organization_email, organisation_name: doc[0].organization_name }
-  //     }
-  //   }))
-  // }
-
-  // fetchOrgByUsingEmail(loginOrgDTO: LoginOrgDTO) {
-  //   Logger.debug(`fetchOrgByUsingEmail() orgDTO:${JSON.stringify(loginOrgDTO)} `, APP);
-
-  //   return this.organizationDb.find({ organization_email: loginOrgDTO.email }).pipe(
-  //     map(doc => {
-  //       if (doc.length == 0) throw new NotFoundException('organization not found')
-  //       else { return doc }
-  //     })
-  //   )
-  // }
-
-  // loginUserByEmail(loginUserDTO: LoginUserDTO) {
-  //   Logger.debug(`loginUserByEmail() loginUserDTO:${JSON.stringify(LoginUserDTO)} `, APP);
-
-  //   return this.findUserByEmail(loginUserDTO).pipe(map(doc => {
-  //     if (doc[0].password != loginUserDTO.password) throw new BadRequestException('incorrect password')
-  //     else {
-  //       return { email: doc[0].email, organisation_name: doc[0].organization_name, third_party_company: doc[0].third_party_org_name }
-  //     }
-  //   }))
 
 
-  // }
+  loginUserByEmail(loginUserDTO: LoginUserDTO) {
+    Logger.debug(`loginUserByEmail() loginUserDTO:${JSON.stringify(loginUserDTO)} `, APP);
 
-  // findUserByEmail(loginUserDTO: LoginUserDTO) {
-  //   Logger.debug(`findUserByEmail() loginUserDTO:${JSON.stringify(LoginUserDTO)} `, APP);
+    loginUserDTO.fedoApp = FEDO_APP;
+    return this.http
+      .post(
+        `${AWS_COGNITO_USER_CREATION_URL_SIT}/token`,
+        {passcode:this.encryptPassword(loginUserDTO)},
+      )
+      .pipe(
+        catchError((err) => {
+          return this.onAWSErrorResponse(err);
+        }),
+        map((res: AxiosResponse) => {
+          if (!res.data) throw new UnauthorizedException();
+          return {
+            jwtToken: res.data.idToken.jwtToken,
+            refreshToken: res.data.refreshToken,
+            accessToken: res.data.accessToken.jwtToken,
+          };
+        }),
+      );
+  }
 
-  //   return this.userDb.find({ email: loginUserDTO.email }).pipe(
-  //     map(doc => {
-  //       if (doc.length == 0) throw new NotFoundException('user not found')
-  //       else return doc
-  //     })
-  //   )
-  // }
+  private readonly onAWSErrorResponse = async (err) => {
+    Logger.debug('onAWSErrorResponse(), ' + err, APP);
 
-  // passwordGenerator() {
-  //   Logger.debug(`passwordGenerator()  `, APP);
+    if (err.response.status === 400)
+      throw new BadRequestException(err.response.data);
+    if (err.response.status === 401)
+      throw new UnauthorizedException(err.response.data);
+    if (err.response.status === 422)
+      throw new UnprocessableEntityException(err.response.data);
+    if (err.response.status === 404)
+      throw new NotFoundException(err.response.data);
+    if (err.response.status === 409)
+      throw new ConflictException(err.response.data);
 
-  //   var i, key = "", characters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-  //   var charactersLength = characters.length;
-  //   for (i = 0; i < 14; i++) {
-  //     key += characters.substr(Math.floor((Math.random() * charactersLength) + 1), 1);
-  //   }
-  //   return key;
-  // }
+    return throwError(() => err);
+  };
+
+  private readonly onHTTPErrorResponse = async (err) => {
+    Logger.debug('onHTTPErrorResponse(), ' + err, APP);
+
+    if (err.response.status === 400)
+      throw new BadRequestException(err.response.data);
+    if (err.response.status === 401)
+      throw new UnauthorizedException(err.response.data.message);
+    if (err.response.status === 422)
+      throw new UnprocessableEntityException(err.response.data.message);
+    if (err.response.status === 404)
+      throw new NotFoundException(err.response.data.message);
+    if (err.response.status === 409)
+      throw new ConflictException(err.response.data.message);
+
+    return throwError(() => err);
+  };
+
+  getOrganisationDetailsOfUserByEmail(loginUserPasswordCheckDTO: LoginUserPasswordCheckDTO) {
+    Logger.debug(`findUserByEmail() loginUserDTO:${JSON.stringify(LoginUserDTO)} `, APP);
+
+    return this.userDb.find({ email: loginUserPasswordCheckDTO.email }).pipe(
+      map(doc => {
+        if (doc.length == 0) throw new NotFoundException('user not found')
+        else return doc
+      }),
+      switchMap(doc=>{
+        if(doc[0].org_id!=null) {
+          return this.fetchOrganizationById(doc[0].org_id)          
+        }
+        else return doc
+      })
+    )
+  }
+
+  forgotPassword(forgotPasswordDTO: ForgotPasswordDTO) {
+    Logger.debug(
+      `admin-console forgotPassword() forgotPasswordDTO:[${JSON.stringify(
+        forgotPasswordDTO,
+      )}]`,
+    );
+
+    forgotPasswordDTO.fedoApp = FEDO_APP;
+    const passcode = this.encryptPassword(forgotPasswordDTO);
+    return this.http
+      .post(`${AWS_COGNITO_USER_CREATION_URL_SIT}/password/otp/`, {passcode:passcode})
+      .pipe(
+        catchError((err) => {
+          return this.onAWSErrorResponse(err);
+        }),
+        map((res: AxiosResponse) => res.data),
+      );
+  }
+
+  confirmForgotPassword(confirmForgotPasswordDTO: ConfirmForgotPasswordDTO) {
+    Logger.debug(
+      `admin-console confirmForgotPassword() confirmForgotPasswordDTO:[${JSON.stringify(
+        confirmForgotPasswordDTO,
+      )}]`,
+    );
+
+    confirmForgotPasswordDTO.fedoApp = FEDO_APP;
+    const passcode = this.encryptPassword(confirmForgotPasswordDTO);
+    return this.http
+      .patch(
+        `${AWS_COGNITO_USER_CREATION_URL_SIT}/password/otp/${confirmForgotPasswordDTO.ConfirmationCode}`,
+        {passcode:passcode},
+      )
+      .pipe(
+        catchError((err) => {
+          return this.onHTTPErrorResponse(err);
+        }),
+        map((_res) => []),
+      );
+  }
 
 
   
@@ -731,43 +797,11 @@ export class VideoToVitalsService {
       map(doc => {
         if (doc.length == 0) throw new NotFoundException('user not found')
         else return doc
-      }),
-      switchMap(doc => {
-        if (doc[0].password == null) return doc
-        else return doc
       })
     )
   }
 
-  
-  saveUserPasswordExistByEmail(loginUserPasswordCheckDTO: LoginUserPasswordCheckDTO) {
-    Logger.debug(`saveUserPasswordExistByEmail() loginUserPasswordCheckDTO:${JSON.stringify(loginUserPasswordCheckDTO)} `, APP);
-
-    return this.userDb.find({ email: loginUserPasswordCheckDTO.email }).pipe(
-      map(doc => {
-        if (doc.length == 0) throw new NotFoundException('user not found')
-        else return doc
-      }),
-      switchMap(doc => {
-        return this.userDb.findandUpdate({ columnName: 'email', columnvalue: loginUserPasswordCheckDTO.email, quries: { password: loginUserPasswordCheckDTO.password } })
-      })
-    )
-  }
-
-  changeUserPasswordExistByEmail(loginUserPasswordCheckDTO: LoginUserPasswordCheckDTO) {
-    Logger.debug(`changeUserPasswordExistByEmail() loginUserPasswordCheckDTO:${JSON.stringify(loginUserPasswordCheckDTO)} `, APP);
-
-    return this.userDb.find({ email: loginUserPasswordCheckDTO.email }).pipe(
-      map(doc => {
-        if (doc.length == 0) throw new NotFoundException('user not found')
-        else return doc
-      }),
-      map(doc => {
-        if (doc[0].password == loginUserPasswordCheckDTO.password) throw new BadRequestException('Password cannot be same as the old password')
-        else return this.userDb.findandUpdate({ columnName: 'email', columnvalue: loginUserPasswordCheckDTO.email, quries: { password: loginUserPasswordCheckDTO.password } })
-      })
-    )
-  }
+ 
 
   sendEmailToChangeUserPasswordExistByEmail(passwordResetDTO: PasswordResetDTO) {
     Logger.debug(`sendEmailToChangeUserPasswordExistByEmail() passwordResetDTO:${JSON.stringify(passwordResetDTO)} `, APP);
@@ -783,5 +817,50 @@ export class VideoToVitalsService {
     )
   }
 
+
+  registerUserbyEmail( RegisterUserdto: RegisterUserDTO) {
+    Logger.debug(`registerUserbyEmail(), RegisterUserdto:[${JSON.stringify(RegisterUserdto,)}] `);
+
+    RegisterUserdto.fedoApp = FEDO_APP    
+    return this.http.post(`${AWS_COGNITO_USER_CREATION_URL_SIT}/`, {passcode:this.encryptPassword(RegisterUserdto)}).pipe(
+          map(doc=>{
+          }),
+          catchError(err =>{  return this.onAWSErrorResponse(err)}))
+
+  }
+
+  confirmSignupUserByEmail( RegisterUserdto: RegisterUserDTO) {
+    Logger.debug(`confirmSignupUserByEmail(), RegisterUserdto: keys ${[JSON.stringify(Object.keys(RegisterUserdto))]} values ${JSON.stringify(Object.values(RegisterUserdto).length)} `, APP);
+
+    RegisterUserdto.fedoApp = FEDO_APP
+    const passcode = this.encryptPassword(RegisterUserdto)
+    return this.http.post(`${AWS_COGNITO_USER_CREATION_URL_SIT}/signupcode`, {passcode:passcode}).pipe(map(res=>[]),catchError(err => {
+       return this.onAWSErrorResponse(err)}))
+  }
+
+  // confirmEmail(confirmEmailDTO: EmailConfirmationDTO) {
+  //   Logger.debug(`confirmEmail() confirmEmailDTO:[${JSON.stringify(confirmEmailDTO,)}]`);
+
+  //   confirmEmailDTO.fedoApp = FEDO_APP;
+  //   return this.http.post(`${AWS_COGNITO_USER_CREATION_URL_SIT}/email/otp/`, {passcode:this.encryptPassword(confirmEmailDTO)},).pipe(catchError(err =>{
+  //    return this.onAWSErrorResponse(err)}), map(_res => []));
+  // }
+
+  // confirmEmailOtp(confirmEmailOtpDTO: EmailConfirmationDTO, otp: string) {
+  //   Logger.debug(`confirmEmailOtp() confirmEmailOtpDTO:[${JSON.stringify(confirmEmailOtpDTO,)}]`);
+
+  //   confirmEmailOtpDTO.fedoApp = FEDO_APP;
+  //   return this.http.patch(`${AWS_COGNITO_USER_CREATION_URL_SIT}/email/otp/${otp}`, {passcode:this.encryptPassword(confirmEmailOtpDTO)},).pipe(catchError(err => this.onAWSErrorResponse(err)), map(_res => []));
+  // }
+
+  encryptPassword(password) {
+    const NodeRSA = require('node-rsa');
+
+    let key_public = new NodeRSA(PUBLIC_KEY)
+    var encryptedString = key_public.encrypt(password, 'base64')
+
+    return encryptedString
+
+  }
 
 }

@@ -1,11 +1,12 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, Logger, ParseIntPipe, UseInterceptors, UploadedFile } from '@nestjs/common';
 import { VideoToVitalsService } from './video-to-vitals.service';
-import { CreateOrganizationDto,LoginUserDTO, LoginUserPasswordCheckDTO, OrgDTO, UpdateOrganizationDto, UpdateUserDTO, UserDTO, VitalUserDTO } from './dto/create-video-to-vital.dto';
+import { CreateOrganizationDto,EmailConfirmationDTO,LoginUserDTO, LoginUserPasswordCheckDTO, OrgDTO, RegisterUserDTO, UpdateOrganizationDto, UpdateUserDTO, UserDTO, VitalUserDTO } from './dto/create-video-to-vital.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { STATIC_IMAGES, STATIC_IMAGES_PROFILE } from 'src/constants';
 import { editFileName, imageFileFilter } from 'src/constants/helper';
 import { PasswordResetDTO } from '../admin/dto/create-admin.dto';
+import { ConfirmForgotPasswordDTO, ForgotPasswordDTO } from '../admin/dto/login.dto';
 
 const APP = "VideoToVitalsController"
 @Controller()
@@ -204,20 +205,64 @@ export class VideoToVitalsController {
     return this.videoToVitalsService.updateUser(id, updateUserDTO);
   }
 
-  // @Post('login/org')
-  // loginOrgByEmail(@Body() loginOrgDTO: LoginOrgDTO) {
-  //   Logger.debug(`loginUserByEmail()  loginUserDTO:${JSON.stringify(LoginUserDTO)} `, APP);
+  @Post('signup/user')
+  registerUserbyEmail(@Body() RegisterUserdto: RegisterUserDTO) {
+    Logger.debug(`registerUserbyEmail()  loginUserDTO:${JSON.stringify(RegisterUserdto)} `, APP);
 
-  //   return this.videoToVitalsService.loginOrgByEmail(loginOrgDTO)
+    return this.videoToVitalsService.registerUserbyEmail(RegisterUserdto)
+  }
+
+  @Post('confirm/signup')
+  confirmSignupUserByEmail(@Body() registerUserdto: RegisterUserDTO) {
+    Logger.debug(`confirmSignupUserByEmail() [${JSON.stringify(Object.keys(registerUserdto))} values ${JSON.stringify(Object.values(registerUserdto).length)}]`, APP);
+
+    return this.videoToVitalsService.confirmSignupUserByEmail(registerUserdto);
+  }
+
+  // @Post('email/otp')
+  // confirmEmail(@Body() confirmEmailDTO: EmailConfirmationDTO) {
+  //   Logger.debug(`confirmEmail() confirmEmailDTO:[${JSON.stringify(confirmEmailDTO,)}]`,);
+
+  //   return this.videoToVitalsService.confirmEmail(confirmEmailDTO);
+  // } 
+
+  // @Post('email/otp/:code')
+  // confirmEmailOtp(@Body() confirmEmailOtpDTO: EmailConfirmationDTO, @Param('code') otp: string) {
+  //   Logger.debug(`confirmEmailOtp() confirmEmailOtpDTO:[${JSON.stringify(confirmEmailOtpDTO,)}] otp:[${otp.length}]`,);
+
+  //   return this.videoToVitalsService.confirmEmailOtp(confirmEmailOtpDTO, otp);
   // }
 
 
-  // @Post('login/user')
-  // loginUserByEmail(@Body() loginUserDTO: LoginUserDTO) {
-  //   Logger.debug(`loginUserByEmail()  loginUserDTO:${JSON.stringify(LoginUserDTO)} `, APP);
+  @Post('login/user')
+  loginUserByEmail(@Body() loginUserDTO: LoginUserDTO) {
+    Logger.debug(`loginUserByEmail()  loginUserDTO:${JSON.stringify(loginUserDTO)} `, APP);
 
-  //   return this.videoToVitalsService.loginUserByEmail(loginUserDTO)
-  // }
+    return this.videoToVitalsService.loginUserByEmail(loginUserDTO)
+  }
+
+  @Patch('user/details')
+  getOrganisationDetailsOfUserByEmail(@Body() loginUserPasswordCheckDTO: LoginUserPasswordCheckDTO) {
+    Logger.debug(`getOrganisationDetailsOfUserByEmail()  loginUserPasswordCheckDTO:${JSON.stringify(loginUserPasswordCheckDTO)} `, APP);
+
+    return this.videoToVitalsService.getOrganisationDetailsOfUserByEmail(loginUserPasswordCheckDTO)
+  }
+
+  @Post('password')
+  // @UseInterceptors(LoggingInterceptor)
+  forgotPassword(@Body() forgotPasswordDTO: ForgotPasswordDTO) {
+    Logger.debug(`forgotPassword() forgotPasswordDTO:[${JSON.stringify(forgotPasswordDTO,)}]`,);
+
+    return this.videoToVitalsService.forgotPassword(forgotPasswordDTO);
+  }
+
+  @Post('password/otp')
+  // @UseInterceptors(LoggingInterceptor)
+  confirmForgotPassword(@Body() confirmForgotPasswordDTO: ConfirmForgotPasswordDTO,) {
+    Logger.debug(`confirmForgotPassword() confirmForgotPasswordDTO:[${JSON.stringify(confirmForgotPasswordDTO,)}]`,);
+
+    return this.videoToVitalsService.confirmForgotPassword(confirmForgotPasswordDTO);
+  }
 
   @Get('check/password')
   checkUserPasswordExistByEmail(@Body() loginUserPasswordCheckDTO: LoginUserPasswordCheckDTO) {
@@ -226,20 +271,6 @@ export class VideoToVitalsController {
     return this.videoToVitalsService.checkUserPasswordExistByEmail(loginUserPasswordCheckDTO)
   }
 
-
-  @Patch('save/password')
-  saveUserPasswordExistByEmail(@Body() loginUserPasswordCheckDTO: LoginUserPasswordCheckDTO) {
-    Logger.debug(`saveUserPasswordExistByEmail()  loginUserPasswordCheckDTO:${JSON.stringify(loginUserPasswordCheckDTO)} `, APP);
-
-    return this.videoToVitalsService.saveUserPasswordExistByEmail(loginUserPasswordCheckDTO)
-  }
-
-  @Patch('change/password')
-  changeUserPasswordExistByEmail(@Body() loginUserPasswordCheckDTO: LoginUserPasswordCheckDTO) {
-    Logger.debug(`changeUserPasswordExistByEmail()  loginUserPasswordCheckDTO:${JSON.stringify(loginUserPasswordCheckDTO)} `, APP);
-
-    return this.videoToVitalsService.changeUserPasswordExistByEmail(loginUserPasswordCheckDTO)
-  }
 
   @Post('change/password/email')
   sendEmailToChangeUserPasswordExistByEmail(@Body() passwordResetDTO: PasswordResetDTO) {

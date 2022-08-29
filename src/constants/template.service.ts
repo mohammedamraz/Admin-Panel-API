@@ -4,8 +4,9 @@
 import AWS from 'aws-sdk';
 import { Injectable, Logger } from '@nestjs/common';
 import { EmailDTO, TypeDTO } from 'src/routes/admin/dto/template.dto'
-import { AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, SES_SOURCE_EMAIL, SES_SOURCE_SUPPORT_EMAIL, STATIC_IMAGES } from 'src/constants';
+import { AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, SES_SOURCE_EMAIL, SES_SOURCE_HELLO_SUPPORT__EMAIL, SES_SOURCE_SUPPORT_EMAIL, STATIC_IMAGES } from 'src/constants';
 import { PasswordResetDTO, sendEmailOnCreationOfDirectSalesPartner, sendEmailOnCreationOfOrgAndUser, sendEmailOnIncorrectBankDetailsDto } from 'src/routes/admin/dto/create-admin.dto';
+import { EmailOtpDto } from 'src/routes/individual-user/dto/create-individual-user.dto';
 
 const APP = "TemplateService";
 @Injectable()
@@ -439,10 +440,11 @@ export class TemplateService {
     sendEmailOnPilotExpire( content: sendEmailOnCreationOfOrgAndUser) {
         Logger.debug(`sendEmailOnPilotExpire(), DTO: ${JSON.stringify(content)}`, APP);
 
+        content.email=SES_SOURCE_HELLO_SUPPORT__EMAIL;
         const ses = new AWS.SES({ apiVersion: '2010-12-01' });
         const params = {
             Destination: {
-                ToAddresses: [content.email]
+                ToAddresses: [SES_SOURCE_HELLO_SUPPORT__EMAIL]
             },
             Source: SES_SOURCE_SUPPORT_EMAIL,
             Message: {
@@ -489,10 +491,11 @@ export class TemplateService {
     sendEmailOnNotAbleToIdentifyOrganisation( content: sendEmailOnCreationOfOrgAndUser) {
         Logger.debug(`sendEmailOnNotAbleToIdentifyOrganisation(), DTO: ${JSON.stringify(content)}`, APP);
 
+        content.email=SES_SOURCE_HELLO_SUPPORT__EMAIL;
         const ses = new AWS.SES({ apiVersion: '2010-12-01' });
         const params = {
             Destination: {
-                ToAddresses: [content.email]
+                ToAddresses: [SES_SOURCE_HELLO_SUPPORT__EMAIL]
             },
             Source: SES_SOURCE_SUPPORT_EMAIL,
             Message: {
@@ -537,9 +540,9 @@ export class TemplateService {
         const ses = new AWS.SES({ apiVersion: '2010-12-01' });
         const params = {
             Destination: {
-                ToAddresses: [content.email]
+                ToAddresses: [SES_SOURCE_HELLO_SUPPORT__EMAIL]
             },
-            Source: SES_SOURCE_SUPPORT_EMAIL,
+            Source: SES_SOURCE_EMAIL,
             Message: {
                 Body: {
                     Html: {
@@ -625,6 +628,51 @@ export class TemplateService {
                 Subject: {
                     Charset: "UTF-8",
                     Data: `Fedo Account: Change Password Request`
+                }
+            }
+        };
+        return this.sendMailAsPromised(params, ses)
+    }
+
+    sendOtpToEmail( emailAndOtp: EmailOtpDto) {
+        Logger.debug(`sendOtpToEmail (), DTO: ${JSON.stringify(emailAndOtp)}`, APP);
+
+        const ses = new AWS.SES({ apiVersion: '2010-12-01' });
+        const params = {
+            Destination: {
+                ToAddresses: [emailAndOtp.email]
+            },
+            Source: SES_SOURCE_SUPPORT_EMAIL,
+            Message: {
+                Body: {
+                    Html: {
+                        Charset: "UTF-8",
+                        Data: `<html lang="en"> 
+                        <head> <link href="https://fonts.googleapis.com/css?family=Montserrat:400,700&display=swap" rel="stylesheet" type="text/css"></head> 
+                        <body style="font-family:'Montserrat',sans-serif;">
+                           <div style="display:grid;justify-items:center;">
+                              <img src="https://fedo-file-server.s3.ap-south-1.amazonaws.com/images/logo.png"" width="25%" style="width:2%,max-width: 2%;" /> 
+                           </div>
+                           <div style="display: grid;">
+                           <p>Hello, OTP for ${emailAndOtp.email} : <b>${emailAndOtp.otp}</b> <br><br></p>
+
+                             <p>If the otp request attempt is not made by you, immediately report to hello@fedo.ai.</p>
+                             
+                             <p>Great Day!<br></p>
+                             <p><b>Team Fedo</b><br></p>
+                             
+                           </div>
+                          </body> 
+                        </html>`
+                    },
+                    Text: {
+                        Charset: "UTF-8",
+                        Data: `Direct Sign Up`
+                    }
+                },
+                Subject: {
+                    Charset: "UTF-8",
+                    Data: `Fedo Vitals: Email Verification`
                 }
             }
         };

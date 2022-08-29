@@ -47,6 +47,35 @@ export class OrgDTO {
     @IsPhoneNumber()
     organization_mobile: phoneNumber;
 }
+
+export class RegisterUserDTO {
+	fedoApp: string;
+	// @IsNotEmpty()
+	email: string;
+	@IsNotEmpty()
+	password: string;
+	username: string;
+    ConfirmationCode: string;
+}
+
+export class EmailConfirmationDTO {
+	@IsOptional() @IsString() fedoApp: string;
+	@IsNotEmpty() @IsString() username: string;
+	@IsNotEmpty() @IsString() password: string;
+    email:string;
+	// @Optional()
+     ConfirmationCode: string;
+}
+
+export const makeuserRegistrationFormat = (registerUserDTO:RegisterUserDTO ): RegisterUserDTO => {
+	const data = {
+	  fedoApp: registerUserDTO.fedoApp,
+	  email: registerUserDTO.email,
+	  password: registerUserDTO.password,
+	  username:registerUserDTO.username	  
+	}
+	return <RegisterUserDTO><unknown>data
+  }
 export class UpdateOrganizationDto {
 
     @IsOptional()
@@ -92,6 +121,7 @@ export class UserDTO {
     product_id:number;
     third_party_org_name:string;
     password:string;
+    org_id:number;
 }
 
 export class VitalUserDTO {
@@ -124,12 +154,15 @@ export class UpdateUserDTO {
 
 export class LoginUserDTO {
 
+    // @IsNotEmpty()
+    // @IsEmail()
+    email?: string;
     @IsNotEmpty()
-    @IsEmail()
-    email: string;
-    @IsNotEmpty()
-    @IsAlphanumeric()
+    // @IsAlphanumeric()
     password: string;
+    fedoApp: string;
+//   @IsNotEmpty()
+  username: string;
     first_party_company?:string;
     third_party_company?:string;
 
