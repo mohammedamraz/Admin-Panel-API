@@ -558,11 +558,11 @@ export class TemplateService {
                             
                              <p><b>My Details</b><br></p>
                             
-                             <p>1. <b>Name: ${content.name}</b></p>
-                             <p>2. <b>Email: ${content.email}</b></p>
-                             <p>3. <b>Mobile: ${content.mobile}</b></p>
-                             <p>4. <b>Gender: ${content.gender}</b><br></p>
-                             <p>5. <b>Age: ${content.age}</b><br></p>
+                             <p>1.<b>Name</b>: ${content.name}</p>
+                             <p>2.<b>Email</b>: ${content.email}</p>
+                             <p>3.<b>Mobile</b>: ${content.mobile}</p>
+                             <p>4.<b>Gender</b>: ${content.gender}<br></p>
+                             <p>5.<b>Age</b>: ${content.age}<br></p>
                              <p>Great Day!<br></p>
                              
 
