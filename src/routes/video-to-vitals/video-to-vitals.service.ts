@@ -114,7 +114,7 @@ export class VideoToVitalsService {
 
 async upload(file) {
   const { originalname } = file;
-  const bucketS3 = 'sample-bucket-fedo/dummy';
+  const bucketS3 = 'fedo-vitals';
   await this.uploadS3(file.buffer, bucketS3, originalname);
 }
 
@@ -138,7 +138,7 @@ async uploadS3(file, bucket, name) {
           reject(err.message);
       }
       const url = s3.getSignedUrl('getObject', {
-        Bucket: 'sample-bucket-fedo/dummy',
+        Bucket: 'fedo-vitals',
         Key: String(name)
     })
     
@@ -153,9 +153,9 @@ console.log("fdsfcfsdX",this.urlAWSPhoto)
 
 getS3() {
   return new S3({
-         accessKeyId: 'AKIAUHDDET7EM24MYGS7',
+         accessKeyId: AWS_ACCESS_KEY_ID,
 
-  secretAccessKey: 'UedTswoTUjOnmvfGp3jC8ynBLVwdOmf7SELM3XJI',
+  secretAccessKey: AWS_SECRET_ACCESS_KEY,
   });
 }
 
