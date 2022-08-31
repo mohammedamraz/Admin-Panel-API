@@ -53,3 +53,14 @@ export class VitalUserDTO {
 
 }
 
+export class ZQueryParamsDto {
+
+    @IsOptional()
+    user_id?: string;
+
+    @IsOptional()
+    org_id?: string;
+
+  
+}
+

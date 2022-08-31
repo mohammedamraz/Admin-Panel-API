@@ -1,9 +1,9 @@
-import { Injectable, Logger, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { catchError, map, switchMap } from 'rxjs';
 import { DatabaseTable } from 'src/lib/database/database.decorator';
 import { DatabaseService } from 'src/lib/database/database.service';
 import { CreateOrganizationDto, UserDTO } from 'src/routes/video-to-vitals/dto/create-video-to-vital.dto';
-import { CreateProfileInfoDTO } from './dto/create-video-to-vital.dto';
+import { CreateProfileInfoDTO, ZQueryParamsDto } from './dto/create-video-to-vital.dto';
 const APP = "ProfileViewService"
 @Injectable()
 export class ProfileInfoService {
@@ -26,10 +26,13 @@ export class ProfileInfoService {
                     return this.userProfileDb.find({ org_id: createProfileInfoDTO.org_id }).pipe(
                         switchMap(res => {
                             if (res.length == 0) throw new NotFoundException('profile info not found')
-                            return this.userProfileDb.findandUpdate({ columnName: 'org_id', columnvalue: createProfileInfoDTO.org_id.toString(), quries: createProfileInfoDTO })
+                            else if(res[0].is_editable==true) return this.userProfileDb.findandUpdate({ columnName: 'org_id', columnvalue: createProfileInfoDTO.org_id.toString(), quries: createProfileInfoDTO })
+                            else throw new BadRequestException('profile info cannot be editable')
                         }))
                 }
-                return this.userProfileDb.findandUpdate({ columnName: 'user_id', columnvalue: createProfileInfoDTO.user_id, quries: createProfileInfoDTO })
+                else if(res[0].is_editable==true) return this.userProfileDb.findandUpdate({ columnName: 'user_id', columnvalue: createProfileInfoDTO.user_id, quries: createProfileInfoDTO })
+                else throw new BadRequestException('profile info cannot be editable')
+
             }))
     }
 
@@ -79,6 +82,41 @@ export class ProfileInfoService {
         )
 
     }
+
+    updateTotalTestsInProfileInfo(createProfileInfoDTO: CreateProfileInfoDTO) {
+        Logger.debug(`updateTotalTestsInProfileInfo() updateUserDTO:${JSON.stringify(createProfileInfoDTO)} `, APP);
+
+    return this.userProfileDb.find({ application_id: createProfileInfoDTO.application_id }).pipe(
+        switchMap(res => {
+            if (res.length == 0) throw new NotFoundException('profile info not found')
+            else  return this.userProfileDb.findandUpdate({ columnName: 'application_id', columnvalue: createProfileInfoDTO.application_id, quries: {total_tests:Number(res[0].total_tests)+1} })
+        }))
+
+    }
+
+
+    fetchProfileByOrgIdByQueryParams(params : ZQueryParamsDto){
+        Logger.debug(`fetchProfileByOrgId()  `, APP);
+
+        return this.userProfileDb.find({user_id:params.user_id}).pipe(
+            map(doc=>doc),
+            map(doc=>{
+                if(doc.length==0){return this.userProfileDb.find({org_id:params.org_id}).pipe(
+                    map(doc=>doc),
+                    // this has to change source source returning 
+                    switchMap(doc=>{
+                        if(doc.length==0)throw new NotFoundException('user not found');
+                        return doc
+                    })
+                )}
+                return doc
+            })
+        )
+        
+
+    }
+
+
 
 
 
