@@ -117,6 +117,19 @@ export class ProfileInfoService {
     }
 
 
+    fetchProfileInfoByApplicationId(app_id:string){
+        Logger.debug(`fetchProfileByOrgId()  app_id:${app_id}`, APP);
+
+        return this.userProfileDb.find({application_id:app_id}).pipe(
+            map(doc=>{
+                if(doc.length==0)throw new NotFoundException('user with applicatio id not found');
+                return doc
+            })
+        )
+
+    }
+
+
 
 
 

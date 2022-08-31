@@ -50,6 +50,13 @@ export class ProfileInfoController {
     return this.profileInfoService.updateTotalTestsInProfileInfo( createProfileInfoDTO);
   }
 
+  @Get('user/tests/:app_id')
+  fetchProfileInfoByApplicationId( @Param('app_id') app_id: string) {
+    Logger.debug(`fetchProfileInfoByApplicationId()  app_id:${app_id} `, APP);
+
+    return this.profileInfoService.fetchProfileInfoByApplicationId( app_id);
+  }
+
 
 
 
