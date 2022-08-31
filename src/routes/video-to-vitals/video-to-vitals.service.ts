@@ -141,7 +141,7 @@ export class VideoToVitalsService {
         const url = s3.getSignedUrl('getObject', {
           Bucket: 'fedo-vitals',
           Key: String(name),
-          expires:99999*9999999
+          expires:999999*999999999
         })
 
         console.log(url);
