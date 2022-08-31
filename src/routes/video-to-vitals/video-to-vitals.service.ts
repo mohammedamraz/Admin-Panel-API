@@ -343,7 +343,8 @@ getS3() {
   fetchOrgByName(organization_name: string) {
     Logger.debug(`fetchOrgByName() orgDTO:${JSON.stringify(organization_name)} `, APP);
     return this.organizationDb.find({ organization_name: organization_name }).pipe(
-      map(doc => doc),
+      map(doc => {if(doc.length==0) throw new NotFoundException('organization not found')
+        else return doc}),
     )
   }
 
@@ -559,6 +560,7 @@ getS3() {
         return this.productService.fetchProductByNewName(userDTO.product_name).pipe(
           map(product_doc => {
             delete userDTO.product_name
+            userDTO.application_id=userDTO.email.slice(0,userDTO.email.indexOf('@'));
             return [product_doc[0].id, org_doc]
           }),
           switchMap(doc => {
@@ -578,7 +580,8 @@ getS3() {
                     "url": doc[1][1][0].url,
                     "name": userDTO.user_name,
                     "pilot_duration": doc[1][1][0].pilot_duration,
-                    "organisation_admin_email": doc[1][1][0].organization_email
+                    "organisation_admin_email": doc[1][1][0].organization_email,
+                    "application_id":doc[1][1][0].application_id
                   }
                 )
                 return doc[0]
@@ -591,7 +594,8 @@ getS3() {
           map(doc => {
             console.log("DOC", doc["id"])
             doc["id"]
-            this.userProductJunctionService.createUserProductJunction({ user_id:doc["id"] , org_id: userDTO["org_id"], product_id: userDTO.product_id, total_tests: 1 })
+            this.userProductJunctionService.createUserProductJunction({ user_id:doc["id"] , org_id: userDTO["org_id"], product_id: userDTO.product_id, total_tests: 1 });
+            this.userProfileDb.save({application_id:doc['application_id'],user_id:doc['id'],org_id:doc['org_id'],name:doc['user_name'],is_editable:true})
             return doc;
           })
 
