@@ -12,7 +12,11 @@ import { HttpModule, HttpService } from '@nestjs/axios';
 @Module({
   imports: [
     DatabaseModule.forFeature({ tableName: 'organization' }),
+    DatabaseModule.forFeature({ tableName: 'organization_product_junction' }),
+
     DatabaseModule.forFeature({ tableName: 'users' }),
+    DatabaseModule.forFeature({ tableName: 'user_profile_info' }),
+
     DatabaseModule.forFeature({ tableName: 'product' }),
     DatabaseModule.forFeature({ tableName: 'user_product_junction' }),
     HttpModule.register({

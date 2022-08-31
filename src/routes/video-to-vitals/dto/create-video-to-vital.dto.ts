@@ -30,11 +30,12 @@ export class CreateOrganizationDto {
     logo: string;
     pilot_duration: number;
     product_name: string;
-    product_id: number;
+    product_id: string;
     id:number;
     status:string;
     total_tests:number;
     application_id:string;
+    stage?:string;
 
 }
 export class OrgDTO {
@@ -122,6 +123,25 @@ export class UserDTO {
     third_party_org_name:string;
     password:string;
     org_id:number;
+}
+
+
+export class UserProfileDTO {
+    // id:number;
+    name: string;
+    age: number;
+    // @IsNotEmpty()
+    // @IsEmail()
+    city: string;
+    // @IsNotEmpty()
+    // @IsPhoneNumber()
+    gender: phoneNumber;
+    org_id:number;
+    total_tests:number;
+    is_editable:boolean;
+    user_id:number;
+    application_id:string;
+    // org_id:number;
 }
 
 export class VitalUserDTO {

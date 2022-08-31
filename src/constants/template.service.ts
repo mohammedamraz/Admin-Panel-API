@@ -359,6 +359,7 @@ export class TemplateService {
                              <p>* Your company logo is uploaded. If not, upload your company logo to brand the app.</p>
                              <p>* Add users whom you would like to give access to use the app during Pilot.<br></p>
                              <p>* You can use your Org Admin sign in credentials to sign into our app.<br></p>
+                             <p>* If you would like to do the test for yourself, you must always use your unique application no. And your unique application no. is <b>${content.application_id}</b>.<br></p>
                              <p><b>Pilot Duration</b><br></p>
                              <p>Your Pilot is set for ${content.pilot_duration} days.</p>
                              <p>For any assistance, you may write to <a>support@fedo.health</a>.</p>
@@ -412,6 +413,7 @@ export class TemplateService {
                              <p><b>First Steps After Sign In</b><br></p>
                              <p>* You will see PlayStore and iOS Store buttons. Click on the respective button and download the app.</p>
                              <p>* Use your dashboard sign in credentials to sign in to the app.</p>
+                             <p>* If you would like to do the test for yourself, you must always use your unique application no. And your unique application no. is ${content.application_id}.<br></p>
                              <p><b>Pilot Duration</b><br></p>
                              <p>Your Pilot is set for ${content.pilot_duration} days.</p>
                              <p>For any assistance, you may contact <b>${content.organisation_admin_name}</b> at <b>${content.organisation_admin_email}</b>.</p>

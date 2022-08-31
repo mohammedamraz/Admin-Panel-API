@@ -10,15 +10,16 @@ import { ProductService } from '../product/product.service';
 import { sendEmailOnCreationOfDirectSalesPartner } from '../admin/dto/create-admin.dto';
 import { UserProductJunctionService } from '../user-product-junction/user-product-junction.service';
 // import { CreateOrganizationDto, EmailConfirmationDTO, LoginUserDTO, LoginUserPasswordCheckDTO, makeuserRegistrationFormat, OrgDTO, RegisterUserDTO, UpdateOrganizationDto, UpdateUserDTO, UserDTO, VitalUserDTO } from './dto/create-video-to-vital.dto';
-import { AWS_COGNITO_USER_CREATION_URL_SIT, FEDO_APP, PUBLIC_KEY } from 'src/constants';
+import { AWS_ACCESS_KEY_ID, AWS_COGNITO_USER_CREATION_URL_SIT, AWS_SECRET_ACCESS_KEY, FEDO_APP, PUBLIC_KEY } from 'src/constants';
 import { HttpService } from '@nestjs/axios';
 import { AxiosResponse } from 'axios';
 import { ConfirmForgotPasswordDTO, ForgotPasswordDTO } from '../admin/dto/login.dto';
-import { CreateOrganizationDto, LoginUserDTO, LoginUserPasswordCheckDTO, OrgDTO, RegisterUserDTO, UpdateOrganizationDto, UpdateUserDTO, UserDTO, VitalUserDTO } from './dto/create-video-to-vital.dto';
+import { CreateOrganizationDto, LoginUserDTO, LoginUserPasswordCheckDTO, OrgDTO, RegisterUserDTO, UpdateOrganizationDto, UpdateUserDTO, UserDTO, UserProfileDTO, VitalUserDTO } from './dto/create-video-to-vital.dto';
 import { applicationDefault, initializeApp } from 'firebase-admin/app';
 import { GOOGLE_APPLICATION_CREDENTIALS } from 'src/constants';
 import { getStorage } from 'firebase-admin/storage';
 import { v4 as uuidv4 } from 'uuid';
+import { S3 } from 'aws-sdk';
 // var gcloud = require('gcloud');
 // const {Storage} = require('@google-cloud/storage');
 
@@ -30,8 +31,12 @@ export class VideoToVitalsService {
   constructor(
     @DatabaseTable('organization')
     private readonly organizationDb: DatabaseService<CreateOrganizationDto>,
+    @DatabaseTable('organization_product_junction')
+    private readonly organizationProductJunctionDb: DatabaseService<CreateOrganizationDto>,
     @DatabaseTable('users')
     private readonly userDb: DatabaseService<UserDTO>,
+    @DatabaseTable('user_profile_info')
+    private readonly userProfileDb: DatabaseService<UserProfileDTO>,
     @DatabaseTable('product')
     private readonly productDb: DatabaseService<CreateProductDto>,
     private readonly productService: ProductService,
@@ -48,21 +53,25 @@ export class VideoToVitalsService {
     this.bucket = getStorage().bucket('gs://facial-analysis-b9fe1.appspot.com')
   }
 
-  createOrganization(createOrganizationDto: CreateOrganizationDto, path: string) {
-    Logger.debug(`createOrganization() createOrganizationDto:${JSON.stringify(createOrganizationDto,)} filename:${path}`, APP);
+  urlAWSPhoto:any
 
+  createOrganization(createOrganizationDto: CreateOrganizationDto, path: any) {
+    Logger.debug(`createOrganization() createOrganizationDto:${JSON.stringify(createOrganizationDto,)} filename:${path}`, APP);
+    let productlist=createOrganizationDto.product_id.split(",")
     return this.fetchOrgByUrl(createOrganizationDto.url).pipe(
       map(doc => {
         if (doc.length == 0) {
-          return this.productService.fetchProductByNewName(createOrganizationDto.product_name).pipe(
-            map(doc => {
-              delete createOrganizationDto.product_name
-              return doc[0].id
-            }),
-            switchMap(async (id) => {
+          // return this.productService.fetchProductByNewName(createOrganizationDto.product_name).pipe(
+            // map(doc => {
+            //   delete createOrganizationDto.product_name
+            //   return doc[0].id
+            // }),
+            // switchMap(async (id) => {
+              
+              console.log("sdfvfsXC",productlist);
+              createOrganizationDto.product_id = productlist[0];
               const tomorrow = new Date();
               const duration = createOrganizationDto.pilot_duration
-              createOrganizationDto.product_id = id
               createOrganizationDto.logo = path
               createOrganizationDto.end_date = new Date(tomorrow.setDate(tomorrow.getDate() + Number(duration)));
               createOrganizationDto.status = "Active"
@@ -71,6 +80,7 @@ export class VideoToVitalsService {
 
               return this.organizationDb.save(createOrganizationDto).pipe(
                 map(res => {
+                  console.log("Res",res)  
                   this.sendEmailService.sendEmailOnCreateOrg(
                     {
                       "email": createOrganizationDto.organization_email,
@@ -78,22 +88,78 @@ export class VideoToVitalsService {
                       "fedo_app": "FEDO VITALS",
                       "url": createOrganizationDto.url,
                       "pilot_duration": (createOrganizationDto.pilot_duration),
+                      "application_id": (res[0].application_id)
                     }
                   )
                   return res
                 })
               );
-            }),
-            switchMap(res => res)
-          )
+            // }),
+            // switchMap(res =>  res)
+          // )
         }
         else {
           throw new ConflictException('domain already taken')
         }
       }),
-      switchMap(res => res)
+      switchMap(res => res),
+      switchMap(async res=> {
+        productlist.map(res1=> this.organizationProductJunctionDb.save({org_id:res[0].id,start_date:createOrganizationDto.start_date,end_date:createOrganizationDto.end_date,pilot_duration:createOrganizationDto.pilot_duration,status:res[0].status,stage:res[0].stage,product_id:res1}) )
+        // this.organizationProductJunctionDb.save({createOrganizationDto});
+        this.userProfileDb.save({application_id:res[0].application_id,org_id:res[0].id})
+        ;await this.upload(path);console.log("urk",this.urlAWSPhoto); this.organizationDb.findByIdandUpdate({id:res[0].id.toString(),quries:{logo:this.urlAWSPhoto}})
+        ;return res})
     )
   }
+
+async upload(file) {
+  const { originalname } = file;
+  const bucketS3 = 'sample-bucket-fedo/dummy';
+  await this.uploadS3(file.buffer, bucketS3, originalname);
+}
+
+async uploadS3(file, bucket, name) {
+  const s3 = this.getS3();
+
+  const params = {
+      Bucket: bucket,
+      Key: String(name),
+      Body: file,
+      acl:'public'
+      
+    
+  };
+
+  
+  return new Promise((resolve, reject) => {
+      s3.upload(params, (err, data) => {
+      if (err) {
+          Logger.error(err);
+          reject(err.message);
+      }
+      const url = s3.getSignedUrl('getObject', {
+        Bucket: 'sample-bucket-fedo/dummy',
+        Key: String(name)
+    })
+    
+      console.log(url);
+      console.log(data);
+      resolve(url);
+this.urlAWSPhoto=url;
+console.log("fdsfcfsdX",this.urlAWSPhoto)
+      });
+  });
+}
+
+getS3() {
+  return new S3({
+         accessKeyId: 'AKIAUHDDET7EM24MYGS7',
+
+  secretAccessKey: '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',
+  });
+}
+
+
 
   fetchOrgByUrl(url: string) {
     Logger.debug(`fetchOrgByUrl() name:${OrgDTO}`, APP);

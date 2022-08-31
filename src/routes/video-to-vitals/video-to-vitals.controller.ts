@@ -14,27 +14,28 @@ export class VideoToVitalsController {
   constructor(private readonly videoToVitalsService: VideoToVitalsService) { }
 
   @Post('org')
-  @UseInterceptors(FileInterceptor('file', {
-    storage: diskStorage({
-      _destination: STATIC_IMAGES,
-      // get destination() {
-      //   console.log("DESTINATION",this._destination )
-      //   return this._destination;
-      // },
-      // set destination(value) {
-      //   console.log("value",value)
-      //   this._destination = value;
-      // },
-      filename: editFileName
-    }),
-    fileFilter: imageFileFilter
-  }))
+  @UseInterceptors(FileInterceptor('file'))
+  // @UseInterceptors(FileInterceptor('file', {
+  //   storage: diskStorage({
+  //     _destination: STATIC_IMAGES,
+  //     // get destination() {
+  //     //   console.log("DESTINATION",this._destination )
+  //     //   return this._destination;
+  //     // },
+  //     // set destination(value) {
+  //     //   console.log("value",value)
+  //     //   this._destination = value;
+  //     // },
+  //     filename: editFileName
+  //   }),
+  //   fileFilter: imageFileFilter
+  // }))
   createOrganization(@Body() createOrganizationDto: CreateOrganizationDto, @UploadedFile() file) {
-    Logger.debug(`createOrganization() createOrganizationDto:${JSON.stringify(createOrganizationDto)} file:${JSON.stringify(file)}`, APP);
+    // Logger.debug(`createOrganization() createOrganizationDto:${JSON.stringify(createOrganizationDto)} file:${JSON.stringify(file)}`, APP);
 
-    return this.videoToVitalsService.uploadFile(file?.path)
+    // return this.videoToVitalsService.uploadFile(file?.path)
 
-    // return this.videoToVitalsService.createOrganization(createOrganizationDto, file?.path);
+    return this.videoToVitalsService.createOrganization(createOrganizationDto, file);
   }
 
   @Get('org/count')

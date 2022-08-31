@@ -1,6 +1,7 @@
 import { AdminModule } from 'src/routes/admin/admin.module';
 import { IndividualUserModule } from 'src/routes/individual-user/individual-user.module';
 import { ProductModule } from 'src/routes/product/product.module';
+import { ProfileInfoModule } from 'src/routes/profile-info/profile-info/profile-info.module';
 import { SalesModule } from 'src/routes/sales/sales.module';
 import { UserProductJunctionModule } from 'src/routes/user-product-junction/user-product-junction.module';
 import { VideoToVitalsModule } from 'src/routes/video-to-vitals/video-to-vitals.module';
@@ -37,5 +38,9 @@ export const APP_ROUTES = [
   {
     path: 'user',
     module: IndividualUserModule,
+  },
+  {
+    path: 'profile_info',
+    module: ProfileInfoModule,
   },
 ];

@@ -120,6 +120,7 @@ export class sendEmailOnCreationOfOrgAndUser {
   gender?  : string;
   age?: string;
   // @IsNotEmpty()
+  application_id?:string;
   
   mobile?:string;
   
