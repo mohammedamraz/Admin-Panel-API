@@ -1,4 +1,4 @@
-import { phoneNumber } from "aws-sdk/clients/importexport";
+// import { phoneNumber } from "aws-sdk/clients/importexport";
 import { IsEmail, IsNotEmpty, IsNumber, IsOptional, IsPhoneNumber, IsString } from "class-validator";
 
 export class CreateIndividualUserDto {
@@ -12,13 +12,13 @@ export class MobileNumberDtO {
 
   @IsNotEmpty()
   @IsPhoneNumber()
-  phone_number: phoneNumber;
+  phone_number: String;
 }
 
 export class MobileNumberAndOtpDtO {
   // @IsNotEmpty()
   // @IsPhoneNumber()
-  phone_number: phoneNumber;
+  phone_number: String;
 
   @IsNotEmpty()
   otp: number;
@@ -32,7 +32,7 @@ export class UpdateUserDto {
   @IsString()
   // @IsPhoneNumber()
   @IsOptional()
-  phone_number: phoneNumber;
+  phone_number: String;
   @IsOptional()
   @IsString()
   // @IsEmail()

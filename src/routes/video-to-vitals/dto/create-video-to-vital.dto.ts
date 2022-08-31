@@ -1,4 +1,4 @@
-import { phoneNumber } from "aws-sdk/clients/importexport";
+// import { phoneNumber } from "aws-sdk/clients/importexport";
 import { IsAlphanumeric, IsBoolean, IsEmail, IsMobilePhone, IsNotEmpty, isNotEmpty, IsNumber, IsOptional, IsPhoneNumber, IsString } from "class-validator";
 
 export class CreateOrganizationDto {
@@ -18,7 +18,7 @@ export class CreateOrganizationDto {
     @IsNotEmpty()
     @IsString()
     @IsPhoneNumber()
-    organization_mobile: phoneNumber;
+    organization_mobile: String;
     @IsNotEmpty()
     @IsString()
     url: string;
@@ -45,7 +45,7 @@ export class OrgDTO {
     @IsEmail()
     organization_email: string;
     @IsPhoneNumber()
-    organization_mobile: phoneNumber;
+    organization_mobile: String;
 }
 
 export class RegisterUserDTO {
@@ -89,7 +89,7 @@ export class UpdateOrganizationDto {
     organization_email: string;
     @IsOptional()
     @IsPhoneNumber()
-    organization_mobile: phoneNumber;
+    organization_mobile: String;
     @IsOptional()
     url: string;
     @IsOptional()
@@ -115,7 +115,7 @@ export class UserDTO {
     email: string;
     @IsNotEmpty()
     @IsPhoneNumber()
-    mobile: phoneNumber;
+    mobile: String;
     organization_name:string;
     product_name:string;
     product_id:number;
@@ -129,7 +129,7 @@ export class VitalUserDTO {
     user_name: string;
     designation: string;
     email: string;
-    mobile: phoneNumber;
+    mobile: String;
     organization_name:string;
     product_name:string;
     org_id:number;
@@ -148,7 +148,7 @@ export class UpdateUserDTO {
     email: string;
     @IsOptional()
     @IsPhoneNumber()
-    mobile: phoneNumber;
+    mobile: String;
 
 }
 
