@@ -22,6 +22,13 @@ export class ProfileInfoController {
     return this.profileInfoService.createProfileInfo( createProfileInfoDTO);
   }
 
+  @Post('info/save')
+  addInfo(@Body() createProfileInfoDTO: CreateProfileInfoDTO) {
+    
+    return this.profileInfoService.addInfo(createProfileInfoDTO);
+
+  }
+
   @Get('info/:user_id')
   fetchProfileByUserId(@Param('user_id') user_id: number) {
     Logger.debug(`fetchProfileByUserId()`, APP);
