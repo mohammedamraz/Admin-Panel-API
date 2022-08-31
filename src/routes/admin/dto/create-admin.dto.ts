@@ -1,5 +1,5 @@
 import { ArrayMinSize, IsNotEmpty, IsNumber, IsNumberString, IsPhoneNumber, IsString, MaxLength, MinLength, ValidateNested } from 'class-validator';
-import { phoneNumber } from 'aws-sdk/clients/importexport';
+// import { phoneNumber } from 'aws-sdk/clients/importexport';
 import { Type } from 'class-transformer';
 import { BadRequestException, Logger } from '@nestjs/common';
 import { CreateSalesJunction } from 'src/routes/sales/dto/create-sale.dto';
@@ -8,14 +8,14 @@ export class MobileNumberDtO {
 
   @IsNotEmpty()
   @IsPhoneNumber()
-  phoneNumber: phoneNumber;
+  phoneNumber: String;
 }
 
 export class MobileDtO {
 
   @IsNotEmpty()
   @IsPhoneNumber()
-  phoneNumber: phoneNumber;
+  phoneNumber: String;
 
   @IsNotEmpty()
   @IsNumber()
@@ -25,7 +25,7 @@ export class MobileDtO {
 export class MobileNumberAndOtpDtO {
   @IsNotEmpty()
   @IsPhoneNumber()
-  phoneNumber: phoneNumber;
+  phoneNumber: String;
 
   @IsNotEmpty()
   otp: number;
@@ -56,7 +56,7 @@ export class User {
   aadhaar_id: string;
   userreference_id: string;
   kycschedule: string;
-  mobile: phoneNumber;
+  mobile: String;
 
 }
 

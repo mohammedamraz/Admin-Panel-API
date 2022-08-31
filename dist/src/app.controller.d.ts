@@ -5,7 +5,7 @@ export declare class AppController {
     getHello(): {
         server: string;
         version: string;
-        documentation: any;
-        fedoApp: any;
+        documentation: string;
+        fedoApp: string;
     };
 }

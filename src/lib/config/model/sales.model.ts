@@ -1,11 +1,11 @@
 import { Email } from "@deepkit/type";
-import { phoneNumber } from "aws-sdk/clients/importexport";
+// import { phoneNumber } from "aws-sdk/clients/importexport";
 
 export class CreateSalesPartnerModel {
 
     id: number;
     name: string;
-    mobile: phoneNumber;
+    mobile: String;
 	location: string;
     email: Email;
     commission: number;

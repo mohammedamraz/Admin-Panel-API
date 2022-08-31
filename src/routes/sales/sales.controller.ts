@@ -12,12 +12,12 @@ const APP = 'SalesController';
 export class SalesController {
   constructor(private readonly salesService: SalesService, private readonly salesCommissionService: SalesCommissionService) { }
 
-  @Post()
-  createSalesPartner(@Body() createSalesPartner: CreateSalesPartner) {
-    Logger.debug(`createSalesPartner() DTO:${JSON.stringify(createSalesPartner,)}`, APP);
+  // @Post()
+  // createSalesPartner(@Body() createSalesPartner: CreateSalesPartner) {
+  //   Logger.debug(`createSalesPartner() DTO:${JSON.stringify(createSalesPartner,)}`, APP);
 
-    return this.salesService.createSalesPartner(createSalesPartner)
-  }
+  //   return this.salesService.createSalesPartner(createSalesPartner)
+  // }
 
 
   @Delete(':id')
