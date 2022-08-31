@@ -10,12 +10,14 @@ import { TemplateService } from 'src/constants/template.service';
     DatabaseModule.forFeature({ tableName: 'sales_commission_junction'}),
     DatabaseModule.forFeature({ tableName: 'sales_partner'}),
     DatabaseModule.forFeature({ tableName: 'sales_partner_requests'}),
+    DatabaseModule.forFeature({ tableName: 'sales_user_junction'}),
     HttpModule.register({
       timeout: 10000,
       maxRedirects: 5
     })
   ],
   controllers: [AdminController],
-  providers: [AdminService, TemplateService]
+  providers: [AdminService, TemplateService],
+  exports:[AdminService]
 })
 export class AdminModule {}
