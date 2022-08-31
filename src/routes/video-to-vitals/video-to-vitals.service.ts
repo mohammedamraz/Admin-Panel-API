@@ -27,7 +27,7 @@ const APP = 'VideoToVitalsService'
 
 @Injectable()
 export class VideoToVitalsService {
-   bucket :any;
+  bucket: any;
   constructor(
     @DatabaseTable('organization')
     private readonly organizationDb: DatabaseService<CreateOrganizationDto>,
@@ -44,58 +44,58 @@ export class VideoToVitalsService {
     private readonly sendEmailService: SendEmailService,
     private http: HttpService,
 
-  ) { 
+  ) {
     initializeApp({
       credential: applicationDefault(),
       databaseURL: GOOGLE_APPLICATION_CREDENTIALS
     });
-   
+
     this.bucket = getStorage().bucket('gs://facial-analysis-b9fe1.appspot.com')
   }
 
-  urlAWSPhoto:any
+  urlAWSPhoto: any
 
   createOrganization(createOrganizationDto: CreateOrganizationDto, path: any) {
     Logger.debug(`createOrganization() createOrganizationDto:${JSON.stringify(createOrganizationDto,)} filename:${path}`, APP);
-    let productlist=createOrganizationDto.product_id.split(",")
+    let productlist = createOrganizationDto.product_id.split(",")
     return this.fetchOrgByUrl(createOrganizationDto.url).pipe(
       map(doc => {
         if (doc.length == 0) {
           // return this.productService.fetchProductByNewName(createOrganizationDto.product_name).pipe(
-            // map(doc => {
-            //   delete createOrganizationDto.product_name
-            //   return doc[0].id
-            // }),
-            // switchMap(async (id) => {
-              
-              console.log("sdfvfsXC",productlist);
-              createOrganizationDto.product_id = productlist[0];
-              const tomorrow = new Date();
-              const duration = createOrganizationDto.pilot_duration
-              createOrganizationDto.logo = path
-              createOrganizationDto.end_date = new Date(tomorrow.setDate(tomorrow.getDate() + Number(duration)));
-              createOrganizationDto.status = "Active"
-              const application_id = createOrganizationDto.organization_email
-              createOrganizationDto.application_id = application_id.slice(0, application_id.indexOf('@'));
+          // map(doc => {
+          //   delete createOrganizationDto.product_name
+          //   return doc[0].id
+          // }),
+          // switchMap(async (id) => {
 
-              return this.organizationDb.save(createOrganizationDto).pipe(
-                map(res => {
-                  console.log("Res",res)  
-                  this.sendEmailService.sendEmailOnCreateOrg(
-                    {
-                      "email": createOrganizationDto.organization_email,
-                      "organisation_admin_name": createOrganizationDto.admin_name,
-                      "fedo_app": "FEDO VITALS",
-                      "url": createOrganizationDto.url,
-                      "pilot_duration": (createOrganizationDto.pilot_duration),
-                      "application_id": (res[0].application_id)
-                    }
-                  )
-                  return res
-                })
-              );
-            // }),
-            // switchMap(res =>  res)
+          console.log("sdfvfsXC", productlist);
+          createOrganizationDto.product_id = productlist[0];
+          const tomorrow = new Date();
+          const duration = createOrganizationDto.pilot_duration
+          createOrganizationDto.logo = path
+          createOrganizationDto.end_date = new Date(tomorrow.setDate(tomorrow.getDate() + Number(duration)));
+          createOrganizationDto.status = "Active"
+          const application_id = createOrganizationDto.organization_email
+          createOrganizationDto.application_id = application_id.slice(0, application_id.indexOf('@'));
+
+          return this.organizationDb.save(createOrganizationDto).pipe(
+            map(res => {
+              console.log("Res", res)
+              this.sendEmailService.sendEmailOnCreateOrg(
+                {
+                  "email": createOrganizationDto.organization_email,
+                  "organisation_admin_name": createOrganizationDto.admin_name,
+                  "fedo_app": "FEDO VITALS",
+                  "url": createOrganizationDto.url,
+                  "pilot_duration": (createOrganizationDto.pilot_duration),
+                  "application_id": (res[0].application_id)
+                }
+              )
+              return res
+            })
+          );
+          // }),
+          // switchMap(res =>  res)
           // )
         }
         else {
@@ -103,61 +103,63 @@ export class VideoToVitalsService {
         }
       }),
       switchMap(res => res),
-      switchMap(async res=> {
-        productlist.map(res1=> this.organizationProductJunctionDb.save({org_id:res[0].id,start_date:createOrganizationDto.start_date,end_date:createOrganizationDto.end_date,pilot_duration:createOrganizationDto.pilot_duration,status:res[0].status,stage:res[0].stage,product_id:res1}) )
+      switchMap(async res => {
+        productlist.map(res1 => this.organizationProductJunctionDb.save({ org_id: res[0].id, start_date: createOrganizationDto.start_date, end_date: createOrganizationDto.end_date, pilot_duration: createOrganizationDto.pilot_duration, status: res[0].status, stage: res[0].stage, product_id: res1 }))
         // this.organizationProductJunctionDb.save({createOrganizationDto});
-        this.userProfileDb.save({application_id:res[0].application_id,org_id:res[0].id})
-        ;await this.upload(path);console.log("urk",this.urlAWSPhoto); this.organizationDb.findByIdandUpdate({id:res[0].id.toString(),quries:{logo:this.urlAWSPhoto}})
-        ;return res})
+        this.userProfileDb.save({ application_id: res[0].application_id, org_id: res[0].id })
+          ; await this.upload(path); console.log("urk", this.urlAWSPhoto); this.organizationDb.findByIdandUpdate({ id: res[0].id.toString(), quries: { logo: this.urlAWSPhoto } })
+          ; return res
+      })
     )
   }
 
-async upload(file) {
-  const { originalname } = file;
-  const bucketS3 = 'fedo-vitals';
-  await this.uploadS3(file.buffer, bucketS3, originalname);
-}
+  async upload(file) {
+    const { originalname } = file;
+    const bucketS3 = 'fedo-vitals';
+    await this.uploadS3(file.buffer, bucketS3, originalname);
+  }
 
-async uploadS3(file, bucket, name) {
-  const s3 = this.getS3();
+  async uploadS3(file, bucket, name) {
+    const s3 = this.getS3();
 
-  const params = {
-      Bucket: bucket,
-      Key: String(name),
-      Body: file,
-      acl:'public'
-      
-    
-  };
+    const params = {
+      Bucket: bucket,
+      Key: String(name),
+      Body: file,
+      acl: 'public'
 
-  
-  return new Promise((resolve, reject) => {
-      s3.upload(params, (err, data) => {
-      if (err) {
-          Logger.error(err);
-          reject(err.message);
-      }
-      const url = s3.getSignedUrl('getObject', {
-        Bucket: 'fedo-vitals',
-        Key: String(name)
-    })
-    
-      console.log(url);
-      console.log(data);
-      resolve(url);
-this.urlAWSPhoto=url;
-console.log("fdsfcfsdX",this.urlAWSPhoto)
-      });
-  });
-}
 
-getS3() {
-  return new S3({
-         accessKeyId: AWS_ACCESS_KEY_ID,
+    };
 
-  secretAccessKey: AWS_SECRET_ACCESS_KEY,
-  });
-}
+
+    return new Promise((resolve, reject) => {
+      s3.upload(params, (err, data) => {
+        if (err) {
+          Logger.error(err);
+          reject(err.message);
+        }
+        const url = s3.getSignedUrl('getObject', {
+          Bucket: 'fedo-vitals',
+          Key: String(name),
+          expires:99999*9999999
+        })
+
+        console.log(url);
+        console.log(data);
+        resolve(url);
+        this.urlAWSPhoto = url;
+        console.log("fdsfcfsdX", this.urlAWSPhoto)
+      });
+    });
+  }
+
+  getS3() {
+    return new S3({
+      accessKeyId: AWS_ACCESS_KEY_ID,
+
+      secretAccessKey: AWS_SECRET_ACCESS_KEY,
+    });
+  }
 
 
 
@@ -170,7 +172,7 @@ getS3() {
   }
 
   fetchOrgCount() {
-    return this.organizationDb.find({is_deleted:false}).pipe(
+    return this.organizationDb.find({ is_deleted: false }).pipe(
       map(doc => { return { "total_organizations_count": doc.length } })
     )
   }
@@ -178,7 +180,7 @@ getS3() {
   fetchAllVitalsPilot() {
     Logger.debug(`fetchAllVitalsPilot()`, APP);
 
-    return this.organizationDb.find({ product_id: 2 ,is_deleted:false}).pipe(
+    return this.organizationDb.find({ product_id: 2, is_deleted: false }).pipe(
       catchError(err => { throw new UnprocessableEntityException(err.message) }),
       map(doc => {
         if (doc.length == 0) {
@@ -343,8 +345,10 @@ getS3() {
   fetchOrgByName(organization_name: string) {
     Logger.debug(`fetchOrgByName() orgDTO:${JSON.stringify(organization_name)} `, APP);
     return this.organizationDb.find({ organization_name: organization_name }).pipe(
-      map(doc => {if(doc.length==0) throw new NotFoundException('organization not found')
-        else return doc}),
+      map(doc => {
+        if (doc.length == 0) throw new NotFoundException('organization not found')
+        else return doc
+      }),
     )
   }
 
@@ -375,7 +379,7 @@ getS3() {
   fetchAllOrganization() {
     Logger.debug(`fetchAllOrganization() `, APP);
 
-    return this.organizationDb.find({is_deleted:false}).pipe(
+    return this.organizationDb.find({ is_deleted: false }).pipe(
       catchError(err => { throw new UnprocessableEntityException(err.message) }),
       map(doc => {
         if (doc.length == 0) {
@@ -442,7 +446,7 @@ getS3() {
   fetchOrganizationById(id: number) {
     Logger.debug(`fetchOrganizationById() id:${id} `, APP);
 
-    return this.organizationDb.find({ id: id, is_deleted:false }).pipe(
+    return this.organizationDb.find({ id: id, is_deleted: false }).pipe(
       catchError(err => { throw new UnprocessableEntityException(err.message) }),
       map(doc => {
         if (doc.length == 0) {
@@ -459,7 +463,7 @@ getS3() {
   fetchVitalsPilotById(id: number) {
     Logger.debug(`fetchVitalsPilotById() id:${id} `, APP);
 
-    return this.organizationDb.find({ id: id, is_deleted:false, product_id:2 }).pipe(
+    return this.organizationDb.find({ id: id, is_deleted: false, product_id: 2 }).pipe(
       catchError(err => { throw new UnprocessableEntityException(err.message) }),
       map(doc => {
         if (doc.length == 0) {
@@ -490,17 +494,17 @@ getS3() {
     updateOrganizationDto.start_date = new Date(Date.now()),
       delete updateOrganizationDto.pilot_duration
 
-    return this.organizationDb.find({ id: id,is_deleted:false }).pipe(
+    return this.organizationDb.find({ id: id, is_deleted: false }).pipe(
       map(res => {
         if (res.length == 0) throw new NotFoundException('organization not found')
-       else return this.organizationDb.findByIdandUpdate({ id: id, quries: updateOrganizationDto })
+        else return this.organizationDb.findByIdandUpdate({ id: id, quries: updateOrganizationDto })
       }))
   };
 
   deleteLogo(id: number) {
     Logger.debug(`deleteLogo(),id:${id},`, APP);
 
-    return this.organizationDb.find({ id: id, is_deleted:false }).pipe(
+    return this.organizationDb.find({ id: id, is_deleted: false }).pipe(
       map(doc => {
         if (doc.length == 0) {
           throw new NotFoundException('organization not found')
@@ -515,12 +519,12 @@ getS3() {
 
     )
 
-    
+
   }
 
   deleteOrganizationByID(id: number) {
 
-    return this.organizationDb.find({ id: id, is_deleted:false }).pipe(
+    return this.organizationDb.find({ id: id, is_deleted: false }).pipe(
       map(doc => {
         if (doc.length == 0) {
           throw new NotFoundException('organization not found')
@@ -560,19 +564,19 @@ getS3() {
         return this.productService.fetchProductByNewName(userDTO.product_name).pipe(
           map(product_doc => {
             delete userDTO.product_name
-            userDTO.application_id=userDTO.email.slice(0,userDTO.email.indexOf('@'));
+            userDTO.application_id = userDTO.email.slice(0, userDTO.email.indexOf('@'));
             return [product_doc[0].id, org_doc]
           }),
           switchMap(doc => {
             userDTO.product_id = Number(doc[0])
             return this.userDb.save(userDTO).pipe(
               map(userdoc => {
-                return [userdoc,doc]
+                return [userdoc, doc]
               }),
 
-              switchMap(doc=>{
+              switchMap(doc => {
                 this.sendEmailService.sendEmailOnCreateOrgUser(
-                 
+
                   {
                     "email": userDTO.email,
                     "organisation_admin_name": doc[1][1][0].admin_name,
@@ -581,12 +585,12 @@ getS3() {
                     "name": userDTO.user_name,
                     "pilot_duration": doc[1][1][0].pilot_duration,
                     "organisation_admin_email": doc[1][1][0].organization_email,
-                    "application_id":doc[1][1][0].application_id
+                    "application_id": doc[1][1][0].application_id
                   }
                 )
                 return doc[0]
               }),
-              
+
             )
 
 
@@ -594,8 +598,8 @@ getS3() {
           map(doc => {
             console.log("DOC", doc["id"])
             doc["id"]
-            this.userProductJunctionService.createUserProductJunction({ user_id:doc["id"] , org_id: userDTO["org_id"], product_id: userDTO.product_id, total_tests: 1 });
-            this.userProfileDb.save({application_id:doc['application_id'],user_id:doc['id'],org_id:doc['org_id'],name:doc['user_name'],is_editable:true})
+            this.userProductJunctionService.createUserProductJunction({ user_id: doc["id"], org_id: userDTO["org_id"], product_id: userDTO.product_id, total_tests: 1 });
+            this.userProfileDb.save({ application_id: doc['application_id'], user_id: doc['id'], org_id: doc['org_id'], name: doc['user_name'], is_editable: true })
             return doc;
           })
 
@@ -759,15 +763,15 @@ getS3() {
 
     return this.userDb.find({ email: loginUserPasswordCheckDTO.username }).pipe(
       switchMap(doc => {
-        if (doc.length == 0){          
-        return this.organizationDb.find({organization_email:loginUserPasswordCheckDTO.username}).pipe(
-          map(doc=>{
-          if (doc.length == 0) throw new NotFoundException('user with this email is not found')
-          else return doc
+        if (doc.length == 0) {
+          return this.organizationDb.find({ organization_email: loginUserPasswordCheckDTO.username }).pipe(
+            map(doc => {
+              if (doc.length == 0) throw new NotFoundException('user with this email is not found')
+              else return doc
 
-          })
-        )
-      }
+            })
+          )
+        }
         else return doc
       }),
     )
@@ -776,35 +780,37 @@ getS3() {
 
 
 
-   user_data:any;
+  user_data: any;
 
   loginUserByEmail(loginUserDTO: LoginUserDTO) {
     Logger.debug(`loginUserByEmail() loginUserDTO:${JSON.stringify(loginUserDTO)} `, APP);
 
-    
+
     loginUserDTO.fedoApp = FEDO_APP;
-    return this.checkEmailIsPresentInUsersOrOrganisation(loginUserDTO).pipe((map(doc=>{this.user_data=doc})),
-    switchMap(doc=>{return this.http
-      .post(
-        `${AWS_COGNITO_USER_CREATION_URL_SIT}/token`,
-        {passcode:this.encryptPassword(loginUserDTO)},
-      )
-      .pipe(
-        catchError((err) => {          
-          return this.onAWSErrorResponse(err);
-        }),
-        map((res: AxiosResponse) => {
-          if (!res.data) throw new UnauthorizedException();
-          return {
-            jwtToken: res.data.idToken.jwtToken,
-            refreshToken: res.data.refreshToken,
-            accessToken: res.data.accessToken.jwtToken,
-            user_data:this.user_data
-          };
-        }),
-      );})
+    return this.checkEmailIsPresentInUsersOrOrganisation(loginUserDTO).pipe((map(doc => { this.user_data = doc })),
+      switchMap(doc => {
+        return this.http
+          .post(
+            `${AWS_COGNITO_USER_CREATION_URL_SIT}/token`,
+            { passcode: this.encryptPassword(loginUserDTO) },
+          )
+          .pipe(
+            catchError((err) => {
+              return this.onAWSErrorResponse(err);
+            }),
+            map((res: AxiosResponse) => {
+              if (!res.data) throw new UnauthorizedException();
+              return {
+                jwtToken: res.data.idToken.jwtToken,
+                refreshToken: res.data.refreshToken,
+                accessToken: res.data.accessToken.jwtToken,
+                user_data: this.user_data
+              };
+            }),
+          );
+      })
     )
-      
+
   }
 
   private readonly onAWSErrorResponse = async (err) => {
@@ -849,9 +855,9 @@ getS3() {
         if (doc.length == 0) throw new NotFoundException('user not found')
         else return doc
       }),
-      switchMap(doc=>{
-        if(doc[0].org_id!=null) {
-          return this.fetchOrganizationById(doc[0].org_id)          
+      switchMap(doc => {
+        if (doc[0].org_id != null) {
+          return this.fetchOrganizationById(doc[0].org_id)
         }
         else return doc
       })
@@ -868,7 +874,7 @@ getS3() {
     forgotPasswordDTO.fedoApp = FEDO_APP;
     const passcode = this.encryptPassword(forgotPasswordDTO);
     return this.http
-      .post(`${AWS_COGNITO_USER_CREATION_URL_SIT}/password/otp/`, {passcode:passcode})
+      .post(`${AWS_COGNITO_USER_CREATION_URL_SIT}/password/otp/`, { passcode: passcode })
       .pipe(
         catchError((err) => {
           return this.onAWSErrorResponse(err);
@@ -889,7 +895,7 @@ getS3() {
     return this.http
       .patch(
         `${AWS_COGNITO_USER_CREATION_URL_SIT}/password/otp/${confirmForgotPasswordDTO.ConfirmationCode}`,
-        {passcode:passcode},
+        { passcode: passcode },
       )
       .pipe(
         catchError((err) => {
@@ -900,7 +906,7 @@ getS3() {
   }
 
 
-  
+
   checkUserPasswordExistByEmail(loginUserPasswordCheckDTO: LoginUserPasswordCheckDTO) {
     Logger.debug(`checkUserPasswordExistByEmail() loginUserPasswordCheckDTO:${JSON.stringify(loginUserPasswordCheckDTO)} `, APP);
 
@@ -912,7 +918,7 @@ getS3() {
     )
   }
 
- 
+
 
   sendEmailToChangeUserPasswordExistByEmail(passwordResetDTO: PasswordResetDTO) {
     Logger.debug(`sendEmailToChangeUserPasswordExistByEmail() passwordResetDTO:${JSON.stringify(passwordResetDTO)} `, APP);
@@ -923,30 +929,31 @@ getS3() {
         else return doc
       }),
       switchMap(doc => {
-        return this.sendEmailService.sendEmailToResetUsersPassword({user_name:doc[0].user_name,email:passwordResetDTO.email,url:"https://sample_web_site?query="+passwordResetDTO.email})
+        return this.sendEmailService.sendEmailToResetUsersPassword({ user_name: doc[0].user_name, email: passwordResetDTO.email, url: "https://sample_web_site?query=" + passwordResetDTO.email })
       })
     )
   }
 
 
-  registerUserbyEmail( RegisterUserdto: RegisterUserDTO) {
+  registerUserbyEmail(RegisterUserdto: RegisterUserDTO) {
     Logger.debug(`registerUserbyEmail(), RegisterUserdto:[${JSON.stringify(RegisterUserdto,)}] `);
 
-    RegisterUserdto.fedoApp = FEDO_APP    
-    return this.http.post(`${AWS_COGNITO_USER_CREATION_URL_SIT}/`, {passcode:this.encryptPassword(RegisterUserdto)}).pipe(
-          map(doc=>{
-          }),
-          catchError(err =>{  return this.onAWSErrorResponse(err)}))
+    RegisterUserdto.fedoApp = FEDO_APP
+    return this.http.post(`${AWS_COGNITO_USER_CREATION_URL_SIT}/`, { passcode: this.encryptPassword(RegisterUserdto) }).pipe(
+      map(doc => {
+      }),
+      catchError(err => { return this.onAWSErrorResponse(err) }))
 
   }
 
-  confirmSignupUserByEmail( RegisterUserdto: RegisterUserDTO) {
+  confirmSignupUserByEmail(RegisterUserdto: RegisterUserDTO) {
     Logger.debug(`confirmSignupUserByEmail(), RegisterUserdto: keys ${[JSON.stringify(Object.keys(RegisterUserdto))]} values ${JSON.stringify(Object.values(RegisterUserdto).length)} `, APP);
 
     RegisterUserdto.fedoApp = FEDO_APP
     const passcode = this.encryptPassword(RegisterUserdto)
-    return this.http.post(`${AWS_COGNITO_USER_CREATION_URL_SIT}/signupcode`, {passcode:passcode}).pipe(map(res=>[]),catchError(err => {
-       return this.onAWSErrorResponse(err)}))
+    return this.http.post(`${AWS_COGNITO_USER_CREATION_URL_SIT}/signupcode`, { passcode: passcode }).pipe(map(res => []), catchError(err => {
+      return this.onAWSErrorResponse(err)
+    }))
   }
 
   // confirmEmail(confirmEmailDTO: EmailConfirmationDTO) {
@@ -976,38 +983,38 @@ getS3() {
 
 
 
-// CHANGE: The path to your service account
+  // CHANGE: The path to your service account
 
 
 
 
 
 
- async uploadFile(filename) {
-  
- 
-
-  const metadata = {
-    metadata: {
-      // This line is very important. It's to create a download token.
-      firebaseStorageDownloadTokens: uuidv4()
-    },
-    contentType: 'image/png',
-    cacheControl: 'public, max-age=31536000',
-  };
+  async uploadFile(filename) {
 
 
 
-  // Uploads a local file to the bucket
-  await this.bucket.upload(filename, {
-    // Support for HTTP requests made with `Accept-Encoding: gzip`
-    gzip: true,
-    metadata: metadata,
-  });
+    const metadata = {
+      metadata: {
+        // This line is very important. It's to create a download token.
+        firebaseStorageDownloadTokens: uuidv4()
+      },
+      contentType: 'image/png',
+      cacheControl: 'public, max-age=31536000',
+    };
 
-console.log(`${filename} uploaded.`);
 
-}
+
+    // Uploads a local file to the bucket
+    await this.bucket.upload(filename, {
+      // Support for HTTP requests made with `Accept-Encoding: gzip`
+      gzip: true,
+      metadata: metadata,
+    });
+
+    console.log(`${filename} uploaded.`);
+
+  }
 
 
 }
