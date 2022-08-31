@@ -1,5 +1,5 @@
 import { Email } from "aws-sdk/clients/codecommit";
-import { phoneNumber } from "aws-sdk/clients/importexport";
+// import { phoneNumber } from "aws-sdk/clients/importexport";
 import { IsEmail, IsEnum, IsMobilePhone, IsNotEmpty, IsNumberString, IsOptional, IsPhoneNumber, IsString, MaxLength, MinLength } from "class-validator";
 
 export class CreateSalesJunction {
@@ -22,7 +22,7 @@ export class CreateSalesPartner {
     name: string;
     @IsPhoneNumber()
     @IsNotEmpty()
-    mobile: phoneNumber;
+    mobile: String;
     location: string;
     email: Email;
     // remarks:string;
@@ -91,7 +91,7 @@ export class UpdateSalesPartner {
     block_account: boolean;
     profile_confirmation: boolean;
     customer_id: string;
-    mobile:phoneNumber;
+    mobile:String;
     email:Email;
 
 }

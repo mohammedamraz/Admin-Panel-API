@@ -22,25 +22,25 @@ export class SalesService {
     @DatabaseTable('sales_commission_junction') private readonly junctiondb: DatabaseService<CreateSalesJunction>,
     private http: HttpService) { }
 
-  createSalesPartner(createSalesPartner: CreateSalesPartner) {
-    Logger.debug(`createSalesPartner() DTO:${JSON.stringify(createSalesPartner,)}`, APP);
+  // createSalesPartner(createSalesPartner: CreateSalesPartner) {
+  //   Logger.debug(`createSalesPartner() DTO:${JSON.stringify(createSalesPartner,)}`, APP);
 
-    return this.fetchSalesPartnerByMobileNumber(createSalesPartner.mobile).pipe(
-      switchMap(_doc => fetchUserByMobileNumber(createSalesPartner.mobile)),
-      switchMap(doc => {
-        if (!doc[0]) return this.saveToDb(doc, createSalesPartner)
-        else return this.saveToDb(doc[0].fedo_id, createSalesPartner)
-      }),
-      switchMap(doc => {
-        createSalesPartner.sales_code = "FEDSP" + String(new Date().getMonth() + 1).padStart(2, '0') + String(new Date().getDate()).padStart(2, '0') + 500 + doc[0].id;
-        createSalesPartner.id = doc[0].id;
-        return this.junctiondb.save({ sales_code: createSalesPartner.sales_code }).pipe(catchError(err => { throw new BadRequestException(err.message) }), map(doc => doc))
-      }),
-      switchMap(doc => this.createInvitation(createSalesPartner, doc)),
-      switchMap(doc => this.updateSalesPartner(createSalesPartner.id.toString(), <UpdateSalesPartner>{ sales_code: createSalesPartner.sales_code })),
-      switchMap(doc => this.fetchSalesPartnerById(createSalesPartner.id.toString()))
-    )
-  }
+  //   return this.fetchSalesPartnerByMobileNumber(createSalesPartner.mobile).pipe(
+  //     switchMap(_doc => fetchUserByMobileNumber(createSalesPartner.mobile)),
+  //     switchMap(doc => {
+  //       if (!doc[0]) return this.saveToDb(doc, createSalesPartner)
+  //       else return this.saveToDb(doc[0].fedo_id, createSalesPartner)
+  //     }),
+  //     switchMap(doc => {
+  //       createSalesPartner.sales_code = "FEDSP" + String(new Date().getMonth() + 1).padStart(2, '0') + String(new Date().getDate()).padStart(2, '0') + 500 + doc[0].id;
+  //       createSalesPartner.id = doc[0].id;
+  //       return this.junctiondb.save({ sales_code: createSalesPartner.sales_code }).pipe(catchError(err => { throw new BadRequestException(err.message) }), map(doc => doc))
+  //     }),
+  //     switchMap(doc => this.createInvitation(createSalesPartner, doc)),
+  //     switchMap(doc => this.updateSalesPartner(createSalesPartner.id.toString(), <UpdateSalesPartner>{ sales_code: createSalesPartner.sales_code })),
+  //     switchMap(doc => this.fetchSalesPartnerById(createSalesPartner.id.toString()))
+  //   )
+  // }
 
   saveToDb(userId: any, createSalesPartner: CreateSalesPartner) {
     Logger.debug(`saveToDb() id: [${JSON.stringify(userId)}] DTO:${JSON.stringify(createSalesPartner,)}`, APP);

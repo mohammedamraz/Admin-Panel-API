@@ -13,12 +13,12 @@ export class IndividualUserController {
   //   return this.individualUserService.userRegistration(createIndividualUserDto);
   // }
 
-  @Post('otp')
-  sentOtpToPhoneNumber(@Body() mobileNumberDtO: MobileNumberDtO) {
-    Logger.debug(`sentOtpToPhoneNumber() mobileNumberDtO: [${JSON.stringify(mobileNumberDtO)}]`, APP);
+  // @Post('otp')
+  // sentOtpToPhoneNumber(@Body() mobileNumberDtO: MobileNumberDtO) {
+  //   Logger.debug(`sentOtpToPhoneNumber() mobileNumberDtO: [${JSON.stringify(mobileNumberDtO)}]`, APP);
 
-    return this.individualUserService.sentOtpToPhoneNumber(mobileNumberDtO);
-  }
+  //   return this.individualUserService.sentOtpToPhoneNumber(mobileNumberDtO);
+  // }
 
   @Post(':phoneNumber/:otp')
   verifyOtpAndRegisterUser(@Param() mobileNumberAndOtpDtO: MobileNumberAndOtpDtO, @Body() createIndividualUserDto: CreateIndividualUserDto) {
