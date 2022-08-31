@@ -2,7 +2,7 @@ image: node:14
 
 .global:
   before_script:
-    - export SERVICE_NAME=fedo-health-sales-api
+    - export SERVICE_NAME=fedo-sales-api
     - export TAGGED_APP_VERSION=`echo $SERVICE_NAME`_`git describe --tags --always --abbrev=0`-`git rev-parse --short HEAD`
     - export AS_FEDO="sudo -H -u fedo-dev"
     - export DEPLOY_LOCATION_DEV=/home/fedo-dev/system-storage/apps/dev.$SERVICE_NAME
