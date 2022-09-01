@@ -45,12 +45,12 @@ export class VideoToVitalsService {
     private http: HttpService,
 
   ) { 
-    initializeApp({
-      credential: applicationDefault(),
-      databaseURL: GOOGLE_APPLICATION_CREDENTIALS
-    });
+    // initializeApp({
+    //   credential: applicationDefault(),
+    //   databaseURL: GOOGLE_APPLICATION_CREDENTIALS
+    // });
    
-    this.bucket = getStorage().bucket('gs://facial-analysis-b9fe1.appspot.com')
+    // this.bucket = getStorage().bucket('gs://facial-analysis-b9fe1.appspot.com')
   }
 
   urlAWSPhoto:any
@@ -78,9 +78,10 @@ export class VideoToVitalsService {
               const application_id = createOrganizationDto.organization_email
               createOrganizationDto.application_id = application_id.slice(0, application_id.indexOf('@'));
 
+              delete createOrganizationDto.logo;
               return this.organizationDb.save(createOrganizationDto).pipe(
                 map(res => {
-                  console.log("Res",res)  
+                  // console.log("Res",res)  
                   this.sendEmailService.sendEmailOnCreateOrg(
                     {
                       "email": createOrganizationDto.organization_email,
@@ -108,7 +109,7 @@ export class VideoToVitalsService {
         // this.organizationProductJunctionDb.save({createOrganizationDto});
         this.userProfileDb.save({application_id:res[0].application_id,org_id:res[0].id})
         ;await this.upload(path);console.log("urk",this.urlAWSPhoto); this.organizationDb.findByIdandUpdate({id:res[0].id.toString(),quries:{logo:this.urlAWSPhoto}})
-        ;return res})
+        ;delete res[0].logo; return res})
     )
   }
 
@@ -125,7 +126,8 @@ async uploadS3(file, bucket, name) {
       Bucket: bucket,
       Key: String(name),
       Body: file,
-      acl:'public'
+      acl:'public',
+      // expires:99999999999999999999999999*999999999999999999999999999
       
     
   };
@@ -142,10 +144,10 @@ async uploadS3(file, bucket, name) {
         Key: String(name)
     })
     
-      console.log(url);
-      console.log(data);
+//       console.log(url);
+//       console.log(data);
       resolve(url);
-this.urlAWSPhoto=url;
+this.urlAWSPhoto=data.Location;
 console.log("fdsfcfsdX",this.urlAWSPhoto)
       });
   });
