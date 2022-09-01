@@ -1,28 +1,23 @@
 import { BadRequestException, ConflictException, Injectable, Logger, NotFoundException, UnauthorizedException, UnprocessableEntityException } from '@nestjs/common';
 import { catchError, concatMap, from, lastValueFrom, map, switchMap, throwError } from 'rxjs';
-import { TemplateService } from 'src/constants/template.service';
 import { DatabaseTable } from 'src/lib/database/database.decorator';
 import { DatabaseService } from 'src/lib/database/database.service';
 import { SendEmailService } from 'src/send-email/send-email.service';
 import { PasswordResetDTO } from '../admin/dto/create-admin.dto';
 import { CreateProductDto } from '../product/dto/create-product.dto';
 import { ProductService } from '../product/product.service';
-import { sendEmailOnCreationOfDirectSalesPartner } from '../admin/dto/create-admin.dto';
 import { UserProductJunctionService } from '../user-product-junction/user-product-junction.service';
-// import { CreateOrganizationDto, EmailConfirmationDTO, LoginUserDTO, LoginUserPasswordCheckDTO, makeuserRegistrationFormat, OrgDTO, RegisterUserDTO, UpdateOrganizationDto, UpdateUserDTO, UserDTO, VitalUserDTO } from './dto/create-video-to-vital.dto';
 import { AWS_ACCESS_KEY_ID, AWS_COGNITO_USER_CREATION_URL_SIT, AWS_SECRET_ACCESS_KEY, FEDO_APP, PUBLIC_KEY } from 'src/constants';
 import { HttpService } from '@nestjs/axios';
 import { AxiosResponse } from 'axios';
 import { ConfirmForgotPasswordDTO, ForgotPasswordDTO } from '../admin/dto/login.dto';
 import { CreateOrganizationDto, LoginUserDTO, LoginUserPasswordCheckDTO, OrgDTO, RegisterUserDTO, UpdateOrganizationDto, UpdateUserDTO, UserDTO, UserProfileDTO, VitalUserDTO } from './dto/create-video-to-vital.dto';
-import { applicationDefault, initializeApp } from 'firebase-admin/app';
+// import { applicationDefault, initializeApp } from 'firebase-admin/app';
 import { GOOGLE_APPLICATION_CREDENTIALS } from 'src/constants';
-import { getStorage } from 'firebase-admin/storage';
+// import { getStorage } from 'firebase-admin/storage';
 import { v4 as uuidv4 } from 'uuid';
 import { S3 } from 'aws-sdk';
-// var gcloud = require('gcloud');
-// const {Storage} = require('@google-cloud/storage');
-
+ 
 const APP = 'VideoToVitalsService'
 
 @Injectable()
@@ -45,13 +40,8 @@ export class VideoToVitalsService {
     private http: HttpService,
 
   ) { 
-    // initializeApp({
-    //   credential: applicationDefault(),
-    //   databaseURL: GOOGLE_APPLICATION_CREDENTIALS
-    // });
-   
-    // this.bucket = getStorage().bucket('gs://facial-analysis-b9fe1.appspot.com')
-  }
+     
+}
 
   urlAWSPhoto:any
 
@@ -720,6 +710,14 @@ getS3() {
     Logger.debug(`fetchUserById() id:${id}} `, APP);
 
     return this.userDb.find({ id: id }).pipe(
+      map(doc => doc)
+    )
+  }
+
+  fetchOrganizationDetailsById(id: number) {
+    Logger.debug(`fetchOrganizationDetailsById() id:${id}} `, APP);
+
+    return this.organizationDb.find({ id: id }).pipe(
       map(doc => doc)
     )
   }
