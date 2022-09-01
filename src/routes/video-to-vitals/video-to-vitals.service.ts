@@ -40,14 +40,7 @@ export class VideoToVitalsService {
     private http: HttpService,
 
   ) { 
-    // if(APP=="VideoToVitalsService"){
-    initializeApp({
-      credential: applicationDefault(),
-      databaseURL: GOOGLE_APPLICATION_CREDENTIALS
-    });
-   
-    this.bucket = getStorage().bucket('gs://facial-analysis-b9fe1.appspot.com')
-//  } 
+     
 }
 
   urlAWSPhoto:any
