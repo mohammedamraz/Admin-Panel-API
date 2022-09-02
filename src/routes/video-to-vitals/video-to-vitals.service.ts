@@ -12,12 +12,8 @@ import { HttpService } from '@nestjs/axios';
 import { AxiosResponse } from 'axios';
 import { ConfirmForgotPasswordDTO, ForgotPasswordDTO } from '../admin/dto/login.dto';
 import { CreateOrganizationDto, LoginUserDTO, LoginUserPasswordCheckDTO, OrgDTO, RegisterUserDTO, UpdateOrganizationDto, UpdateUserDTO, UserDTO, UserProfileDTO, VitalUserDTO } from './dto/create-video-to-vital.dto';
-// import { applicationDefault, initializeApp } from 'firebase-admin/app';
-import { GOOGLE_APPLICATION_CREDENTIALS } from 'src/constants';
-// import { getStorage } from 'firebase-admin/storage';
 import { v4 as uuidv4 } from 'uuid';
 import { S3 } from 'aws-sdk';
-import { CompositionPage } from 'twilio/lib/rest/video/v1/composition';
 
 const APP = 'VideoToVitalsService'
 
@@ -52,20 +48,13 @@ export class VideoToVitalsService {
     return this.fetchOrgByUrl(createOrganizationDto.url).pipe(
       map(doc => {
         if (doc.length == 0) {
-          // return this.productService.fetchProductByNewName(createOrganizationDto.product_name).pipe(
-          // map(doc => {
-          //   delete createOrganizationDto.product_name
-          //   return doc[0].id
-          // }),
-          // switchMap(async (id) => {
           createOrganizationDto.product_id = productlist[0];
           const tomorrow = new Date();
           const duration = createOrganizationDto.pilot_duration
           createOrganizationDto.logo = path
           createOrganizationDto.end_date = new Date(tomorrow.setDate(tomorrow.getDate() + Number(duration)));
           createOrganizationDto.status = "Active"
-          const application_id = createOrganizationDto.organization_email
-          createOrganizationDto.application_id = application_id.slice(0, application_id.indexOf('@'));
+          createOrganizationDto.application_id = createOrganizationDto.organization_mobile.slice(3, 14);
 
           delete createOrganizationDto.logo;
           return this.organizationDb.save(createOrganizationDto).pipe(
@@ -162,7 +151,14 @@ export class VideoToVitalsService {
     Logger.debug(`fetchOrgByUrl() name:${OrgDTO}`, APP);
 
     return this.organizationDb.find({ url: url }).pipe(
-      map(doc => doc)
+      map(doc => {
+        if (doc.length == 0){
+          return doc
+        }
+        if (doc.length != 0){
+          throw new ConflictException("domain already taken") 
+        }
+      })
     )
   }
 
@@ -341,8 +337,10 @@ export class VideoToVitalsService {
     Logger.debug(`fetchOrgByName() orgDTO:${JSON.stringify(organization_name)} `, APP);
     return this.organizationDb.find({ organization_name: organization_name }).pipe(
       map(doc => {
-        if (doc.length == 0) throw new NotFoundException('organization not found')
-        else return doc
+        if (doc.length != 0) {
+          throw new ConflictException(`organization exist with ${organization_name}`)
+        }
+        else { return doc }
       }),
     )
   }

@@ -66,6 +66,13 @@ export class VideoToVitalsController {
     return this.videoToVitalsService.fetchOrgByCondition(orgDTO)
   }
 
+  @Get('org/:url')
+  fetchOrgByUrl(@Param() url: string,) {
+    Logger.debug(`fetchOrgByUrl() url:${url} `, APP);
+
+    return this.videoToVitalsService.fetchOrgByUrl(url)
+  }
+
   @Patch('org/status')
   updateStatus() {
     return this.videoToVitalsService.updateStatus()
