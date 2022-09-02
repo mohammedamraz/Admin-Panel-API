@@ -353,7 +353,7 @@ export class TemplateService {
                              <p>You may click the below link and sign up to view your dashboard</p>
                              <p>Note that you will be asked to set a new password for once.<br></p>
                              <p><b>Your Custom Pilot URL:</b><br></p>
-                             <a>${content.url}<br></a>
+                             <p><a href=${content.url}>ADMIN PANEL SIGNUP</a><br></p>
                              <p><b>First Steps After Sign In</b><br></p>
                              <p>* Check and ensure your organisation name is entered correctly. If not, edit it.</p>
                              <p>* Your company logo is uploaded. If not, upload your company logo to brand the app.</p>
@@ -409,7 +409,7 @@ export class TemplateService {
                              <p>You may click the below link and sign up to view your dashboard</p>
                              <p>Note that you will be asked to set a new password for once.<br></p>
                              <p><b>Your Custom Pilot URL:</b><br></p>
-                             <p>${content.url}<br></p>
+                             <p><a href=${content.url}>ADMIN PANEL SIGNUP</a><br></p>
                              <p><b>First Steps After Sign In</b><br></p>
                              <p>* You will see PlayStore and iOS Store buttons. Click on the respective button and download the app.</p>
                              <p>* Use your dashboard sign in credentials to sign in to the app.</p>
