@@ -87,7 +87,7 @@ export class VideoToVitalsService {
           this.organizationProductJunctionDb.save({ org_id: res[0].id, start_date: createOrganizationDto.start_date, end_date: createOrganizationDto.end_date, pilot_duration: createOrganizationDto.pilot_duration, status: res[0].status, stage: res[0].stage, product_id: res1 }))
         if (path != null) {
           this.userProfileDb.save({ application_id: res[0].application_id, org_id: res[0].id });
-          console.log("path",path);
+        
           
           await this.upload(path); this.organizationDb.findByIdandUpdate({ id: res[0].id.toString(), quries: { logo: this.urlAWSPhoto } });
           delete res[0].logo; return res
@@ -107,17 +107,17 @@ export class VideoToVitalsService {
 
   patchImageToOrganization(id:number,path:any){
     Logger.debug(`patchImageToOrganization() id:${id} filename:}`, APP);
-
-    console.log(path)
+    if (path != null){
+  
     return this.fetchOrganizationById(id).pipe(
       map( async doc=>{ await this.upload(path); this.organizationDb.findByIdandUpdate({ id: id.toString(), quries: { logo: this.urlAWSPhoto } }) })
     )
-    
+  }
+  else return []    
 
   }
 
   async upload(file) {
-    console.log(file)
     const { originalname } = file;
     const bucketS3 = 'fedo-vitals';
     await this.uploadS3(file.buffer, bucketS3, originalname);
@@ -148,8 +148,6 @@ export class VideoToVitalsService {
         })
 
         resolve(url);
-        console.log(",",data.Location);
-        
         this.urlAWSPhoto = data.Location;
       });
     });
@@ -504,9 +502,7 @@ export class VideoToVitalsService {
     Logger.debug(`updateOrganization(), ,`, APP);
 
 
-    // if (path) {
-    //   updateOrganizationDto.logo = path
-    // }
+  
     if (updateOrganizationDto.pilot_duration) {
       const tomorrow = new Date();
       const duration = updateOrganizationDto.pilot_duration
