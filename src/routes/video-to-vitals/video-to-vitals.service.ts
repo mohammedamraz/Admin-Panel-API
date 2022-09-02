@@ -48,6 +48,11 @@ export class VideoToVitalsService {
     return this.fetchOrgByUrl(createOrganizationDto.url).pipe(
       map(doc => {
         if (doc.length == 0) {
+          return this.fetchOrgByCondition(createOrganizationDto).pipe(
+            map(doc => {
+             return doc
+            }),
+            switchMap( (doc) => {
           createOrganizationDto.product_id = productlist[0];
           const tomorrow = new Date();
           const duration = createOrganizationDto.pilot_duration
@@ -72,9 +77,9 @@ export class VideoToVitalsService {
               return res
             })
           );
-          // }),
+          }),
           // switchMap(res =>  res)
-          // )
+          )
         }
         else {
           throw new ConflictException('domain already taken')
@@ -283,9 +288,9 @@ export class VideoToVitalsService {
 
   fetchOrgByNameEmailAndMobile(orgDTO: OrgDTO) {
     Logger.debug(`fetchOrgByNameEmailAndMobile() orgDTO:${JSON.stringify(orgDTO)} `, APP);
-    return this.organizationDb.find(orgDTO).pipe(
+    return this.organizationDb.find({ organization_name: orgDTO.organization_name, organization_email: orgDTO.organization_email, organization_mobile:orgDTO.organization_mobile}).pipe(
       map(doc => {
-        console.log("length", doc.length)
+        console.log("DOCUMENT ID LENGTH", doc.length)
         if (doc.length != 0) {
           throw new ConflictException("organization exist with organization name, email id and mobile no.")
         }
@@ -557,7 +562,7 @@ export class VideoToVitalsService {
         return this.productService.fetchProductByNewName(userDTO.product_name).pipe(
           map(product_doc => {
             delete userDTO.product_name
-            userDTO.application_id = userDTO.email.slice(0, userDTO.email.indexOf('@'));
+            // userDTO.application_id = userDTO.email.slice(0, userDTO.email.indexOf('@'));
             return [product_doc[0].id, org_doc]
           }),
           switchMap(doc => {
