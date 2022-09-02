@@ -31,7 +31,7 @@ export class VideoToVitalsController {
   //   fileFilter: imageFileFilter
   // }))
   createOrganization(@Body() createOrganizationDto: CreateOrganizationDto, @UploadedFile() file) {
-    // Logger.debug(`createOrganization() createOrganizationDto:${JSON.stringify(createOrganizationDto)} file:${JSON.stringify(file)}`, APP);
+    Logger.debug(`createOrganization() createOrganizationDto:${JSON.stringify(createOrganizationDto)} file:${JSON.stringify(file)}`, APP);
 
     // return this.videoToVitalsService.uploadFile(file?.path)
 
@@ -85,25 +85,20 @@ export class VideoToVitalsController {
     return this.videoToVitalsService.fetchOrganizationById(id);
   }
 
+  @Patch('org/logo/:id')
+  @UseInterceptors(FileInterceptor('file'))
+  patchImageToOrganization( @Param('id', ParseIntPipe) id: number,@UploadedFile() file) {
+    Logger.debug(`patchImageToOrganization() id:${id}  file:)}`, APP);
+
+    return this.videoToVitalsService.patchImageToOrganization(id, file);
+  }
+  
+
   @Patch('org/:id')
-  @UseInterceptors(FileInterceptor('file', {
-    storage: diskStorage({
-      _destination:STATIC_IMAGES,
-      // get destination() {
-      //   return this._destination;
-      // },
-      // set destination(value) {
-      //   this._destination = value;
-      // },
-      filename: editFileName
-    }),
-    fileFilter: imageFileFilter
-  }))
+  updateOrganization(@Param('id') id: string, @Body() updateOrganizationDto: UpdateOrganizationDto) {
+    Logger.debug(`updateOrganization() id:${id}  `, APP);
 
-  async updateOrganization(@Param('id') id: string, @Body() updateOrganizationDto: UpdateOrganizationDto, @UploadedFile() file) {
-    Logger.debug(`updateOrganization() id:${id} file:${file} `, APP);
-
-    return this.videoToVitalsService.updateOrganization(id, updateOrganizationDto, file?.path);
+    return this.videoToVitalsService.updateOrganization(id, updateOrganizationDto);
   }
 
   @Delete('org/logo/:id')
@@ -163,7 +158,7 @@ export class VideoToVitalsController {
   addUser(@Body() userDTO: UserDTO) {
     Logger.debug(`addUser() addUserDTO:${JSON.stringify(userDTO)} `, APP);
 
-    return this.videoToVitalsService.addUser(userDTO)
+  return this.videoToVitalsService.addUser(userDTO)
   }
 
   @Get('users/:email/:mobile')

@@ -7,13 +7,23 @@ export const FEDO_USER_POOL_NAME = process.env.FEDO_USER_POOL_NAME || 'HSA-SALES
 export const FEDO_APP_CLIENT_NAME = process.env.FEDO_APP_CLIENT_NAME || 'HSA-SALESADMIN-AppClient';
 export const FEDO_APP_CLIENT_ID = process.env.FEDO_APP || '4iaahrh33ojt8sh0vq96toi5em';
 
+export const FEDO_USER_ADMIN_PANEL_POOL_NAME = process.env.FEDO_USER_ADMIN_PANEL_POOL_NAME || 'HSA-Admin-Panel';
+
+
+
+export const FEDO_APP_ADMIN_PANEL_CLIENT_NAME = process.env.FEDO_APP_ADMIN_PANEL_CLIENT_NAME || 'HSA-AdminPanel-AppClient';
+
+export const FEDO_APP_ADMIN_PANEL_CLIENT_ID = process.env.FEDO_APP_ADMIN_PANEL_CLIENT_ID || '18imhpa3fbpbj66n4r1vovkftt';
+
+
+
 export const HOST = process.env.FEDO_HSA_SALES_SERVER_HOST || '0.0.0.0';
 export const PORT = parseInt(process.env.FEDO_HSA_SALES_SERVER_PORT, 10) || 36000;
 export const APP_VERSION = packageJson.version;
 export const DEBUG_LEVEL = process.env.FEDO_HSA_SALES_SERVER_LOG_LEVEL || 'debug';
 export const APP_DOCUMENTATION = process.env.FEDO_HSA_SERVER_DOCUMENTATION || 'https://fedo.health/hsa/docs';
-// export const POSTGRES_DB_URI_DB_URL = process.env.FEDO_HSA_SALES_SERVER_DB_URI || 'postgresql://postgres:ban0Malik@localhost:5432/hsa_sales';
-export const POSTGRES_DB_URI_DB_URL = process.env.FEDO_HSA_SALES_SERVER_DB_URI || 'postgresql://postgres:akash@localhost:5432/hsa-sales';
+export const POSTGRES_DB_URI_DB_URL = process.env.FEDO_HSA_SALES_SERVER_DB_URI || 'postgresql://postgres:ban0Malik@localhost:5432/hsa_sales';
+// export const POSTGRES_DB_URI_DB_URL = process.env.FEDO_HSA_SALES_SERVER_DB_URI || 'postgresql://postgres:akash@localhost:5432/hsa-sales';
 
 export const AMRAZ_AUTHTOKEN = process.env.FEDO_HSA_SALES_TWILIO_AUTHTOKEN || "a8eeaa76be56a78e5a8acfb19d1856d8";
 

@@ -7,7 +7,7 @@ import { PasswordResetDTO } from '../admin/dto/create-admin.dto';
 import { CreateProductDto } from '../product/dto/create-product.dto';
 import { ProductService } from '../product/product.service';
 import { UserProductJunctionService } from '../user-product-junction/user-product-junction.service';
-import { AWS_ACCESS_KEY_ID, AWS_COGNITO_USER_CREATION_URL_SIT, AWS_SECRET_ACCESS_KEY, FEDO_APP, PUBLIC_KEY } from 'src/constants';
+import { AWS_ACCESS_KEY_ID, AWS_COGNITO_USER_CREATION_URL_SIT, AWS_SECRET_ACCESS_KEY, FEDO_APP, FEDO_USER_ADMIN_PANEL_POOL_NAME, PUBLIC_KEY } from 'src/constants';
 import { HttpService } from '@nestjs/axios';
 import { AxiosResponse } from 'axios';
 import { ConfirmForgotPasswordDTO, ForgotPasswordDTO } from '../admin/dto/login.dto';
@@ -59,12 +59,13 @@ export class VideoToVitalsService {
           delete createOrganizationDto.logo;
           return this.organizationDb.save(createOrganizationDto).pipe(
             map(res => {
+              var encryption="org_id="+res[0].id;
               this.sendEmailService.sendEmailOnCreateOrg(
                 {
                   "email": createOrganizationDto.organization_email,
                   "organisation_admin_name": createOrganizationDto.admin_name,
                   "fedo_app": "FEDO VITALS",
-                  "url": createOrganizationDto.url+"?org_id="+res[0].id,
+                  "url": createOrganizationDto.url+"?"+this.encryptPassword(encryption),
                   "pilot_duration": (createOrganizationDto.pilot_duration),
                   "application_id": (res[0].application_id)
                 }
@@ -86,6 +87,8 @@ export class VideoToVitalsService {
           this.organizationProductJunctionDb.save({ org_id: res[0].id, start_date: createOrganizationDto.start_date, end_date: createOrganizationDto.end_date, pilot_duration: createOrganizationDto.pilot_duration, status: res[0].status, stage: res[0].stage, product_id: res1 }))
         if (path != null) {
           this.userProfileDb.save({ application_id: res[0].application_id, org_id: res[0].id });
+          console.log("path",path);
+          
           await this.upload(path); this.organizationDb.findByIdandUpdate({ id: res[0].id.toString(), quries: { logo: this.urlAWSPhoto } });
           delete res[0].logo; return res
         }
@@ -101,7 +104,20 @@ export class VideoToVitalsService {
     )
   }
 
+
+  patchImageToOrganization(id:number,path:any){
+    Logger.debug(`patchImageToOrganization() id:${id} filename:}`, APP);
+
+    console.log(path)
+    return this.fetchOrganizationById(id).pipe(
+      map( async doc=>{ await this.upload(path); this.organizationDb.findByIdandUpdate({ id: id.toString(), quries: { logo: this.urlAWSPhoto } }) })
+    )
+    
+
+  }
+
   async upload(file) {
+    console.log(file)
     const { originalname } = file;
     const bucketS3 = 'fedo-vitals';
     await this.uploadS3(file.buffer, bucketS3, originalname);
@@ -132,6 +148,8 @@ export class VideoToVitalsService {
         })
 
         resolve(url);
+        console.log(",",data.Location);
+        
         this.urlAWSPhoto = data.Location;
       });
     });
@@ -345,6 +363,18 @@ export class VideoToVitalsService {
     )
   }
 
+  fetchOrgByNameForUserCreation(organization_name: string) {
+    Logger.debug(`fetchOrgByNameForUserCreation() orgDTO:${JSON.stringify(organization_name)} `, APP);
+    return this.organizationDb.find({ organization_name: organization_name }).pipe(
+      map(doc => {
+        if (doc.length == 0) {
+          throw new ConflictException(`organization not found`)
+        }
+        else { return doc }
+      }),
+    )
+  }
+
   fetchOrgByEmail(orgDTO: OrgDTO) {
     Logger.debug(`fetchOrgByEmailAndMobile() orgDTO:${JSON.stringify(orgDTO)} `, APP);
     return this.organizationDb.find({ organization_email: orgDTO.organization_email }).pipe(
@@ -470,13 +500,13 @@ export class VideoToVitalsService {
     )
   }
 
-  updateOrganization(id: string, updateOrganizationDto: UpdateOrganizationDto, path: string) {
-    Logger.debug(`updateOrganization(), ${path},`, APP);
+  updateOrganization(id: string, updateOrganizationDto: UpdateOrganizationDto) {
+    Logger.debug(`updateOrganization(), ,`, APP);
 
 
-    if (path) {
-      updateOrganizationDto.logo = path
-    }
+    // if (path) {
+    //   updateOrganizationDto.logo = path
+    // }
     if (updateOrganizationDto.pilot_duration) {
       const tomorrow = new Date();
       const duration = updateOrganizationDto.pilot_duration
@@ -548,7 +578,7 @@ export class VideoToVitalsService {
   addUser(userDTO: UserDTO) {
     Logger.debug(`addUser() addUserDTO:${JSON.stringify(userDTO)} `, APP);
 
-    return this.fetchOrgByName(userDTO.organization_name).pipe(
+    return this.fetchOrgByNameForUserCreation(userDTO.organization_name).pipe(
       map(org_doc => {
         return org_doc
       }),
@@ -568,13 +598,14 @@ export class VideoToVitalsService {
               }),
 
               switchMap(doc => {
+                var encryption="user_id="+doc[0][0]['id'];
                 this.sendEmailService.sendEmailOnCreateOrgUser(
 
                   {
                     "email": userDTO.email,
                     "organisation_admin_name": doc[1][1][0].admin_name,
                     "fedo_app": "FEDO VITALS",
-                    "url": doc[1][1][0].url+"?user_id="+doc[0][0]['id'],
+                    "url": doc[1][1][0].url+"?"+this.encryptPassword(encryption),
                     "name": userDTO.user_name,
                     "pilot_duration": doc[1][1][0].pilot_duration,
                     "organisation_admin_email": doc[1][1][0].organization_email,
@@ -787,7 +818,7 @@ export class VideoToVitalsService {
     Logger.debug(`loginUserByEmail() loginUserDTO:${JSON.stringify(loginUserDTO)} `, APP);
 
 
-    loginUserDTO.fedoApp = FEDO_APP;
+    loginUserDTO.fedoApp = FEDO_USER_ADMIN_PANEL_POOL_NAME;
     return this.checkEmailIsPresentInUsersOrOrganisation(loginUserDTO).pipe((map(doc => { this.user_data = doc })),
       switchMap(doc => {
         return this.http
@@ -872,7 +903,7 @@ export class VideoToVitalsService {
       )}]`,
     );
 
-    forgotPasswordDTO.fedoApp = FEDO_APP;
+    forgotPasswordDTO.fedoApp = FEDO_USER_ADMIN_PANEL_POOL_NAME;
     const passcode = this.encryptPassword(forgotPasswordDTO);
     return this.http
       .post(`${AWS_COGNITO_USER_CREATION_URL_SIT}/password/otp/`, { passcode: passcode })
@@ -891,7 +922,7 @@ export class VideoToVitalsService {
       )}]`,
     );
 
-    confirmForgotPasswordDTO.fedoApp = FEDO_APP;
+    confirmForgotPasswordDTO.fedoApp = FEDO_USER_ADMIN_PANEL_POOL_NAME;
     const passcode = this.encryptPassword(confirmForgotPasswordDTO);
     return this.http
       .patch(
@@ -939,7 +970,7 @@ export class VideoToVitalsService {
   registerUserbyEmail(RegisterUserdto: RegisterUserDTO) {
     Logger.debug(`registerUserbyEmail(), RegisterUserdto:[${JSON.stringify(RegisterUserdto,)}] `);
 
-    RegisterUserdto.fedoApp = FEDO_APP
+    RegisterUserdto.fedoApp = FEDO_USER_ADMIN_PANEL_POOL_NAME
     return this.http.post(`${AWS_COGNITO_USER_CREATION_URL_SIT}/`, { passcode: this.encryptPassword(RegisterUserdto) }).pipe(
       map(doc => {
       }),
@@ -950,7 +981,7 @@ export class VideoToVitalsService {
   confirmSignupUserByEmail(RegisterUserdto: RegisterUserDTO) {
     Logger.debug(`confirmSignupUserByEmail(), RegisterUserdto: keys ${[JSON.stringify(Object.keys(RegisterUserdto))]} values ${JSON.stringify(Object.values(RegisterUserdto).length)} `, APP);
 
-    RegisterUserdto.fedoApp = FEDO_APP
+    RegisterUserdto.fedoApp = FEDO_USER_ADMIN_PANEL_POOL_NAME
     const passcode = this.encryptPassword(RegisterUserdto)
     return this.http.post(`${AWS_COGNITO_USER_CREATION_URL_SIT}/signupcode`, { passcode: passcode }).pipe(map(res => []), catchError(err => {
       return this.onAWSErrorResponse(err)
