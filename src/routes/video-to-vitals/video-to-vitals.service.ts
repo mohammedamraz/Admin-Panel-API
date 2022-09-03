@@ -588,7 +588,7 @@ export class VideoToVitalsService {
         return this.productService.fetchProductByNewName(userDTO.product_name).pipe(
           map(product_doc => {
             delete userDTO.product_name
-            // userDTO.application_id = userDTO.email.slice(0, userDTO.email.indexOf('@'));
+            userDTO.application_id = userDTO.mobile.slice(3, 14);
             return [product_doc[0].id, org_doc]
           }),
           switchMap(doc => {
@@ -819,7 +819,7 @@ export class VideoToVitalsService {
     Logger.debug(`loginUserByEmail() loginUserDTO:${JSON.stringify(loginUserDTO)} `, APP);
 
 
-    loginUserDTO.fedoApp = FEDO_USER_ADMIN_PANEL_POOL_NAME;
+    loginUserDTO.fedoApp = FEDO_APP;
     return this.checkEmailIsPresentInUsersOrOrganisation(loginUserDTO).pipe((map(doc => { this.user_data = doc })),
       switchMap(doc => {
         return this.http
@@ -904,7 +904,7 @@ export class VideoToVitalsService {
       )}]`,
     );
 
-    forgotPasswordDTO.fedoApp = FEDO_USER_ADMIN_PANEL_POOL_NAME;
+    forgotPasswordDTO.fedoApp = FEDO_APP;
     const passcode = this.encryptPassword(forgotPasswordDTO);
     return this.http
       .post(`${AWS_COGNITO_USER_CREATION_URL_SIT}/password/otp/`, { passcode: passcode })
@@ -923,7 +923,7 @@ export class VideoToVitalsService {
       )}]`,
     );
 
-    confirmForgotPasswordDTO.fedoApp = FEDO_USER_ADMIN_PANEL_POOL_NAME;
+    confirmForgotPasswordDTO.fedoApp = FEDO_APP;
     const passcode = this.encryptPassword(confirmForgotPasswordDTO);
     return this.http
       .patch(
@@ -971,7 +971,7 @@ export class VideoToVitalsService {
   registerUserbyEmail(RegisterUserdto: RegisterUserDTO) {
     Logger.debug(`registerUserbyEmail(), RegisterUserdto:[${JSON.stringify(RegisterUserdto,)}] `);
 
-    RegisterUserdto.fedoApp = FEDO_USER_ADMIN_PANEL_POOL_NAME
+    RegisterUserdto.fedoApp = FEDO_APP
     return this.http.post(`${AWS_COGNITO_USER_CREATION_URL_SIT}/`, { passcode: this.encryptPassword(RegisterUserdto) }).pipe(
       map(doc => {
       }),
@@ -982,7 +982,7 @@ export class VideoToVitalsService {
   confirmSignupUserByEmail(RegisterUserdto: RegisterUserDTO) {
     Logger.debug(`confirmSignupUserByEmail(), RegisterUserdto: keys ${[JSON.stringify(Object.keys(RegisterUserdto))]} values ${JSON.stringify(Object.values(RegisterUserdto).length)} `, APP);
 
-    RegisterUserdto.fedoApp = FEDO_USER_ADMIN_PANEL_POOL_NAME
+    RegisterUserdto.fedoApp = FEDO_APP
     const passcode = this.encryptPassword(RegisterUserdto)
     return this.http.post(`${AWS_COGNITO_USER_CREATION_URL_SIT}/signupcode`, { passcode: passcode }).pipe(map(res => []), catchError(err => {
       return this.onAWSErrorResponse(err)

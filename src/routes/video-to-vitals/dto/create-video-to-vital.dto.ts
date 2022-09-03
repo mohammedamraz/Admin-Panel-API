@@ -123,6 +123,7 @@ export class UserDTO {
     product_id:number;
     third_party_org_name:string;
     password:string;
+    application_id?:string;
     org_id:number;
 }
 
