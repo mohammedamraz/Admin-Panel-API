@@ -64,13 +64,13 @@ export class VideoToVitalsService {
           delete createOrganizationDto.logo;
           return this.organizationDb.save(createOrganizationDto).pipe(
             map(res => {
-              var encryption="org_id="+res[0].id;
+              var encryption={org_id:res[0].id};
               this.sendEmailService.sendEmailOnCreateOrg(
                 {
                   "email": createOrganizationDto.organization_email,
                   "organisation_admin_name": createOrganizationDto.admin_name,
                   "fedo_app": "FEDO VITALS",
-                  "url": createOrganizationDto.url+"?"+this.encryptPassword(encryption),
+                  "url": createOrganizationDto.url+"?"+encodeURIComponent(this.encryptPassword(encryption)),
                   "pilot_duration": (createOrganizationDto.pilot_duration),
                   "application_id": (res[0].application_id)
                 }
@@ -522,6 +522,22 @@ export class VideoToVitalsService {
       }))
   };
 
+  changeRegisterStatusOnceConfirmed(id: number) {
+    Logger.debug(`changeRegisterStatusOnceConfirmed() id:${id} `, APP);
+
+    return this.organizationDb.find({ id: id, is_deleted: false }).pipe(
+      map(doc => {
+        if (doc.length == 0) {
+          throw new NotFoundException('organization not found')
+        }
+        else {
+          return this.organizationDb.findByIdandUpdate({id:id.toString(),quries:{is_register:true}})
+        }
+      }),
+
+    )
+  }
+
   deleteLogo(id: number) {
     Logger.debug(`deleteLogo(),id:${id},`, APP);
 
@@ -592,6 +608,8 @@ export class VideoToVitalsService {
                 return [product_doc[0].id, org_doc]
               }),
               switchMap(doc => {
+                console.log("deszfsd");
+                
                 userDTO.product_id = Number(doc[0])
                 return this.userDb.save(userDTO).pipe(
                   map(userdoc => {
@@ -599,14 +617,15 @@ export class VideoToVitalsService {
                   }),
     
                   switchMap(doc => {
-                    var encryption="user_id="+doc[0][0]['id'];
+                    var encryption={user_id: doc[0][0]['id']};
+                    
                     this.sendEmailService.sendEmailOnCreateOrgUser(
     
                       {
                         "email": userDTO.email,
                         "organisation_admin_name": doc[1][1][0].admin_name,
                         "fedo_app": "FEDO VITALS",
-                        "url": doc[1][1][0].url+"?"+this.encryptPassword(encryption),
+                        "url": doc[1][1][0].url+"?"+encodeURIComponent(this.encryptPassword(JSON.stringify(encryption))),
                         "name": userDTO.user_name,
                         "pilot_duration": doc[1][1][0].pilot_duration,
                         "organisation_admin_email": doc[1][1][0].organization_email,
@@ -1011,7 +1030,6 @@ export class VideoToVitalsService {
 
     let key_public = new NodeRSA(PUBLIC_KEY)
     var encryptedString = key_public.encrypt(password, 'base64')
-
     return encryptedString
 
   }

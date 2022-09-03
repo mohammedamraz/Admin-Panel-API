@@ -99,6 +99,14 @@ export class VideoToVitalsController {
     return this.videoToVitalsService.updateOrganization(id, updateOrganizationDto);
   }
 
+  @Patch('org/register/status/:id')
+  changeRegisterStatusOnceConfirmed(@Param('id') id: number) {
+    Logger.debug(`updateOrganization() id:${id}  `, APP);
+
+    return this.videoToVitalsService.changeRegisterStatusOnceConfirmed(id);
+  }
+
+
   @Delete('org/logo/:id')
   deleteLogo(@Param('id', ParseIntPipe) id: number) {
     return this.videoToVitalsService.deleteLogo(id);
