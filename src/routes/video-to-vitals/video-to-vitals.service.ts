@@ -361,7 +361,7 @@ export class VideoToVitalsService {
     return this.organizationDb.find({ organization_name: organization_name }).pipe(
       map(doc => {
         if (doc.length != 0) {
-          throw new ConflictException(`organization exist with ${organization_name}`)
+          throw new ConflictException(`organization exist with organization_name`)
         }
         else { return doc }
       }),
@@ -369,11 +369,11 @@ export class VideoToVitalsService {
   }
 
   fetchOrgByNameForUserCreation(organization_name: string) {
-    Logger.debug(`fetchOrgByNameForUserCreation() orgDTO:${JSON.stringify(organization_name)} `, APP);
+    Logger.debug(`fetchOrgByNameForUserCreation() orgDTO:${organization_name} `, APP);
     return this.organizationDb.find({ organization_name: organization_name }).pipe(
       map(doc => {
         if (doc.length == 0) {
-          throw new ConflictException(`organization not found`)
+          throw new NotFoundException(`organization not found`)
         }
         else { return doc }
       }),
@@ -592,7 +592,6 @@ export class VideoToVitalsService {
         return this.productService.fetchProductByNewName(userDTO.product_name).pipe(
           map(product_doc => {
             delete userDTO.product_name
-            // userDTO.application_id = userDTO.email.slice(0, userDTO.email.indexOf('@'));
             return [product_doc[0].id, org_doc]
           }),
           switchMap(doc => {
@@ -614,7 +613,6 @@ export class VideoToVitalsService {
                     "name": userDTO.user_name,
                     "pilot_duration": doc[1][1][0].pilot_duration,
                     "organisation_admin_email": doc[1][1][0].organization_email,
-                    "application_id": doc[1][1][0].application_id
                   }
                 )
                 return doc[0]
