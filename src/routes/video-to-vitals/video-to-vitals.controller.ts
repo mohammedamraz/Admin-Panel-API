@@ -19,11 +19,9 @@ export class VideoToVitalsController {
   //   storage: diskStorage({
   //     _destination: STATIC_IMAGES,
   //     // get destination() {
-  //     //   console.log("DESTINATION",this._destination )
   //     //   return this._destination;
   //     // },
   //     // set destination(value) {
-  //     //   console.log("value",value)
   //     //   this._destination = value;
   //     // },
   //     filename: editFileName

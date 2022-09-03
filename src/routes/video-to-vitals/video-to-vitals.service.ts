@@ -92,7 +92,7 @@ export class VideoToVitalsService {
           this.organizationProductJunctionDb.save({ org_id: res[0].id, start_date: createOrganizationDto.start_date, end_date: createOrganizationDto.end_date, pilot_duration: createOrganizationDto.pilot_duration, status: res[0].status, stage: res[0].stage, product_id: res1 }))
         if (path != null) {
           this.userProfileDb.save({ application_id: res[0].application_id, org_id: res[0].id });
-          console.log("path",path);
+        
           
           await this.upload(path); this.organizationDb.findByIdandUpdate({ id: res[0].id.toString(), quries: { logo: this.urlAWSPhoto } });
           delete res[0].logo; return res
@@ -112,17 +112,17 @@ export class VideoToVitalsService {
 
   patchImageToOrganization(id:number,path:any){
     Logger.debug(`patchImageToOrganization() id:${id} filename:}`, APP);
-
-    console.log(path)
+    if (path != null){
+  
     return this.fetchOrganizationById(id).pipe(
       map( async doc=>{ await this.upload(path); this.organizationDb.findByIdandUpdate({ id: id.toString(), quries: { logo: this.urlAWSPhoto } }) })
     )
-    
+  }
+  else return []    
 
   }
 
   async upload(file) {
-    console.log(file)
     const { originalname } = file;
     const bucketS3 = 'fedo-vitals';
     await this.uploadS3(file.buffer, bucketS3, originalname);
@@ -153,8 +153,6 @@ export class VideoToVitalsService {
         })
 
         resolve(url);
-        console.log(",",data.Location);
-        
         this.urlAWSPhoto = data.Location;
       });
     });
@@ -308,7 +306,6 @@ export class VideoToVitalsService {
     Logger.debug(`fetchOrgByNameEmailAndMobile() orgDTO:${JSON.stringify(orgDTO)} `, APP);
     return this.organizationDb.find({ organization_name: orgDTO.organization_name, organization_email: orgDTO.organization_email, organization_mobile:orgDTO.organization_mobile}).pipe(
       map(doc => {
-        console.log("DOCUMENT ID LENGTH", doc.length)
         if (doc.length != 0) {
           throw new ConflictException("organization exist with organization name, email id and mobile no.")
         }
@@ -321,7 +318,6 @@ export class VideoToVitalsService {
     Logger.debug(`fetchOrgByNameEmail() orgDTO:${JSON.stringify(orgDTO)} `, APP);
     return this.organizationDb.find({ organization_name: orgDTO.organization_name, organization_email: orgDTO.organization_email }).pipe(
       map(doc => {
-        console.log("length", doc.length)
         if (doc.length != 0) {
           throw new ConflictException("organization exist with organization name, email id ")
         }
@@ -347,7 +343,6 @@ export class VideoToVitalsService {
     Logger.debug(`fetchOrgByNameMobile() orgDTO:${JSON.stringify(orgDTO)} `, APP);
     return this.organizationDb.find({ organization_name: orgDTO.organization_name, organization_mobile: orgDTO.organization_mobile }).pipe(
       map(doc => {
-        console.log("length", doc.length)
         if (doc.length != 0) {
           throw new ConflictException("organization exist with organization name, mobile no. ")
         }
@@ -509,9 +504,7 @@ export class VideoToVitalsService {
     Logger.debug(`updateOrganization(), ,`, APP);
 
 
-    // if (path) {
-    //   updateOrganizationDto.logo = path
-    // }
+  
     if (updateOrganizationDto.pilot_duration) {
       const tomorrow = new Date();
       const duration = updateOrganizationDto.pilot_duration
@@ -583,57 +576,65 @@ export class VideoToVitalsService {
   addUser(userDTO: UserDTO) {
     Logger.debug(`addUser() addUserDTO:${JSON.stringify(userDTO)} `, APP);
 
-    return this.fetchOrgByNameForUserCreation(userDTO.organization_name).pipe(
-      map(org_doc => {
-        return org_doc
-      }),
-      switchMap(org_doc => {
-        userDTO["org_id"] = org_doc[0].id
-        return this.productService.fetchProductByNewName(userDTO.product_name).pipe(
-          map(product_doc => {
-            delete userDTO.product_name
-            return [product_doc[0].id, org_doc]
+    return this.fetchUserByCondition(userDTO).pipe(
+      map(user_doc=>user_doc),
+      switchMap(user_doc=>{
+         return  this.fetchOrgByNameForUserCreation(userDTO.organization_name).pipe(
+          map(org_doc => {
+            return org_doc
           }),
-          switchMap(doc => {
-            userDTO.product_id = Number(doc[0])
-            return this.userDb.save(userDTO).pipe(
-              map(userdoc => {
-                return [userdoc, doc]
+          switchMap(org_doc => {
+            userDTO["org_id"] = org_doc[0].id
+            return this.productService.fetchProductByNewName(userDTO.product_name).pipe(
+              map(product_doc => {
+                delete userDTO.product_name
+                userDTO.application_id = userDTO.mobile.slice(3, 14);
+                return [product_doc[0].id, org_doc]
               }),
-
               switchMap(doc => {
-                var encryption="user_id="+doc[0][0]['id'];
-                this.sendEmailService.sendEmailOnCreateOrgUser(
-
-                  {
-                    "email": userDTO.email,
-                    "organisation_admin_name": doc[1][1][0].admin_name,
-                    "fedo_app": "FEDO VITALS",
-                    "url": doc[1][1][0].url+"?"+this.encryptPassword(encryption),
-                    "name": userDTO.user_name,
-                    "pilot_duration": doc[1][1][0].pilot_duration,
-                    "organisation_admin_email": doc[1][1][0].organization_email,
-                  }
+                userDTO.product_id = Number(doc[0])
+                return this.userDb.save(userDTO).pipe(
+                  map(userdoc => {
+                    return [userdoc, doc]
+                  }),
+    
+                  switchMap(doc => {
+                    var encryption="user_id="+doc[0][0]['id'];
+                    this.sendEmailService.sendEmailOnCreateOrgUser(
+    
+                      {
+                        "email": userDTO.email,
+                        "organisation_admin_name": doc[1][1][0].admin_name,
+                        "fedo_app": "FEDO VITALS",
+                        "url": doc[1][1][0].url+"?"+this.encryptPassword(encryption),
+                        "name": userDTO.user_name,
+                        "pilot_duration": doc[1][1][0].pilot_duration,
+                        "organisation_admin_email": doc[1][1][0].organization_email,
+                        "application_id":userDTO.application_id
+                      }
+                    )
+                    return doc[0]
+                  }),
+    
                 )
-                return doc[0]
+    
+    
               }),
-
+              map(doc => {
+                doc["id"]
+                this.userProductJunctionService.createUserProductJunction({ user_id: doc["id"], org_id: userDTO["org_id"], product_id: userDTO.product_id, total_tests: 1 });
+                this.userProfileDb.save({ application_id: doc['application_id'], user_id: doc['id'], org_id: doc['org_id'], name: doc['user_name'], is_editable: true })
+                return doc;
+              })
+    
             )
-
-
           }),
-          map(doc => {
-            console.log("DOC", doc["id"])
-            doc["id"]
-            this.userProductJunctionService.createUserProductJunction({ user_id: doc["id"], org_id: userDTO["org_id"], product_id: userDTO.product_id, total_tests: 1 });
-            this.userProfileDb.save({ application_id: doc['application_id'], user_id: doc['id'], org_id: doc['org_id'], name: doc['user_name'], is_editable: true })
-            return doc;
-          })
-
+    
         )
-      }),
-
+      })
     )
+    
+   
 
   }
 
@@ -671,7 +672,6 @@ export class VideoToVitalsService {
         return lastValueFrom(this.userProductJunctionService.fetchUserProductJunctionDataByUserIdAndProductId(userData.id, userData.product_id))
           .then(doc => {
             userData['total_tests'] = doc[0].total_tests
-            console.log("DOC", doc)
             temp.push(userData);
             return userData
           })
@@ -821,7 +821,7 @@ export class VideoToVitalsService {
     Logger.debug(`loginUserByEmail() loginUserDTO:${JSON.stringify(loginUserDTO)} `, APP);
 
 
-    loginUserDTO.fedoApp = FEDO_USER_ADMIN_PANEL_POOL_NAME;
+    loginUserDTO.fedoApp = FEDO_APP;
     return this.checkEmailIsPresentInUsersOrOrganisation(loginUserDTO).pipe((map(doc => { this.user_data = doc })),
       switchMap(doc => {
         return this.http
@@ -906,7 +906,7 @@ export class VideoToVitalsService {
       )}]`,
     );
 
-    forgotPasswordDTO.fedoApp = FEDO_USER_ADMIN_PANEL_POOL_NAME;
+    forgotPasswordDTO.fedoApp = FEDO_APP;
     const passcode = this.encryptPassword(forgotPasswordDTO);
     return this.http
       .post(`${AWS_COGNITO_USER_CREATION_URL_SIT}/password/otp/`, { passcode: passcode })
@@ -925,7 +925,7 @@ export class VideoToVitalsService {
       )}]`,
     );
 
-    confirmForgotPasswordDTO.fedoApp = FEDO_USER_ADMIN_PANEL_POOL_NAME;
+    confirmForgotPasswordDTO.fedoApp = FEDO_APP;
     const passcode = this.encryptPassword(confirmForgotPasswordDTO);
     return this.http
       .patch(
@@ -973,7 +973,7 @@ export class VideoToVitalsService {
   registerUserbyEmail(RegisterUserdto: RegisterUserDTO) {
     Logger.debug(`registerUserbyEmail(), RegisterUserdto:[${JSON.stringify(RegisterUserdto,)}] `);
 
-    RegisterUserdto.fedoApp = FEDO_USER_ADMIN_PANEL_POOL_NAME
+    RegisterUserdto.fedoApp = FEDO_APP
     return this.http.post(`${AWS_COGNITO_USER_CREATION_URL_SIT}/`, { passcode: this.encryptPassword(RegisterUserdto) }).pipe(
       map(doc => {
       }),
@@ -984,7 +984,7 @@ export class VideoToVitalsService {
   confirmSignupUserByEmail(RegisterUserdto: RegisterUserDTO) {
     Logger.debug(`confirmSignupUserByEmail(), RegisterUserdto: keys ${[JSON.stringify(Object.keys(RegisterUserdto))]} values ${JSON.stringify(Object.values(RegisterUserdto).length)} `, APP);
 
-    RegisterUserdto.fedoApp = FEDO_USER_ADMIN_PANEL_POOL_NAME
+    RegisterUserdto.fedoApp = FEDO_APP
     const passcode = this.encryptPassword(RegisterUserdto)
     return this.http.post(`${AWS_COGNITO_USER_CREATION_URL_SIT}/signupcode`, { passcode: passcode }).pipe(map(res => []), catchError(err => {
       return this.onAWSErrorResponse(err)
