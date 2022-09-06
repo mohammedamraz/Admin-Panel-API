@@ -14,6 +14,8 @@ import { ConfirmForgotPasswordDTO, ForgotPasswordDTO } from '../admin/dto/login.
 import { CreateOrganizationDto, LoginUserDTO, LoginUserPasswordCheckDTO, OrgDTO, RegisterUserDTO, UpdateOrganizationDto, UpdateUserDTO, UserDTO, UserProfileDTO, VitalUserDTO } from './dto/create-video-to-vital.dto';
 import { v4 as uuidv4 } from 'uuid';
 import { S3 } from 'aws-sdk';
+import { application } from 'express';
+import { CreateUserProductJunctionDto } from '../user-product-junction/dto/create-user-product-junction.dto';
 
 const APP = 'VideoToVitalsService'
 
@@ -25,6 +27,8 @@ export class VideoToVitalsService {
     private readonly organizationDb: DatabaseService<CreateOrganizationDto>,
     @DatabaseTable('organization_product_junction')
     private readonly organizationProductJunctionDb: DatabaseService<CreateOrganizationDto>,
+    @DatabaseTable('user_product_junction')
+  private readonly userProductJunctionDb: DatabaseService<CreateUserProductJunctionDto>,
     @DatabaseTable('users')
     private readonly userDb: DatabaseService<UserDTO>,
     @DatabaseTable('user_profile_info')
@@ -812,6 +816,24 @@ export class VideoToVitalsService {
 
   }
 
+  updateUserByApplicationId(user_id: string) {
+    Logger.debug(`updateUserByApplicationId() id:${user_id} updateUserDTO:)} `, APP);
+
+    return this.userDb.find({ id: user_id }).pipe(
+      switchMap(res => {
+        if (res.length == 0) throw new NotFoundException('user not found')
+        else{
+          return this.userProductJunctionDb.find({user_id:user_id}).pipe(switchMap(doc=>{
+            console.log("doc");
+            console.log("doc",doc);
+            
+        return this.userProductJunctionDb.findandUpdate({columnName: 'user_id', columnvalue: user_id, quries: {total_tests:doc[0].total_tests+1} })
+      }))
+        }
+      }))
+
+  }
+
   checkEmailIsPresentInUsersOrOrganisation(loginUserPasswordCheckDTO: LoginUserDTO) {
     Logger.debug(`checkEmailIsPresentInUsersOrOrganisation() loginUserDTO:${JSON.stringify(LoginUserDTO)} `, APP);
 
@@ -835,6 +857,7 @@ export class VideoToVitalsService {
 
 
   user_data: any;
+  org_data:any
 
   loginUserByEmail(loginUserDTO: LoginUserDTO) {
     Logger.debug(`loginUserByEmail() loginUserDTO:${JSON.stringify(loginUserDTO)} `, APP);
@@ -859,6 +882,37 @@ export class VideoToVitalsService {
                 refreshToken: res.data.refreshToken,
                 accessToken: res.data.accessToken.jwtToken,
                 user_data: this.user_data
+              };
+            }),
+          );
+      })
+    )
+
+  }
+
+  loginOrganizationByEmail(loginUserDTO: LoginUserDTO) {
+    Logger.debug(`loginOrganizationByEmail() loginUserDTO:${JSON.stringify(loginUserDTO)} `, APP);
+
+
+    loginUserDTO.fedoApp = FEDO_APP;
+    return this.getOrganisationDetailsByEmail(loginUserDTO).pipe((map(doc => { this.org_data = doc })),
+      switchMap(doc => {
+        return this.http
+          .post(
+            `${AWS_COGNITO_USER_CREATION_URL_SIT}/token`,
+            { passcode: this.encryptPassword(loginUserDTO) },
+          )
+          .pipe(
+            catchError((err) => {
+              return this.onAWSErrorResponse(err);
+            }),
+            map((res: AxiosResponse) => {
+              if (!res.data) throw new UnauthorizedException();
+              return {
+                jwtToken: res.data.idToken.jwtToken,
+                refreshToken: res.data.refreshToken,
+                accessToken: res.data.accessToken.jwtToken,
+                user_data: this.org_data
               };
             }),
           );
@@ -901,8 +955,21 @@ export class VideoToVitalsService {
     return throwError(() => err);
   };
 
+  getOrganisationDetailsByEmail(loginUserPasswordCheckDTO: LoginUserDTO) {
+    Logger.debug(`getOrganisationDetailsByEmail() loginUserDTO:${JSON.stringify(LoginUserDTO)} `, APP);
+
+    return this.organizationDb.find({ organization_email: loginUserPasswordCheckDTO.username }).pipe(
+      map(doc => {
+        if (doc.length == 0) throw new NotFoundException('organization with this email is not found')
+        else return doc
+
+      })
+    )
+  }
+
+
   getOrganisationDetailsOfUserByEmail(loginUserPasswordCheckDTO: LoginUserPasswordCheckDTO) {
-    Logger.debug(`findUserByEmail() loginUserDTO:${JSON.stringify(LoginUserDTO)} `, APP);
+    Logger.debug(`getOrganisationDetailsOfUserByEmail() loginUserDTO:${JSON.stringify(LoginUserDTO)} `, APP);
 
     return this.userDb.find({ email: loginUserPasswordCheckDTO.email }).pipe(
       map(doc => {

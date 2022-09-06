@@ -97,8 +97,9 @@ export class ProfileInfoService {
     return this.userProfileDb.find({ application_id: createProfileInfoDTO.application_id }).pipe(
         switchMap(res => {
             if (res.length == 0) throw new NotFoundException('profile info not found')
-            else  return this.userProfileDb.findandUpdate({ columnName: 'application_id', columnvalue: createProfileInfoDTO.application_id, quries: {total_tests:Number(res[0].total_tests)+1} })
-        }))
+            else{   this.userProfileDb.findandUpdate({ columnName: 'application_id', columnvalue: createProfileInfoDTO.application_id, quries: {total_tests:Number(res[0].total_tests)+1} });
+            return this.videoToVitalsService.updateUserByApplicationId(res[0].user_id)
+       } }))
 
     }
 

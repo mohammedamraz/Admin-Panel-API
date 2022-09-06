@@ -7,6 +7,7 @@ import { STATIC_IMAGES, STATIC_IMAGES_PROFILE } from 'src/constants';
 import { editFileName, imageFileFilter } from 'src/constants/helper';
 import { PasswordResetDTO } from '../admin/dto/create-admin.dto';
 import { ConfirmForgotPasswordDTO, ForgotPasswordDTO } from '../admin/dto/login.dto';
+import { LoggingInterceptor } from 'src/interceptors/interceptor';
 
 const APP = "VideoToVitalsController"
 @Controller()
@@ -217,6 +218,7 @@ export class VideoToVitalsController {
   }
 
   @Post('signup/user')
+  // @UseInterceptors(LoggingInterceptor)
   registerUserbyEmail(@Body() RegisterUserdto: RegisterUserDTO) {
     Logger.debug(`registerUserbyEmail()  loginUserDTO:${JSON.stringify(RegisterUserdto)} `, APP);
 
@@ -224,6 +226,7 @@ export class VideoToVitalsController {
   }
 
   @Post('confirm/signup')
+  // @UseInterceptors(LoggingInterceptor)
   confirmSignupUserByEmail(@Body() registerUserdto: RegisterUserDTO) {
     Logger.debug(`confirmSignupUserByEmail() [${JSON.stringify(Object.keys(registerUserdto))} values ${JSON.stringify(Object.values(registerUserdto).length)}]`, APP);
 
@@ -246,10 +249,19 @@ export class VideoToVitalsController {
 
 
   @Post('login/user')
+  // @UseInterceptors(LoggingInterceptor)
   loginUserByEmail(@Body() loginUserDTO: LoginUserDTO) {
     Logger.debug(`loginUserByEmail()  loginUserDTO:${JSON.stringify(loginUserDTO)} `, APP);
 
     return this.videoToVitalsService.loginUserByEmail(loginUserDTO)
+  }
+
+  @Post('login/org')
+  // @UseInterceptors(LoggingInterceptor)
+  loginOrganizationByEmail(@Body() loginUserDTO: LoginUserDTO) {
+    Logger.debug(`loginOrganizationByEmail()  loginUserDTO:${JSON.stringify(loginUserDTO)} `, APP);
+
+    return this.videoToVitalsService.loginOrganizationByEmail(loginUserDTO)
   }
 
   @Get('user/details')
