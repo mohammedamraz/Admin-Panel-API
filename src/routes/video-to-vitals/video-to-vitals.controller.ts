@@ -8,11 +8,16 @@ import { editFileName, imageFileFilter } from 'src/constants/helper';
 import { PasswordResetDTO } from '../admin/dto/create-admin.dto';
 import { ConfirmForgotPasswordDTO, ForgotPasswordDTO } from '../admin/dto/login.dto';
 import { LoggingInterceptor } from 'src/interceptors/interceptor';
+import { OrganizationService } from './organization.service';
+
 
 const APP = "VideoToVitalsController"
 @Controller()
 export class VideoToVitalsController {
-  constructor(private readonly videoToVitalsService: VideoToVitalsService) { }
+  constructor(
+    private readonly videoToVitalsService: VideoToVitalsService,
+    private readonly organizationService: OrganizationService,
+    ) { }
 
   @Post('org')
   @UseInterceptors(FileInterceptor('file'))
@@ -34,54 +39,54 @@ export class VideoToVitalsController {
 
     // return this.videoToVitalsService.uploadFile(file?.path)
 
-    return this.videoToVitalsService.createOrganization(createOrganizationDto, file);
+    return this.organizationService.createOrganization(createOrganizationDto, file);
   }
 
   @Get('org/count')
   fetchOrgCount() {
     Logger.debug(`fetchOrgByCount()`, APP);
 
-    return this.videoToVitalsService.fetchOrgCount()
+    return this.organizationService.fetchOrgCount()
   }
 
   @Get('org')
   fetchAllOrganization() {
     Logger.debug(`fetchAllOrganization()`, APP);
 
-    return this.videoToVitalsService.fetchAllOrganization();
+    return this.organizationService.fetchAllOrganization();
   }
 
   @Get('org/latest')
   fetchFiveLatestOrganization() {
     Logger.debug(`fetchFiveLatestOrganization()`, APP);
 
-    return this.videoToVitalsService.fetchFiveLatestOrganization();
+    return this.organizationService.fetchFiveLatestOrganization();
   }
 
   @Get('org/:organization_name/:organization_email/:organization_mobile')
   fetchOrgByCondition(@Param() orgDTO: OrgDTO,) {
     Logger.debug(`fetchOrgByCondition() orgDTO:${JSON.stringify(orgDTO)} `, APP);
 
-    return this.videoToVitalsService.fetchOrgByCondition(orgDTO)
+    return this.organizationService.fetchOrgByCondition(orgDTO)
   }
 
   @Get('org/:url')
   fetchOrgByUrl(@Param() url: string,) {
     Logger.debug(`fetchOrgByUrl() url:${url} `, APP);
 
-    return this.videoToVitalsService.fetchOrgByUrl(url)
+    return this.organizationService.fetchOrgByUrl(url)
   }
 
   @Patch('org/status')
   updateStatus() {
-    return this.videoToVitalsService.updateStatus()
+    return this.organizationService.updateStatus()
    } 
 
   @Get('org/:id')
   fetchOrganizationById(@Param('id', ParseIntPipe) id: number) {
     Logger.debug(`fetchOrganizationById() id:${id} `, APP);
 
-    return this.videoToVitalsService.fetchOrganizationById(id);
+    return this.organizationService.fetchOrganizationById(id);
   }
 
   @Patch('org/logo/:id')
@@ -89,7 +94,7 @@ export class VideoToVitalsController {
   patchImageToOrganization( @Param('id', ParseIntPipe) id: number,@UploadedFile() file) {
     Logger.debug(`patchImageToOrganization() id:${id}  file:)}`, APP);
 
-    return this.videoToVitalsService.patchImageToOrganization(id, file);
+    return this.organizationService.patchImageToOrganization(id, file);
   }
   
 
@@ -97,7 +102,7 @@ export class VideoToVitalsController {
   updateOrganization(@Param('id') id: string, @Body() updateOrganizationDto: UpdateOrganizationDto) {
     Logger.debug(`updateOrganization() id:${id}  `, APP);
 
-    return this.videoToVitalsService.updateOrganization(id, updateOrganizationDto);
+    return this.organizationService.updateOrganization(id, updateOrganizationDto);
   }
 
   @Patch('org/register/status/:id')
@@ -110,12 +115,12 @@ export class VideoToVitalsController {
 
   @Delete('org/logo/:id')
   deleteLogo(@Param('id', ParseIntPipe) id: number) {
-    return this.videoToVitalsService.deleteLogo(id);
+    return this.organizationService.deleteLogo(id);
   }
 
   @Delete('org/:id')
   deleteOrganizationByID(@Param('id', ParseIntPipe) id: number) {
-    return this.videoToVitalsService.deleteOrganizationByID(id);
+    return this.organizationService.deleteOrganizationByID(id);
   }
 
   
