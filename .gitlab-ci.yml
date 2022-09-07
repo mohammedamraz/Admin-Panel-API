@@ -52,7 +52,7 @@ Deploy:
     -     chmod 400 $SSH_PRIVATE_KEY_SALES
     -     echo "Deploying to DEV"
     -     scp -i $SSH_PRIVATE_KEY_SALES -o StrictHostKeyChecking=no $TAGGED_APP_VERSION.tar ubuntu@log.fedo.health:~
-    -     ssh -i $SSH_PRIVATE_KEY_SALES -o StrictHostKeyChecking=no ubuntu@log.fedo.health "sudo systemctl stop dev.$SERVICE_NAME;$AS_FEDO bash -c \"cp $TAGGED_APP_VERSION.tar $RELEASE_LOCATION; cd $DEPLOY_LOCATION_DEV; pwd; unlink $SERVICE_NAME; rm -rf *; tar -xzf $RELEASE_LOCATION/$TAGGED_APP_VERSION.tar;ln -s $DEPLOY_LOCATION_DEV/$TAGGED_APP_VERSION $DEPLOY_LOCATION_DEV/dev-$SERVICE_NAME\"; cd; rm -f $TAGGED_APP_VERSION.tar; sudo systemctl start dev.$SERVICE_NAME;"
+    -     ssh -i $SSH_PRIVATE_KEY_SALES -o StrictHostKeyChecking=no ubuntu@log.fedo.health "sudo systemctl stop dev.$SERVICE_NAME;$AS_FEDO bash -c \"cp $TAGGED_APP_VERSION.tar $RELEASE_LOCATION; cd $DEPLOY_LOCATION_DEV; pwd; unlink dev-$SERVICE_NAME; rm -rf *; tar -xzf $RELEASE_LOCATION/$TAGGED_APP_VERSION.tar;ln -s $DEPLOY_LOCATION_DEV/$TAGGED_APP_VERSION $DEPLOY_LOCATION_DEV/dev-$SERVICE_NAME\"; cd; rm -f $TAGGED_APP_VERSION.tar; sudo systemctl start dev.$SERVICE_NAME;"
     - fi
     - if [[ $CI_COMMIT_TITLE =~ "alpha" ||  $CI_COMMIT_TITLE =~ "beta" ||  $CI_COMMIT_TITLE =~ "rc" ]]; then
     -     echo "Deploying to SIT"

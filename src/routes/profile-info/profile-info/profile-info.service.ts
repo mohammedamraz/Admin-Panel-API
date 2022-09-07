@@ -1,7 +1,7 @@
 import { BadRequestException, ConflictException, Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { applicationDefault, initializeApp } from 'firebase-admin/app';
 import { catchError, map, switchMap } from 'rxjs';
-import { GOOGLE_APPLICATION_CREDENTIALS } from 'src/constants';
+// import { GOOGLE_APPLICATION_CREDENTIALS } from 'src/constants';
 import { DatabaseTable } from 'src/lib/database/database.decorator';
 import { DatabaseService } from 'src/lib/database/database.service';
 import { CreateOrganizationDto, UserDTO } from 'src/routes/video-to-vitals/dto/create-video-to-vital.dto';

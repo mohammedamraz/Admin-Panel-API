@@ -29,7 +29,6 @@ export declare const SES_SOURCE_HELLO_SUPPORT__EMAIL: string;
 export declare const STATIC_IMAGES: string;
 export declare const STATIC_IMAGES_PROFILE: string;
 export declare const FEDO_HSA_USER_CONNECTION_URL: string;
-export declare const GOOGLE_APPLICATION_CREDENTIALS = "./facial-analysis-b9fe1-firebase-adminsdk-1zbc9-b67a0472af.json";
 export declare const AWS_COGNITO_USER_CREATION_URL_SIT: string;
 export declare const PUBLIC_KEY: string;
 export declare const PRIVATE_KEY: string;
