@@ -45,6 +45,7 @@ export class OrgDTO {
     @IsString()
     @IsEmail()
     organization_email: string;
+    @IsString()
     @IsPhoneNumber()
     organization_mobile: String;
 }
@@ -122,8 +123,8 @@ export class UserDTO {
     product_id:number;
     third_party_org_name:string;
     password:string;
+    application_id?:string;
     org_id:number;
-    application_id:string;
 }
 
 

@@ -7,6 +7,7 @@ import { STATIC_IMAGES, STATIC_IMAGES_PROFILE } from 'src/constants';
 import { editFileName, imageFileFilter } from 'src/constants/helper';
 import { PasswordResetDTO } from '../admin/dto/create-admin.dto';
 import { ConfirmForgotPasswordDTO, ForgotPasswordDTO } from '../admin/dto/login.dto';
+import { LoggingInterceptor } from 'src/interceptors/interceptor';
 
 const APP = "VideoToVitalsController"
 @Controller()
@@ -19,11 +20,9 @@ export class VideoToVitalsController {
   //   storage: diskStorage({
   //     _destination: STATIC_IMAGES,
   //     // get destination() {
-  //     //   console.log("DESTINATION",this._destination )
   //     //   return this._destination;
   //     // },
   //     // set destination(value) {
-  //     //   console.log("value",value)
   //     //   this._destination = value;
   //     // },
   //     filename: editFileName
@@ -31,7 +30,7 @@ export class VideoToVitalsController {
   //   fileFilter: imageFileFilter
   // }))
   createOrganization(@Body() createOrganizationDto: CreateOrganizationDto, @UploadedFile() file) {
-    // Logger.debug(`createOrganization() createOrganizationDto:${JSON.stringify(createOrganizationDto)} file:${JSON.stringify(file)}`, APP);
+    Logger.debug(`createOrganization() createOrganizationDto:${JSON.stringify(createOrganizationDto)} file:${JSON.stringify(file)}`, APP);
 
     // return this.videoToVitalsService.uploadFile(file?.path)
 
@@ -66,6 +65,13 @@ export class VideoToVitalsController {
     return this.videoToVitalsService.fetchOrgByCondition(orgDTO)
   }
 
+  @Get('org/:url')
+  fetchOrgByUrl(@Param() url: string,) {
+    Logger.debug(`fetchOrgByUrl() url:${url} `, APP);
+
+    return this.videoToVitalsService.fetchOrgByUrl(url)
+  }
+
   @Patch('org/status')
   updateStatus() {
     return this.videoToVitalsService.updateStatus()
@@ -78,26 +84,29 @@ export class VideoToVitalsController {
     return this.videoToVitalsService.fetchOrganizationById(id);
   }
 
-  @Patch('org/:id')
-  @UseInterceptors(FileInterceptor('file', {
-    storage: diskStorage({
-      _destination:STATIC_IMAGES,
-      // get destination() {
-      //   return this._destination;
-      // },
-      // set destination(value) {
-      //   this._destination = value;
-      // },
-      filename: editFileName
-    }),
-    fileFilter: imageFileFilter
-  }))
+  @Patch('org/logo/:id')
+  @UseInterceptors(FileInterceptor('file'))
+  patchImageToOrganization( @Param('id', ParseIntPipe) id: number,@UploadedFile() file) {
+    Logger.debug(`patchImageToOrganization() id:${id}  file:)}`, APP);
 
-  async updateOrganization(@Param('id') id: string, @Body() updateOrganizationDto: UpdateOrganizationDto, @UploadedFile() file) {
-    Logger.debug(`updateOrganization() id:${id} file:${file} `, APP);
-
-    return this.videoToVitalsService.updateOrganization(id, updateOrganizationDto, file?.path);
+    return this.videoToVitalsService.patchImageToOrganization(id, file);
   }
+  
+
+  @Patch('org/:id')
+  updateOrganization(@Param('id') id: string, @Body() updateOrganizationDto: UpdateOrganizationDto) {
+    Logger.debug(`updateOrganization() id:${id}  `, APP);
+
+    return this.videoToVitalsService.updateOrganization(id, updateOrganizationDto);
+  }
+
+  @Patch('org/register/status/:id')
+  changeRegisterStatusOnceConfirmed(@Param('id') id: number) {
+    Logger.debug(`updateOrganization() id:${id}  `, APP);
+
+    return this.videoToVitalsService.changeRegisterStatusOnceConfirmed(id);
+  }
+
 
   @Delete('org/logo/:id')
   deleteLogo(@Param('id', ParseIntPipe) id: number) {
@@ -156,7 +165,7 @@ export class VideoToVitalsController {
   addUser(@Body() userDTO: UserDTO) {
     Logger.debug(`addUser() addUserDTO:${JSON.stringify(userDTO)} `, APP);
 
-    return this.videoToVitalsService.addUser(userDTO)
+  return this.videoToVitalsService.addUser(userDTO)
   }
 
   @Get('users/:email/:mobile')
@@ -209,6 +218,7 @@ export class VideoToVitalsController {
   }
 
   @Post('signup/user')
+  // @UseInterceptors(LoggingInterceptor)
   registerUserbyEmail(@Body() RegisterUserdto: RegisterUserDTO) {
     Logger.debug(`registerUserbyEmail()  loginUserDTO:${JSON.stringify(RegisterUserdto)} `, APP);
 
@@ -216,6 +226,7 @@ export class VideoToVitalsController {
   }
 
   @Post('confirm/signup')
+  // @UseInterceptors(LoggingInterceptor)
   confirmSignupUserByEmail(@Body() registerUserdto: RegisterUserDTO) {
     Logger.debug(`confirmSignupUserByEmail() [${JSON.stringify(Object.keys(registerUserdto))} values ${JSON.stringify(Object.values(registerUserdto).length)}]`, APP);
 
@@ -238,10 +249,19 @@ export class VideoToVitalsController {
 
 
   @Post('login/user')
+  // @UseInterceptors(LoggingInterceptor)
   loginUserByEmail(@Body() loginUserDTO: LoginUserDTO) {
     Logger.debug(`loginUserByEmail()  loginUserDTO:${JSON.stringify(loginUserDTO)} `, APP);
 
     return this.videoToVitalsService.loginUserByEmail(loginUserDTO)
+  }
+
+  @Post('login/org')
+  // @UseInterceptors(LoggingInterceptor)
+  loginOrganizationByEmail(@Body() loginUserDTO: LoginUserDTO) {
+    Logger.debug(`loginOrganizationByEmail()  loginUserDTO:${JSON.stringify(loginUserDTO)} `, APP);
+
+    return this.videoToVitalsService.loginOrganizationByEmail(loginUserDTO)
   }
 
   @Patch('user/details')
