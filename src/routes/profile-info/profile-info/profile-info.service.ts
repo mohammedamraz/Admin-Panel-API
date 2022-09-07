@@ -1,20 +1,28 @@
 import { BadRequestException, ConflictException, Injectable, Logger, NotFoundException } from '@nestjs/common';
+import { applicationDefault, initializeApp } from 'firebase-admin/app';
 import { catchError, map, switchMap } from 'rxjs';
+// import { GOOGLE_APPLICATION_CREDENTIALS } from 'src/constants';
 import { DatabaseTable } from 'src/lib/database/database.decorator';
 import { DatabaseService } from 'src/lib/database/database.service';
 import { CreateOrganizationDto, UserDTO } from 'src/routes/video-to-vitals/dto/create-video-to-vital.dto';
+import { VideoToVitalsService } from 'src/routes/video-to-vitals/video-to-vitals.service';
 import { CreateProfileInfoDTO, ZQueryParamsDto } from './dto/create-video-to-vital.dto';
 const APP = "ProfileViewService"
+// const check=true
 @Injectable()
 export class ProfileInfoService {
 
     constructor(
         @DatabaseTable('user_profile_info')
         private readonly userProfileDb: DatabaseService<CreateProfileInfoDTO>,
-        @DatabaseTable('users')
-    private readonly userDb: DatabaseService<UserDTO>,
-    @DatabaseTable('organization')
-    private readonly organizationDb: DatabaseService<CreateOrganizationDto>,) { }
+    //     @DatabaseTable('users')
+    // private readonly userDb: DatabaseService<UserDTO>,
+    private readonly videoToVitalsService: VideoToVitalsService,
+    // @DatabaseTable('organization')
+    // private readonly organizationDb: DatabaseService<CreateOrganizationDto>,
+    ) {
+        
+     }
 
     updateProfileInfo(createProfileInfoDTO: CreateProfileInfoDTO) {
         Logger.debug(`updateUser() updateUserDTO:${JSON.stringify(createProfileInfoDTO)} `, APP);
@@ -57,10 +65,10 @@ export class ProfileInfoService {
     createProfileInfo(createProfileInfoDTO: CreateProfileInfoDTO) {
         Logger.debug(`createProfileInfo() updateUserDTO:${JSON.stringify(createProfileInfoDTO)} `, APP);
 
-        return this.userDb.find({ id: createProfileInfoDTO.user_id }).pipe(
+        return this.videoToVitalsService.fetchUserById(Number(createProfileInfoDTO.user_id)).pipe(
             switchMap(doc => {
               if (doc.length == 0){          
-              return this.organizationDb.find({id:createProfileInfoDTO.org_id}).pipe(
+              return this.videoToVitalsService.fetchOrganizationDetailsById(createProfileInfoDTO.org_id).pipe(
                 map(doc=>{
                 if (doc.length == 0) throw new NotFoundException('user not found')
                 else return this.userProfileDb.save(createProfileInfoDTO)
@@ -106,8 +114,9 @@ export class ProfileInfoService {
     return this.userProfileDb.find({ application_id: createProfileInfoDTO.application_id }).pipe(
         switchMap(res => {
             if (res.length == 0) throw new NotFoundException('profile info not found')
-            else  return this.userProfileDb.findandUpdate({ columnName: 'application_id', columnvalue: createProfileInfoDTO.application_id, quries: {total_tests:Number(res[0].total_tests)+1} })
-        }))
+            else{   this.userProfileDb.findandUpdate({ columnName: 'application_id', columnvalue: createProfileInfoDTO.application_id, quries: {total_tests:Number(res[0].total_tests)+1} });
+            return this.videoToVitalsService.updateUserByApplicationId(res[0].user_id)
+       } }))
 
     }
 
