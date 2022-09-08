@@ -421,6 +421,22 @@ export class OrganizationService {
       );
   
     }
+
+    findAllProductsMappedWithOrganization(id:any) {
+      Logger.debug(`findAllProductsMappedWithOrganization() `, APP);
+  
+      return this.fetchOrganizationById(id).pipe(
+        catchError(err => { throw new UnprocessableEntityException(err.message) }),
+        switchMap(doc => {
+          if (doc.length == 0) {
+            throw new NotFoundException('No Organization Found')
+          }
+          else {
+            return this.organizationProductJunctionDb.find({org_id:id})
+          }
+        }),
+      );
+    }
   
     fetchotherDetails(createOrganizationDto: CreateOrganizationDto[]) {
   
@@ -464,7 +480,7 @@ export class OrganizationService {
     fetchOrganizationById(id: number) {
       Logger.debug(`fetchOrganizationById() id:${id} `, APP);
   
-      return this.organizationDb.find({ id: id, is_deleted: false }).pipe(
+      return this.fetchOrganizationDetailsById(id).pipe(
         catchError(err => { throw new UnprocessableEntityException(err.message) }),
         map(doc => {
           if (doc.length == 0) {

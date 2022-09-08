@@ -14,4 +14,11 @@ export class ProductController {
     return this.productService.addProduct(createProductDto);
   }
 
+  @Get()
+  fetchAllProducts() {
+    Logger.debug(`fetchAllProducts()`, APP);
+
+    return this.productService.fetchAllProducts();
+  }
+
 }

@@ -1,9 +1,10 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Logger } from '@nestjs/common';
 import { OrgProductJunctionService } from './org-product-junction.service';
 import { CreateOrgProductJunctionDto } from './dto/create-org-product-junction.dto';
 import { UpdateOrgProductJunctionDto } from './dto/update-org-product-junction.dto';
 
-@Controller('org-product-junction')
+const APP = "OrgProductJunctionController";
+@Controller()
 export class OrgProductJunctionController {
   constructor(private readonly orgProductJunctionService: OrgProductJunctionService) {}
 
@@ -31,4 +32,12 @@ export class OrgProductJunctionController {
   remove(@Param('id') id: string) {
     return this.orgProductJunctionService.remove(+id);
   }
+
+  // @Get(':id')
+  // findAllProductsMappedWithOrganization(@Param('id') id: string) {
+  //   Logger.debug(`fetchAllProducts()`, APP);
+    
+  //   return this.orgProductJunctionService.findAllProductsMappedWithOrganization(+id);
+  // }
+
 }

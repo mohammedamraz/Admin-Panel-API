@@ -29,7 +29,7 @@ export class VideoToVitalsService {
     @DatabaseTable('organization_product_junction')
     private readonly organizationProductJunctionDb: DatabaseService<CreateOrganizationDto>,
     @DatabaseTable('user_product_junction')
-  private readonly userProductJunctionDb: DatabaseService<CreateUserProductJunctionDto>,
+    private readonly userProductJunctionDb: DatabaseService<CreateUserProductJunctionDto>,
     @DatabaseTable('users')
     private readonly userDb: DatabaseService<UserDTO>,
     @DatabaseTable('user_profile_info')
@@ -46,7 +46,7 @@ export class VideoToVitalsService {
 
   }
 
- 
+
 
   fetchAllVitalsPilot() {
     Logger.debug(`fetchAllVitalsPilot()`, APP);
@@ -167,7 +167,7 @@ export class VideoToVitalsService {
           throw new NotFoundException('organization not found')
         }
         else {
-          return this.organizationDb.findByIdandUpdate({id:id.toString(),quries:{is_register:true}})
+          return this.organizationDb.findByIdandUpdate({ id: id.toString(), quries: { is_register: true } })
         }
       }),
 
@@ -188,70 +188,143 @@ export class VideoToVitalsService {
   addUser(userDTO: UserDTO) {
     Logger.debug(`addUser() addUserDTO:${JSON.stringify(userDTO)} `, APP);
 
+    let product_user_list = userDTO.product_id.toString().split(",")
     return this.fetchUserByCondition(userDTO).pipe(
-      map(user_doc=>user_doc),
-      switchMap(user_doc=>{
-         return  this.fetchOrgByNameForUserCreation(userDTO.organization_name).pipe(
+      map(user_doc => user_doc),
+      switchMap(user_doc => {
+        return this.fetchOrgByNameForUserCreation(userDTO.organization_name).pipe(
           map(org_doc => {
             return org_doc
           }),
           switchMap(org_doc => {
+            console.log("docuser", org_doc);
             userDTO["org_id"] = org_doc[0].id
-            return this.productService.fetchProductByNewName(userDTO.product_name).pipe(
-              map(product_doc => {
-                delete userDTO.product_name
-                userDTO.application_id = userDTO.mobile.slice(3, 14);
-                return [product_doc[0].id, org_doc]
+            delete userDTO.product_name
+            userDTO.application_id = userDTO.mobile.slice(3, 14);
+            userDTO.product_id = Number(product_user_list[0]);
+            return this.userDb.save(userDTO).pipe(
+              map(userdoc => {
+                console.log("deletion", userdoc);
+
+                return [userdoc, org_doc]
               }),
+
               switchMap(doc => {
-                console.log("deszfsd");
-                
-                userDTO.product_id = Number(doc[0])
-                return this.userDb.save(userDTO).pipe(
-                  map(userdoc => {
-                    return [userdoc, doc]
-                  }),
-    
-                  switchMap(doc => {
-                    var encryption={user_id: doc[0][0]['id']};
-                    
-                    this.sendEmailService.sendEmailOnCreateOrgUser(
-    
-                      {
-                        "email": userDTO.email,
-                        "organisation_admin_name": doc[1][1][0].admin_name,
-                        "fedo_app": "FEDO VITALS",
-                        "url": doc[1][1][0].url+"?"+encodeURIComponent(this.encryptPassword(JSON.stringify(encryption))),
-                        "name": userDTO.user_name,
-                        "pilot_duration": doc[1][1][0].pilot_duration,
-                        "organisation_admin_email": doc[1][1][0].organization_email,
-                        "application_id":userDTO.application_id
-                      }
-                    )
-                    return doc[0]
-                  }),
-    
+                console.log("after deletiom", doc);
+                var encryption = { user_id: doc[0][0]['id'] };
+
+                console.log("data to check after deletion", doc[0][0]['id']);
+                console.log("data to check after deletion", doc[1][0]['admin_name']);
+
+
+                this.sendEmailService.sendEmailOnCreateOrgUser(
+
+                  {
+                    "email": userDTO.email,
+                    "organisation_admin_name": doc[1][0]['admin_name'],
+                    "fedo_app": "FEDO VITALS",
+                    "url": doc[1][0]['url'] + "?" + encodeURIComponent(this.encryptPassword(JSON.stringify(encryption))),
+                    "name": userDTO.user_name,
+                    "pilot_duration": doc[1][0]['pilot_duration'],
+                    "organisation_admin_email": doc[1][0]['organization_email'],
+                    "application_id": userDTO.application_id
+                  }
                 )
-    
-    
+                return doc[0]
               }),
-              map(doc => {
-                doc["id"]
-                this.userProductJunctionService.createUserProductJunction({ user_id: doc["id"], org_id: userDTO["org_id"], product_id: userDTO.product_id, total_tests: 1 });
-                this.userProfileDb.save({ application_id: doc['application_id'], user_id: doc['id'], org_id: doc['org_id'], name: doc['user_name'], is_editable: true })
-                return doc;
-              })
-    
+
             )
+
+
           }),
-    
+          map(doc => {
+            console.log("org-id", userDTO["org_id"]);
+
+            product_user_list.map(res1 =>
+              this.userProductJunctionService.createUserProductJunction({ user_id: doc["id"], org_id: userDTO["org_id"], product_id: Number(res1), total_tests: 0 })
+
+            )
+            doc["id"]
+            this.userProfileDb.save({ application_id: doc['application_id'], user_id: doc['id'], org_id: doc['org_id'], name: doc['user_name'], is_editable: true })
+            return doc;
+          })
+
         )
-      })
+      }),
+
     )
-    
-   
+
 
   }
+
+
+  // addUser(userDTO: UserDTO) {
+  //   Logger.debug(`addUser() addUserDTO:${JSON.stringify(userDTO)} `, APP);
+
+  //   return this.fetchUserByCondition(userDTO).pipe(
+  //     map(user_doc=>user_doc),
+  //     switchMap(user_doc=>{
+  //        return  this.fetchOrgByNameForUserCreation(userDTO.organization_name).pipe(
+  //         map(org_doc => {
+  //           return org_doc
+  //         }),
+  //         switchMap(org_doc => {
+  //           userDTO["org_id"] = org_doc[0].id
+  //           return this.productService.fetchProductByNewName(userDTO.product_name).pipe(
+  //             map(product_doc => {
+  //               delete userDTO.product_name
+  //               userDTO.application_id = userDTO.mobile.slice(3, 14);
+  //               return [product_doc[0].id, org_doc]
+  //             }),
+  //             switchMap(doc => {
+  //               console.log("deszfsd");
+
+  //               userDTO.product_id = Number(doc[0])
+  //               return this.userDb.save(userDTO).pipe(
+  //                 map(userdoc => {
+  //                   return [userdoc, doc]
+  //                 }),
+
+  //                 switchMap(doc => {
+  //                   var encryption={user_id: doc[0][0]['id']};
+
+  //                   this.sendEmailService.sendEmailOnCreateOrgUser(
+
+  //                     {
+  //                       "email": userDTO.email,
+  //                       "organisation_admin_name": doc[1][1][0].admin_name,
+  //                       "fedo_app": "FEDO VITALS",
+  //                       "url": doc[1][1][0].url+"?"+encodeURIComponent(this.encryptPassword(JSON.stringify(encryption))),
+  //                       "name": userDTO.user_name,
+  //                       "pilot_duration": doc[1][1][0].pilot_duration,
+  //                       "organisation_admin_email": doc[1][1][0].organization_email,
+  //                       "application_id":userDTO.application_id
+  //                     }
+  //                   )
+  //                   return doc[0]
+  //                 }),
+
+  //               )
+
+
+  //             }),
+  //             map(doc => {
+  //               doc["id"]
+  //               this.userProductJunctionService.createUserProductJunction({ user_id: doc["id"], org_id: userDTO["org_id"], product_id: userDTO.product_id, total_tests: 1 });
+  //               this.userProfileDb.save({ application_id: doc['application_id'], user_id: doc['id'], org_id: doc['org_id'], name: doc['user_name'], is_editable: true })
+  //               return doc;
+  //             })
+
+  //           )
+  //         }),
+
+  //       )
+  //     })
+  //   )
+
+
+
+  // }
 
   fetchUsersCountByOrgId(org_id: number) {
     Logger.debug(`fetchUsersCountByOrgId() org_id:${org_id}} `, APP);
@@ -406,13 +479,13 @@ export class VideoToVitalsService {
     return this.userDb.find({ id: user_id }).pipe(
       switchMap(res => {
         if (res.length == 0) throw new NotFoundException('user not found')
-        else{
-          return this.userProductJunctionDb.find({user_id:user_id}).pipe(switchMap(doc=>{
+        else {
+          return this.userProductJunctionDb.find({ user_id: user_id }).pipe(switchMap(doc => {
             console.log("doc");
-            console.log("doc",doc);
-            
-        return this.userProductJunctionDb.findandUpdate({columnName: 'user_id', columnvalue: user_id, quries: {total_tests:doc[0].total_tests+1} })
-      }))
+            console.log("doc", doc);
+
+            return this.userProductJunctionDb.findandUpdate({ columnName: 'user_id', columnvalue: user_id, quries: { total_tests: doc[0].total_tests + 1 } })
+          }))
         }
       }))
 
@@ -441,7 +514,7 @@ export class VideoToVitalsService {
 
 
   user_data: any;
-  org_data:any
+  org_data: any
 
   loginUserByEmail(loginUserDTO: LoginUserDTO) {
     Logger.debug(`loginUserByEmail() loginUserDTO:${JSON.stringify(loginUserDTO)} `, APP);

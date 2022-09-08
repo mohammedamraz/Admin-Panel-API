@@ -1,5 +1,5 @@
-import { ConflictException, Injectable, Logger, NotFoundException } from '@nestjs/common';
-import { map, switchMap } from 'rxjs';
+import { ConflictException, Injectable, Logger, NotFoundException, UnprocessableEntityException } from '@nestjs/common';
+import { catchError, map, switchMap } from 'rxjs';
 // import { CreateProductModel } from 'src/lib/config/model/product.model';
 import { DatabaseTable } from 'src/lib/database/database.decorator';
 import { DatabaseService } from 'src/lib/database/database.service';
@@ -49,6 +49,22 @@ export class ProductService {
       })
       
     )
+  }
+
+  fetchAllProducts() {
+    Logger.debug(`fetchAllProducts() `, APP);
+
+    return this.productDb.find({ is_active: true }).pipe(
+      catchError(err => { throw new UnprocessableEntityException(err.message) }),
+      map(doc => {
+        if (doc.length == 0) {
+          throw new NotFoundException('No Products Found')
+        }
+        else {
+          return doc
+        }
+      }),
+    );
   }
 }
 

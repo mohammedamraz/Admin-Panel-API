@@ -63,6 +63,15 @@ export class VideoToVitalsController {
     return this.organizationService.fetchFiveLatestOrganization();
   }
 
+  @Get('org/product/access/:id')
+  findAllProductsMappedWithOrganization(@Param('id') id: string) {
+    Logger.debug(`findAllProductsMappedWithOrganization()`, APP);
+    
+    return this.organizationService.findAllProductsMappedWithOrganization(+id);
+  }
+
+
+  
   @Get('org/:organization_name/:organization_email/:organization_mobile')
   fetchOrgByCondition(@Param() orgDTO: OrgDTO,) {
     Logger.debug(`fetchOrgByCondition() orgDTO:${JSON.stringify(orgDTO)} `, APP);
