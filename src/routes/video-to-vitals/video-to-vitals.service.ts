@@ -4,7 +4,7 @@ import { DatabaseTable } from 'src/lib/database/database.decorator';
 import { DatabaseService } from 'src/lib/database/database.service';
 import { SendEmailService } from 'src/send-email/send-email.service';
 import { PasswordResetDTO } from '../admin/dto/create-admin.dto';
-import { CreateProductDto } from '../product/dto/create-product.dto';
+// import { CreateProductDto } from '../product/dto/create-product.dto';
 import { ProductService } from '../product/product.service';
 import { UserProductJunctionService } from '../user-product-junction/user-product-junction.service';
 import { AWS_ACCESS_KEY_ID, AWS_COGNITO_USER_CREATION_URL_SIT, AWS_SECRET_ACCESS_KEY, FEDO_APP, FEDO_USER_ADMIN_PANEL_POOL_NAME, PUBLIC_KEY } from 'src/constants';
@@ -17,6 +17,7 @@ import { S3 } from 'aws-sdk';
 import { application } from 'express';
 import { CreateUserProductJunctionDto } from '../user-product-junction/dto/create-user-product-junction.dto';
 import { OrganizationService } from './organization.service';
+import { CreateProductDto } from '../product/dto/create-product.dto';
 
 const APP = 'VideoToVitalsService'
 

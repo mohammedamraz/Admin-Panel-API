@@ -3,6 +3,7 @@ import { IndividualUserModule } from 'src/routes/individual-user/individual-user
 import { ProductModule } from 'src/routes/product/product.module';
 import { ProfileInfoModule } from 'src/routes/profile-info/profile-info/profile-info.module';
 import { SalesModule } from 'src/routes/sales/sales.module';
+import { ThirdpartyOrganizationModule } from 'src/routes/thirdparty-organization/thirdparty-organization.module';
 import { UserProductJunctionModule } from 'src/routes/user-product-junction/user-product-junction.module';
 import { VideoToVitalsModule } from 'src/routes/video-to-vitals/video-to-vitals.module';
 import { SendEmailModule } from 'src/send-email/send-email.module';
@@ -42,5 +43,9 @@ export const APP_ROUTES = [
   {
     path: 'profile_info',
     module: ProfileInfoModule,
+  },
+  {
+    path: 'tpa',
+    module: ThirdpartyOrganizationModule,
   },
 ];

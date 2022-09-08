@@ -222,6 +222,18 @@ export class DatabaseService<T> implements DatabaseInterface<T> {
     return this.runQuery(query);
   }
 
+  findByAlphabetForTpa(org_id:string,findbyConditionParams: findByDateParams): Observable<T[]> {
+    Logger.debug(`findByAlphabetForTpa(): params ${[JSON.stringify(findbyConditionParams)]}`, APP);
+
+
+    let variables = [];
+    let values = []
+    let params = findbyConditionParams
+    Object.values(params).map((params, index) => { variables.push(params), values.push((`$${index + 1}`)) })
+    const query = `SELECT * FROM ${this.tableName} WHERE org_id=${org_id} AND tpa_name like '${params.name}%' `;
+    return this.runQuery(query);
+  }
+
 
   findByConditionSales(id: string, findbyConditionParams: findByDateParams) {
     Logger.debug(`findByConditionSales(): params ${[JSON.stringify(findbyConditionParams)]}`, APP);
