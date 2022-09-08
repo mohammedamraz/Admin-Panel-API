@@ -65,7 +65,7 @@ export class VideoToVitalsController {
     return this.videoToVitalsService.fetchOrgByCondition(orgDTO)
   }
 
-  @Get('org/:url')
+  @Get('org/domain/:url')
   fetchOrgByUrl(@Param() url: string,) {
     Logger.debug(`fetchOrgByUrl() url:${url} `, APP);
 
