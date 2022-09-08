@@ -41,9 +41,15 @@ export class OrganizationService {
     bucket: any;
     urlAWSPhoto: any
   
+    respilot:any
     createOrganization(createOrganizationDto: CreateOrganizationDto, path: any) {
       Logger.debug(`createOrganization() createOrganizationDto:${JSON.stringify(createOrganizationDto,)} filename:${path}`, APP);
       let productlist = createOrganizationDto.product_id.split(",")
+      let productlist_pilotduration = (createOrganizationDto.pilot_duration).toString().split(",")
+      // let productlist_status = (createOrganizationDto.fedo_score).toString().split(",")
+      let productlist_fedoscore = (createOrganizationDto.fedo_score).toString().split(",")
+
+
       return this.fetchOrgByUrl(createOrganizationDto.url).pipe(
         map(doc => {
           if (doc.length == 0) {
@@ -53,10 +59,12 @@ export class OrganizationService {
               }),
               switchMap( (doc) => {
             createOrganizationDto.product_id = productlist[0];
-            const tomorrow = new Date();
-            const duration = createOrganizationDto.pilot_duration
+            createOrganizationDto.pilot_duration = Number(productlist[0]);
+            createOrganizationDto.fedo_score = Boolean(productlist_fedoscore[0])
+
+
             createOrganizationDto.logo = path
-            createOrganizationDto.end_date = new Date(tomorrow.setDate(tomorrow.getDate() + Number(duration)));
+            
             createOrganizationDto.status = "Active"
             createOrganizationDto.application_id = createOrganizationDto.organization_mobile.slice(3, 14);
   
@@ -87,8 +95,29 @@ export class OrganizationService {
         }),
         switchMap(res => res),
         switchMap(async res => {
-          productlist.map(res1 =>
-            this.organizationProductJunctionDb.save({ org_id: res[0].id, start_date: createOrganizationDto.start_date, end_date: createOrganizationDto.end_date, pilot_duration: createOrganizationDto.pilot_duration, status: res[0].status, stage: res[0].stage, product_id: res1 }))
+          // productlistpilot.map(respilot=>
+          //   this.respilot=respilot)
+            console.log("respilot",this.respilot);
+            
+          for (let index = 0; index < productlist.length; index++) {
+            const tomorrow = new Date();
+            const duration = productlist_pilotduration[index]
+            createOrganizationDto.end_date = new Date(tomorrow.setDate(tomorrow.getDate() + Number(duration)));
+            await lastValueFrom(this.organizationProductJunctionDb.save({ org_id: res[0].id, end_date: createOrganizationDto.end_date, pilot_duration: productlist_pilotduration[index], status: res[0].status, product_id: productlist[index],fedoscore:productlist_fedoscore[index] }))
+            // const element = array[index];
+            
+          }
+          // (res1 =>
+          //   // console.log("res",res1,this.respilot)
+            
+            
+              // )
+          //   )
+            // productlistfedoscore.map(res1 =>
+            //   // console.log("res",res1,this.respilot)
+              
+            //   this.organizationProductJunctionDb.find({ org_id: res[0].id, start_date: createOrganizationDto.start_date, end_date: createOrganizationDto.end_date, pilot_duration: createOrganizationDto.pilot_duration, status: res[0].status, stage: res[0].stage, product_id: res1 })
+            //   )
           if (path != null) {
             this.userProfileDb.save({ application_id: res[0].application_id, org_id: res[0].id });
           

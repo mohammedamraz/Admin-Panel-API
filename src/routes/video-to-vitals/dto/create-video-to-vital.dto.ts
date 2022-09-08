@@ -120,7 +120,7 @@ export class UserDTO {
     mobile: phoneNumber;
     organization_name:string;
     product_name:string;
-    product_id:number;
+    product_id?:number;
     third_party_org_name:string;
     password:string;
     application_id?:string;
