@@ -8,30 +8,26 @@ const APP = "OrgProductJunctionController";
 export class OrgProductJunctionController {
   constructor(private readonly orgProductJunctionService: OrgProductJunctionService) {}
 
-  @Post()
-  create(@Body() createOrgProductJunctionDto: CreateOrgProductJunctionDto) {
-    return this.orgProductJunctionService.create(createOrgProductJunctionDto);
-  }
 
-  @Get()
-  findAll() {
-    return this.orgProductJunctionService.findAll();
-  }
+  // @Get()
+  // findAll() {
+  //   return this.orgProductJunctionService.findAll();
+  // }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.orgProductJunctionService.findOne(+id);
-  }
+  // @Get(':id')
+  // findOne(@Param('id') id: string) {
+  //   return this.orgProductJunctionService.findOne(+id);
+  // }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateOrgProductJunctionDto: UpdateOrgProductJunctionDto) {
-    return this.orgProductJunctionService.update(+id, updateOrgProductJunctionDto);
-  }
+  // @Patch(':id')
+  // update(@Param('id') id: string, @Body() updateOrgProductJunctionDto: UpdateOrgProductJunctionDto) {
+  //   return this.orgProductJunctionService.update(+id, updateOrgProductJunctionDto);
+  // }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.orgProductJunctionService.remove(+id);
-  }
+  // @Delete(':id')
+  // remove(@Param('id') id: string) {
+  //   return this.orgProductJunctionService.remove(+id);
+  // }
 
   // @Get(':id')
   // findAllProductsMappedWithOrganization(@Param('id') id: string) {

@@ -30,7 +30,7 @@ export class ThirdpartyOrganizationService {
       addThirdPartyOrganization(createThirdPartyOrganizationDto: CreateThirdPartyOrganizationDto) {
         Logger.debug(`addThirdPartyOrganization() createProductDto:${JSON.stringify(createThirdPartyOrganizationDto)} }`, APP);
     
-      return this.organizationService.fetchOrganizationById(Number(createThirdPartyOrganizationDto.org_id)).pipe(
+      return this.organizationService.fetchOrganizationByIdDetails(Number(createThirdPartyOrganizationDto.org_id)).pipe(
         switchMap(doc=>{
           if(doc.length==0) throw new NotFoundException('organization not found')
             else return this.tpaJunctionDB.save({tpa_name:createThirdPartyOrganizationDto.tpa_name,org_id:createThirdPartyOrganizationDto.org_id}).pipe(
@@ -47,7 +47,7 @@ export class ThirdpartyOrganizationService {
       fetchThirdPartyOrganizationOfSpecificOrg(org_id: string,params: ZQueryParamsDto) {
         Logger.debug(`fetchThirdPartyOrganizationOfSpecificOrg() createProductDto:${org_id} }`, APP);
     
-      return this.organizationService.fetchOrganizationById(Number(org_id)).pipe(
+      return this.organizationService.fetchOrganizationByIdDetails(Number(org_id)).pipe(
         switchMap(doc=>{
           if(doc.length==0) throw new NotFoundException('organization not found')
             else return this.tpaJunctionDB.findByAlphabetForTpa(org_id,params).pipe(

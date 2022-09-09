@@ -2,8 +2,10 @@ import { HttpModule } from '@nestjs/axios';
 import { Module } from '@nestjs/common';
 import { TemplateService } from 'src/constants/template.service';
 import { DatabaseModule } from 'src/lib/database/database.module';
-import { SendEmailService } from 'src/send-email/send-email.service';
+import { OrgProductJunctionService } from '../org-product-junction/org-product-junction.service';
+// import { SendEmailService } from 'src/send-email/send-email.service';
 import { ProductService } from '../product/product.service';
+import { SendEmailService } from '../send-email/send-email.service';
 import { UserProductJunctionService } from '../user-product-junction/user-product-junction.service';
 import { OrganizationService } from '../video-to-vitals/organization.service';
 import { ThirdpartyOrganizationController } from './thirdparty-organization.controller';
@@ -32,7 +34,7 @@ import { ThirdpartyOrganizationService } from './thirdparty-organization.service
 
 ],
   controllers: [ThirdpartyOrganizationController],
-  providers: [ThirdpartyOrganizationService,OrganizationService,ProductService,UserProductJunctionService,SendEmailService,TemplateService],
+  providers: [ThirdpartyOrganizationService,OrganizationService,ProductService,UserProductJunctionService,SendEmailService,TemplateService,OrgProductJunctionService],
   exports:[ThirdpartyOrganizationService]
 })
 export class ThirdpartyOrganizationModule {}

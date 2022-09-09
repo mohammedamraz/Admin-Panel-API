@@ -2,11 +2,12 @@ import { HttpModule } from '@nestjs/axios';
 import { Module } from '@nestjs/common';
 import { TemplateService } from 'src/constants/template.service';
 import { DatabaseModule } from 'src/lib/database/database.module';
+import { OrgProductJunctionService } from 'src/routes/org-product-junction/org-product-junction.service';
 import { ProductService } from 'src/routes/product/product.service';
+import { SendEmailService } from 'src/routes/send-email/send-email.service';
 import { UserProductJunctionService } from 'src/routes/user-product-junction/user-product-junction.service';
 import { OrganizationService } from 'src/routes/video-to-vitals/organization.service';
 import { VideoToVitalsService } from 'src/routes/video-to-vitals/video-to-vitals.service';
-import { SendEmailService } from 'src/send-email/send-email.service';
 import { ProfileInfoController } from './profile-info.controller';
 import { ProfileInfoService } from './profile-info.service';
 
@@ -23,6 +24,6 @@ import { ProfileInfoService } from './profile-info.service';
       maxRedirects: 5
     })]
 ,  controllers: [ProfileInfoController],
-  providers: [ProfileInfoService,VideoToVitalsService,ProductService, UserProductJunctionService, SendEmailService, TemplateService, OrganizationService]
+  providers: [ProfileInfoService,VideoToVitalsService,ProductService, UserProductJunctionService, SendEmailService, TemplateService, OrganizationService,OrgProductJunctionService]
 })
 export class ProfileInfoModule {}
