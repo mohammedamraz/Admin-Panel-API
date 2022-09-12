@@ -193,7 +193,7 @@ export class VideoToVitalsService {
     return this.fetchUserByCondition(userDTO).pipe(
       map(user_doc => user_doc),
       switchMap(user_doc => {
-        return this.fetchOrgByNameForUserCreation(userDTO.organization_name).pipe(
+        return this.organizationService.fetchOrganizationById(userDTO.org_id).pipe(
           map(org_doc => {
             return org_doc
           }),
@@ -203,6 +203,7 @@ export class VideoToVitalsService {
             delete userDTO.product_name
             userDTO.application_id = userDTO.mobile.slice(3, 14);
             userDTO.product_id = Number(product_user_list[0]);
+            // here we are not saving org_id because we were initially saving name and now id we are saving in junction so it is not needed 
             return this.userDb.save(userDTO).pipe(
               map(userdoc => {
                 console.log("deletion", userdoc);
