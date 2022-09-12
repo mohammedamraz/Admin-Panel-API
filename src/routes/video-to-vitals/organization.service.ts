@@ -1,17 +1,16 @@
 import { HttpService } from '@nestjs/axios';
 import { BadRequestException, ConflictException, Injectable, Logger, NotFoundException, UnauthorizedException, UnprocessableEntityException } from '@nestjs/common';
 import { DatabaseTable } from 'src/lib/database/database.decorator';
-import { SendEmailService } from 'src/send-email/send-email.service';
-import { CreateProductDto } from '../product/dto/create-product.dto';
-import { ProductService } from '../product/product.service';
-import { CreateUserProductJunctionDto } from '../user-product-junction/dto/create-user-product-junction.dto';
-import { UserProductJunctionService } from '../user-product-junction/user-product-junction.service';
-import { CreateOrganizationDto,OrgDTO, UpdateOrganizationDto, UserDTO, UserProfileDTO} from './dto/create-video-to-vital.dto';
+import { CreateOrganizationDto,OrgDTO, QueryParamsDto, UpdateOrganizationDto, UserProfileDTO} from './dto/create-video-to-vital.dto';
 import { DatabaseService } from 'src/lib/database/database.service';
 import { catchError, concatMap, from, lastValueFrom, map, switchMap, throwError } from 'rxjs';
 import { AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, PUBLIC_KEY } from 'src/constants';
 import { S3 } from 'aws-sdk';
 import { v4 as uuidv4 } from 'uuid';
+import { OrgProductJunctionService } from '../org-product-junction/org-product-junction.service';
+import { CreateOrgProductJunctionDto } from '../org-product-junction/dto/create-org-product-junction.dto';
+import { UserProductJunctionService } from '../user-product-junction/user-product-junction.service';
+import { SendEmailService } from '../send-email/send-email.service';
 
 const APP = 'OrganizationService'
 @Injectable()
@@ -22,22 +21,15 @@ export class OrganizationService {
     private readonly organizationDb: DatabaseService<CreateOrganizationDto>,
     @DatabaseTable('organization_product_junction')
     private readonly organizationProductJunctionDb: DatabaseService<CreateOrganizationDto>,
-    @DatabaseTable('user_product_junction')
-    private readonly userProductJunctionDb: DatabaseService<CreateUserProductJunctionDto>,
-    @DatabaseTable('users')
-    private readonly userDb: DatabaseService<UserDTO>,
     @DatabaseTable('user_profile_info')
     private readonly userProfileDb: DatabaseService<UserProfileDTO>,
     @DatabaseTable('product')
-    private readonly productDb: DatabaseService<CreateProductDto>,
-    private readonly productService: ProductService,
-    private readonly userProductJunctionService: UserProductJunctionService,
     private readonly sendEmailService: SendEmailService,
+    private readonly orgProductJunctionService: OrgProductJunctionService,
+    private readonly userProductJunctionService: UserProductJunctionService,
     private http: HttpService,
+  ) {}
   
-    ) {
-  
-    }
     bucket: any;
     urlAWSPhoto: any
   
@@ -162,7 +154,7 @@ export class OrganizationService {
       Logger.debug(`patchImageToOrganization() id:${id} filename:}`, APP);
       if (path != null){
     
-      return this.fetchOrganizationById(id).pipe(
+      return this.fetchOrganizationByIdDetails(id).pipe(
         map( async doc=>{ await this.upload(path); this.organizationDb.findByIdandUpdate({ id: id.toString(), quries: { logo: this.urlAWSPhoto } }) })
       )
     }
@@ -214,34 +206,169 @@ export class OrganizationService {
       });
     }
   
+    fetchOrgCount() {
+      Logger.debug(`fetchOrgCount() `, APP);
+
+      return this.organizationDb.find({ is_deleted: false }).pipe(
+        map(doc => { return { "total_organizations_count": doc.length } }),
+        catchError(err => {throw new UnprocessableEntityException(err.message)})
+      )
+    }
+
+    fetchAllOrganization(queryParamsDto: QueryParamsDto) {
+      Logger.debug(`fetchAllOrganization() queryParamsDto: ${JSON.stringify(queryParamsDto)}`, APP);
+
+      if (queryParamsDto.type){
+        return this.organizationDb.fetchLatestFive().pipe(
+          catchError(err => {throw new UnprocessableEntityException(err.message)}),
+          map(doc => this.fetchotherDetails(doc)),
+          switchMap(doc => this.updateStatus(doc))
+        );
+      }
+      if (queryParamsDto.url){
+        return this.organizationDb.find({ url: queryParamsDto.url }).pipe(
+          catchError(err => {throw new UnprocessableEntityException(err.message)}),
+          map(doc => {
+            if (doc.length == 0){
+              return doc
+            }
+            else{
+              throw new ConflictException("domain already taken") 
+            }
+          })
+        )
+        
+      }
+      else{
+        return this.organizationDb.find({ is_deleted: false }).pipe(
+          catchError(err => { throw new UnprocessableEntityException(err.message) }),
+          map(doc => {
+            console.log("deszfsd",doc);
+            if (doc.length == 0) throw new NotFoundException('No Data available')
+            else {return this.fetchotherDetails(doc)}
+          }),
+           switchMap(doc => this.updateStatus(doc))
+         );
+      }
+    }
+
+    fetchotherDetails(createOrganizationDto: CreateOrganizationDto[]) {
+      Logger.debug(`fetchotherDetails() createOrganizationDto: ${JSON.stringify(createOrganizationDto)}`, APP);
+
+      let userProfileData: CreateOrganizationDto[] = [];
+      return lastValueFrom(from(createOrganizationDto).pipe(
+        concatMap(orgData => {
+          return lastValueFrom(this.userProductJunctionService.fetchUserProductJunctionDataByOrgId(orgData.id))
+          
+            .then(doc => {
+              console.log("DOC",doc)
+              orgData['total_users'] = doc.length;
+              orgData['total_tests'] = doc.reduce((pre, acc) => pre + acc['total_tests'], 0);
+              userProfileData.push(orgData);
+              return orgData
+            })
+        }),
+      )).then(_doc => this.fetchotherMoreDetails(userProfileData))
+    }
+
+    fetchotherMoreDetails(createOrganizationDto: CreateOrganizationDto[]) {
+      Logger.debug(`fetchotherMoreDetails() createOrganizationDto: ${JSON.stringify(createOrganizationDto)}`, APP);
+
+      let orgData: CreateOrganizationDto[] = [];
+      return lastValueFrom(from(createOrganizationDto).pipe(
+        concatMap(orgJunData => {
+          return lastValueFrom(this.orgProductJunctionService.fetchOrgProductJunctionDataByOrgId(orgJunData.id))
+            .then(doc => {
+              doc.forEach(object => {
+                object['progress'] =  this.fetchDate(object);
+              });
+              orgJunData['product'] = doc
+              orgData.push(orgJunData);
+              return orgJunData
+            })
+        }),
+      )).then(_doc => orgData)
+    }
   
+    fetchDate(createOrgProductJunctionDto: CreateOrgProductJunctionDto) {
+      Logger.debug(`fetchDate() createOrgProductJunctionDto: ${JSON.stringify(createOrgProductJunctionDto)}`, APP);
+
+      let countDownDate = new Date(createOrgProductJunctionDto.end_date).getTime();
+      let startDate = new Date(createOrgProductJunctionDto.start_date).getTime();
+      // Update the count down every 1 second
+      // Get todays date and time
+      let now = new Date().getTime();
+  
+      // Find the distance between now and the count down date
+      let distanceWhole = countDownDate - startDate;
+      let distanceLeft = countDownDate - now;
+  
+      // Time calculations for minutes and percentage progressed
+      let minutesLeft = Math.floor(distanceLeft / (1000 * 60));
+      let minutesTotal = Math.floor(distanceWhole / (1000 * 60));
+      return Math.floor(((minutesTotal - minutesLeft) / minutesTotal) * 100);
+    }
+
+    // fetchFiveLatestOrganization() {
+    //   Logger.debug(`fetchFiveLatestOrganization()`, APP);
+  
+    //   return this.organizationDb.fetchLatestFive().pipe(
+    //     catchError(err => {
+    //       throw new UnprocessableEntityException(err.message)
+    //     }),
+    //     map(doc => this.fetchotherDetails(doc))
+    //   );
+  
+    // }
+
+    // fetchUserProfileDataByOrgId(org_id:number){
+    //   return this.userProfileDb.find({org_id:org_id}).pipe(
+    //     map(doc=>doc)
+    //   )
+    // }
   
     fetchOrgByUrl(url: string) {
-      Logger.debug(`fetchOrgByUrl() name:${OrgDTO}`, APP);
+      Logger.debug(`fetchOrgByUrl() url:${url}`, APP);
   
       return this.organizationDb.find({ url: url }).pipe(
         map(doc => {
           if (doc.length == 0){
             return doc
           }
-          if (doc.length != 0){
+          else{
             throw new ConflictException("domain already taken") 
           }
         })
       )
     }
   
-    fetchOrgCount() {
-      return this.organizationDb.find({ is_deleted: false }).pipe(
-        map(doc => { return { "total_organizations_count": doc.length } })
+
+    // 
+    fetchOrganizationById(id: number) {
+      Logger.debug(`fetchOrganizationById() id:${id} `, APP);
+  
+      return this.organizationDb.find({ id: id, is_deleted: false }).pipe(
+        catchError(err => { throw new UnprocessableEntityException(err.message) }),
+        map(doc => {
+          if (doc.length == 0) {
+            throw new NotFoundException('organization not found')
+          }
+          else {
+            return this.fetchotherDetails(doc)
+          }
+        }),
+        switchMap(doc => this.updateStatus(doc))
+
+  
       )
     }
   
-    updateStatus() {
+  
+    updateStatus(data:any) {
       return this.organizationDb.updateColumnByCondition().pipe(
-        map(doc => { return { "status": "updated" } })
-      )
-    }
+        map(doc => { return { "status": "updated" } }),
+        map(doc=>data))
+      }
   
     fetchOrgByCondition(orgDTO: OrgDTO) {
       Logger.debug(`fetchOrgByCondition() orgDTO:${JSON.stringify(orgDTO)} `, APP);
@@ -394,21 +521,21 @@ export class OrganizationService {
       )
     }
   
-    fetchAllOrganization() {
-      Logger.debug(`fetchAllOrganization() `, APP);
+    // fetchAllOrganization() {
+    //   Logger.debug(`fetchAllOrganization() `, APP);
   
-      return this.organizationDb.find({ is_deleted: false }).pipe(
-        catchError(err => { throw new UnprocessableEntityException(err.message) }),
-        map(doc => {
-          if (doc.length == 0) {
-            throw new NotFoundException('No Data available')
-          }
-          else {
-            return this.fetchotherDetails(doc)
-          }
-        }),
-      );
-    }
+    //   return this.organizationDb.find({ is_deleted: false }).pipe(
+    //     catchError(err => { throw new UnprocessableEntityException(err.message) }),
+    //     map(doc => {
+    //       if (doc.length == 0) {
+    //         throw new NotFoundException('No Data available')
+    //       }
+    //       else {
+    //         return this.fetchotherDetails(doc)
+    //       }
+    //     }),
+    //   );
+    // }
   
     fetchFiveLatestOrganization() {
       Logger.debug(`fetchFiveLatestOrganization()`, APP);
@@ -425,7 +552,7 @@ export class OrganizationService {
     findAllProductsMappedWithOrganization(id:any) {
       Logger.debug(`findAllProductsMappedWithOrganization() `, APP);
   
-      return this.fetchOrganizationById(id).pipe(
+      return this.fetchOrganizationByIdDetails(id).pipe(
         catchError(err => { throw new UnprocessableEntityException(err.message) }),
         switchMap(doc => {
           if (doc.length == 0) {
@@ -438,47 +565,47 @@ export class OrganizationService {
       );
     }
   
-    fetchotherDetails(createOrganizationDto: CreateOrganizationDto[]) {
+    // fetchotherDetails(createOrganizationDto: CreateOrganizationDto[]) {
   
-      let temp: CreateOrganizationDto[] = [];
-      return lastValueFrom(from(createOrganizationDto).pipe(
-        concatMap(orgData => {
-          return lastValueFrom(this.userProductJunctionService.fetchUserProductJunctionDataByOrgId(orgData.id))
-            .then(doc => {
-              orgData['total_users'] = doc.length;
-              orgData['total_tests'] = doc.reduce((pre, acc) => pre + acc['total_tests'], 0);
-              orgData['progress'] = this.fetchDate(orgData);
-              temp.push(orgData);
-              return orgData
-            })
-        }),
-      )).then(_doc => temp)
-    }
+    //   let temp: CreateOrganizationDto[] = [];
+    //   return lastValueFrom(from(createOrganizationDto).pipe(
+    //     concatMap(orgData => {
+    //       return lastValueFrom(this.userProductJunctionService.fetchUserProductJunctionDataByOrgId(orgData.id))
+    //         .then(doc => {
+    //           orgData['total_users'] = doc.length;
+    //           orgData['total_tests'] = doc.reduce((pre, acc) => pre + acc['total_tests'], 0);
+    //           orgData['progress'] = this.fetchDate(orgData);
+    //           temp.push(orgData);
+    //           return orgData
+    //         })
+    //     }),
+    //   )).then(_doc => temp)
+    // }
   
-    fetchDate(createOrganizationDto: CreateOrganizationDto) {
+    // fetchDate(createOrganizationDto: CreateOrganizationDto) {
   
-      let countDownDate = new Date(createOrganizationDto.end_date).getTime();
-      let startDate = new Date(createOrganizationDto.start_date).getTime();
-      // Update the count down every 1 second
-      // Get todays date and time
-      let now = new Date().getTime();
+    //   let countDownDate = new Date(createOrganizationDto.end_date).getTime();
+    //   let startDate = new Date(createOrganizationDto.start_date).getTime();
+    //   // Update the count down every 1 second
+    //   // Get todays date and time
+    //   let now = new Date().getTime();
   
-      // Find the distance between now and the count down date
-      let distanceWhole = countDownDate - startDate;
-      let distanceLeft = countDownDate - now;
+    //   // Find the distance between now and the count down date
+    //   let distanceWhole = countDownDate - startDate;
+    //   let distanceLeft = countDownDate - now;
   
-      // Time calculations for minutes and percentage progressed
-      let minutesLeft = Math.floor(distanceLeft / (1000 * 60));
-      let minutesTotal = Math.floor(distanceWhole / (1000 * 60));
-      return Math.floor(((minutesTotal - minutesLeft) / minutesTotal) * 100);
-    }
-  
-  
+    //   // Time calculations for minutes and percentage progressed
+    //   let minutesLeft = Math.floor(distanceLeft / (1000 * 60));
+    //   let minutesTotal = Math.floor(distanceWhole / (1000 * 60));
+    //   return Math.floor(((minutesTotal - minutesLeft) / minutesTotal) * 100);
+    // }
   
   
   
-    fetchOrganizationById(id: number) {
-      Logger.debug(`fetchOrganizationById() id:${id} `, APP);
+  
+  
+    fetchOrganizationByIdDetails(id: number) {
+      Logger.debug(`fetchOrganizationByIdDetails() id:${id} `, APP);
   
       return this.fetchOrganizationDetailsById(id).pipe(
         catchError(err => { throw new UnprocessableEntityException(err.message) }),
@@ -566,9 +693,6 @@ export class OrganizationService {
       )
     }
   
-
-  
-  
     private readonly onAWSErrorResponse = async (err) => {
       Logger.debug('onAWSErrorResponse(), ' + err, APP);
   
@@ -603,10 +727,6 @@ export class OrganizationService {
       return throwError(() => err);
     };
   
-  
-  
-    
-  
     encryptPassword(password) {
       const NodeRSA = require('node-rsa');
   
@@ -615,10 +735,6 @@ export class OrganizationService {
       return encryptedString
   
     }
-  
-  
-  
-  
 
     async uploadFile(filename) {
       const metadata = {
@@ -641,13 +757,5 @@ export class OrganizationService {
   
       console.log(`${filename} uploaded.`);
   
-    }
-  
-
-  
-
-
-
-
-
+  }
 }

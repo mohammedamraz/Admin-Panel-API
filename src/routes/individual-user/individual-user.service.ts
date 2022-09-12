@@ -4,7 +4,7 @@ import { catchError, map, switchMap } from 'rxjs';
 import { GUPSHUP_OTP_MESSAGE_FORMAT, GUPSHUP_OTP_VERIFICATION } from 'src/constants';
 import { DatabaseTable } from 'src/lib/database/database.decorator';
 import { DatabaseService } from 'src/lib/database/database.service';
-import { SendEmailService } from 'src/send-email/send-email.service';
+import { SendEmailService } from '../send-email/send-email.service';
 import { CreateIndividualUserDto, EmailOtpDto, FreeQuotaExhaustedDto, MobileNumberAndOtpDtO, MobileNumberDtO, UpdateUserDto } from './dto/create-individual-user.dto';
 import { UpdateIndividualUserDto } from './dto/update-individual-user.dto';
 

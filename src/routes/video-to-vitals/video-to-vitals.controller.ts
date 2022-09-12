@@ -1,13 +1,9 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Logger, ParseIntPipe, UseInterceptors, UploadedFile } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Logger, ParseIntPipe, UseInterceptors, UploadedFile, Query } from '@nestjs/common';
 import { VideoToVitalsService } from './video-to-vitals.service';
-import { CreateOrganizationDto,EmailConfirmationDTO,LoginUserDTO, LoginUserPasswordCheckDTO, OrgDTO, RegisterUserDTO, UpdateOrganizationDto, UpdateUserDTO, UserDTO, VitalUserDTO } from './dto/create-video-to-vital.dto';
+import { CreateOrganizationDto,EmailConfirmationDTO,LoginUserDTO, LoginUserPasswordCheckDTO, OrgDTO, ProductDto, QueryParamsDto, RegisterUserDTO, UpdateOrganizationDto, UpdateUserDTO, UserDTO, UserParamDto, VitalUserDTO } from './dto/create-video-to-vital.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { diskStorage } from 'multer';
-import { STATIC_IMAGES, STATIC_IMAGES_PROFILE } from 'src/constants';
-import { editFileName, imageFileFilter } from 'src/constants/helper';
 import { PasswordResetDTO } from '../admin/dto/create-admin.dto';
 import { ConfirmForgotPasswordDTO, ForgotPasswordDTO } from '../admin/dto/login.dto';
-import { LoggingInterceptor } from 'src/interceptors/interceptor';
 import { OrganizationService } from './organization.service';
 
 
@@ -50,18 +46,18 @@ export class VideoToVitalsController {
   }
 
   @Get('org')
-  fetchAllOrganization() {
-    Logger.debug(`fetchAllOrganization()`, APP);
+  fetchAllOrganization( @Query() queryParamsDto: QueryParamsDto) {
+    Logger.debug(`fetchAllOrganization() queryParamsDto: ${JSON.stringify(queryParamsDto)}`, APP);
 
-    return this.organizationService.fetchAllOrganization();
+    return this.organizationService.fetchAllOrganization(queryParamsDto);
   }
 
-  @Get('org/latest')
-  fetchFiveLatestOrganization() {
-    Logger.debug(`fetchFiveLatestOrganization()`, APP);
+  // @Get('org/latest')
+  // fetchFiveLatestOrganization() {
+  //   Logger.debug(`fetchFiveLatestOrganization()`, APP);
 
-    return this.organizationService.fetchFiveLatestOrganization();
-  }
+  //   return this.organizationService.fetchFiveLatestOrganization();
+  // }
 
   @Get('org/product/access/:id')
   findAllProductsMappedWithOrganization(@Param('id') id: string) {
@@ -79,17 +75,17 @@ export class VideoToVitalsController {
     return this.organizationService.fetchOrgByCondition(orgDTO)
   }
 
-  @Get('org/:url')
-  fetchOrgByUrl(@Param() url: string,) {
-    Logger.debug(`fetchOrgByUrl() url:${url} `, APP);
+  // @Get('org')
+  // fetchOrgByUrl(@Query() url: string,) {
+  //   Logger.debug(`fetchOrgByUrl() url:${url} `, APP);
 
-    return this.organizationService.fetchOrgByUrl(url)
-  }
+  //   return this.organizationService.fetchOrgByUrl(url)
+  // }
 
-  @Patch('org/status')
-  updateStatus() {
-    return this.organizationService.updateStatus()
-   } 
+  // @Patch('org/status')
+  // updateStatus() {
+  //   return this.organizationService.updateStatus()
+  //  } 
 
   @Get('org/:id')
   fetchOrganizationById(@Param('id', ParseIntPipe) id: number) {
@@ -133,33 +129,33 @@ export class VideoToVitalsController {
   }
 
   
-  @Get('vitals_count')
-  fetchVitalsPilotCount() {
-    Logger.debug(`fetchVitalsPilotCount()`, APP);
+  @Get('count')
+  fetchPilotCount(@Query() productDto: ProductDto) {
+    Logger.debug(`fetchPilotCount() ProductDto: ${JSON.stringify(productDto)}`, APP);
 
-    return this.videoToVitalsService.fetchVitalsPilotCount()
+    return this.videoToVitalsService.fetchPilotCount(productDto)
   }
 
-  @Get('/active_vitals_count')
-  fetchActiveVitalsPilotCount() {
-    Logger.debug(`fetchActiveVitalsPilotCount()`, APP);
+  // @Get('/active_vitals_count')
+  // fetchActiveVitalsPilotCount() {
+  //   Logger.debug(`fetchActiveVitalsPilotCount()`, APP);
 
-    return this.videoToVitalsService.fetchActiveVitalsPilotCount()
-  }
+  //   return this.videoToVitalsService.fetchActiveVitalsPilotCount()
+  // }
 
   @Get()
-  fetchAllVitalsPilot() {
+  fetchAllVitalsPilot(@Query() queryParamsDto: QueryParamsDto ) {
     Logger.debug(`fetchAllVitalsPilot()`, APP);
 
-    return this.videoToVitalsService.fetchAllVitalsPilot()
+    return this.videoToVitalsService.fetchAllVitalsPilot(queryParamsDto)
   }
 
-  @Get('latest')
-  fetchFiveLatestVitalsPilot() {
-    Logger.debug(`fetchAllVitalsPilot()`, APP);
+  // @Get('latest')
+  // fetchFiveLatestVitalsPilot() {
+  //   Logger.debug(`fetchAllVitalsPilot()`, APP);
 
-    return this.videoToVitalsService.fetchFiveLatestVitalsPilot()
-  }
+  //   return this.videoToVitalsService.fetchFiveLatestVitalsPilot()
+  // }
 
   @Get('tests')
   fetchAllVitalsTestCount() {
@@ -168,18 +164,25 @@ export class VideoToVitalsController {
     return this.videoToVitalsService.fetchAllVitalsTestCount()
   }
 
-  @Get(':id')
-  fetchVitalsPilotById(@Param('id', ParseIntPipe) id: number) {
-    Logger.debug(`fetchVitalsPilotById() id:${id} `, APP);
+  // @Get(':org_id')
+  // fetchVitalsPilotById(@Param('org_id',ParseIntPipe ) org_id: number) {
+  //   Logger.debug(`fetchVitalsPilotById() id:${org_id} `, APP);
 
-    return this.videoToVitalsService.fetchVitalsPilotById(id);
-  }
+  //   return this.videoToVitalsService.fetchVitalsPilotById(org_id);
+  // }
 
   @Post('users')
   addUser(@Body() userDTO: UserDTO) {
     Logger.debug(`addUser() addUserDTO:${JSON.stringify(userDTO)} `, APP);
 
   return this.videoToVitalsService.addUser(userDTO)
+  }
+
+  @Get('users/:org_id')
+  fetchAllUsers(@Param('org_id',ParseIntPipe) org_id:number, @Query() userParamDto: UserParamDto){
+    Logger.debug(`fetchAllUsers()`, APP);
+
+    return this.videoToVitalsService.fetchAllUsers(org_id,userParamDto)
   }
 
   @Get('users/:email/:mobile')

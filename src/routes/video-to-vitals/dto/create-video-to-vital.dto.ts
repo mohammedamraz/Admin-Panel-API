@@ -1,5 +1,5 @@
 import { phoneNumber } from "aws-sdk/clients/importexport";
-import { IsAlphanumeric, IsBoolean, IsEmail, IsMobilePhone, IsNotEmpty, isNotEmpty, IsNumber, IsOptional, IsPhoneNumber, IsString } from "class-validator";
+import { IsAlphanumeric, IsBoolean, IsEmail, IsEnum, IsMobilePhone, IsNotEmpty, isNotEmpty, IsNumber, IsOptional, IsPhoneNumber, IsString } from "class-validator";
 
 export class CreateOrganizationDto {
     @IsNotEmpty()
@@ -36,7 +36,7 @@ export class CreateOrganizationDto {
     total_tests:number;
     application_id:string;
     stage?:string;
-
+    org_id:string;
 }
 export class OrgDTO {
     @IsNotEmpty()
@@ -201,3 +201,64 @@ export class LoginUserPasswordCheckDTO {
     
 
 }
+
+export enum Type {
+    "latest" = "latest",
+    "active" = "active",
+}
+export class QueryParamsDto{
+    
+    @IsOptional()
+    @IsEnum(Type)
+    type: Type;
+    @IsOptional()
+    @IsNotEmpty()
+    url: string;
+}
+
+export enum Product {
+    "hsa" = "hsa",
+    "vitals" = "vitals",
+    "ruw" = "ruw"
+
+}
+
+export enum Active {
+    "active" ="active"
+
+}
+
+export class ProductDto{
+    @IsNotEmpty()
+    @IsEnum(Product)
+    product: Product
+    @IsOptional()
+    @IsEnum(Active)
+    status:Active
+}
+
+
+
+export const CONVERTINNUMBER = {
+    hsa: 1,
+    vitals: 2,
+    ruw: 3
+  }
+
+  export const CONVERTINACTIVE = {
+     active : "Active"
+  }
+
+  
+  export enum Typo{
+    "latest" = "latest"
+  }
+
+
+  export class UserParamDto{
+    @IsOptional()
+    @IsNotEmpty()
+    @IsEnum(Typo)
+    type: Typo
+
+  }
