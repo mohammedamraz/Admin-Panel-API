@@ -90,25 +90,25 @@ export class UpdateOrganizationDto {
     admin_name: string;
     @IsOptional()
     designation: string;
-    @IsOptional()
-    @IsEmail()
-    organization_email: string;
+    // @IsOptional()
+    // @IsEmail()
+    // organization_email: string;
     @IsOptional()
     @IsPhoneNumber()
     organization_mobile: phoneNumber;
-    @IsOptional()
-    url: string;
-    @IsOptional()
-    start_date: Date;
-    @IsOptional()
-    end_date: Date;
-    @IsOptional()
-    fedo_score: boolean;
-    @IsOptional()
-    logo: string;
-    @IsOptional()
-    pilot_duration: number;
-    org_id:number;
+    // @IsOptional()
+    // url: string;
+    // @IsOptional()
+    // start_date: Date;
+    // @IsOptional()
+    // end_date: Date;
+    // @IsOptional()
+    // fedo_score: boolean;
+    // @IsOptional()
+    // logo: string;
+    // @IsOptional()
+    // pilot_duration: number;
+    // org_id:number;
     
 }
 

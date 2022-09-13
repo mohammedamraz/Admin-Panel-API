@@ -10,6 +10,7 @@ import { HttpModule, HttpService } from '@nestjs/axios';
 import { OrganizationService } from './organization.service';
 import { OrgProductJunctionService } from '../org-product-junction/org-product-junction.service';
 import { SendEmailService } from '../send-email/send-email.service';
+import { UsersService } from './users.service';
 
 @Module({
   imports: [
@@ -27,7 +28,7 @@ import { SendEmailService } from '../send-email/send-email.service';
     })
   ],
   controllers: [VideoToVitalsController],
-  providers: [VideoToVitalsService, ProductService, UserProductJunctionService, SendEmailService, TemplateService, OrganizationService, OrgProductJunctionService ],
+  providers: [VideoToVitalsService, ProductService, UserProductJunctionService, SendEmailService, TemplateService, OrganizationService, OrgProductJunctionService, UsersService ],
   exports: [OrganizationService]
 })
 export class VideoToVitalsModule { }
