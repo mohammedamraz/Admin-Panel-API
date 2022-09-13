@@ -233,6 +233,13 @@ export class VideoToVitalsController {
     return this.videoToVitalsService.sendEmailToChangeUserPasswordExistByEmail(passwordResetDTO)
   }
 
+  @Patch('org/stage/:id')
+  markAsWonAndLost(@Param('id', ParseIntPipe) id: number, @Body() updateOrganizationDto: UpdateOrganizationDto) {
+    Logger.debug(`updateOrganization() id:${id} updateOrganizationDto: ${JSON.stringify(updateOrganizationDto)} `, APP);
+
+    return this.organizationService.updateOrganization(id, updateOrganizationDto);
+  }
+
 }
 
 
