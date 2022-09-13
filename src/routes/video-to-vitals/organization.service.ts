@@ -32,8 +32,8 @@ export class OrganizationService {
   
     bucket: any;
     urlAWSPhoto: any
-  
     respilot:any
+
     createOrganization(createOrganizationDto: CreateOrganizationDto, path: any) {
       Logger.debug(`createOrganization() createOrganizationDto:${JSON.stringify(createOrganizationDto,)} filename:${path}`, APP);
       let productlist = createOrganizationDto.product_id.split(",")
@@ -309,24 +309,6 @@ export class OrganizationService {
       return Math.floor(((minutesTotal - minutesLeft) / minutesTotal) * 100);
     }
 
-    // fetchFiveLatestOrganization() {
-    //   Logger.debug(`fetchFiveLatestOrganization()`, APP);
-  
-    //   return this.organizationDb.fetchLatestFive().pipe(
-    //     catchError(err => {
-    //       throw new UnprocessableEntityException(err.message)
-    //     }),
-    //     map(doc => this.fetchotherDetails(doc))
-    //   );
-  
-    // }
-
-    // fetchUserProfileDataByOrgId(org_id:number){
-    //   return this.userProfileDb.find({org_id:org_id}).pipe(
-    //     map(doc=>doc)
-    //   )
-    // }
-  
     fetchOrgByUrl(url: string) {
       Logger.debug(`fetchOrgByUrl() url:${url}`, APP);
   
@@ -342,8 +324,6 @@ export class OrganizationService {
       )
     }
   
-
-    // 
     fetchOrganizationById(id: number) {
       Logger.debug(`fetchOrganizationById() id:${id} `, APP);
   
@@ -358,11 +338,8 @@ export class OrganizationService {
           }
         }),
         switchMap(doc => this.updateStatus(doc))
-
-  
       )
     }
-  
   
     updateStatus(data:any) {
       return this.organizationDb.updateColumnByCondition().pipe(
@@ -521,22 +498,6 @@ export class OrganizationService {
       )
     }
   
-    // fetchAllOrganization() {
-    //   Logger.debug(`fetchAllOrganization() `, APP);
-  
-    //   return this.organizationDb.find({ is_deleted: false }).pipe(
-    //     catchError(err => { throw new UnprocessableEntityException(err.message) }),
-    //     map(doc => {
-    //       if (doc.length == 0) {
-    //         throw new NotFoundException('No Data available')
-    //       }
-    //       else {
-    //         return this.fetchotherDetails(doc)
-    //       }
-    //     }),
-    //   );
-    // }
-  
     fetchFiveLatestOrganization() {
       Logger.debug(`fetchFiveLatestOrganization()`, APP);
   
@@ -565,45 +526,6 @@ export class OrganizationService {
       );
     }
   
-    // fetchotherDetails(createOrganizationDto: CreateOrganizationDto[]) {
-  
-    //   let temp: CreateOrganizationDto[] = [];
-    //   return lastValueFrom(from(createOrganizationDto).pipe(
-    //     concatMap(orgData => {
-    //       return lastValueFrom(this.userProductJunctionService.fetchUserProductJunctionDataByOrgId(orgData.id))
-    //         .then(doc => {
-    //           orgData['total_users'] = doc.length;
-    //           orgData['total_tests'] = doc.reduce((pre, acc) => pre + acc['total_tests'], 0);
-    //           orgData['progress'] = this.fetchDate(orgData);
-    //           temp.push(orgData);
-    //           return orgData
-    //         })
-    //     }),
-    //   )).then(_doc => temp)
-    // }
-  
-    // fetchDate(createOrganizationDto: CreateOrganizationDto) {
-  
-    //   let countDownDate = new Date(createOrganizationDto.end_date).getTime();
-    //   let startDate = new Date(createOrganizationDto.start_date).getTime();
-    //   // Update the count down every 1 second
-    //   // Get todays date and time
-    //   let now = new Date().getTime();
-  
-    //   // Find the distance between now and the count down date
-    //   let distanceWhole = countDownDate - startDate;
-    //   let distanceLeft = countDownDate - now;
-  
-    //   // Time calculations for minutes and percentage progressed
-    //   let minutesLeft = Math.floor(distanceLeft / (1000 * 60));
-    //   let minutesTotal = Math.floor(distanceWhole / (1000 * 60));
-    //   return Math.floor(((minutesTotal - minutesLeft) / minutesTotal) * 100);
-    // }
-  
-  
-  
-  
-  
     fetchOrganizationByIdDetails(id: number) {
       Logger.debug(`fetchOrganizationByIdDetails() id:${id} `, APP);
   
@@ -621,27 +543,13 @@ export class OrganizationService {
       )
     }
   
-   
-  
-    updateOrganization(id: string, updateOrganizationDto: UpdateOrganizationDto) {
-      Logger.debug(`updateOrganization(), ,`, APP);
-  
-  
-    
-      if (updateOrganizationDto.pilot_duration) {
-        const tomorrow = new Date();
-        const duration = updateOrganizationDto.pilot_duration
-        updateOrganizationDto.end_date = new Date(tomorrow.setDate(tomorrow.getDate() + Number(duration)));
-        delete updateOrganizationDto.pilot_duration
-      }
-  
-      updateOrganizationDto.start_date = new Date(Date.now()),
-        delete updateOrganizationDto.pilot_duration
+    updateOrganization(id: number, updateOrganizationDto: UpdateOrganizationDto) {
+      Logger.debug(`updateOrganization() id:${id} updateOrganizationDto: ${JSON.stringify(updateOrganizationDto)} `, APP);
   
       return this.organizationDb.find({ id: id, is_deleted: false }).pipe(
         map(res => {
           if (res.length == 0) throw new NotFoundException('organization not found')
-          else return this.organizationDb.findByIdandUpdate({ id: id, quries: updateOrganizationDto })
+          else return this.organizationDb.findByIdandUpdate({ id: id.toString(), quries: updateOrganizationDto })
         }))
     };
   
