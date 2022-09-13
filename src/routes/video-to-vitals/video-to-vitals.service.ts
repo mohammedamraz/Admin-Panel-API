@@ -50,17 +50,17 @@ export class VideoToVitalsService {
   fetchAllVitalsPilot(queryParamsDto: QueryParamsDto) {
     Logger.debug(`fetchAllVitalsPilot()`, APP);
 
-    if (queryParamsDto.type == "latest"){
+    if (queryParamsDto.type == "latest") {
       return this.organizationProductJunctionDb.fetchLatestFiveByProductId(2).pipe(
         catchError(err => {
-         throw new UnprocessableEntityException(err.message)
+          throw new UnprocessableEntityException(err.message)
         }),
         map(doc => this.fetchotherDetails(doc)),
         switchMap(doc => this.organizationService.updateStatus(doc))
       );
-      
+
     }
-    if (queryParamsDto.type == "active"){
+    if (queryParamsDto.type == "active") {
       return this.organizationProductJunctionDb.find({ product_id: 2, status: "Active" }).pipe(
         catchError(err => { throw new UnprocessableEntityException(err.message) }),
         map(doc => {
@@ -68,14 +68,14 @@ export class VideoToVitalsService {
             throw new NotFoundException('No Data available')
           }
           else {
-            
+
             return this.fetchotherDetails(doc)
           }
         }),
         switchMap(doc => this.organizationService.updateStatus(doc))
       );
     }
-    else{
+    else {
       return this.organizationProductJunctionDb.find({ product_id: 2 }).pipe(
         catchError(err => { throw new UnprocessableEntityException(err.message) }),
         map(doc => {
@@ -83,7 +83,7 @@ export class VideoToVitalsService {
             throw new NotFoundException('No Data available')
           }
           else {
-            
+
             return this.fetchotherDetails(doc)
           }
         }),
@@ -91,7 +91,7 @@ export class VideoToVitalsService {
       );
     }
 
-    
+
   }
 
   fetchotherDetails(createOrganizationDto: CreateOrganizationDto[]) {
@@ -108,7 +108,7 @@ export class VideoToVitalsService {
             return orgData
           })
       }),
-    )).then(_doc => this.fetchotherMoreDetails(userProfileData)).catch(err=>{throw new UnprocessableEntityException(err.message)})
+    )).then(_doc => this.fetchotherMoreDetails(userProfileData)).catch(err => { throw new UnprocessableEntityException(err.message) })
   }
 
   fetchotherMoreDetails(createOrganizationDto: CreateOrganizationDto[]) {
@@ -117,16 +117,16 @@ export class VideoToVitalsService {
     let orgData: CreateOrganizationDto[] = [];
     return lastValueFrom(from(createOrganizationDto).pipe(
       concatMap(orgJunData => {
-        return lastValueFrom(this.organizationDb.find({id:orgJunData.org_id}))
+        return lastValueFrom(this.organizationDb.find({ id: orgJunData.org_id }))
           .then(doc => {
-              orgJunData['progress'] = this.fetchDate(orgJunData);
-              orgJunData['organization_name'] = doc[0].organization_name
-              orgData.push(orgJunData);
-              return orgJunData
-            
+            orgJunData['progress'] = this.fetchDate(orgJunData);
+            orgJunData['organization_name'] = doc[0].organization_name
+            orgData.push(orgJunData);
+            return orgJunData
+
           })
       }),
-    )).then(_doc => orgData).catch(err=>{throw new UnprocessableEntityException(err.message)})
+    )).then(_doc => orgData).catch(err => { throw new UnprocessableEntityException(err.message) })
   }
 
   fetchDate(createOrganizationDto: CreateOrganizationDto) {
@@ -160,18 +160,18 @@ export class VideoToVitalsService {
 
   fetchPilotCount(productDto: ProductDto) {
     Logger.debug(`fetchPilotCount() product:${JSON.stringify(productDto)}`, APP);
-    if (productDto.status){
-      return this.organizationProductJunctionDb.find({ product_id: CONVERTINNUMBER[productDto.product], status: CONVERTINACTIVE[productDto.status]}).pipe(
+    if (productDto.status) {
+      return this.organizationProductJunctionDb.find({ product_id: CONVERTINNUMBER[productDto.product], status: CONVERTINACTIVE[productDto.status] }).pipe(
         map(doc => { return `{ total_${productDto.product}_pilot_count: ${doc.length} }` }),
-        catchError(err=>{throw new UnprocessableEntityException(err.message)})
+        catchError(err => { throw new UnprocessableEntityException(err.message) })
       )
     }
-    else{
-      return this.organizationProductJunctionDb.find({ product_id: CONVERTINNUMBER[productDto.product]}).pipe(
+    else {
+      return this.organizationProductJunctionDb.find({ product_id: CONVERTINNUMBER[productDto.product] }).pipe(
         map(doc => { return `{ total_${productDto.product}_pilot_count: ${doc.length} }` })
       )
     }
-   
+
   }
 
   // fetchActiveVitalsPilotCount() {
@@ -268,32 +268,18 @@ export class VideoToVitalsService {
     return this.fetchUserByCondition(userDTO).pipe(
       map(user_doc => user_doc),
       switchMap(user_doc => {
-        return this.organizationService.fetchOrganizationById(userDTO.org_id).pipe(
-          map(org_doc => {
-            return org_doc
-          }),
+        return this.organizationService.fetchOrganizationByIdDetails(userDTO.org_id).pipe(
+          map(org_doc => { return org_doc }),
           switchMap(org_doc => {
-            console.log("docuser", org_doc);
-            userDTO["org_id"] = org_doc[0].id
-            delete userDTO.product_name
             userDTO.application_id = userDTO.mobile.slice(3, 14);
-            userDTO.product_id = Number(product_user_list[0]);
-            // here we are not saving org_id because we were initially saving name and now id we are saving in junction so it is not needed 
+            userDTO.organization_name = org_doc[0].organization_name;
+            delete userDTO.product_id;
             return this.userDb.save(userDTO).pipe(
               map(userdoc => {
-                console.log("deletion", userdoc);
-
                 return [userdoc, org_doc]
               }),
-
               switchMap(doc => {
-                console.log("after deletiom", doc);
                 var encryption = { user_id: doc[0][0]['id'] };
-
-                console.log("data to check after deletion", doc[0][0]['id']);
-                console.log("data to check after deletion", doc[1][0]['admin_name']);
-
-
                 this.sendEmailService.sendEmailOnCreateOrgUser(
 
                   {
@@ -308,30 +294,16 @@ export class VideoToVitalsService {
                   }
                 )
                 return doc[0]
-              }),
-
-            )
-
-
+              }))
           }),
           map(doc => {
-            console.log("org-id", userDTO["org_id"]);
-
             product_user_list.map(res1 =>
-              this.userProductJunctionService.createUserProductJunction({ user_id: doc["id"], org_id: userDTO["org_id"], product_id: Number(res1), total_tests: 0 })
-
-            )
-            doc["id"]
+              this.userProductJunctionService.createUserProductJunction({ user_id: doc["id"], org_id: userDTO["org_id"], product_id: Number(res1), total_tests: 0 }))
+            // doc["id"]
             this.userProfileDb.save({ application_id: doc['application_id'], user_id: doc['id'], org_id: doc['org_id'], name: doc['user_name'], is_editable: true })
             return doc;
-          })
-
-        )
-      }),
-
-    )
-
-
+          }))
+      }))
   }
 
 
@@ -402,25 +374,25 @@ export class VideoToVitalsService {
 
 
   // }
-  fetchAllUsers(org_id:number,userParamDto: UserParamDto){
+  fetchAllUsers(org_id: number, userParamDto: UserParamDto) {
     Logger.debug(`fetchAllUsers()`, APP);
-    if (userParamDto.type){
+    if (userParamDto.type) {
       return this.userDb.fetchLatestFiveUserByOrgId(org_id).pipe(
         catchError(err => { throw new UnprocessableEntityException(err.message) }),
-        map(doc =>this.fetchUsersTestDetails(doc))
+        map(doc => this.fetchUsersTestDetails(doc))
       )
     }
-    else{
-      return this.userDb.find({org_id: org_id}).pipe(
+    else {
+      return this.userDb.find({ org_id: org_id }).pipe(
         catchError(err => { throw new UnprocessableEntityException(err.message) }),
-        map(doc=>{
-          if (doc.length==0) {throw new  NotFoundException("user Not available")}
-          else{
-             return this.fetchUsersTestDetails(doc)
+        map(doc => {
+          if (doc.length == 0) { throw new NotFoundException("user Not available") }
+          else {
+            return this.fetchUsersTestDetails(doc)
           }
         })
       )
-    }  
+    }
   }
 
   fetchUsersTestDetails(userDTO: UserDTO[]) {
@@ -432,7 +404,7 @@ export class VideoToVitalsService {
       concatMap(userData => {
         return lastValueFrom(this.userProductJunctionService.fetchUserProductJunctionDataByUserId(userData.id))
           .then(doc => {
-            
+
             userData['tests'] = doc
             temp.push(userData);
             return userData
@@ -453,7 +425,7 @@ export class VideoToVitalsService {
   fetchAllUsersByOrgIdAndProductId(vitalUserDTO: VitalUserDTO) {
     Logger.debug(`fetchAllUsersByOrgIdAndProductId()`, APP);
 
-    return this.userDb.find({ org_id: vitalUserDTO.org_id}).pipe(
+    return this.userDb.find({ org_id: vitalUserDTO.org_id }).pipe(
       catchError(err => { throw new UnprocessableEntityException(err.message) }),
       map(doc => {
         if (doc.length == 0) {

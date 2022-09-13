@@ -37,6 +37,10 @@ export class CreateOrganizationDto {
     application_id:string;
     stage?:string;
     org_id:string;
+    productaccess_web?:boolean;
+    productaccess_mobile?:boolean;
+    web_fedoscore?:boolean;
+    web_url?:string;
 }
 export class OrgDTO {
     @IsNotEmpty()
