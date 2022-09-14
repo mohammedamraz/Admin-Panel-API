@@ -66,6 +66,21 @@ export class ProductService {
       }),
     );
   }
+
+  fetchProductById(id: number) {
+    Logger.debug(`fetchProductById() id:`, APP);
+    return this.productDb.find({id:id}).pipe(
+      catchError(err => { throw new UnprocessableEntityException(err.message) }),
+      switchMap(doc => {
+        if (doc.length == 0) {
+          throw new NotFoundException('No Products Found')
+        }
+        else {
+          return doc
+        }
+      }),
+    );
+  }
 }
 
 
