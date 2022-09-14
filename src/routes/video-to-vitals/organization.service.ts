@@ -11,6 +11,7 @@ import { OrgProductJunctionService } from '../org-product-junction/org-product-j
 import { CreateOrgProductJunctionDto } from '../org-product-junction/dto/create-org-product-junction.dto';
 import { UserProductJunctionService } from '../user-product-junction/user-product-junction.service';
 import { SendEmailService } from '../send-email/send-email.service';
+import { ProductService } from '../product/product.service';
 
 const APP = 'OrganizationService'
 @Injectable()
@@ -25,6 +26,7 @@ export class OrganizationService {
     private readonly userProfileDb: DatabaseService<UserProfileDTO>,
     // @DatabaseTable('product')
     private readonly sendEmailService: SendEmailService,
+    private readonly productService: ProductService,
     private readonly orgProductJunctionService: OrgProductJunctionService,
     private readonly userProductJunctionService: UserProductJunctionService,
     private http: HttpService,
@@ -230,7 +232,6 @@ export class OrganizationService {
       return this.organizationDb.find({ is_deleted: false }).pipe(
         catchError(err => { throw new UnprocessableEntityException(err.message) }),
         map(doc => {
-          console.log("deszfsd", doc);
           if (doc.length == 0) throw new NotFoundException('No Data available')
           else { return this.fetchotherDetails(doc) }
         }),
@@ -248,7 +249,6 @@ export class OrganizationService {
         return lastValueFrom(this.userProductJunctionService.fetchUserProductJunctionDataByOrgId(orgData.id))
 
           .then(doc => {
-            console.log("DOC", doc)
             orgData['total_users'] = doc.length;
             orgData['total_tests'] = doc.reduce((pre, acc) => pre + acc['total_tests'], 0);
             userProfileData.push(orgData);
@@ -273,6 +273,45 @@ export class OrganizationService {
             orgData.push(orgJunData);
             return orgJunData
           })
+      }),
+    )).then(_doc => orgData)
+  }
+
+  fetchProductDetails(createOrganizationDto: CreateOrganizationDto[]) {
+    Logger.debug(`fetchotherMoreDetails() createOrganizationDto: ${JSON.stringify(createOrganizationDto)}`, APP);
+
+    let orgData: CreateOrganizationDto[] = [];
+    return lastValueFrom(from(createOrganizationDto).pipe(
+      concatMap(orgJunData => {
+        let doc = lastValueFrom(this.orgProductJunctionService.fetchOrgProductJunctionDataByOrgId(orgJunData.id))
+
+
+        let result: Array<object> = [];
+
+        let res = new Promise<void>(async (resolve, rejects) => {
+          (await doc).forEach(async (object, index) => {
+            await lastValueFrom(this.productService.fetchProductById(object.product_id)).then(
+              productDoc => {
+                result.push(object);
+                result[index]['progress'] = this.fetchDate(object);
+                result[index]['url'] = productDoc
+                
+              }
+            );
+            if (result.length == (await doc).length) {
+              orgJunData['product'] = result
+              orgData.push(orgJunData);
+              resolve()
+              return orgJunData
+            }
+          });
+
+
+        })
+
+        return res.then((item) => {return item })
+
+
       }),
     )).then(_doc => orgData)
   }
@@ -354,7 +393,7 @@ export class OrganizationService {
           throw new NotFoundException('organization not found')
         }
         else {
-          return this.fetchotherDetails(doc)
+          return this.fetchProductDetails(doc)
         }
       }),
       switchMap(doc => this.updateStatus(doc))

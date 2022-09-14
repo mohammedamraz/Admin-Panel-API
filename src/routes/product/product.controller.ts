@@ -21,4 +21,11 @@ export class ProductController {
     return this.productService.fetchAllProducts();
   }
 
+  @Get(':id')
+  fetchProductById(@Param('id') id: number) {
+    Logger.debug(`fetchAllProducts() id:${id}`, APP);
+
+    return this.productService.fetchProductById(id);
+  }
+
 }
