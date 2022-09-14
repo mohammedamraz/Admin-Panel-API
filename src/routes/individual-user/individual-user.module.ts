@@ -5,7 +5,7 @@ import { AdminService } from '../admin/admin.service';
 import { DatabaseModule } from 'src/lib/database/database.module';
 import { TemplateService } from 'src/constants/template.service';
 import { HttpModule } from '@nestjs/axios/dist';
-import { SendEmailService } from 'src/send-email/send-email.service';
+import { SendEmailService } from '../send-email/send-email.service';
 
 @Module({
 

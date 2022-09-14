@@ -54,7 +54,7 @@ export class ProductService {
   fetchAllProducts() {
     Logger.debug(`fetchAllProducts() `, APP);
 
-    return this.productDb.find({ is_active: true }).pipe(
+    return this.productDb.fetchAll().pipe(
       catchError(err => { throw new UnprocessableEntityException(err.message) }),
       map(doc => {
         if (doc.length == 0) {

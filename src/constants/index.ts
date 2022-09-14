@@ -44,6 +44,8 @@ export const AWS_ACCESS_KEY_ID = process.env.FEDO_HSA_SALES_AWS_ACCESS_KEY_ID ||
 export const AWS_SECRET_ACCESS_KEY = process.env.FEDO_HSA_SALES_AWS_SECRET_ACCESS_KEY || 'OQhNvqgnqtv94XW4yB2R0vnZqt9yK98TpFztUHgT';
 export const SES_SOURCE_EMAIL = process.env.FEDO_COMM_SERVER_AWS_SES_SOURCE_EMAIL || "FEDO HSA <hsa@fedo.ai>";
 export const SES_SOURCE_SUPPORT_EMAIL = process.env.FEDO_COMM_SERVER_AWS_SES_SUPPORT_EMAIL || "FEDO HSA <support@fedo.health>";
+export const SES_SOURCE_SUPPORT_EMAIL_AI = process.env.FEDO_COMM_SERVER_AWS_SES_SUPPORT_EMAIL_AI || "FEDO HSA <support@fedo.ai>";
+
 export const SES_SOURCE_HELLO_SUPPORT__EMAIL = process.env.FEDO_COMM_SERVER_AWS_SES_HELLO_SUPPORT_EMAIL || "FEDO HSA <mohd.amraz0@gmail.com>";
 export const STATIC_IMAGES = process.env.FEDO_HSA_SERVER_STATIC_IMAGES || 'https://fedo-file-server.s3.ap-south-1.amazonaws.com/images';
 export const STATIC_IMAGES_PROFILE = process.env.FEDO_HSA_SERVER_STATIC_IMAGES || 'C:/static images/';

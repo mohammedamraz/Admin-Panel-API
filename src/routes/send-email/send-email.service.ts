@@ -56,5 +56,11 @@ export class SendEmailService {
     return this.templateService.sendOtpToEmail(emailAndOtp);
   }
 
+  sendEmailOnVitalsWebAppAccess(body: sendEmailOnCreationOfOrgAndUser){
+    Logger.debug(`sendEmailOnVitalsWebAppAccess() body: [${JSON.stringify(body)}]`, APP);
+
+    return this.templateService.sendEmailOnVitalsWebAppAccess(body)
+  }
+
 
 }

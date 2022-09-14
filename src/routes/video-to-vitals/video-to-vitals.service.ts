@@ -2,22 +2,20 @@ import { BadRequestException, ConflictException, Injectable, Logger, NotFoundExc
 import { catchError, concatMap, from, lastValueFrom, map, switchMap, throwError } from 'rxjs';
 import { DatabaseTable } from 'src/lib/database/database.decorator';
 import { DatabaseService } from 'src/lib/database/database.service';
-import { SendEmailService } from 'src/send-email/send-email.service';
 import { PasswordResetDTO } from '../admin/dto/create-admin.dto';
-// import { CreateProductDto } from '../product/dto/create-product.dto';
 import { ProductService } from '../product/product.service';
 import { UserProductJunctionService } from '../user-product-junction/user-product-junction.service';
-import { AWS_ACCESS_KEY_ID, AWS_COGNITO_USER_CREATION_URL_SIT, AWS_SECRET_ACCESS_KEY, FEDO_APP, FEDO_USER_ADMIN_PANEL_POOL_NAME, PUBLIC_KEY } from 'src/constants';
+import { AWS_COGNITO_USER_CREATION_URL_SIT, FEDO_APP, PUBLIC_KEY } from 'src/constants';
 import { HttpService } from '@nestjs/axios';
 import { AxiosResponse } from 'axios';
 import { ConfirmForgotPasswordDTO, ForgotPasswordDTO } from '../admin/dto/login.dto';
-import { CreateOrganizationDto, LoginUserDTO, LoginUserPasswordCheckDTO, OrgDTO, RegisterUserDTO, UpdateOrganizationDto, UpdateUserDTO, UserDTO, UserProfileDTO, VitalUserDTO } from './dto/create-video-to-vital.dto';
+import { CreateOrganizationDto, LoginUserDTO, LoginUserPasswordCheckDTO, OrgDTO, CONVERTINNUMBER, ProductDto, RegisterUserDTO, UpdateOrganizationDto, UpdateUserDTO, UserDTO, UserProfileDTO, VitalUserDTO, CONVERTINACTIVE, QueryParamsDto, UserParamDto } from './dto/create-video-to-vital.dto';
 import { v4 as uuidv4 } from 'uuid';
-import { S3 } from 'aws-sdk';
-import { application } from 'express';
 import { CreateUserProductJunctionDto } from '../user-product-junction/dto/create-user-product-junction.dto';
 import { OrganizationService } from './organization.service';
 import { CreateProductDto } from '../product/dto/create-product.dto';
+import { SendEmailService } from '../send-email/send-email.service';
+import { UsersService } from './users.service';
 
 const APP = 'VideoToVitalsService'
 
@@ -41,83 +39,84 @@ export class VideoToVitalsService {
     private readonly userProductJunctionService: UserProductJunctionService,
     private readonly sendEmailService: SendEmailService,
     private readonly organizationService: OrganizationService,
+    private readonly usersService: UsersService,
     private http: HttpService,
 
-  ) {
+  ) {}
 
-  }
+  fetchAllVitalsPilot(id:number,queryParamsDto: QueryParamsDto) {
+    Logger.debug(`fetchAllVitalsPilot() product_id:${id}`, APP);
 
-
-
-  fetchAllVitalsPilot() {
-    Logger.debug(`fetchAllVitalsPilot()`, APP);
-
-    return this.organizationDb.find({ product_id: 2, is_deleted: false }).pipe(
-      catchError(err => { throw new UnprocessableEntityException(err.message) }),
-      map(doc => {
-        if (doc.length == 0) {
-          throw new NotFoundException('No Data available')
-        }
-        else {
-          return this.fetchotherDetails(doc)
-        }
-      }),
-    );
-  }
-
-  fetchFiveLatestVitalsPilot() {
-    Logger.debug(`fetchFiveLatestVitalsPilot()`, APP);
-
-    return this.organizationDb.fetchLatestFiveByProductId(2).pipe(
-      catchError(err => {
-        throw new UnprocessableEntityException(err.message)
-      }),
-      map(doc => this.fetchotherDetails(doc))
-    );
-
-
-  }
-
-  fetchVitalsPilotCount() {
-    return this.organizationDb.find({ product_id: 2, is_deleted: false }).pipe(
-      map(doc => { return { "total_Vitals_pilot_count": doc.length } })
-    )
-  }
-
-  fetchActiveVitalsPilotCount() {
-    return this.organizationDb.find({ product_id: 2, status: 'Active', is_deleted: false }).pipe(
-      map(doc => { return { "Active_Vitals_pilot_count": doc.length } })
-    )
-  }
-
-
-  fetchOrgByNameForUserCreation(organization_name: string) {
-    Logger.debug(`fetchOrgByNameForUserCreation() orgDTO:${organization_name} `, APP);
-    return this.organizationDb.find({ organization_name: organization_name }).pipe(
-      map(doc => {
-        if (doc.length == 0) {
-          throw new NotFoundException(`organization not found`)
-        }
-        else { return doc }
-      }),
-    )
+    if (queryParamsDto.type == "latest"){
+      return this.organizationProductJunctionDb.fetchLatestFiveByProductId(id).pipe(
+        catchError(err => {throw new UnprocessableEntityException(err.message)}),
+        map(doc => this.fetchotherDetails(doc)),
+        switchMap(doc => this.organizationService.updateStatus(doc))
+      );
+    }
+    if (queryParamsDto.type == "active"){
+      return this.organizationProductJunctionDb.find({ product_id: id, status: "Active" }).pipe(
+        catchError(err => { throw new UnprocessableEntityException(err.message) }),
+        map(doc => {
+          if (doc.length == 0) {
+            throw new NotFoundException('No Data available')
+          }
+          else {
+            return this.fetchotherDetails(doc)
+          }
+        }),
+        switchMap(doc => this.organizationService.updateStatus(doc))
+      );
+    }
+    else{
+      return this.organizationProductJunctionDb.find({ product_id: id }).pipe(
+        catchError(err => { throw new UnprocessableEntityException(err.message) }),
+        map(doc => {
+          if (doc.length == 0) {
+            throw new NotFoundException('No Data available')
+          }
+          else {
+            return this.fetchotherDetails(doc)
+          }
+        }),
+        switchMap(doc => this.organizationService.updateStatus(doc))
+      );
+    } 
   }
 
   fetchotherDetails(createOrganizationDto: CreateOrganizationDto[]) {
+    Logger.debug(`fetchotherDetails() createOrganizationDto: ${JSON.stringify(createOrganizationDto)}`, APP);
 
-    let temp: CreateOrganizationDto[] = [];
+    let userProfileData: CreateOrganizationDto[] = [];
     return lastValueFrom(from(createOrganizationDto).pipe(
       concatMap(orgData => {
-        return lastValueFrom(this.userProductJunctionService.fetchUserProductJunctionDataByOrgId(orgData.id))
+        return lastValueFrom(this.userProductJunctionService.fetchUserProductJunctionDataByOrgId(Number(orgData.org_id)))
           .then(doc => {
             orgData['total_users'] = doc.length;
             orgData['total_tests'] = doc.reduce((pre, acc) => pre + acc['total_tests'], 0);
-            orgData['progress'] = this.fetchDate(orgData);
-            temp.push(orgData);
+            userProfileData.push(orgData);
             return orgData
           })
       }),
-    )).then(_doc => temp)
+    )).then(_doc => this.fetchotherMoreDetails(userProfileData)).catch(err => { throw new UnprocessableEntityException(err.message) })
+  }
+
+  fetchotherMoreDetails(createOrganizationDto: CreateOrganizationDto[]) {
+    Logger.debug(`fetchotherMoreDetails() createOrganizationDto: ${JSON.stringify(createOrganizationDto)}`, APP);
+
+    let orgData: CreateOrganizationDto[] = [];
+    return lastValueFrom(from(createOrganizationDto).pipe(
+      concatMap(orgJunData => {
+        return lastValueFrom(this.organizationDb.find({ id: orgJunData.org_id }))
+          .then(doc => {
+            orgJunData['progress'] = this.fetchDate(orgJunData);
+            orgJunData['organization_name'] = doc[0].organization_name
+            orgData.push(orgJunData);
+            return orgJunData
+
+          })
+      }),
+    )).then(_doc => orgData).catch(err => { throw new UnprocessableEntityException(err.message) })
   }
 
   fetchDate(createOrganizationDto: CreateOrganizationDto) {
@@ -138,24 +137,89 @@ export class VideoToVitalsService {
     return Math.floor(((minutesTotal - minutesLeft) / minutesTotal) * 100);
   }
 
+  // fetchFiveLatestVitalsPilot() {
+  //   Logger.debug(`fetchFiveLatestVitalsPilot()`, APP);
+
+  //   return this.organizationDb.fetchLatestFiveByProductId(2).pipe(
+  //     catchError(err => {
+  //       throw new UnprocessableEntityException(err.message)
+  //     }),
+  //     map(doc => this.fetchotherDetails(doc))
+  //   );
+  // }
+
+  fetchPilotCount(productDto: ProductDto) {
+    Logger.debug(`fetchPilotCount() product:${JSON.stringify(productDto)}`, APP);
+    if (productDto.status) {
+      return this.organizationProductJunctionDb.find({ product_id: CONVERTINNUMBER[productDto.product], status: CONVERTINACTIVE[productDto.status] }).pipe(
+        map(doc => { return `{ total_${productDto.product}_pilot_count: ${doc.length} }` }),
+        catchError(err => { throw new UnprocessableEntityException(err.message) })
+      )
+    }
+    else {
+      return this.organizationProductJunctionDb.find({ product_id: CONVERTINNUMBER[productDto.product] }).pipe(
+        map(doc => { return `{ total_${productDto.product}_pilot_count: ${doc.length} }` })
+      )
+    }
+
+  }
+
+  // fetchActiveVitalsPilotCount() {
+  //   return this.organizationDb.find({ product_id: 2, status: 'Active', is_deleted: false }).pipe(
+  //     map(doc => { return { "Active_Vitals_pilot_count": doc.length } })
+  //   )
+  // }
 
 
-  fetchVitalsPilotById(id: number) {
-    Logger.debug(`fetchVitalsPilotById() id:${id} `, APP);
-
-    return this.organizationDb.find({ id: id, is_deleted: false, product_id: 2 }).pipe(
-      catchError(err => { throw new UnprocessableEntityException(err.message) }),
+  fetchOrgByNameForUserCreation(organization_name: string) {
+    Logger.debug(`fetchOrgByNameForUserCreation() orgDTO:${organization_name} `, APP);
+    return this.organizationDb.find({ organization_name: organization_name }).pipe(
       map(doc => {
         if (doc.length == 0) {
-          throw new NotFoundException('vitals pilot not found')
+          throw new NotFoundException(`organization not found`)
         }
-        else {
-          return doc
-        }
+        else { return doc }
       }),
-
     )
   }
+
+  // fetchotherDetails(createOrganizationDto: CreateOrganizationDto[]) {
+
+  //   let temp: CreateOrganizationDto[] = [];
+  //   return lastValueFrom(from(createOrganizationDto).pipe(
+  //     concatMap(orgData => {
+  //       return lastValueFrom(this.userProductJunctionService.fetchUserProductJunctionDataByOrgId(orgData.id))
+  //         .then(doc => {
+  //           orgData['total_users'] = doc.length;
+  //           orgData['total_tests'] = doc.reduce((pre, acc) => pre + acc['total_tests'], 0);
+  //           orgData['progress'] = this.fetchDate(orgData);
+  //           temp.push(orgData);
+  //           return orgData
+  //         })
+  //     }),
+  //   )).then(_doc => temp)
+  // }
+
+
+
+
+
+  // fetchVitalsPilotById(org_id: number) {
+  //   Logger.debug(`fetchVitalsPilotById() id:${org_id} `, APP);
+
+  //   return this.organizationProductJunctionDb.find({ org_id: org_id, product_id: 2 }).pipe(
+  //     catchError(err => { throw new UnprocessableEntityException(err.message) }),
+  //     map(doc => {
+  //       if (doc.length == 0) {
+  //         throw new NotFoundException('vitals pilot not found')
+  //       }
+  //       else {
+  //         return this.fetchotherDetails(doc)
+  //       }
+  //     }),
+  //     switchMap(doc => this.organizationService.updateStatus(doc))
+  //   )
+  // }
 
 
 
@@ -175,11 +239,13 @@ export class VideoToVitalsService {
     )
   }
 
-  fetchAllVitalsTestCount() {
-    Logger.debug(`fetchAllVitalsTestCount() ) `, APP);
-
-    return this.userProductJunctionService.fetchUserProductJunctionDataByProductId(2).pipe(
+  fetchAllVitalsTestCount(id: number) {
+    Logger.debug(`fetchAllVitalsTestCount() product_id:${id} `, APP);
+  
+    return this.userProductJunctionService.fetchUserProductJunctionDataByProductId(id).pipe(
+      catchError(err => { throw new UnprocessableEntityException(err.message) }),
       map(doc => {
+        if (doc.length==0) throw new NotFoundException(`product not available with product id ${id}`)
         const total_tests = doc.reduce((pre, acc) => pre + acc['total_tests'], 0);
         return { "total_tests": total_tests }
       })
@@ -190,34 +256,21 @@ export class VideoToVitalsService {
     Logger.debug(`addUser() addUserDTO:${JSON.stringify(userDTO)} `, APP);
 
     let product_user_list = userDTO.product_id.toString().split(",")
-    return this.fetchUserByCondition(userDTO).pipe(
+    return this.usersService.fetchUserByCondition(userDTO).pipe(
       map(user_doc => user_doc),
       switchMap(user_doc => {
-        return this.fetchOrgByNameForUserCreation(userDTO.organization_name).pipe(
-          map(org_doc => {
-            return org_doc
-          }),
+        return this.organizationService.fetchOrganizationByIdDetails(userDTO.org_id).pipe(
+          map(org_doc => { return org_doc }),
           switchMap(org_doc => {
-            console.log("docuser", org_doc);
-            userDTO["org_id"] = org_doc[0].id
-            delete userDTO.product_name
             userDTO.application_id = userDTO.mobile.slice(3, 14);
-            userDTO.product_id = Number(product_user_list[0]);
+            userDTO.organization_name = org_doc[0].organization_name;
+            delete userDTO.product_id;
             return this.userDb.save(userDTO).pipe(
               map(userdoc => {
-                console.log("deletion", userdoc);
-
                 return [userdoc, org_doc]
               }),
-
               switchMap(doc => {
-                console.log("after deletiom", doc);
                 var encryption = { user_id: doc[0][0]['id'] };
-
-                console.log("data to check after deletion", doc[0][0]['id']);
-                console.log("data to check after deletion", doc[1][0]['admin_name']);
-
-
                 this.sendEmailService.sendEmailOnCreateOrgUser(
 
                   {
@@ -232,30 +285,16 @@ export class VideoToVitalsService {
                   }
                 )
                 return doc[0]
-              }),
-
-            )
-
-
+              }))
           }),
           map(doc => {
-            console.log("org-id", userDTO["org_id"]);
-
             product_user_list.map(res1 =>
-              this.userProductJunctionService.createUserProductJunction({ user_id: doc["id"], org_id: userDTO["org_id"], product_id: Number(res1), total_tests: 0 })
-
-            )
-            doc["id"]
+              this.userProductJunctionService.createUserProductJunction({ user_id: doc["id"], org_id: userDTO["org_id"], product_id: Number(res1), total_tests: 0 }))
+            // doc["id"]
             this.userProfileDb.save({ application_id: doc['application_id'], user_id: doc['id'], org_id: doc['org_id'], name: doc['user_name'], is_editable: true })
             return doc;
-          })
-
-        )
-      }),
-
-    )
-
-
+          }))
+      }))
   }
 
 
@@ -332,105 +371,6 @@ export class VideoToVitalsService {
 
     return this.userDb.find({ org_id: org_id }).pipe(
       map(doc => { return { "total user for a particular organization": doc.length } })
-    )
-  }
-
-  fetchAllUsersByOrgIdAndProductId(vitalUserDTO: VitalUserDTO) {
-    Logger.debug(`fetchAllUsersByOrgIdAndProductId()`, APP);
-
-    return this.userDb.find({ org_id: vitalUserDTO.org_id, product_id: 2 }).pipe(
-      catchError(err => { throw new UnprocessableEntityException(err.message) }),
-      map(doc => {
-        if (doc.length == 0) {
-          throw new NotFoundException('user not found')
-        }
-        else {
-          return this.fetchUsersotherDetails(doc)
-        }
-      }),
-    );
-  }
-
-  fetchUsersotherDetails(userDTO: UserDTO[]) {
-    Logger.debug(`fetchUsersotherDetails() userDTO:${JSON.stringify(userDTO)} `, APP);
-
-
-    let temp: UserDTO[] = [];
-    return lastValueFrom(from(userDTO).pipe(
-      concatMap(userData => {
-        return lastValueFrom(this.userProductJunctionService.fetchUserProductJunctionDataByUserIdAndProductId(userData.id, userData.product_id))
-          .then(doc => {
-            userData['total_tests'] = doc[0].total_tests
-            temp.push(userData);
-            return userData
-          })
-          .catch(err => { throw new UnprocessableEntityException(err.message) })
-      }),
-    )).then(_doc => temp)
-  }
-
-  fetchFiveLatestUsersByOrgIdAndProductId(vitalUserDTO: VitalUserDTO) {
-    Logger.debug(`fetchFiveLatestUsersByOrgIdAndProductId() vitalUserDTO:${JSON.stringify(vitalUserDTO)} `, APP);
-
-    return this.userDb.fetchLatestFiveUserByProductIdOrgId(2, vitalUserDTO.org_id,).pipe(
-      map(doc => this.fetchUsersotherDetails(doc))
-    )
-  }
-
-  fetchUserByCondition(userDTO: UserDTO) {
-    Logger.debug(`fetchAllUsertByEmailAndMobile() addUserDTO:${JSON.stringify(userDTO)} `, APP);
-
-    return this.fetchAllUsersByEmailAndMobile(userDTO).pipe(
-      map(doc => doc),
-      switchMap(doc => {
-        return this.fetchAllUsersByEmail(userDTO).pipe(
-          map(doc => doc),
-          switchMap(doc => {
-            return this.fetchAllUsersByMobile(userDTO).pipe(
-              map(doc => { return doc })
-            )
-          }),
-        )
-      })
-    )
-  }
-
-  fetchAllUsersByEmailAndMobile(userDTO: UserDTO) {
-    Logger.debug(`fetchAllUsertByEmailAndMobile() addUserDTO:${JSON.stringify(userDTO)} `, APP);
-
-    return this.userDb.find({ email: userDTO.email, mobile: userDTO.mobile }).pipe(
-      map(doc => {
-        if (doc.length != 0) {
-          throw new ConflictException("user exist with email id and mobile no.")
-        }
-        else { return doc }
-      })
-    )
-  }
-
-  fetchAllUsersByEmail(userDTO: UserDTO) {
-    Logger.debug(`fetchAllUsertByEmail() addUserDTO:${JSON.stringify(userDTO)} `, APP);
-
-    return this.userDb.find({ email: userDTO.email }).pipe(
-      map(doc => {
-        if (doc.length != 0) {
-          throw new ConflictException("user exist with email id")
-        }
-        else { return doc }
-      })
-    )
-  }
-
-  fetchAllUsersByMobile(userDTO: UserDTO) {
-    Logger.debug(`fetchAllUsertByMobile() addUserDTO:${JSON.stringify(userDTO)} `, APP);
-
-    return this.userDb.find({ mobile: userDTO.mobile }).pipe(
-      map(doc => {
-        if (doc.length != 0) {
-          throw new ConflictException("user exist with mobile number")
-        }
-        else { return doc }
-      })
     )
   }
 

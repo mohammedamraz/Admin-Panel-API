@@ -12,11 +12,11 @@ import { AdminModule } from './routes/admin/admin.module';
 import { VideoToVitalsModule } from './routes/video-to-vitals/video-to-vitals.module';
 import { ProductModule } from './routes/product/product.module';
 import { UserProductJunctionModule } from './routes/user-product-junction/user-product-junction.module';
-import { SendEmailModule } from './send-email/send-email.module';
 import { OrgProductJunctionModule } from './routes/org-product-junction/org-product-junction.module';
 import { IndividualUserModule } from './routes/individual-user/individual-user.module';
 import { ProfileInfoModule } from './routes/profile-info/profile-info/profile-info.module';
 import { ThirdpartyOrganizationModule } from './routes/thirdparty-organization/thirdparty-organization.module';
+import { SendEmailModule } from './routes/send-email/send-email.module';
 
 @Module({
   imports: [

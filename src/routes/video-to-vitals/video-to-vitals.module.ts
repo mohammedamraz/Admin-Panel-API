@@ -4,11 +4,13 @@ import { VideoToVitalsController } from './video-to-vitals.controller';
 import { DatabaseModule } from 'src/lib/database/database.module';
 import { ProductService } from '../product/product.service';
 import { UserProductJunctionService } from '../user-product-junction/user-product-junction.service';
-import { SendEmailService } from 'src/send-email/send-email.service';
 import { TemplateService } from 'src/constants/template.service';
 import { HttpModule, HttpService } from '@nestjs/axios';
 // import { HttpModule } from '@nestjs/axios';
 import { OrganizationService } from './organization.service';
+import { OrgProductJunctionService } from '../org-product-junction/org-product-junction.service';
+import { SendEmailService } from '../send-email/send-email.service';
+import { UsersService } from './users.service';
 
 @Module({
   imports: [
@@ -26,7 +28,7 @@ import { OrganizationService } from './organization.service';
     })
   ],
   controllers: [VideoToVitalsController],
-  providers: [VideoToVitalsService, ProductService, UserProductJunctionService, SendEmailService, TemplateService, OrganizationService ],
+  providers: [VideoToVitalsService, ProductService, UserProductJunctionService, SendEmailService, TemplateService, OrganizationService, OrgProductJunctionService, UsersService ],
   exports: [OrganizationService]
 })
 export class VideoToVitalsModule { }

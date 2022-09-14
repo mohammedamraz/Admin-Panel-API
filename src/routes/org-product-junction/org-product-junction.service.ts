@@ -1,25 +1,24 @@
-import { Injectable, Logger, NotFoundException, UnprocessableEntityException } from '@nestjs/common';
-import { catchError, map } from 'rxjs';
+import {  Logger, NotFoundException, UnprocessableEntityException } from '@nestjs/common';
+import { catchError } from 'rxjs';
+import { Injectable } from '@nestjs/common';
+import { map } from 'rxjs';
+import { DatabaseTable } from 'src/lib/database/database.decorator';
+import { DatabaseService } from 'src/lib/database/database.service';
 import { CreateOrgProductJunctionDto } from './dto/create-org-product-junction.dto';
 import { UpdateOrgProductJunctionDto } from './dto/update-org-product-junction.dto';
 
 @Injectable()
 export class OrgProductJunctionService {
-  create(createOrgProductJunctionDto: CreateOrgProductJunctionDto) {
-    return 'This action adds a new orgProductJunction';
-  }
 
-  findAll() {
-    return `This action returns all orgProductJunction`;
-  }
+  constructor(@DatabaseTable('organization_product_junction')
+  private readonly organizationProductJunctionDb: DatabaseService<CreateOrgProductJunctionDto>){}
 
-  findOne(id: number) {
-    return `This action returns a #${id} orgProductJunction`;
-  }
+    fetchOrgProductJunctionDataByOrgId(org_id:number){
+      return this.organizationProductJunctionDb.find({org_id:org_id}).pipe(
+        map(doc=>doc)
+      )
+    }
 
-  update(id: number, updateOrgProductJunctionDto: UpdateOrgProductJunctionDto) {
-    return `This action updates a #${id} orgProductJunction`;
-  }
 
   remove(id: number) {
     return `This action removes a #${id} orgProductJunction`;
