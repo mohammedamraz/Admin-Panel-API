@@ -34,12 +34,11 @@ export class OrganizationService {
   urlAWSPhoto: any
 
   respilot_duration: any
-  createOrganization(createOrganizationDto: CreateOrganizationDto, path: any) {
+  async createOrganization(createOrganizationDto: CreateOrganizationDto, path: any) {
     Logger.debug(`createOrganization() createOrganizationDto:${JSON.stringify(createOrganizationDto,)} filename:${path}`, APP);
     
-    console.log('path',path)
     if (path != null) {
-      this.upload(path);
+      await this.upload(path);
       createOrganizationDto.logo=this.urlAWSPhoto;
     }
     else delete createOrganizationDto.logo
@@ -47,6 +46,15 @@ export class OrganizationService {
     let productlist_pilotduration = (createOrganizationDto.pilot_duration)?.toString().split(",")
     let productlist_fedoscore = (createOrganizationDto.fedo_score)?.toString().split(",")
     let productlist_webApp = (createOrganizationDto.productaccess_web)?.toString().split(",")||['false','false']
+    productlist_webApp.map(res=>{
+      console.log("Ressssss",res)
+      if(res.toString().length<1){
+        console.log("resaaaaa",res.toString().length)
+
+      }
+      console.log("res",res.toString().length)
+    }
+      )
     // let productlist_mobileApp = (createOrganizationDto.productaccess_mobile).toString().split(",")
     let productlist_webFedoscore = (createOrganizationDto.web_fedoscore)?.toString().split(",")
     let productlist_weburl = (createOrganizationDto.web_url)?.toString().split(",")
@@ -489,19 +497,19 @@ export class OrganizationService {
     )
   }
 
-  fetchOrganizationDetailsByUrl(url: string) {
-    Logger.debug(`fetchOrganizationDetailsByUrl() orgDTO:${JSON.stringify(url)} `, APP);
-    return this.organizationDb.find({ url: 'http://www.fedo.ai/admin/vital/'+url }).pipe(
-      switchMap(doc => {
-        console.log("res",doc);
+  // fetchOrganizationDetailsByUrl(url: string) {
+  //   Logger.debug(`fetchOrganizationDetailsByUrl() orgDTO:${JSON.stringify(url)} `, APP);
+  //   return this.organizationDb.find({ url: 'http://www.fedo.ai/admin/vital/'+url }).pipe(
+  //     switchMap(doc => {
+  //       console.log("res",doc);
         
-        if (doc.length == 0) {
-          throw new NotFoundException(`organization not found`)
-        }
-        else { return doc }
-      })
-    )
-  }
+  //       if (doc.length == 0) {
+  //         throw new NotFoundException(`organization not found`)
+  //       }
+  //       else { return doc }
+  //     })
+  //   )
+  // }
 
   fetchOrgByEmail(orgDTO: OrgDTO) {
     Logger.debug(`fetchOrgByEmailAndMobile() orgDTO:${JSON.stringify(orgDTO)} `, APP);

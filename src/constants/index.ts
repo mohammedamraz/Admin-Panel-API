@@ -11,7 +11,7 @@ export const FEDO_APP_CLIENT_ID = process.env.FEDO_APP || '4iaahrh33ojt8sh0vq96t
 // export const FEDO_USER_POOL_NAME = process.env.FEDO_USER_POOL_NAME || 'HSA-SALES-ADMIN';
 export const FEDO_USER_ADMIN_PANEL_POOL_NAME = process.env.FEDO_USER_ADMIN_PANEL_POOL_NAME || 'HSA-Admin-Panel';
 export const FEDO_APP_ADMIN_PANEL_CLIENT_NAME = process.env.FEDO_APP_ADMIN_PANEL_CLIENT_NAME || 'HSA-AdminPanel-AppClient';
-export const FEDO_APP_ADMIN_PANEL_CLIENT_ID = process.env.FEDO_APP_ADMIN_PANEL_CLIENT_ID || '18imhpa3fbpbj66n4r1vovkftt';
+export const FEDO_APP_ADMIN_PANEL_CLIENT_ID = process.env.FEDO_APP_ADMIN_PANEL_CLIENT_ID || 'c4uk66lomohv83evjhmt5qu3h';
 
 
 

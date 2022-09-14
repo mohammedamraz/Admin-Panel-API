@@ -5,7 +5,7 @@ import { DatabaseService } from 'src/lib/database/database.service';
 import { PasswordResetDTO } from '../admin/dto/create-admin.dto';
 import { ProductService } from '../product/product.service';
 import { UserProductJunctionService } from '../user-product-junction/user-product-junction.service';
-import { AWS_COGNITO_USER_CREATION_URL_SIT, FEDO_APP, PUBLIC_KEY } from 'src/constants';
+import { AWS_COGNITO_USER_CREATION_URL_SIT, FEDO_APP, FEDO_USER_ADMIN_PANEL_POOL_NAME, PUBLIC_KEY } from 'src/constants';
 import { HttpService } from '@nestjs/axios';
 import { AxiosResponse } from 'axios';
 import { ConfirmForgotPasswordDTO, ForgotPasswordDTO } from '../admin/dto/login.dto';
@@ -461,7 +461,7 @@ export class VideoToVitalsService {
     Logger.debug(`loginUserByEmail() loginUserDTO:${JSON.stringify(loginUserDTO)} `, APP);
 
 
-    loginUserDTO.fedoApp = FEDO_APP;
+    loginUserDTO.fedoApp = FEDO_USER_ADMIN_PANEL_POOL_NAME;
     return this.checkEmailIsPresentInUsersOrOrganisation(loginUserDTO).pipe((map(doc => { this.user_data = doc })),
       switchMap(doc => {
         return this.http
@@ -475,12 +475,22 @@ export class VideoToVitalsService {
             }),
             map((res: AxiosResponse) => {
               if (!res.data) throw new UnauthorizedException();
-              return {
+              
+              else if(this.user_data['user_name']){
+                return {
                 jwtToken: res.data.idToken.jwtToken,
                 refreshToken: res.data.refreshToken,
                 accessToken: res.data.accessToken.jwtToken,
                 user_data: this.user_data
-              };
+              };}
+              else{
+                return {
+                  jwtToken: res.data.idToken.jwtToken,
+                  refreshToken: res.data.refreshToken,
+                  accessToken: res.data.accessToken.jwtToken,
+                  org_data: this.user_data
+                };
+              }
             }),
           );
       })
@@ -488,36 +498,36 @@ export class VideoToVitalsService {
 
   }
 
-  loginOrganizationByEmail(loginUserDTO: LoginUserDTO) {
-    Logger.debug(`loginOrganizationByEmail() loginUserDTO:${JSON.stringify(loginUserDTO)} `, APP);
+  // loginOrganizationByEmail(loginUserDTO: LoginUserDTO) {
+  //   Logger.debug(`loginOrganizationByEmail() loginUserDTO:${JSON.stringify(loginUserDTO)} `, APP);
 
 
-    loginUserDTO.fedoApp = FEDO_APP;
-    return this.getOrganisationDetailsByEmail(loginUserDTO).pipe((map(doc => { this.org_data = doc })),
-      switchMap(doc => {
-        return this.http
-          .post(
-            `${AWS_COGNITO_USER_CREATION_URL_SIT}/token`,
-            { passcode: this.encryptPassword(loginUserDTO) },
-          )
-          .pipe(
-            catchError((err) => {
-              return this.onAWSErrorResponse(err);
-            }),
-            map((res: AxiosResponse) => {
-              if (!res.data) throw new UnauthorizedException();
-              return {
-                jwtToken: res.data.idToken.jwtToken,
-                refreshToken: res.data.refreshToken,
-                accessToken: res.data.accessToken.jwtToken,
-                user_data: this.org_data
-              };
-            }),
-          );
-      })
-    )
+  //   loginUserDTO.fedoApp = FEDO_APP;
+  //   return this.getOrganisationDetailsByEmail(loginUserDTO).pipe((map(doc => { this.org_data = doc })),
+  //     switchMap(doc => {
+  //       return this.http
+  //         .post(
+  //           `${AWS_COGNITO_USER_CREATION_URL_SIT}/token`,
+  //           { passcode: this.encryptPassword(loginUserDTO) },
+  //         )
+  //         .pipe(
+  //           catchError((err) => {
+  //             return this.onAWSErrorResponse(err);
+  //           }),
+  //           map((res: AxiosResponse) => {
+  //             if (!res.data) throw new UnauthorizedException();
+  //             return {
+  //               jwtToken: res.data.idToken.jwtToken,
+  //               refreshToken: res.data.refreshToken,
+  //               accessToken: res.data.accessToken.jwtToken,
+  //               user_data: this.org_data
+  //             };
+  //           }),
+  //         );
+  //     })
+  //   )
 
-  }
+  // }
 
   private readonly onAWSErrorResponse = async (err) => {
     Logger.debug('onAWSErrorResponse(), ' + err, APP);
@@ -590,7 +600,7 @@ export class VideoToVitalsService {
       )}]`,
     );
 
-    forgotPasswordDTO.fedoApp = FEDO_APP;
+    forgotPasswordDTO.fedoApp = FEDO_USER_ADMIN_PANEL_POOL_NAME;
     const passcode = this.encryptPassword(forgotPasswordDTO);
     return this.http
       .post(`${AWS_COGNITO_USER_CREATION_URL_SIT}/password/otp/`, { passcode: passcode })
@@ -609,7 +619,7 @@ export class VideoToVitalsService {
       )}]`,
     );
 
-    confirmForgotPasswordDTO.fedoApp = FEDO_APP;
+    confirmForgotPasswordDTO.fedoApp = FEDO_USER_ADMIN_PANEL_POOL_NAME;
     const passcode = this.encryptPassword(confirmForgotPasswordDTO);
     return this.http
       .patch(
@@ -657,7 +667,7 @@ export class VideoToVitalsService {
   registerUserbyEmail(RegisterUserdto: RegisterUserDTO) {
     Logger.debug(`registerUserbyEmail(), RegisterUserdto:[${JSON.stringify(RegisterUserdto,)}] `);
 
-    RegisterUserdto.fedoApp = FEDO_APP
+    RegisterUserdto.fedoApp = FEDO_USER_ADMIN_PANEL_POOL_NAME
     return this.http.post(`${AWS_COGNITO_USER_CREATION_URL_SIT}/`, { passcode: this.encryptPassword(RegisterUserdto) }).pipe(
       map(doc => {
       }),
@@ -668,7 +678,7 @@ export class VideoToVitalsService {
   confirmSignupUserByEmail(RegisterUserdto: RegisterUserDTO) {
     Logger.debug(`confirmSignupUserByEmail(), RegisterUserdto: keys ${[JSON.stringify(Object.keys(RegisterUserdto))]} values ${JSON.stringify(Object.values(RegisterUserdto).length)} `, APP);
 
-    RegisterUserdto.fedoApp = FEDO_APP
+    RegisterUserdto.fedoApp = FEDO_USER_ADMIN_PANEL_POOL_NAME
     const passcode = this.encryptPassword(RegisterUserdto)
     return this.http.post(`${AWS_COGNITO_USER_CREATION_URL_SIT}/signupcode`, { passcode: passcode }).pipe(map(res => []), catchError(err => {
       return this.onAWSErrorResponse(err)

@@ -61,12 +61,12 @@ export class VideoToVitalsController {
     return this.organizationService.fetchOrganizationById(id);
   }
 
-  @Get('org/name/:url')
-  fetchOrganizationDetailsByUrl(@Param ('url') url: string) {
-    Logger.debug(`fetchOrganizationByName() url:${url} `, APP);
+  // @Get('org/name/:url')
+  // fetchOrganizationDetailsByUrl(@Param ('url') url: string) {
+  //   Logger.debug(`fetchOrganizationByName() url:${url} `, APP);
 
-    return this.organizationService.fetchOrganizationDetailsByUrl(url);
-  }
+  //   return this.organizationService.fetchOrganizationDetailsByUrl(url);
+  // }
 
   @Patch('org/logo/:id')
   @UseInterceptors(FileInterceptor('file'))
@@ -88,6 +88,13 @@ export class VideoToVitalsController {
     Logger.debug(`updateOrganization() id:${id}  `, APP);
 
     return this.videoToVitalsService.changeRegisterStatusOnceConfirmed(id);
+  }
+
+  @Patch('user/register/status/:id')
+  changeUserRegisterStatusOnceConfirmed(@Param('id') id: number) {
+    Logger.debug(`changeUserRegisterStatusOnceConfirmed() id:${id}  `, APP);
+
+    return this.usersService.changeUserRegisterStatusOnceConfirmed(id);
   }
 
 
@@ -195,13 +202,13 @@ export class VideoToVitalsController {
     return this.videoToVitalsService.loginUserByEmail(loginUserDTO)
   }
 
-  @Post('login/org')
-  // @UseInterceptors(LoggingInterceptor)
-  loginOrganizationByEmail(@Body() loginUserDTO: LoginUserDTO) {
-    Logger.debug(`loginOrganizationByEmail()  loginUserDTO:${JSON.stringify(loginUserDTO)} `, APP);
+  // @Post('login/org')
+  // // @UseInterceptors(LoggingInterceptor)
+  // loginOrganizationByEmail(@Body() loginUserDTO: LoginUserDTO) {
+  //   Logger.debug(`loginOrganizationByEmail()  loginUserDTO:${JSON.stringify(loginUserDTO)} `, APP);
 
-    return this.videoToVitalsService.loginOrganizationByEmail(loginUserDTO)
-  }
+  //   return this.videoToVitalsService.loginOrganizationByEmail(loginUserDTO)
+  // }
 
   @Get('user/details')
   getOrganisationDetailsOfUserByEmail(@Body() loginUserPasswordCheckDTO: LoginUserPasswordCheckDTO) {
