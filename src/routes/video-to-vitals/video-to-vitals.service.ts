@@ -537,7 +537,7 @@ export class VideoToVitalsService {
     if (err.response.status === 401)
       throw new UnauthorizedException(err.response.data);
     if (err.response.status === 422)
-      throw new UnprocessableEntityException(err.response.data);
+      throw new UnprocessableEntityException(err);
     if (err.response.status === 404)
       throw new NotFoundException(err.response.data);
     if (err.response.status === 409)
@@ -669,9 +669,9 @@ export class VideoToVitalsService {
 
     RegisterUserdto.fedoApp = FEDO_USER_ADMIN_PANEL_POOL_NAME
     return this.http.post(`${AWS_COGNITO_USER_CREATION_URL_SIT}/`, { passcode: this.encryptPassword(RegisterUserdto) }).pipe(
-      map(doc => {
+      map(doc => { console.log('doc',doc)
       }),
-      catchError(err => { return this.onAWSErrorResponse(err) }))
+      catchError(err => { console.log('err',err);return this.onAWSErrorResponse(err) }))
 
   }
 

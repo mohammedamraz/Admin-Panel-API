@@ -16,12 +16,14 @@ export const FEDO_APP_ADMIN_PANEL_CLIENT_ID = process.env.FEDO_APP_ADMIN_PANEL_C
 
 
 export const HOST = process.env.FEDO_HSA_SALES_SERVER_HOST || '0.0.0.0';
-export const PORT = parseInt(process.env.FEDO_HSA_SALES_SERVER_PORT, 10) || 36000;
+export const PORT = parseInt(process.env.FEDO_HSA_SALES_SERVER_PORT, 10) || 35000;
 export const APP_VERSION = packageJson.version;
 export const DEBUG_LEVEL = process.env.FEDO_HSA_SALES_SERVER_LOG_LEVEL || 'debug';
 export const APP_DOCUMENTATION = process.env.FEDO_HSA_SERVER_DOCUMENTATION || 'https://fedo.health/hsa/docs';
 export const POSTGRES_DB_URI_DB_URL = process.env.FEDO_HSA_SALES_SERVER_DB_URI || 'postgresql://postgres:ban0Malik@localhost:5432/hsa_sales';
 // export const POSTGRES_DB_URI_DB_URL = process.env.FEDO_HSA_SALES_SERVER_DB_URI || 'postgresql://postgres:akash@localhost:5432/hsa-sales-multiple-product';
+// export const POSTGRES_DB_URI_DB_URL = process.env.FEDO_HSA_SALES_SERVER_DB_URI || 'postgresql://postgres:Fedo@1234@localhost:5432/';
+// export const POSTGRES_DB_URI_DB_URL = process.env.FEDO_HSA_SALES_SERVER_DB_URI || 'postgresql://postgres:akash@localhost:5432/hsa-sales';
 
 export const AMRAZ_AUTHTOKEN = process.env.FEDO_HSA_SALES_TWILIO_AUTHTOKEN || "a8eeaa76be56a78e5a8acfb19d1856d8";
 
@@ -42,18 +44,21 @@ export const SALES_PARTNER_NOTIFICATION = process.env.FEDO_HSA_SALES_PARTNER_NOT
 
 export const AWS_ACCESS_KEY_ID = process.env.FEDO_HSA_SALES_AWS_ACCESS_KEY_ID || 'AKIAWVJICQ3FDBOB6CGC';
 export const AWS_SECRET_ACCESS_KEY = process.env.FEDO_HSA_SALES_AWS_SECRET_ACCESS_KEY || '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';
+
 export const SES_SOURCE_EMAIL = process.env.FEDO_COMM_SERVER_AWS_SES_SOURCE_EMAIL || "FEDO HSA <hsa@fedo.ai>";
 export const SES_SOURCE_SUPPORT_EMAIL = process.env.FEDO_COMM_SERVER_AWS_SES_SUPPORT_EMAIL || "FEDO HSA <support@fedo.health>";
 export const SES_SOURCE_SUPPORT_EMAIL_AI = process.env.FEDO_COMM_SERVER_AWS_SES_SUPPORT_EMAIL_AI || "FEDO HSA <support@fedo.ai>";
 
 export const SES_SOURCE_HELLO_SUPPORT__EMAIL = process.env.FEDO_COMM_SERVER_AWS_SES_HELLO_SUPPORT_EMAIL || "FEDO HSA <mohd.amraz0@gmail.com>";
+
 export const STATIC_IMAGES = process.env.FEDO_HSA_SERVER_STATIC_IMAGES || 'https://fedo-file-server.s3.ap-south-1.amazonaws.com/images';
 export const STATIC_IMAGES_PROFILE = process.env.FEDO_HSA_SERVER_STATIC_IMAGES || 'C:/static images/';
 export const FEDO_HSA_USER_CONNECTION_URL = process.env.FEDO_HSA_USER_CONNECTION_URL || 'http://0.0.0.0:35000/users/';
-export const GOOGLE_APPLICATION_CREDENTIALS="./facial-analysis-b9fe1-firebase-adminsdk-1zbc9-b67a0472af.json";
+// export const GOOGLE_APPLICATION_CREDENTIALS="./facial-analysis-b9fe1-firebase-adminsdk-1zbc9-b67a0472af.json";
 
 
 export const AWS_COGNITO_USER_CREATION_URL_SIT = process.env.FEDO_AWS_COGNITO_USER_CREATION_URL || 'https://dev.fedo.health/hsa/fis/v1/users';
+// export const AWS_COGNITO_USER_CREATION_URL_SIT = process.env.FEDO_AWS_COGNITO_USER_CREATION_URL || 'http://0.0.0.0:36000/users';
 export const PUBLIC_KEY =
 	'-----BEGIN PUBLIC KEY-----\n' +
 	'MIIEIjANBgkqhkiG9w0BAQEFAAOCBA8AMIIECgKCBAEAo2ylqziqV2jMxA1WFVwa\n' +

@@ -24,23 +24,23 @@ export class IndividualUserService {
     return this.individualUserDb.save(createIndividualUserDto)
   }
 
-  sentOtpToPhoneNumber(mobileNumberDtO: MobileNumberDtO) {
-    Logger.debug(`sentOtpToPhoneNumber() mobileNumberDtO: [${JSON.stringify(mobileNumberDtO,)}]`, APP,);
+  // sentOtpToPhoneNumber(mobileNumberDtO: MobileNumberDtO) {
+  //   Logger.debug(`sentOtpToPhoneNumber() mobileNumberDtO: [${JSON.stringify(mobileNumberDtO,)}]`, APP,);
 
-    return this.fetchUserByPhoneNumber(mobileNumberDtO.phone_number).pipe(
-      map(userDoc => {
-        userDoc
-      }),
-      switchMap(userDoc => {
-        return this.http.post(`${GUPSHUP_OTP_VERIFICATION}&phone_no=${mobileNumberDtO.phone_number}${GUPSHUP_OTP_MESSAGE_FORMAT}`,).pipe(
-          catchError((err) => { return err; }),
-          map((doc) => {
-            return { status: doc['data'] };
-          }),
-        );
-      })
-    )
-  }
+  //   return this.fetchUserByPhoneNumber(mobileNumberDtO.phone_number).pipe(
+  //     map(userDoc => {
+  //       userDoc
+  //     }),
+  //     switchMap(userDoc => {
+  //       return this.http.post(`${GUPSHUP_OTP_VERIFICATION}&phone_no=${mobileNumberDtO.phone_number}${GUPSHUP_OTP_MESSAGE_FORMAT}`,).pipe(
+  //         catchError((err) => { return err; }),
+  //         map((doc) => {
+  //           return { status: doc['data'] };
+  //         }),
+  //       );
+  //     })
+  //   )
+  // }
 
   fetchUserByPhoneNumber(phone_number: string) {
     Logger.debug(`fetchUserByPhoneNumber() phone_number: [${JSON.stringify(phone_number,)}]`, APP,);

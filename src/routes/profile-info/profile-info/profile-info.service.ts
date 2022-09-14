@@ -1,7 +1,7 @@
-import { BadRequestException, Injectable, Logger, NotFoundException } from '@nestjs/common';
+import { BadRequestException, ConflictException, Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { applicationDefault, initializeApp } from 'firebase-admin/app';
 import { catchError, map, switchMap } from 'rxjs';
-import { GOOGLE_APPLICATION_CREDENTIALS } from 'src/constants';
+// import { GOOGLE_APPLICATION_CREDENTIALS } from 'src/constants';
 import { DatabaseTable } from 'src/lib/database/database.decorator';
 import { DatabaseService } from 'src/lib/database/database.service';
 import { CreateOrganizationDto, UserDTO } from 'src/routes/video-to-vitals/dto/create-video-to-vital.dto';
@@ -44,6 +44,23 @@ export class ProfileInfoService {
                 else throw new BadRequestException('profile info cannot be editable')
 
             }))
+    }
+
+    addInfo(createProfileInfoDTO: CreateProfileInfoDTO) {
+        Logger.debug(`addInfo() updateUserDTO:${JSON.stringify(createProfileInfoDTO)} `, APP);
+        return this.userProfileDb.save(createProfileInfoDTO).pipe(map(doc => {
+
+            if (createProfileInfoDTO.application_id == undefined) {
+                throw new ConflictException();
+
+            }
+
+        }), catchError(err => {
+
+            return err
+
+        }));
+
     }
 
 

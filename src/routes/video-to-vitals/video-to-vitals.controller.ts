@@ -54,6 +54,18 @@ export class VideoToVitalsController {
     return this.organizationService.fetchOrgByCondition(orgDTO)
   }
 
+  // @Get('org/domain/:url')
+  // fetchOrgByUrl(@Param() url: string,) {
+  //   Logger.debug(`fetchOrgByUrl() url:${url} `, APP);
+
+  //   return this.videoToVitalsService.fetchOrgByUrl(url)
+  // }
+
+  // @Patch('org/status')
+  // updateStatus() {
+  //   return this.videoToVitalsService.updateStatus()
+  //  } 
+
   @Get('org/:id')
   fetchOrganizationById(@Param('id', ParseIntPipe) id: number) {
     Logger.debug(`fetchOrganizationById() id:${id} `, APP);
@@ -210,7 +222,7 @@ export class VideoToVitalsController {
   //   return this.videoToVitalsService.loginOrganizationByEmail(loginUserDTO)
   // }
 
-  @Get('user/details')
+  @Patch('user/details')
   getOrganisationDetailsOfUserByEmail(@Body() loginUserPasswordCheckDTO: LoginUserPasswordCheckDTO) {
     Logger.debug(`getOrganisationDetailsOfUserByEmail()  loginUserPasswordCheckDTO:${JSON.stringify(loginUserPasswordCheckDTO)} `, APP);
 

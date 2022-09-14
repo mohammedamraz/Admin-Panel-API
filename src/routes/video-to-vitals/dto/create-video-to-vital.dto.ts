@@ -18,7 +18,7 @@ export class CreateOrganizationDto {
     @IsNotEmpty()
     @IsString()
     @IsPhoneNumber()
-    organization_mobile: phoneNumber;
+    organization_mobile: String;
     @IsNotEmpty()
     @IsString()
     url: string;
@@ -52,7 +52,7 @@ export class OrgDTO {
     organization_email: string;
     @IsString()
     @IsPhoneNumber()
-    organization_mobile: phoneNumber;
+    organization_mobile: String;
 }
 
 export class RegisterUserDTO {
@@ -122,7 +122,7 @@ export class UserDTO {
     email: string;
     @IsNotEmpty()
     @IsPhoneNumber()
-    mobile: phoneNumber;
+    mobile: String;
     organization_name:string;
     product_name:string;
     product_id?:number;
@@ -156,7 +156,7 @@ export class VitalUserDTO {
     user_name: string;
     designation: string;
     email: string;
-    mobile: phoneNumber;
+    mobile: String;
     organization_name:string;
     product_name:string;
     org_id:number;
@@ -175,7 +175,7 @@ export class UpdateUserDTO {
     email: string;
     @IsOptional()
     @IsPhoneNumber()
-    mobile: phoneNumber;
+    mobile: String;
 
 }
 

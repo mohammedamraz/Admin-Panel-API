@@ -2,14 +2,17 @@ image: node:14
 
 .global:
   before_script:
-    - export SERVICE_NAME=fedo-health-sales-api
+    - export SERVICE_NAME=fedo-sales-api
     - export TAGGED_APP_VERSION=`echo $SERVICE_NAME`_`git describe --tags --always --abbrev=0`-`git rev-parse --short HEAD`
-    - export AS_FEDO="sudo -H -u fedo-dev"
-    - export DEPLOY_LOCATION_DEV=/home/fedo-dev/system-storage/apps/dev.$SERVICE_NAME
-    - export DEPLOY_LOCATION_SIT=/home/fedo-dev/system-storage/apps/sit.$SERVICE_NAME
-    - export DEPLOY_LOCATION_UAT=/home/fedo-dev/system-storage/apps/uat.$SERVICE_NAME
-    - export RELEASE_LOCATION=/home/fedo-dev/system-storage/releases
-    - echo "Tagged version = "$TAGGED_APP_VERSION
+    # - export AS_FEDO="sudo -H -u fedo-log"
+    # - export DEPLOY_LOCATION_DEV=/home/fedo-log/system-storage/apps/dev.$SERVICE_NAME
+    # - export DEPLOY_LOCATION_SIT=/home/fedo-log/system-storage/apps/sit.$SERVICE_NAME
+    # - export DEPLOY_LOCATION_UAT=/home/fedo-log/system-storage/apps/uat.$SERVICE_NAME
+    # - export RELEASE_LOCATION=/home/fedo-log/system-storage/releases
+
+    - export DEPLOY_LOCATION_PROD=/home/fedo-admin/system-storage/apps/$SERVICE_NAME
+    - export RELEASE_LOCATION_PROD=/home/fedo-admin/system-storage/releases
+    - export AS_FEDO_PROD="sudo -H -u fedo-admin"
   after_script:
     - echo "All stages complete"
  
@@ -45,23 +48,36 @@ Deploy:
   before_script:
     - !reference [.global, before_script]
   script:
-    - if [[ $CI_COMMIT_TITLE =~ "build" || $CI_COMMIT_TITLE =~ "alpha" ||  $CI_COMMIT_TITLE =~ "beta" ||  $CI_COMMIT_TITLE =~ "rc" ]]; then
+    # - if [[ $CI_COMMIT_TITLE =~ "build" || $CI_COMMIT_TITLE =~ "alpha" ||  $CI_COMMIT_TITLE =~ "beta" ||  $CI_COMMIT_TITLE =~ "rc" ]]; then
+    # -     npm install -g nexe
+    # -     nexe dist/src/main.js -o $TAGGED_APP_VERSION -t x64-14.15.3
+    # -     tar -czf $TAGGED_APP_VERSION.tar $TAGGED_APP_VERSION
+    # -     chmod 400 $SSH_PRIVATE_KEY_SALES
+    # -     echo "Deploying to DEV"
+    # -     scp -i $SSH_PRIVATE_KEY_SALES -o StrictHostKeyChecking=no $TAGGED_APP_VERSION.tar ubuntu@log.fedo.health:~
+    # -     ssh -i $SSH_PRIVATE_KEY_SALES -o StrictHostKeyChecking=no ubuntu@log.fedo.health "sudo systemctl stop dev.$SERVICE_NAME;$AS_FEDO bash -c \"cp $TAGGED_APP_VERSION.tar $RELEASE_LOCATION; cd $DEPLOY_LOCATION_DEV; pwd; unlink dev-$SERVICE_NAME; rm -rf *; tar -xzf $RELEASE_LOCATION/$TAGGED_APP_VERSION.tar;ln -s $DEPLOY_LOCATION_DEV/$TAGGED_APP_VERSION $DEPLOY_LOCATION_DEV/dev-$SERVICE_NAME\"; cd; rm -f $TAGGED_APP_VERSION.tar; sudo systemctl start dev.$SERVICE_NAME;"
+    # - fi
+    # - if [[ $CI_COMMIT_TITLE =~ "alpha" ||  $CI_COMMIT_TITLE =~ "beta" ||  $CI_COMMIT_TITLE =~ "rc" ]]; then
+    # -     echo "Deploying to SIT"
+    # -     ssh -i $SSH_PRIVATE_KEY_SALES -o StrictHostKeyChecking=no ubuntu@log.fedo.health "sudo systemctl stop sit.$SERVICE_NAME;$AS_FEDO bash -c \"cp $TAGGED_APP_VERSION.tar $RELEASE_LOCATION; cd $DEPLOY_LOCATION_SIT; unlink sit-$SERVICE_NAME;rm -rf *; tar -xzf $RELEASE_LOCATION/$TAGGED_APP_VERSION.tar;ln -s $DEPLOY_LOCATION_SIT/$TAGGED_APP_VERSION $DEPLOY_LOCATION_SIT/sit-$SERVICE_NAME\"; cd; rm -f $TAGGED_APP_VERSION.tar; sudo systemctl start sit.$SERVICE_NAME;"
+    # - fi
+    # - if [[ $CI_COMMIT_TITLE =~ "beta" ||  $CI_COMMIT_TITLE =~ "rc" ]]; then
+    # -     echo "Deploying to UAT / demo"
+    # -     ssh -i $SSH_PRIVATE_KEY_SALES -o StrictHostKeyChecking=no ubuntu@log.fedo.health "sudo systemctl stop uat.$SERVICE_NAME;$AS_FEDO bash -c \"cp $TAGGED_APP_VERSION.tar $RELEASE_LOCATION; cd $DEPLOY_LOCATION_UAT; unlink uat-$SERVICE_NAME;rm -rf *; tar -xzf $RELEASE_LOCATION/$TAGGED_APP_VERSION.tar; ln -s $DEPLOY_LOCATION_UAT/$TAGGED_APP_VERSION $DEPLOY_LOCATION_UAT/uat-$SERVICE_NAME\"; cd; rm -f $TAGGED_APP_VERSION.tar; sudo systemctl start uat.$SERVICE_NAME;"
+    # - fi
+
+
+    - if [[ $CI_COMMIT_TITLE =~ "rc" ]]; then
     -     npm install -g nexe
     -     nexe dist/src/main.js -o $TAGGED_APP_VERSION -t x64-14.15.3
     -     tar -czf $TAGGED_APP_VERSION.tar $TAGGED_APP_VERSION
-    -     chmod 400 $SSH_PRIVATE_KEY_SALES
-    -     echo "Deploying to DEV"
-    -     scp -i $SSH_PRIVATE_KEY_SALES -o StrictHostKeyChecking=no $TAGGED_APP_VERSION.tar ubuntu@dev.services.fedo.health:~
-    -     ssh -i $SSH_PRIVATE_KEY_SALES -o StrictHostKeyChecking=no ubuntu@dev.services.fedo.health "sudo systemctl stop dev.$SERVICE_NAME;$AS_FEDO bash -c \"cp $TAGGED_APP_VERSION.tar $RELEASE_LOCATION; cd $DEPLOY_LOCATION_DEV; pwd; unlink dev-$SERVICE_NAME; rm -rf *; tar -xzf $RELEASE_LOCATION/$TAGGED_APP_VERSION.tar;ln -s $DEPLOY_LOCATION_DEV/$TAGGED_APP_VERSION $DEPLOY_LOCATION_DEV/dev-$SERVICE_NAME\"; cd; rm -f $TAGGED_APP_VERSION.tar; sudo systemctl start dev.$SERVICE_NAME;"
+    -     chmod 400 $SSH_PRIVATE_KEY_SALES_PROD
+    -     echo "Deploying to PROD"
+    -     scp -i $SSH_PRIVATE_KEY_SALES_PROD -o StrictHostKeyChecking=no $TAGGED_APP_VERSION.tar ubuntu@fedo.ai:~
+    -     ssh -i $SSH_PRIVATE_KEY_SALES_PROD -o StrictHostKeyChecking=no ubuntu@fedo.ai "sudo systemctl stop $SERVICE_NAME;$AS_FEDO_PROD bash -c \"cp $TAGGED_APP_VERSION.tar $RELEASE_LOCATION_PROD; cd $DEPLOY_LOCATION_PROD; pwd; unlink $SERVICE_NAME; rm -rf *; tar -xzf $RELEASE_LOCATION_PROD/$TAGGED_APP_VERSION.tar;ln -s $DEPLOY_LOCATION_PROD/$TAGGED_APP_VERSION $DEPLOY_LOCATION_PROD/$SERVICE_NAME\"; cd; rm -f $TAGGED_APP_VERSION.tar; sudo systemctl start $SERVICE_NAME;"
     - fi
-    - if [[ $CI_COMMIT_TITLE =~ "alpha" ||  $CI_COMMIT_TITLE =~ "beta" ||  $CI_COMMIT_TITLE =~ "rc" ]]; then
-    -     echo "Deploying to SIT"
-    -     ssh -i $SSH_PRIVATE_KEY_SALES -o StrictHostKeyChecking=no ubuntu@dev.services.fedo.health "sudo systemctl stop sit.$SERVICE_NAME;$AS_FEDO bash -c \"cp $TAGGED_APP_VERSION.tar $RELEASE_LOCATION; cd $DEPLOY_LOCATION_SIT; unlink sit-$SERVICE_NAME;rm -rf *; tar -xzf $RELEASE_LOCATION/$TAGGED_APP_VERSION.tar;ln -s $DEPLOY_LOCATION_SIT/$TAGGED_APP_VERSION $DEPLOY_LOCATION_SIT/sit-$SERVICE_NAME\"; cd; rm -f $TAGGED_APP_VERSION.tar; sudo systemctl start sit.$SERVICE_NAME;"
-    - fi
-    - if [[ $CI_COMMIT_TITLE =~ "beta" ||  $CI_COMMIT_TITLE =~ "rc" ]]; then
-    -     echo "Deploying to UAT / demo"
-    -     ssh -i $SSH_PRIVATE_KEY_SALES -o StrictHostKeyChecking=no ubuntu@dev.services.fedo.health "sudo systemctl stop uat.$SERVICE_NAME;$AS_FEDO bash -c \"cp $TAGGED_APP_VERSION.tar $RELEASE_LOCATION; cd $DEPLOY_LOCATION_UAT; unlink uat-$SERVICE_NAME;rm -rf *; tar -xzf $RELEASE_LOCATION/$TAGGED_APP_VERSION.tar; ln -s $DEPLOY_LOCATION_UAT/$TAGGED_APP_VERSION $DEPLOY_LOCATION_UAT/uat-$SERVICE_NAME\"; cd; rm -f $TAGGED_APP_VERSION.tar; sudo systemctl start uat.$SERVICE_NAME;"
-    - fi
+    - cd
+    - rm -f $TAGGED_APP_VERSION.tar
 
   after_script:
     - !reference [.global, after_script]
