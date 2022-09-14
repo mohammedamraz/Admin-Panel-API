@@ -13,4 +13,6 @@
 export class CreateProductDto {
     id:number;
     product_name: string;
+    web_url?:string;
+    mobile_url?:string;
 }

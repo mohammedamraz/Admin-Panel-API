@@ -6,7 +6,7 @@ import { DatabaseTable } from 'src/lib/database/database.decorator';
 import { DatabaseService } from 'src/lib/database/database.service';
 import { CreateOrgProductJunctionDto } from './dto/create-org-product-junction.dto';
 import { UpdateOrgProductJunctionDto } from './dto/update-org-product-junction.dto';
-
+const APP = 'OrgProductJunctionService';
 @Injectable()
 export class OrgProductJunctionService {
 
@@ -14,6 +14,8 @@ export class OrgProductJunctionService {
   private readonly organizationProductJunctionDb: DatabaseService<CreateOrgProductJunctionDto>){}
 
     fetchOrgProductJunctionDataByOrgId(org_id:number){
+      Logger.debug(`fetchOrgProductJunctionDataByOrgId() body: ${JSON.stringify(org_id)}`, APP);
+
       return this.organizationProductJunctionDb.find({org_id:org_id}).pipe(
         map(doc=>doc)
       )

@@ -1,4 +1,4 @@
-import { ConflictException, Injectable, Logger, NotFoundException, UnprocessableEntityException } from '@nestjs/common';
+import { BadRequestException, ConflictException, Injectable, Logger, NotFoundException, UnprocessableEntityException } from '@nestjs/common';
 import { catchError, map, switchMap } from 'rxjs';
 // import { CreateProductModel } from 'src/lib/config/model/product.model';
 import { DatabaseTable } from 'src/lib/database/database.decorator';
@@ -23,7 +23,8 @@ export class ProductService {
       }),
       switchMap(doc => {
         return this.productDb.save(createProductDto).pipe(
-          map(doc => doc)
+          map(doc => doc),
+          catchError(err=>{throw new BadRequestException(err.message)})
         );
       })
     )

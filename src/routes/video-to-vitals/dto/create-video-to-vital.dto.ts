@@ -41,6 +41,7 @@ export class CreateOrganizationDto {
     productaccess_mobile?:boolean;
     web_fedoscore?:boolean;
     web_url?:string;
+    type?:string;
 }
 export class OrgDTO {
     @IsNotEmpty()

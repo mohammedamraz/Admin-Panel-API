@@ -61,6 +61,13 @@ export class VideoToVitalsController {
     return this.organizationService.fetchOrganizationById(id);
   }
 
+  @Get('org/name/:url')
+  fetchOrganizationDetailsByUrl(@Param ('url') url: string) {
+    Logger.debug(`fetchOrganizationByName() url:${url} `, APP);
+
+    return this.organizationService.fetchOrganizationDetailsByUrl(url);
+  }
+
   @Patch('org/logo/:id')
   @UseInterceptors(FileInterceptor('file'))
   patchImageToOrganization( @Param('id', ParseIntPipe) id: number,@UploadedFile() file) {

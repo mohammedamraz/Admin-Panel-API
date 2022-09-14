@@ -1,5 +1,5 @@
 import { Body, Controller, Logger, Post } from '@nestjs/common';
-import { sendEmailOnCreationOfOrgAndUser } from '../admin/dto/create-admin.dto';
+import { sendEmailOnCreationOfDirectSalesPartner, sendEmailOnCreationOfOrgAndUser } from '../admin/dto/create-admin.dto';
 import { SendEmailService } from './send-email.service';
 
 const APP = "SendEmailController"
@@ -10,12 +10,26 @@ export class SendEmailController {
         private readonly sendEmailService: SendEmailService,
       ) {}
 
-    // @Post("payment-record")
-    // updatePaidAmount(@Body() updateAmountdto:sendEmailOnCreationOfOrgAndUser) {
-    //   Logger.debug(`updatePaidAmount() updateAmountdto: [${JSON.stringify(updateAmountdto)}]`, APP);
+    @Post('org/webAccess')
+    sendEmailOnVitalsWebAppAccess(@Body() body:sendEmailOnCreationOfOrgAndUser) {
+      Logger.debug(`sendEmailOnVitalsWebAppAccess() body: [${JSON.stringify(body)}]`, APP);
   
-    //   return this.templateService.sendEmailOnVitalsWebAppAccess(updateAmountdto)
-    // }
+      return this.sendEmailService.sendEmailOnVitalsWebAppAccess(body)
+    }
+
+    @Post('pilotExpire')
+    sendEmailOnPilotExpire(@Body() body:sendEmailOnCreationOfDirectSalesPartner) {
+      Logger.debug(`sendEmailOnPilotExpire() body: [${JSON.stringify(body)}]`, APP);
+  
+      return this.sendEmailService.sendEmailOnPilotExpire(body)
+    }
+
+    @Post('org/invalid')
+    sendEmailOnNotAbleToIdentifyOrganisation(@Body() body:sendEmailOnCreationOfDirectSalesPartner) {
+      Logger.debug(`sendEmailOnNotAbleToIdentifyOrganisation() body: [${JSON.stringify(body)}]`, APP);
+  
+      return this.sendEmailService.sendEmailOnNotAbleToIdentifyOrganisation(body)
+    }
 
 
 }

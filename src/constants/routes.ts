@@ -7,6 +7,7 @@ import { ThirdpartyOrganizationModule } from 'src/routes/thirdparty-organization
 import { SendEmailModule } from 'src/routes/send-email/send-email.module';
 import { UserProductJunctionModule } from 'src/routes/user-product-junction/user-product-junction.module';
 import { VideoToVitalsModule } from 'src/routes/video-to-vitals/video-to-vitals.module';
+import { OrgProductJunctionModule } from 'src/routes/org-product-junction/org-product-junction.module';
 /**
  * NOTE: Routes are picked on 'first-match'
  *       So the order is important
@@ -35,6 +36,10 @@ export const APP_ROUTES = [
   {
     path: 'notification',
     module: SendEmailModule,
+  },
+  {
+    path: 'orgJunction',
+    module: OrgProductJunctionModule,
   },
   {
     path: 'user',

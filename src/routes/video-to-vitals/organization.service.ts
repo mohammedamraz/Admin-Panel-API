@@ -37,12 +37,19 @@ export class OrganizationService {
   createOrganization(createOrganizationDto: CreateOrganizationDto, path: any) {
     Logger.debug(`createOrganization() createOrganizationDto:${JSON.stringify(createOrganizationDto,)} filename:${path}`, APP);
     
+    console.log('path',path)
+    if (path != null) {
+      this.upload(path);
+      createOrganizationDto.logo=this.urlAWSPhoto;
+    }
+    else delete createOrganizationDto.logo
     let productlist = createOrganizationDto.product_id.split(",")
-    let productlist_pilotduration = (createOrganizationDto.pilot_duration).toString().split(",")
-    let productlist_fedoscore = (createOrganizationDto.fedo_score).toString().split(",")
-    let productlist_webApp = (createOrganizationDto.productaccess_mobile).toString().split(",")
-    let productlist_mobileApp = (createOrganizationDto.productaccess_web).toString().split(",")
-    let productlist_webFedoscore = (createOrganizationDto.web_fedoscore).toString().split(",")
+    let productlist_pilotduration = (createOrganizationDto.pilot_duration)?.toString().split(",")
+    let productlist_fedoscore = (createOrganizationDto.fedo_score)?.toString().split(",")
+    let productlist_webApp = (createOrganizationDto.productaccess_web)?.toString().split(",")||['false','false']
+    // let productlist_mobileApp = (createOrganizationDto.productaccess_mobile).toString().split(",")
+    let productlist_webFedoscore = (createOrganizationDto.web_fedoscore)?.toString().split(",")
+    let productlist_weburl = (createOrganizationDto.web_url)?.toString().split(",")
     return this.fetchOrgByUrl(createOrganizationDto.url).pipe(
       map(doc => {
         if (doc.length == 0) {
@@ -57,6 +64,7 @@ export class OrganizationService {
               delete createOrganizationDto.productaccess_mobile;
               delete createOrganizationDto.productaccess_web;
               delete createOrganizationDto.web_fedoscore;
+              delete createOrganizationDto.web_url;
               return this.organizationDb.save(createOrganizationDto).pipe(
                 map(res => {
                   var encryption = { org_id: res[0].id };
@@ -84,18 +92,19 @@ export class OrganizationService {
           const tomorrow = new Date();
           const duration = productlist_pilotduration[index]
           createOrganizationDto.end_date = new Date(tomorrow.setDate(tomorrow.getDate() + Number(duration)));
-          await lastValueFrom(this.organizationProductJunctionDb.save({ org_id: res[0].id, end_date: createOrganizationDto.end_date, pilot_duration: productlist_pilotduration[index], status: createOrganizationDto.status, product_id: productlist[index], fedoscore: productlist_fedoscore[index], mobile_access:productlist_mobileApp[index],web_access:productlist_webApp[index],web_fedoscore:productlist_webFedoscore[index] }))
+          await lastValueFrom(this.organizationProductJunctionDb.save({ org_id: res[0].id, end_date: createOrganizationDto.end_date, pilot_duration: productlist_pilotduration[index], status: createOrganizationDto.status, product_id: productlist[index], fedoscore: productlist_fedoscore[index],web_access:productlist_webApp[index],web_fedoscore:productlist_webFedoscore[index],web_url:productlist_weburl[index] }))
         }
-        if (path != null) {
+        // if (path != null) {
+        //   this.userProfileDb.save({ application_id: res[0].application_id, org_id: res[0].id });
+        //   await this.upload(path); this.organizationDb.findByIdandUpdate({ id: res[0].id.toString(), quries: { logo: this.urlAWSPhoto } });
+        //   delete res[0].logo; return res
+        // }
+        // else {
           this.userProfileDb.save({ application_id: res[0].application_id, org_id: res[0].id });
-          await this.upload(path); this.organizationDb.findByIdandUpdate({ id: res[0].id.toString(), quries: { logo: this.urlAWSPhoto } });
-          delete res[0].logo; return res
-        }
-        else {
-          this.userProfileDb.save({ application_id: res[0].application_id, org_id: res[0].id });
-          this.organizationDb.findByIdandUpdate({ id: res[0].id.toString(), quries: { logo: this.urlAWSPhoto } });
-          delete res[0].logo; return res
-        }
+        //   this.organizationDb.findByIdandUpdate({ id: res[0].id.toString(), quries: { logo: this.urlAWSPhoto } });
+        //   delete res[0].logo; 
+        return res
+        // }
       }))
   }
 
@@ -480,6 +489,20 @@ export class OrganizationService {
     )
   }
 
+  fetchOrganizationDetailsByUrl(url: string) {
+    Logger.debug(`fetchOrganizationDetailsByUrl() orgDTO:${JSON.stringify(url)} `, APP);
+    return this.organizationDb.find({ url: 'http://www.fedo.ai/admin/vital/'+url }).pipe(
+      switchMap(doc => {
+        console.log("res",doc);
+        
+        if (doc.length == 0) {
+          throw new NotFoundException(`organization not found`)
+        }
+        else { return doc }
+      })
+    )
+  }
+
   fetchOrgByEmail(orgDTO: OrgDTO) {
     Logger.debug(`fetchOrgByEmailAndMobile() orgDTO:${JSON.stringify(orgDTO)} `, APP);
     return this.organizationDb.find({ organization_email: orgDTO.organization_email }).pipe(
@@ -527,7 +550,7 @@ export class OrganizationService {
           throw new NotFoundException('No Organization Found')
         }
         else {
-          return this.organizationProductJunctionDb.find({ org_id: id })
+          return this.orgProductJunctionService.fetchOrgProductJunctionDataByOrgId(id)
         }
       }),
     );
