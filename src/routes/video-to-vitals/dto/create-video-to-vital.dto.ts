@@ -1,5 +1,5 @@
 import { phoneNumber } from "aws-sdk/clients/importexport";
-import { IsAlphanumeric, IsBoolean, IsEmail, IsMobilePhone, IsNotEmpty, isNotEmpty, IsNumber, IsOptional, IsPhoneNumber, IsString } from "class-validator";
+import { IsAlphanumeric, IsBoolean, IsEmail, IsEnum, IsMobilePhone, IsNotEmpty, isNotEmpty, IsNumber, IsOptional, IsPhoneNumber, IsString } from "class-validator";
 
 export class CreateOrganizationDto {
     @IsNotEmpty()
@@ -36,7 +36,12 @@ export class CreateOrganizationDto {
     total_tests:number;
     application_id:string;
     stage?:string;
-
+    org_id:string;
+    productaccess_web?:boolean;
+    productaccess_mobile?:boolean;
+    web_fedoscore?:boolean;
+    web_url?:string;
+    type?:string;
 }
 export class OrgDTO {
     @IsNotEmpty()
@@ -86,25 +91,25 @@ export class UpdateOrganizationDto {
     admin_name: string;
     @IsOptional()
     designation: string;
-    @IsOptional()
-    @IsEmail()
-    organization_email: string;
+    // @IsOptional()
+    // @IsEmail()
+    // organization_email: string;
     @IsOptional()
     @IsPhoneNumber()
-    organization_mobile: String;
-    @IsOptional()
-    url: string;
-    @IsOptional()
-    start_date: Date;
-    @IsOptional()
-    end_date: Date;
-    @IsOptional()
-    fedo_score: boolean;
-    @IsOptional()
-    logo: string;
-    @IsOptional()
-    pilot_duration: number;
-    org_id:number;
+    organization_mobile: phoneNumber;
+    // @IsOptional()
+    // url: string;
+    // @IsOptional()
+    // start_date: Date;
+    // @IsOptional()
+    // end_date: Date;
+    // @IsOptional()
+    // fedo_score: boolean;
+    // @IsOptional()
+    // logo: string;
+    // @IsOptional()
+    // pilot_duration: number;
+    // org_id:number;
     
 }
 
@@ -120,7 +125,7 @@ export class UserDTO {
     mobile: String;
     organization_name:string;
     product_name:string;
-    product_id:number;
+    product_id?:number;
     third_party_org_name:string;
     password:string;
     application_id?:string;
@@ -201,3 +206,64 @@ export class LoginUserPasswordCheckDTO {
     
 
 }
+
+export enum Type {
+    "latest" = "latest",
+    "active" = "active",
+}
+export class QueryParamsDto{
+    
+    @IsOptional()
+    @IsEnum(Type)
+    type: Type;
+    @IsOptional()
+    @IsNotEmpty()
+    url: string;
+}
+
+export enum Product {
+    "hsa" = "hsa",
+    "vitals" = "vitals",
+    "ruw" = "ruw"
+
+}
+
+export enum Active {
+    "active" ="active"
+
+}
+
+export class ProductDto{
+    @IsNotEmpty()
+    @IsEnum(Product)
+    product: Product
+    @IsOptional()
+    @IsEnum(Active)
+    status:Active
+}
+
+
+
+export const CONVERTINNUMBER = {
+    hsa: 1,
+    vitals: 2,
+    ruw: 3
+  }
+
+  export const CONVERTINACTIVE = {
+     active : "Active"
+  }
+
+  
+  export enum Typo{
+    "latest" = "latest"
+  }
+
+
+  export class UserParamDto{
+    @IsOptional()
+    @IsNotEmpty()
+    @IsEnum(Typo)
+    type: Typo
+
+  }

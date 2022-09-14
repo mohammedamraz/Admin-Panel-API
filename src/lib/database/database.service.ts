@@ -222,6 +222,18 @@ export class DatabaseService<T> implements DatabaseInterface<T> {
     return this.runQuery(query);
   }
 
+  findByAlphabetForTpa(org_id:string,findbyConditionParams: findByDateParams): Observable<T[]> {
+    Logger.debug(`findByAlphabetForTpa(): params ${[JSON.stringify(findbyConditionParams)]}`, APP);
+
+
+    let variables = [];
+    let values = []
+    let params = findbyConditionParams
+    Object.values(params).map((params, index) => { variables.push(params), values.push((`$${index + 1}`)) })
+    const query = `SELECT * FROM ${this.tableName} WHERE org_id=${org_id} AND tpa_name like '${params.name}%' `;
+    return this.runQuery(query);
+  }
+
 
   findByConditionSales(id: string, findbyConditionParams: findByDateParams) {
     Logger.debug(`findByConditionSales(): params ${[JSON.stringify(findbyConditionParams)]}`, APP);
@@ -349,9 +361,16 @@ export class DatabaseService<T> implements DatabaseInterface<T> {
     return this.runQuery(query)
   }
 
+  fetchLatestFiveUserByOrgId(org_id:number): Observable<T[]> {
+    Logger.debug(`fetchLatestFive()`, APP);
+    const query = `SELECT * FROM users WHERE is_deleted = false and org_id = ${org_id} ORDER BY id DESC LIMIT 5 `
+
+    return this.runQuery(query)
+  }
+
   fetchLatestFiveByProductId(product_id:number): Observable<T[]> {
     Logger.debug(`fetchLatestFiveByProductId()`, APP);
-    const query = `SELECT * FROM organization WHERE is_deleted = false and product_id = ${product_id} ORDER BY id DESC LIMIT 5 `
+    const query = `SELECT * FROM organization_product_junction WHERE  product_id = ${product_id} ORDER BY id DESC LIMIT 5 `
 
     return this.runQuery(query)
   }
@@ -366,7 +385,7 @@ export class DatabaseService<T> implements DatabaseInterface<T> {
   updateColumnByCondition(): Observable<T[]>{
     Logger.debug(`updateColumnByCondition()`, APP);
 
-    const query = `UPDATE organization SET status = CASE WHEN CURRENT_DATE< end_date  THEN 'Active' ELSE 'Expired' END `
+    const query = `UPDATE organization_product_junction SET status = CASE WHEN CURRENT_DATE< end_date  THEN 'Active' ELSE 'Expired' END `
     return this.runQuery(query)
 
   }

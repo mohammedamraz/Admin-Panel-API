@@ -5,6 +5,7 @@ import { catchError, map, switchMap } from 'rxjs';
 import { DatabaseTable } from 'src/lib/database/database.decorator';
 import { DatabaseService } from 'src/lib/database/database.service';
 import { CreateOrganizationDto, UserDTO } from 'src/routes/video-to-vitals/dto/create-video-to-vital.dto';
+import { OrganizationService } from 'src/routes/video-to-vitals/organization.service';
 import { VideoToVitalsService } from 'src/routes/video-to-vitals/video-to-vitals.service';
 import { CreateProfileInfoDTO, ZQueryParamsDto } from './dto/create-video-to-vital.dto';
 const APP = "ProfileViewService"
@@ -18,6 +19,7 @@ export class ProfileInfoService {
     //     @DatabaseTable('users')
     // private readonly userDb: DatabaseService<UserDTO>,
     private readonly videoToVitalsService: VideoToVitalsService,
+    private readonly organizationService: OrganizationService,
     // @DatabaseTable('organization')
     // private readonly organizationDb: DatabaseService<CreateOrganizationDto>,
     ) {
@@ -68,7 +70,7 @@ export class ProfileInfoService {
         return this.videoToVitalsService.fetchUserById(Number(createProfileInfoDTO.user_id)).pipe(
             switchMap(doc => {
               if (doc.length == 0){          
-              return this.videoToVitalsService.fetchOrganizationDetailsById(createProfileInfoDTO.org_id).pipe(
+              return this.organizationService.fetchOrganizationDetailsById(createProfileInfoDTO.org_id).pipe(
                 map(doc=>{
                 if (doc.length == 0) throw new NotFoundException('user not found')
                 else return this.userProfileDb.save(createProfileInfoDTO)

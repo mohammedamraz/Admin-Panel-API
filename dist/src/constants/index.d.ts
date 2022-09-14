@@ -25,6 +25,7 @@ export declare const AWS_ACCESS_KEY_ID: string;
 export declare const AWS_SECRET_ACCESS_KEY: string;
 export declare const SES_SOURCE_EMAIL: string;
 export declare const SES_SOURCE_SUPPORT_EMAIL: string;
+export declare const SES_SOURCE_SUPPORT_EMAIL_AI: string;
 export declare const SES_SOURCE_HELLO_SUPPORT__EMAIL: string;
 export declare const STATIC_IMAGES: string;
 export declare const STATIC_IMAGES_PROFILE: string;
