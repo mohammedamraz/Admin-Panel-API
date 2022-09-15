@@ -13,53 +13,54 @@ const APP = 'ThirdpartyOrganizationService'
 @Injectable()
 export class ThirdpartyOrganizationService {
 
-    constructor(
-        
-        @DatabaseTable('third_party_organization')
-        private readonly tpaJunctionDB: DatabaseService<UpdateThirdPartyOrganizationJunctionDto>,
+  constructor(
 
-        private readonly organizationService: OrganizationService,
-        private http: HttpService,
-    
-      ) {
+    @DatabaseTable('third_party_organization')
+    private readonly tpaJunctionDB: DatabaseService<UpdateThirdPartyOrganizationJunctionDto>,
 
+    private readonly organizationService: OrganizationService,
+    private http: HttpService,
 
-    
-      }
-
-      addThirdPartyOrganization(createThirdPartyOrganizationDto: CreateThirdPartyOrganizationDto) {
-        Logger.debug(`addThirdPartyOrganization() createProductDto:${JSON.stringify(createThirdPartyOrganizationDto)} }`, APP);
-    
-      return this.organizationService.fetchOrganizationByIdDetails(Number(createThirdPartyOrganizationDto.org_id)).pipe(
-        switchMap(doc=>{
-          if(doc.length==0) throw new NotFoundException('organization not found')
-            else return this.tpaJunctionDB.save({tpa_name:createThirdPartyOrganizationDto.tpa_name,org_id:createThirdPartyOrganizationDto.org_id}).pipe(
-              map(doc => doc),
-              catchError(err=>{throw new BadRequestException()})
-            )
-          })
-      )
+  ) {
 
 
-      }
+
+  }
+
+  addThirdPartyOrganization(createThirdPartyOrganizationDto: CreateThirdPartyOrganizationDto) {
+    Logger.debug(`addThirdPartyOrganization() createProductDto:${JSON.stringify(createThirdPartyOrganizationDto)} }`, APP);
+
+    return this.organizationService.fetchOrganizationByIdDetails(Number(createThirdPartyOrganizationDto.org_id)).pipe(
+      switchMap(doc => {
+        if (doc.length == 0) throw new NotFoundException('organization not found')
+        else return this.tpaJunctionDB.save({ tpa_name: createThirdPartyOrganizationDto.tpa_name, org_id: createThirdPartyOrganizationDto.org_id }).pipe(
+          map(doc => doc),
+          catchError(err => { throw new BadRequestException() })
+        )
+      })
+    )
 
 
-      fetchThirdPartyOrganizationOfSpecificOrg(org_id: string,params: ZQueryParamsDto) {
-        Logger.debug(`fetchThirdPartyOrganizationOfSpecificOrg() createProductDto:${org_id} }`, APP);
-    
-      return this.organizationService.fetchOrganizationByIdDetails(Number(org_id)).pipe(
-        switchMap(doc=>{
-          if(doc.length==0) throw new NotFoundException('organization not found')
-            else return this.tpaJunctionDB.findByAlphabetForTpa(org_id,params).pipe(
-              map(doc => doc),
-              catchError(err=>{throw new BadRequestException()})
-            )
-          })
-      )
+  }
 
 
-      }
-    
+  fetchThirdPartyOrganizationOfSpecificOrg(org_id: string, params: ZQueryParamsDto) {
+    Logger.debug(`fetchThirdPartyOrganizationOfSpecificOrg() createProductDto:${org_id} }`, APP);
+
+    return this.organizationService.fetchOrganizationByIdDetails(Number(org_id)).pipe(
+      switchMap(doc => {
+        if (doc.length == 0) throw new NotFoundException('organization not found')
+        else if (params.name == undefined) return this.tpaJunctionDB.find({ org_id: org_id })
+        else return this.tpaJunctionDB.findByAlphabetForTpa(org_id, params).pipe(
+          map(doc => doc),
+          catchError(err => { throw new BadRequestException() })
+        )
+      })
+    )
+
+
+  }
+
 
 
 }

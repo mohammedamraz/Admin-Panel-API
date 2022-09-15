@@ -1,7 +1,7 @@
 import { HttpService } from '@nestjs/axios';
 import { BadRequestException, ConflictException, Injectable, Logger, NotFoundException, UnauthorizedException, UnprocessableEntityException } from '@nestjs/common';
 import { DatabaseTable } from 'src/lib/database/database.decorator';
-import { CreateOrganizationDto, OrgDTO, QueryParamsDto, UpdateOrganizationDto, UserProfileDTO } from './dto/create-video-to-vital.dto';
+import { CreateOrganizationDto, OrgDTO, QueryParamsDto, UpdateOrganizationDto, UpdateWholeOrganizationDto, UserProfileDTO } from './dto/create-video-to-vital.dto';
 import { DatabaseService } from 'src/lib/database/database.service';
 import { catchError, concatMap, from, lastValueFrom, map, switchMap, throwError } from 'rxjs';
 import { AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, PUBLIC_KEY } from 'src/constants';
@@ -36,30 +36,21 @@ export class OrganizationService {
   urlAWSPhoto: any
 
   respilot_duration: any
+
   async createOrganization(createOrganizationDto: CreateOrganizationDto, path: any) {
     Logger.debug(`createOrganization() createOrganizationDto:${JSON.stringify(createOrganizationDto,)} filename:${path}`, APP);
-    
+
     if (path != null) {
       await this.upload(path);
-      createOrganizationDto.logo=this.urlAWSPhoto;
+      createOrganizationDto.logo = this.urlAWSPhoto;
     }
     else delete createOrganizationDto.logo
     let productlist = createOrganizationDto.product_id.split(",")
     let productlist_pilotduration = (createOrganizationDto.pilot_duration)?.toString().split(",")
     let productlist_fedoscore = (createOrganizationDto.fedo_score)?.toString().split(",")
-    let productlist_webApp = (createOrganizationDto.productaccess_web)?.toString().split(",")||['false','false']
-    productlist_webApp.map(res=>{
-      console.log("Ressssss",res)
-      if(res.toString().length<1){
-        console.log("resaaaaa",res.toString().length)
-
-      }
-      console.log("res",res.toString().length)
-    }
-      )
-    // let productlist_mobileApp = (createOrganizationDto.productaccess_mobile).toString().split(",")
-    let productlist_webFedoscore = (createOrganizationDto.web_fedoscore)?.toString().split(",")
-    let productlist_weburl = (createOrganizationDto.web_url)?.toString().split(",")
+    let productlist_webApp = (createOrganizationDto.productaccess_web)?.toString().split(",") || []
+    let productlist_webFedoscore = (createOrganizationDto.web_fedoscore)?.toString().split(",") || []
+    let productlist_weburl = (createOrganizationDto.web_url)?.toString().split(",") || []
     return this.fetchOrgByUrl(createOrganizationDto.url).pipe(
       map(doc => {
         if (doc.length == 0) {
@@ -98,24 +89,78 @@ export class OrganizationService {
       switchMap(res => res),
       switchMap(async res => {
         for (let index = 0; index < productlist.length; index++) {
+          if ((productlist_webApp[index] == undefined) || (productlist_webApp[index].toString().length < 1)) productlist_webApp.push('false')
+          if ((productlist_webFedoscore[index] == undefined) || (productlist_webFedoscore[index].toString().length < 1)) productlist_webFedoscore.push('false')
+          if ((productlist_weburl[index] == undefined) || (productlist_weburl[index].toString().length < 1)) productlist_weburl.push('')
           createOrganizationDto.status = "Active"
           const tomorrow = new Date();
           const duration = productlist_pilotduration[index]
           createOrganizationDto.end_date = new Date(tomorrow.setDate(tomorrow.getDate() + Number(duration)));
-          await lastValueFrom(this.organizationProductJunctionDb.save({ org_id: res[0].id, end_date: createOrganizationDto.end_date, pilot_duration: productlist_pilotduration[index], status: createOrganizationDto.status, product_id: productlist[index], fedoscore: productlist_fedoscore[index],web_access:productlist_webApp[index],web_fedoscore:productlist_webFedoscore[index],web_url:productlist_weburl[index] }))
+          await lastValueFrom(this.organizationProductJunctionDb.save({ org_id: res[0].id, end_date: createOrganizationDto.end_date, pilot_duration: productlist_pilotduration[index], status: createOrganizationDto.status, product_id: productlist[index], fedoscore: productlist_fedoscore[index], web_access: productlist_webApp[index], web_fedoscore: productlist_webFedoscore[index], web_url: productlist_weburl[index] }))
         }
-        // if (path != null) {
-        //   this.userProfileDb.save({ application_id: res[0].application_id, org_id: res[0].id });
-        //   await this.upload(path); this.organizationDb.findByIdandUpdate({ id: res[0].id.toString(), quries: { logo: this.urlAWSPhoto } });
-        //   delete res[0].logo; return res
-        // }
-        // else {
-          this.userProfileDb.save({ application_id: res[0].application_id, org_id: res[0].id });
-        //   this.organizationDb.findByIdandUpdate({ id: res[0].id.toString(), quries: { logo: this.urlAWSPhoto } });
-        //   delete res[0].logo; 
+        this.userProfileDb.save({ application_id: res[0].application_id, org_id: res[0].id });
         return res
-        // }
       }))
+  }
+
+  async updateOrganizationByFedoAdmin(id: number, updateWholeOrganizationDto: UpdateWholeOrganizationDto, path: any) {
+    Logger.debug(`createOrganization() createOrganizationDto:${JSON.stringify(updateWholeOrganizationDto)} filename:{path}`, APP);
+
+    if (path != null) {
+      await this.upload(path);
+      updateWholeOrganizationDto.logo = this.urlAWSPhoto;
+    }
+    else delete updateWholeOrganizationDto.logo
+    let productlist = updateWholeOrganizationDto.product_id?.split(",")
+    let productlist_junction = updateWholeOrganizationDto.product_junction_id?.split(",")
+    let productlist_pilotduration = (updateWholeOrganizationDto.pilot_duration)?.toString().split(",")
+    let productlist_fedoscore = (updateWholeOrganizationDto.fedo_score)?.toString().split(",")
+    let productlist_webApp = (updateWholeOrganizationDto.productaccess_web)?.toString().split(",") || []
+    let productlist_webFedoscore = (updateWholeOrganizationDto.web_fedoscore)?.toString().split(",") || []
+    let productlist_weburl = (updateWholeOrganizationDto.web_url)?.toString().split(",") || []
+    return this.fetchOrganizationByIdDetails(id).pipe(
+      map(doc => { return doc }),
+      switchMap((doc) => {
+        // updateWholeOrganizationDto.application_id = updateWholeOrganizationDto.organization_mobile?.slice(3, 14);
+        delete updateWholeOrganizationDto.product_id;
+        delete updateWholeOrganizationDto.pilot_duration;
+        delete updateWholeOrganizationDto.fedo_score;
+        delete updateWholeOrganizationDto.productaccess_mobile;
+        delete updateWholeOrganizationDto.productaccess_web;
+        delete updateWholeOrganizationDto.web_fedoscore;
+        delete updateWholeOrganizationDto.web_url;
+        delete updateWholeOrganizationDto.product_junction_id;
+        updateWholeOrganizationDto.updated_date = new Date();
+        return this.organizationDb.findByIdandUpdate({ id: String(id), quries: updateWholeOrganizationDto })
+      }),
+      switchMap(async res => {
+        for (let index = 0; index < productlist_junction.length; index++) {
+          if ((productlist_webApp[index] == undefined) || (productlist_webApp[index].toString().length < 1)) productlist_webApp.push('false')
+          if ((productlist_webFedoscore[index] == undefined) || (productlist_webFedoscore[index].toString().length < 1)) productlist_webFedoscore.push('false')
+          if ((productlist_weburl[index] == undefined) || (productlist_weburl[index].toString().length < 1)) productlist_weburl.push('')
+          const tomorrow = new Date();
+          const duration = productlist_pilotduration[index]
+          updateWholeOrganizationDto.end_date = new Date(tomorrow.setDate(tomorrow.getDate() + Number(duration)));
+          await lastValueFrom(this.organizationProductJunctionDb.findByIdandUpdate({ id: productlist_junction[index], quries: { org_id: id, end_date: updateWholeOrganizationDto.end_date, pilot_duration: productlist_pilotduration[index], fedoscore: productlist_fedoscore[index], web_access: productlist_webApp[index], web_fedoscore: productlist_webFedoscore[index], web_url: productlist_weburl[index] } }))
+        }
+        // for (let index = 0; index < productlist.length; index++) {
+        //   if ((productlist_webApp[index] == undefined) || (productlist_webApp[index].toString().length < 1)) productlist_webApp.push('false')
+        //   if ((productlist_webFedoscore[index] == undefined) || (productlist_webFedoscore[index].toString().length < 1)) productlist_webFedoscore.push('false')
+        //   if ((productlist_weburl[index] == undefined) || (productlist_weburl[index].toString().length < 1)) productlist_weburl.push('')
+        //   const tomorrow = new Date();
+        //   const duration = productlist_pilotduration[index]
+        //   updateWholeOrganizationDto.end_date = new Date(tomorrow.setDate(tomorrow.getDate() + Number(duration)));
+        //   await lastValueFrom(this.organizationProductJunctionDb.find({ id: productlist_junction[index] }).pipe(
+        //     map(doc => {
+        //       console.log("doc", doc);
+        //       if (doc.length != 0) lastValueFrom(this.organizationProductJunctionDb.findByIdandUpdate({ id: productlist_junction[index], quries: { org_id: id, end_date: updateWholeOrganizationDto.end_date, pilot_duration: productlist_pilotduration[index], fedoscore: productlist_fedoscore[index], web_access: productlist_webApp[index], web_fedoscore: productlist_webFedoscore[index], web_url: productlist_weburl[index] } }))
+        //       else lastValueFrom(this.organizationProductJunctionDb.save({ org_id: id, end_date: updateWholeOrganizationDto.end_date, pilot_duration: productlist_pilotduration[index], status: "Active", product_id: productlist[index], fedoscore: productlist_fedoscore[index], web_access: productlist_webApp[index], web_fedoscore: productlist_webFedoscore[index], web_url: productlist_weburl[index] }))
+        //     })
+        //   )
+        //   )
+        // }
+      })
+    )
   }
 
   //this function can be used for the paginator function that we are using in the list of datas in the admin panel 
@@ -295,7 +340,7 @@ export class OrganizationService {
                 result.push(object);
                 result[index]['progress'] = this.fetchDate(object);
                 result[index]['url'] = productDoc
-                
+
               }
             );
             if (result.length == (await doc).length) {
@@ -309,7 +354,7 @@ export class OrganizationService {
 
         })
 
-        return res.then((item) => {return item })
+        return res.then((item) => { return item })
 
 
       }),
@@ -357,22 +402,13 @@ export class OrganizationService {
     )
   }
 
-  fetchOrgByUrlBothWeb(url: string,weburl:string) {
+  fetchOrgByUrlFromJunction(url: string, weburl: string) {
     Logger.debug(`fetchOrgByUrl() url:${url}`, APP);
 
-    return this.organizationDb.find({ url: url }).pipe(
-      switchMap(doc => {
+    return this.organizationProductJunctionDb.find({ web_url: url }).pipe(
+      map(doc => {
         if (doc.length == 0) {
-          return this.organizationDb.find({ web_url: weburl }).pipe(
-            switchMap(doc => {
-              if (doc.length == 0) {
-                return doc
-              }
-              else {
-                throw new ConflictException("web url domain already taken")
-              }
-            })
-          )
+          return doc
         }
         else {
           throw new ConflictException("domain already taken")
@@ -541,7 +577,7 @@ export class OrganizationService {
   //   return this.organizationDb.find({ url: 'http://www.fedo.ai/admin/vital/'+url }).pipe(
   //     switchMap(doc => {
   //       console.log("res",doc);
-        
+
   //       if (doc.length == 0) {
   //         throw new NotFoundException(`organization not found`)
   //       }
@@ -603,7 +639,7 @@ export class OrganizationService {
     );
   }
 
- 
+
 
 
   fetchOrganizationByIdDetails(id: number) {
@@ -627,7 +663,7 @@ export class OrganizationService {
 
   updateOrganization(id: number, updateOrganizationDto: UpdateOrganizationDto) {
     Logger.debug(`updateOrganization() id:${id} updateOrganizationDto: ${JSON.stringify(updateOrganizationDto)} `, APP);
-    
+
     return this.organizationDb.find({ id: id, is_deleted: false }).pipe(
       map(res => {
         if (res.length == 0) throw new NotFoundException('organization not found')
@@ -726,26 +762,5 @@ export class OrganizationService {
 
   }
 
-  // async uploadFile(filename) {
-  //   const metadata = {
-  //     metadata: {
-  //       // This line is very important. It's to create a download token.
-  //       firebaseStorageDownloadTokens: uuidv4()
-  //     },
-  //     contentType: 'image/png',
-  //     cacheControl: 'public, max-age=31536000',
-  //   };
 
-
-
-  //   // Uploads a local file to the bucket
-  //   await this.bucket.upload(filename, {
-  //     // Support for HTTP requests made with `Accept-Encoding: gzip`
-  //     gzip: true,
-  //     metadata: metadata,
-  //   });
-
-  //   console.log(`${filename} uploaded.`);
-
-  // }
 }

@@ -1,6 +1,6 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, Logger, ParseIntPipe, UseInterceptors, UploadedFile, Query } from '@nestjs/common';
 import { VideoToVitalsService } from './video-to-vitals.service';
-import { CreateOrganizationDto, LoginUserDTO, LoginUserPasswordCheckDTO, OrgDTO, ProductDto, QueryParamsDto, RegisterUserDTO, UpdateOrganizationDto, UpdateUserDTO, UserDTO, UserParamDto, VitalUserDTO } from './dto/create-video-to-vital.dto';
+import { CreateOrganizationDto, LoginUserDTO, LoginUserPasswordCheckDTO, OrgDTO, ProductDto, QueryParamsDto, RegisterUserDTO, UpdateOrganizationDto, UpdateUserDTO, UpdateWholeOrganizationDto, UserDTO, UserParamDto, VitalUserDTO } from './dto/create-video-to-vital.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { PasswordResetDTO } from '../admin/dto/create-admin.dto';
 import { ConfirmForgotPasswordDTO, ForgotPasswordDTO } from '../admin/dto/login.dto';
@@ -12,10 +12,10 @@ const APP = "VideoToVitalsController"
 @Controller()
 export class VideoToVitalsController {
   constructor(
-      private readonly videoToVitalsService: VideoToVitalsService,
-      private readonly organizationService: OrganizationService,
-      private readonly usersService: UsersService,
-    ) { }
+    private readonly videoToVitalsService: VideoToVitalsService,
+    private readonly organizationService: OrganizationService,
+    private readonly usersService: UsersService,
+  ) { }
 
   @Post('org')
   @UseInterceptors(FileInterceptor('file'))
@@ -33,7 +33,7 @@ export class VideoToVitalsController {
   }
 
   @Get('org')
-  fetchAllOrganization( @Query() queryParamsDto: QueryParamsDto) {
+  fetchAllOrganization(@Query() queryParamsDto: QueryParamsDto) {
     Logger.debug(`fetchAllOrganization() queryParamsDto: ${JSON.stringify(queryParamsDto)}`, APP);
 
     return this.organizationService.fetchAllOrganization(queryParamsDto);
@@ -42,7 +42,7 @@ export class VideoToVitalsController {
   @Get('org/product/access/:id')
   findAllProductsMappedWithOrganization(@Param('id') id: string) {
     Logger.debug(`findAllProductsMappedWithOrganization()`, APP);
-    
+
     return this.organizationService.findAllProductsMappedWithOrganization(+id);
   }
 
@@ -82,18 +82,29 @@ export class VideoToVitalsController {
 
   @Patch('org/logo/:id')
   @UseInterceptors(FileInterceptor('file'))
-  patchImageToOrganization( @Param('id', ParseIntPipe) id: number,@UploadedFile() file) {
+  patchImageToOrganization(@Param('id', ParseIntPipe) id: number, @UploadedFile() file) {
     Logger.debug(`patchImageToOrganization() id:${id}  file:)}`, APP);
 
     return this.organizationService.patchImageToOrganization(id, file);
   }
-  
+
   @Patch('org/:id')
   updateOrganization(@Param('id', ParseIntPipe) id: number, @Body() updateOrganizationDto: UpdateOrganizationDto) {
     Logger.debug(`updateOrganization() id:${id} updateOrganizationDto: ${JSON.stringify(updateOrganizationDto)} `, APP);
 
     return this.organizationService.updateOrganization(id, updateOrganizationDto);
   }
+
+  @Patch(':id')
+  @UseInterceptors(FileInterceptor('file'))
+
+  updateOrganizationByFedoAdmin(@Param('id', ParseIntPipe) id: number, @Body() updateWholeOrganizationDto: UpdateWholeOrganizationDto, @UploadedFile() file) {
+    Logger.debug(`updateOrganizationByFedoAdmin() id:${id} updateWholeOrganizationDto: ${JSON.stringify(updateWholeOrganizationDto)} `, APP);
+
+    return this.organizationService.updateOrganizationByFedoAdmin(id, updateWholeOrganizationDto, file);
+  }
+
+
 
   @Patch('org/register/status/:id')
   changeRegisterStatusOnceConfirmed(@Param('id') id: number) {
@@ -128,10 +139,10 @@ export class VideoToVitalsController {
   }
 
   @Get(':id')
-  fetchAllVitalsPilot(@Param('id',ParseIntPipe) id: number, @Query() queryParamsDto: QueryParamsDto ) {
+  fetchAllVitalsPilot(@Param('id', ParseIntPipe) id: number, @Query() queryParamsDto: QueryParamsDto) {
     Logger.debug(`fetchAllVitalsPilot() product_id:${id}`, APP);
 
-    return this.videoToVitalsService.fetchAllVitalsPilot(id,queryParamsDto)
+    return this.videoToVitalsService.fetchAllVitalsPilot(id, queryParamsDto)
   }
 
   @Get('tests/:id')
@@ -145,14 +156,14 @@ export class VideoToVitalsController {
   addUser(@Body() userDTO: UserDTO) {
     Logger.debug(`addUser() addUserDTO:${JSON.stringify(userDTO)} `, APP);
 
-  return this.videoToVitalsService.addUser(userDTO)
+    return this.videoToVitalsService.addUser(userDTO)
   }
 
   @Get('users/:org_id')
-  fetchAllUsers(@Param('org_id',ParseIntPipe) org_id:number, @Query() userParamDto: UserParamDto){
+  fetchAllUsers(@Param('org_id', ParseIntPipe) org_id: number, @Query() userParamDto: UserParamDto) {
     Logger.debug(`fetchAllUsers()`, APP);
 
-    return this.usersService.fetchAllUsers(org_id,userParamDto)
+    return this.usersService.fetchAllUsers(org_id, userParamDto)
   }
 
   @Get('users/:email/:mobile')
@@ -163,7 +174,7 @@ export class VideoToVitalsController {
   }
 
   @Get('users/users_count/:org_id')
-  fetchUsersCountByOrgId(@Param('org_id',ParseIntPipe) org_id: number) {
+  fetchUsersCountByOrgId(@Param('org_id', ParseIntPipe) org_id: number) {
     Logger.debug(`fetchUsersCountByOrgId org_id:${org_id}`, APP);
 
     return this.videoToVitalsService.fetchUsersCountByOrgId(org_id)
