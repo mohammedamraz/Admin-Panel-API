@@ -446,7 +446,7 @@ export class VideoToVitalsService {
             })
           )
         }
-        else return doc
+        else return [doc]
       }),
     )
   }
@@ -476,7 +476,7 @@ export class VideoToVitalsService {
             map((res: AxiosResponse) => {
               if (!res.data) throw new UnauthorizedException();
               
-              else if(this.user_data['user_name']){
+              else if(this.user_data[0].user_name){
                 return {
                 jwtToken: res.data.idToken.jwtToken,
                 refreshToken: res.data.refreshToken,
