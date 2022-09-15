@@ -31,18 +31,64 @@ export class CreateOrganizationDto {
     pilot_duration: number;
     product_name: string;
     product_id: string;
-    id:number;
-    status:string;
-    total_tests:number;
-    application_id:string;
-    stage?:string;
-    org_id:string;
-    productaccess_web?:boolean;
-    productaccess_mobile?:boolean;
-    web_fedoscore?:boolean;
-    web_url?:string;
-    type?:string;
+    id: number;
+    status: string;
+    total_tests: number;
+    application_id: string;
+    stage?: string;
+    org_id: string;
+    productaccess_web?: boolean;
+    productaccess_mobile?: boolean;
+    web_fedoscore?: boolean;
+    web_url?: string;
+    type?: string;
 }
+
+export class UpdateWholeOrganizationDto {
+    // @IsNotEmpty()
+    // @IsString()
+    organization_name: string;
+    // @IsNotEmpty()
+    // @IsString()
+    admin_name: string;
+    // @IsNotEmpty()
+    // @IsString()
+    designation: string;
+    // @IsNotEmpty()
+    // @IsString()
+    // @IsEmail()
+    organization_email: string;
+    // @IsNotEmpty()
+    // @IsString()
+    // @IsPhoneNumber()
+    organization_mobile: phoneNumber;
+    // @IsNotEmpty()
+    // @IsString()
+    url: string;
+    start_date: Date;
+    end_date: Date;
+    @IsOptional()
+    fedo_score: boolean;
+    @IsOptional()
+    logo: string;
+    pilot_duration: number;
+    product_name: string;
+    product_id: string;
+    product_junction_id: string;
+    id: number;
+    status: string;
+    total_tests: number;
+    application_id: string;
+    stage?: string;
+    org_id: string;
+    productaccess_web?: boolean;
+    productaccess_mobile?: boolean;
+    web_fedoscore?: boolean;
+    web_url?: string;
+    type?: string;
+    updated_date?: Date;
+}
+
 export class OrgDTO {
     @IsNotEmpty()
     @IsString()
@@ -56,33 +102,33 @@ export class OrgDTO {
 }
 
 export class RegisterUserDTO {
-	fedoApp: string;
-	// @IsNotEmpty()
-	email: string;
-	@IsNotEmpty()
-	password: string;
-	username: string;
+    fedoApp: string;
+    // @IsNotEmpty()
+    email: string;
+    @IsNotEmpty()
+    password: string;
+    username: string;
     ConfirmationCode: string;
 }
 
 export class EmailConfirmationDTO {
-	@IsOptional() @IsString() fedoApp: string;
-	@IsNotEmpty() @IsString() username: string;
-	@IsNotEmpty() @IsString() password: string;
-    email:string;
-	// @Optional()
-     ConfirmationCode: string;
+    @IsOptional() @IsString() fedoApp: string;
+    @IsNotEmpty() @IsString() username: string;
+    @IsNotEmpty() @IsString() password: string;
+    email: string;
+    // @Optional()
+    ConfirmationCode: string;
 }
 
-export const makeuserRegistrationFormat = (registerUserDTO:RegisterUserDTO ): RegisterUserDTO => {
-	const data = {
-	  fedoApp: registerUserDTO.fedoApp,
-	  email: registerUserDTO.email,
-	  password: registerUserDTO.password,
-	  username:registerUserDTO.username	  
-	}
-	return <RegisterUserDTO><unknown>data
-  }
+export const makeuserRegistrationFormat = (registerUserDTO: RegisterUserDTO): RegisterUserDTO => {
+    const data = {
+        fedoApp: registerUserDTO.fedoApp,
+        email: registerUserDTO.email,
+        password: registerUserDTO.password,
+        username: registerUserDTO.username
+    }
+    return <RegisterUserDTO><unknown>data
+}
 export class UpdateOrganizationDto {
 
     @IsOptional()
@@ -110,11 +156,13 @@ export class UpdateOrganizationDto {
     // @IsOptional()
     // pilot_duration: number;
     // org_id:number;
-    
+
 }
 
+
+
 export class UserDTO {
-    id:number;
+    id: number;
     user_name: string;
     designation: string;
     @IsNotEmpty()
@@ -123,13 +171,13 @@ export class UserDTO {
     @IsNotEmpty()
     @IsPhoneNumber()
     mobile: phoneNumber;
-    organization_name:string;
-    product_name:string;
-    product_id?:number;
-    third_party_org_name:string;
-    password:string;
-    application_id?:string;
-    org_id:number;
+    organization_name: string;
+    product_name: string;
+    product_id?: number;
+    third_party_org_name: string;
+    password: string;
+    application_id?: string;
+    org_id: number;
 }
 
 
@@ -143,24 +191,24 @@ export class UserProfileDTO {
     // @IsNotEmpty()
     // @IsPhoneNumber()
     gender: phoneNumber;
-    org_id:number;
-    total_tests:number;
-    is_editable:boolean;
-    user_id:number;
-    application_id:string;
+    org_id: number;
+    total_tests: number;
+    is_editable: boolean;
+    user_id: number;
+    application_id: string;
     // org_id:number;
 }
 
 export class VitalUserDTO {
-    id:number;
+    id: number;
     user_name: string;
     designation: string;
     email: string;
     mobile: phoneNumber;
-    organization_name:string;
-    product_name:string;
-    org_id:number;
-    product_id:number;
+    organization_name: string;
+    product_name: string;
+    org_id: number;
+    product_id: number;
 
 }
 
@@ -188,10 +236,10 @@ export class LoginUserDTO {
     // @IsAlphanumeric()
     password: string;
     fedoApp: string;
-//   @IsNotEmpty()
-  username: string;
-    first_party_company?:string;
-    third_party_company?:string;
+    //   @IsNotEmpty()
+    username: string;
+    first_party_company?: string;
+    third_party_company?: string;
 
 }
 
@@ -201,9 +249,9 @@ export class LoginUserPasswordCheckDTO {
     @IsNotEmpty()
     @IsEmail()
     email: string;
-  
+
     password: string;
-    
+
 
 }
 
@@ -211,8 +259,8 @@ export enum Type {
     "latest" = "latest",
     "active" = "active",
 }
-export class QueryParamsDto{
-    
+export class QueryParamsDto {
+
     @IsOptional()
     @IsEnum(Type)
     type: Type;
@@ -229,17 +277,17 @@ export enum Product {
 }
 
 export enum Active {
-    "active" ="active"
+    "active" = "active"
 
 }
 
-export class ProductDto{
+export class ProductDto {
     @IsNotEmpty()
     @IsEnum(Product)
     product: Product
     @IsOptional()
     @IsEnum(Active)
-    status:Active
+    status: Active
 }
 
 
@@ -248,22 +296,22 @@ export const CONVERTINNUMBER = {
     hsa: 1,
     vitals: 2,
     ruw: 3
-  }
+}
 
-  export const CONVERTINACTIVE = {
-     active : "Active"
-  }
+export const CONVERTINACTIVE = {
+    active: "Active"
+}
 
-  
-  export enum Typo{
+
+export enum Typo {
     "latest" = "latest"
-  }
+}
 
 
-  export class UserParamDto{
+export class UserParamDto {
     @IsOptional()
     @IsNotEmpty()
     @IsEnum(Typo)
     type: Typo
 
-  }
+}
