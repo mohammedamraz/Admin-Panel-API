@@ -219,6 +219,12 @@ export class QueryParamsDto{
     @IsOptional()
     @IsNotEmpty()
     url: string;
+    @IsNotEmpty()
+    @IsOptional()
+    page: number;
+    @IsNotEmpty()
+    @IsOptional()
+    per_page: number;
 }
 
 export enum Product {

@@ -129,7 +129,7 @@ export class VideoToVitalsController {
 
   @Get(':id')
   fetchAllVitalsPilot(@Param('id',ParseIntPipe) id: number, @Query() queryParamsDto: QueryParamsDto ) {
-    Logger.debug(`fetchAllVitalsPilot() product_id:${id}`, APP);
+    Logger.debug(`fetchAllVitalsPilot() product_id:${id} queryParamsDto:${JSON.stringify(queryParamsDto)}`, APP);
 
     return this.videoToVitalsService.fetchAllVitalsPilot(id,queryParamsDto)
   }
