@@ -128,37 +128,36 @@ export class OrganizationService {
         delete updateWholeOrganizationDto.productaccess_mobile;
         delete updateWholeOrganizationDto.productaccess_web;
         delete updateWholeOrganizationDto.web_fedoscore;
-        delete updateWholeOrganizationDto.web_url;
+        delete updateWholeOrganizationDto.web_url;  
         delete updateWholeOrganizationDto.product_junction_id;
         updateWholeOrganizationDto.updated_date = new Date();
         return this.organizationDb.findByIdandUpdate({ id: String(id), quries: updateWholeOrganizationDto })
       }),
       switchMap(async res => {
-        for (let index = 0; index < productlist_junction.length; index++) {
-          if ((productlist_webApp[index] == undefined) || (productlist_webApp[index].toString().length < 1)) productlist_webApp.push('false')
-          if ((productlist_webFedoscore[index] == undefined) || (productlist_webFedoscore[index].toString().length < 1)) productlist_webFedoscore.push('false')
-          if ((productlist_weburl[index] == undefined) || (productlist_weburl[index].toString().length < 1)) productlist_weburl.push('')
-          const tomorrow = new Date();
-          const duration = productlist_pilotduration[index]
-          updateWholeOrganizationDto.end_date = new Date(tomorrow.setDate(tomorrow.getDate() + Number(duration)));
-          await lastValueFrom(this.organizationProductJunctionDb.findByIdandUpdate({ id: productlist_junction[index], quries: { org_id: id, end_date: updateWholeOrganizationDto.end_date, pilot_duration: productlist_pilotduration[index], fedoscore: productlist_fedoscore[index], web_access: productlist_webApp[index], web_fedoscore: productlist_webFedoscore[index], web_url: productlist_weburl[index] } }))
-        }
-        // for (let index = 0; index < productlist.length; index++) {
+        // for (let index = 0; index < productlist_junction.length; index++) {
         //   if ((productlist_webApp[index] == undefined) || (productlist_webApp[index].toString().length < 1)) productlist_webApp.push('false')
         //   if ((productlist_webFedoscore[index] == undefined) || (productlist_webFedoscore[index].toString().length < 1)) productlist_webFedoscore.push('false')
         //   if ((productlist_weburl[index] == undefined) || (productlist_weburl[index].toString().length < 1)) productlist_weburl.push('')
         //   const tomorrow = new Date();
         //   const duration = productlist_pilotduration[index]
         //   updateWholeOrganizationDto.end_date = new Date(tomorrow.setDate(tomorrow.getDate() + Number(duration)));
-        //   await lastValueFrom(this.organizationProductJunctionDb.find({ id: productlist_junction[index] }).pipe(
-        //     map(doc => {
-        //       console.log("doc", doc);
-        //       if (doc.length != 0) lastValueFrom(this.organizationProductJunctionDb.findByIdandUpdate({ id: productlist_junction[index], quries: { org_id: id, end_date: updateWholeOrganizationDto.end_date, pilot_duration: productlist_pilotduration[index], fedoscore: productlist_fedoscore[index], web_access: productlist_webApp[index], web_fedoscore: productlist_webFedoscore[index], web_url: productlist_weburl[index] } }))
-        //       else lastValueFrom(this.organizationProductJunctionDb.save({ org_id: id, end_date: updateWholeOrganizationDto.end_date, pilot_duration: productlist_pilotduration[index], status: "Active", product_id: productlist[index], fedoscore: productlist_fedoscore[index], web_access: productlist_webApp[index], web_fedoscore: productlist_webFedoscore[index], web_url: productlist_weburl[index] }))
-        //     })
-        //   )
-        //   )
+        //   await lastValueFrom(this.organizationProductJunctionDb.findByIdandUpdate({ id: productlist_junction[index], quries: { org_id: id, end_date: updateWholeOrganizationDto.end_date, pilot_duration: productlist_pilotduration[index], fedoscore: productlist_fedoscore[index], web_access: productlist_webApp[index], web_fedoscore: productlist_webFedoscore[index], web_url: productlist_weburl[index] } }))
         // }
+        for (let index = 0; index < productlist.length; index++) {
+          if ((productlist_webApp[index] == undefined) || (productlist_webApp[index].toString().length < 1)) productlist_webApp.push('false')
+          if ((productlist_webFedoscore[index] == undefined) || (productlist_webFedoscore[index].toString().length < 1)) productlist_webFedoscore.push('false')
+          if ((productlist_weburl[index] == undefined) || (productlist_weburl[index].toString().length < 1)) productlist_weburl.push('')
+          const tomorrow = new Date();
+          const duration = productlist_pilotduration[index]
+          updateWholeOrganizationDto.end_date = new Date(tomorrow.setDate(tomorrow.getDate() + Number(duration)));
+          await lastValueFrom(this.organizationProductJunctionDb.find({ id: productlist_junction[index] }).pipe(
+            map(async doc => {
+              if (doc.length != 0) await lastValueFrom(this.organizationProductJunctionDb.findByIdandUpdate({ id: productlist_junction[index], quries: { org_id: id, end_date: updateWholeOrganizationDto.end_date, pilot_duration: productlist_pilotduration[index], fedoscore: productlist_fedoscore[index], web_access: productlist_webApp[index], web_fedoscore: productlist_webFedoscore[index], web_url: productlist_weburl[index] } }))
+              else await lastValueFrom(this.organizationProductJunctionDb.save({ org_id: id, end_date: updateWholeOrganizationDto.end_date, pilot_duration: productlist_pilotduration[index], status: "Active", product_id: productlist[index], fedoscore: productlist_fedoscore[index], web_access: productlist_webApp[index], web_fedoscore: productlist_webFedoscore[index], web_url: productlist_weburl[index] }))
+            })
+          )
+          )
+        }
       })
     )
   }

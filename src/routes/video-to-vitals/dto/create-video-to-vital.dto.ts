@@ -204,19 +204,11 @@ export class VitalUserDTO {
     user_name: string;
     designation: string;
     email: string;
-<<<<<<< HEAD
     mobile: String;
     organization_name:string;
     product_name:string;
     org_id:number;
     product_id:number;
-=======
-    mobile: phoneNumber;
-    organization_name: string;
-    product_name: string;
-    org_id: number;
-    product_id: number;
->>>>>>> 92f5b333cf2179e0bb92b7ecf14454d27a354d7a
 
 }
 
