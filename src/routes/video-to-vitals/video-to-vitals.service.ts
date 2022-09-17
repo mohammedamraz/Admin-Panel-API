@@ -152,13 +152,13 @@ export class VideoToVitalsService {
     Logger.debug(`fetchPilotCount() product:${JSON.stringify(productDto)}`, APP);
     if (productDto.status) {
       return this.organizationProductJunctionDb.find({ product_id: CONVERTINNUMBER[productDto.product], status: CONVERTINACTIVE[productDto.status] }).pipe(
-        map(doc => { return `{ total_${productDto.product}_pilot_count: ${doc.length} }` }),
+        map(doc => ({ ['total_'+`${productDto.product}`+'_pilot_count']: `${doc.length}` })),
         catchError(err => { throw new UnprocessableEntityException(err.message) })
       )
     }
     else {
       return this.organizationProductJunctionDb.find({ product_id: CONVERTINNUMBER[productDto.product] }).pipe(
-        map(doc => { return `{ total_${productDto.product}_pilot_count: ${doc.length} }` })
+        map(doc =>  ({ ['total_'+`${productDto.product}`+'_pilot_count']: `${doc.length}` }))
       )
     }
 
