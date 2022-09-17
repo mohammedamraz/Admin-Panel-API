@@ -51,6 +51,11 @@ export class OrganizationService {
     let productlist_webApp = (createOrganizationDto.productaccess_web)?.toString().split(",") || []
     let productlist_webFedoscore = (createOrganizationDto.web_fedoscore)?.toString().split(",") || []
     let productlist_weburl = (createOrganizationDto.web_url)?.toString().split(",") || []
+    // productlist_weburl.map(res=>{
+
+
+    //   return this.fetchOrgByUrlBoth(createOrganizationDto.url,res).pipe(
+    
     return this.fetchOrgByUrl(createOrganizationDto.url).pipe(
       map(doc => {
         if (doc.length == 0) {
@@ -101,6 +106,7 @@ export class OrganizationService {
         this.userProfileDb.save({ application_id: res[0].application_id, org_id: res[0].id });
         return res
       }))
+    // })
   }
 
   async updateOrganizationByFedoAdmin(id: number, updateWholeOrganizationDto: UpdateWholeOrganizationDto, path: any) {
@@ -401,18 +407,49 @@ export class OrganizationService {
     )
   }
 
-  fetchOrgByUrlFromJunction(url: string, weburl: string) {
+  fetchOrgByUrlBoth(url: string,web_url:string) {
     Logger.debug(`fetchOrgByUrl() url:${url}`, APP);
 
-    return this.organizationProductJunctionDb.find({ web_url: url }).pipe(
-      map(doc => {
+    return this.organizationDb.find({ url: url }).pipe(
+      switchMap(doc => {
         if (doc.length == 0) {
-          return doc
+          return this.organizationProductJunctionDb.find({ web_url: web_url }).pipe(
+            map(doc => {
+              console.log("doc",doc);
+              
+              if (doc.length == 0) {
+                return []
+              }
+              else {
+                throw new ConflictException("web domain already taken")
+              }
+            })
+          )
         }
         else {
           throw new ConflictException("domain already taken")
         }
       })
+    )
+  }
+
+  fetchOrgByUrlFromJunction(weburl: string) {
+    Logger.debug(`fetchOrgByUrl() url:${weburl}`, APP);
+
+    return this.organizationProductJunctionDb.find({ web_url: weburl }).pipe(
+      map(doc=> doc),
+      switchMap(doc => {
+        console.log("doc",doc)
+        if (doc.length == 0) {
+          throw new NotFoundException("domain not found")
+        }
+        else {
+          return doc
+        }
+      }),
+      switchMap(doc=>{ return this.fetchOrganizationByIdDetails(Number(doc.org_id)).pipe(switchMap(doc=>{
+        console.log("sdfcsdfc",doc);return doc
+      }))})
     )
   }
 
