@@ -70,7 +70,7 @@ export class ProductService {
 
   fetchProductById(id: number) {
     Logger.debug(`fetchProductById() id:${id}`, APP);
-    return this.productDb.find({id:id,is_active:true}).pipe(
+    return this.productDb.find({id:id}).pipe(
       catchError(err => { throw new UnprocessableEntityException(err.message) }),
       switchMap(doc => {
         if (doc.length == 0) {

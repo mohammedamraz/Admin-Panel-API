@@ -265,36 +265,29 @@ export class OrganizationService {
       concatMap(orgJunData => {
         return lastValueFrom(this.orgProductJunctionService.fetchOrgProductJunctionDataByOrgId(orgJunData.id))
           .then(doc => {
-            doc.forEach(object => {
-              object['progress'] = this.fetchDate(object);
-            });
-            orgJunData['product'] = doc
-            orgData.push(orgJunData);
-            return orgJunData
+            let result: Array<object> = [];
+            let res = new Promise<void>(async (resolve, rejects) => {
+              (doc).forEach(async (object, index) => {
+                await lastValueFrom(this.productService.fetchProductById(object.product_id)).then(
+                  productDoc => {
+                    result.push(object);
+                    result[index]['progress'] = this.fetchDate(object);
+                    result[index]['product_detail'] = productDoc   
+                  }
+                ).catch(err=>{throw new UnprocessableEntityException(err.message) });
+                if (result.length == (await doc).length) {
+                  orgJunData['product'] = result
+                  orgData.push(orgJunData);
+                  resolve()
+                  return orgJunData 
+                }
+              });
+            })
+            return res.then((item) => {return item })
           })
       }),
     )).then(_doc => this.Paginator(orgData,queryParamsDto.page,queryParamsDto.per_page))
   }
-
-  // fetchProductDetails(createOrganizationDto: CreateOrganizationDto[]) {
-  //   Logger.debug(`fetchotherMoreDetails() createOrganizationDto: ${JSON.stringify(createOrganizationDto)}`, APP);
-
-  //   let orgData: CreateOrganizationDto[] = [];
-  //   return lastValueFrom(from(createOrganizationDto).pipe(
-  //     concatMap(orgJunData => {
-  //       return lastValueFrom(this.orgProductJunctionService.fetchOrgProductJunctionDataByOrgId(orgJunData.id))
-  //         .then(doc => {
-  //           doc.forEach(object => {
-  //             object['progress'] = this.fetchDate(object);
-
-  //           });
-  //           orgJunData['product'] = doc
-  //           orgData.push(orgJunData);
-  //           return orgJunData
-  //         })
-  //     }),
-  //   )).then(_doc => orgData);
-  // }
 
   fetchProductDetails(createOrganizationDto: CreateOrganizationDto[]) {
     Logger.debug(`fetchProductDetails() createOrganizationDto: ${JSON.stringify(createOrganizationDto)}`, APP);
@@ -312,7 +305,7 @@ export class OrganizationService {
                 result[index]['progress'] = this.fetchDate(object);
                 result[index]['url'] = productDoc   
               }
-            );
+            ).catch(err=>{throw new UnprocessableEntityException(err.message) });
             if (result.length == (await doc).length) {
               orgJunData['product'] = result
               orgData.push(orgJunData);
@@ -324,6 +317,7 @@ export class OrganizationService {
         return res.then((item) => {return item })
       }),
     )).then(_doc => orgData)
+   .catch(err=>{throw new UnprocessableEntityException(err.message) })
   }
 
   fetchDate(createOrgProductJunctionDto: CreateOrgProductJunctionDto) {
