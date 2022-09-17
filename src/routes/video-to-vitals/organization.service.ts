@@ -51,6 +51,11 @@ export class OrganizationService {
     let productlist_webApp = (createOrganizationDto.productaccess_web)?.toString().split(",") || []
     let productlist_webFedoscore = (createOrganizationDto.web_fedoscore)?.toString().split(",") || []
     let productlist_weburl = (createOrganizationDto.web_url)?.toString().split(",") || []
+    // productlist_weburl.map(res=>{
+
+
+    //   return this.fetchOrgByUrlBoth(createOrganizationDto.url,res).pipe(
+    
     return this.fetchOrgByUrl(createOrganizationDto.url).pipe(
       map(doc => {
         if (doc.length == 0) {
@@ -101,6 +106,7 @@ export class OrganizationService {
         this.userProfileDb.save({ application_id: res[0].application_id, org_id: res[0].id });
         return res
       }))
+    // })
   }
 
   async updateOrganizationByFedoAdmin(id: number, updateWholeOrganizationDto: UpdateWholeOrganizationDto, path: any) {
@@ -134,31 +140,31 @@ export class OrganizationService {
         return this.organizationDb.findByIdandUpdate({ id: String(id), quries: updateWholeOrganizationDto })
       }),
       switchMap(async res => {
-        for (let index = 0; index < productlist_junction.length; index++) {
-          if ((productlist_webApp[index] == undefined) || (productlist_webApp[index].toString().length < 1)) productlist_webApp.push('false')
-          if ((productlist_webFedoscore[index] == undefined) || (productlist_webFedoscore[index].toString().length < 1)) productlist_webFedoscore.push('false')
-          if ((productlist_weburl[index] == undefined) || (productlist_weburl[index].toString().length < 1)) productlist_weburl.push('')
-          const tomorrow = new Date();
-          const duration = productlist_pilotduration[index]
-          updateWholeOrganizationDto.end_date = new Date(tomorrow.setDate(tomorrow.getDate() + Number(duration)));
-          await lastValueFrom(this.organizationProductJunctionDb.findByIdandUpdate({ id: productlist_junction[index], quries: { org_id: id, end_date: updateWholeOrganizationDto.end_date, pilot_duration: productlist_pilotduration[index], fedoscore: productlist_fedoscore[index], web_access: productlist_webApp[index], web_fedoscore: productlist_webFedoscore[index], web_url: productlist_weburl[index] } }))
-        }
-        // for (let index = 0; index < productlist.length; index++) {
+        // for (let index = 0; index < productlist_junction.length; index++) {
         //   if ((productlist_webApp[index] == undefined) || (productlist_webApp[index].toString().length < 1)) productlist_webApp.push('false')
         //   if ((productlist_webFedoscore[index] == undefined) || (productlist_webFedoscore[index].toString().length < 1)) productlist_webFedoscore.push('false')
         //   if ((productlist_weburl[index] == undefined) || (productlist_weburl[index].toString().length < 1)) productlist_weburl.push('')
         //   const tomorrow = new Date();
         //   const duration = productlist_pilotduration[index]
         //   updateWholeOrganizationDto.end_date = new Date(tomorrow.setDate(tomorrow.getDate() + Number(duration)));
-        //   await lastValueFrom(this.organizationProductJunctionDb.find({ id: productlist_junction[index] }).pipe(
-        //     map(doc => {
-        //       console.log("doc", doc);
-        //       if (doc.length != 0) lastValueFrom(this.organizationProductJunctionDb.findByIdandUpdate({ id: productlist_junction[index], quries: { org_id: id, end_date: updateWholeOrganizationDto.end_date, pilot_duration: productlist_pilotduration[index], fedoscore: productlist_fedoscore[index], web_access: productlist_webApp[index], web_fedoscore: productlist_webFedoscore[index], web_url: productlist_weburl[index] } }))
-        //       else lastValueFrom(this.organizationProductJunctionDb.save({ org_id: id, end_date: updateWholeOrganizationDto.end_date, pilot_duration: productlist_pilotduration[index], status: "Active", product_id: productlist[index], fedoscore: productlist_fedoscore[index], web_access: productlist_webApp[index], web_fedoscore: productlist_webFedoscore[index], web_url: productlist_weburl[index] }))
-        //     })
-        //   )
-        //   )
+        //   await lastValueFrom(this.organizationProductJunctionDb.findByIdandUpdate({ id: productlist_junction[index], quries: { org_id: id, end_date: updateWholeOrganizationDto.end_date, pilot_duration: productlist_pilotduration[index], fedoscore: productlist_fedoscore[index], web_access: productlist_webApp[index], web_fedoscore: productlist_webFedoscore[index], web_url: productlist_weburl[index] } }))
         // }
+        for (let index = 0; index < productlist.length; index++) {
+          if ((productlist_webApp[index] == undefined) || (productlist_webApp[index].toString().length < 1)) productlist_webApp.push('false')
+          if ((productlist_webFedoscore[index] == undefined) || (productlist_webFedoscore[index].toString().length < 1)) productlist_webFedoscore.push('false')
+          if ((productlist_weburl[index] == undefined) || (productlist_weburl[index].toString().length < 1)) productlist_weburl.push('')
+          const tomorrow = new Date();
+          const duration = productlist_pilotduration[index]
+          updateWholeOrganizationDto.end_date = new Date(tomorrow.setDate(tomorrow.getDate() + Number(duration)));
+          await lastValueFrom(this.organizationProductJunctionDb.find({ id: productlist_junction[index] }).pipe(
+            map(async doc => {
+
+              if (doc.length != 0) await lastValueFrom(this.organizationProductJunctionDb.findByIdandUpdate({ id: productlist_junction[index], quries: { org_id: id, end_date: updateWholeOrganizationDto.end_date, pilot_duration: productlist_pilotduration[index], fedoscore: productlist_fedoscore[index], web_access: productlist_webApp[index], web_fedoscore: productlist_webFedoscore[index], web_url: productlist_weburl[index] } }))
+              else await lastValueFrom(this.organizationProductJunctionDb.save({ org_id: id, end_date: updateWholeOrganizationDto.end_date, pilot_duration: productlist_pilotduration[index], status: "Active", product_id: productlist[index], fedoscore: productlist_fedoscore[index], web_access: productlist_webApp[index], web_fedoscore: productlist_webFedoscore[index], web_url: productlist_weburl[index] }))
+            })
+          )
+          )
+        }
       })
     )
   }
@@ -402,18 +408,49 @@ export class OrganizationService {
     )
   }
 
-  fetchOrgByUrlFromJunction(url: string, weburl: string) {
+  fetchOrgByUrlBoth(url: string,web_url:string) {
     Logger.debug(`fetchOrgByUrl() url:${url}`, APP);
 
-    return this.organizationProductJunctionDb.find({ web_url: url }).pipe(
-      map(doc => {
+    return this.organizationDb.find({ url: url }).pipe(
+      switchMap(doc => {
         if (doc.length == 0) {
-          return doc
+          return this.organizationProductJunctionDb.find({ web_url: web_url }).pipe(
+            map(doc => {
+              console.log("doc",doc);
+              
+              if (doc.length == 0) {
+                return []
+              }
+              else {
+                throw new ConflictException("web domain already taken")
+              }
+            })
+          )
         }
         else {
           throw new ConflictException("domain already taken")
         }
       })
+    )
+  }
+
+  fetchOrgByUrlFromJunction(weburl: string) {
+    Logger.debug(`fetchOrgByUrl() url:${weburl}`, APP);
+
+    return this.organizationProductJunctionDb.find({ web_url: weburl }).pipe(
+      map(doc=> doc),
+      switchMap(doc => {
+        console.log("doc",doc)
+        if (doc.length == 0) {
+          throw new NotFoundException("domain not found")
+        }
+        else {
+          return doc
+        }
+      }),
+      switchMap(doc=>{ return this.fetchOrganizationByIdDetails(Number(doc.org_id)).pipe(switchMap(doc=>{
+        console.log("sdfcsdfc",doc);return doc
+      }))})
     )
   }
 

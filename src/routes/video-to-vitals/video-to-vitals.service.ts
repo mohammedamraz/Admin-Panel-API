@@ -422,10 +422,7 @@ export class VideoToVitalsService {
         if (res.length == 0) throw new NotFoundException('user not found')
         else {
           return this.userProductJunctionDb.find({ user_id: user_id }).pipe(switchMap(doc => {
-            console.log("doc");
-            console.log("doc", doc);
-
-            return this.userProductJunctionDb.findandUpdate({ columnName: 'user_id', columnvalue: user_id, quries: { total_tests: doc[0].total_tests + 1 } })
+            return this.userProductJunctionDb.findandUpdate({ columnName: 'id', columnvalue: doc[doc.length-1].id.toString(), quries: { total_tests: doc[doc.length-1].total_tests + 1 } })
           }))
         }
       }))

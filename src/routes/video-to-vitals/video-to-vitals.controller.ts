@@ -147,6 +147,15 @@ export class VideoToVitalsController {
     return this.videoToVitalsService.addUser(userDTO)
   }
 
+  
+  @Get('junction/domain/:url')
+  fetchOrgByUrlFromJunction(@Param('url') url: string) {
+    Logger.debug(`fetchOrgByUrlFromJunction()`, APP);
+
+    return this.organizationService.fetchOrgByUrlFromJunction(url)
+  }
+
+
   @Get('users/:org_id')
   fetchAllUsers(@Param('org_id', ParseIntPipe) org_id: number, @Query() userParamDto: UserParamDto) {
     Logger.debug(`fetchAllUsers()`, APP);
