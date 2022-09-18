@@ -189,7 +189,7 @@ export class VideoToVitalsController {
     return this.videoToVitalsService.fetchUsersCountByOrgId(org_id)
   }
 
-  @Get('users/:id')
+  @Get('users/data/list/:id')
   fetchUserById(@Param('id', ParseIntPipe) id: number) {
     Logger.debug(`fetchUserById()`, APP);
 
