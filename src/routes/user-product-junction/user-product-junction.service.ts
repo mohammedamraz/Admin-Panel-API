@@ -40,5 +40,12 @@ export class UserProductJunctionService {
     )
   }
 
+  // fetchTotalTestOfOrganizationByOrgId(org_id: number){
+
+     
+   
+
+  // }
+
 
 }

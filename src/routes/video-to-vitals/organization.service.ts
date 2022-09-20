@@ -388,7 +388,10 @@ export class OrganizationService {
         return lastValueFrom(this.userProductJunctionService.fetchUserProductJunctionDataByOrgId(orgData.id))
 
           .then(doc => {
-            orgData['total_users'] = doc.length;
+          let  data=[];
+          
+            
+            orgData['total_users'] = new Set(doc.map((item) => item.user_id)).size
             orgData['total_tests'] = doc.reduce((pre, acc) => pre + acc['total_tests'], 0);
             userProfileData.push(orgData);
             return orgData

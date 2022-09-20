@@ -279,11 +279,19 @@ export class VideoToVitalsController {
     return this.videoToVitalsService.sendEmailToChangeUserPasswordExistByEmail(passwordResetDTO)
   }
 
-  @Patch('org/stage/:id')
-  markAsWonAndLost(@Param('id', ParseIntPipe) id: number, @Body() updateOrganizationDto: UpdateOrganizationDto) {
-    Logger.debug(`updateOrganization() id:${id} updateOrganizationDto: ${JSON.stringify(updateOrganizationDto)} `, APP);
+  // @Patch('org/stage/:id')
+  // markAsWonAndLost(@Param('id', ParseIntPipe) id: number, @Body() updateOrganizationDto: UpdateOrganizationDto) {
+  //   Logger.debug(`updateOrganization() id:${id} updateOrganizationDto: ${JSON.stringify(updateOrganizationDto)} `, APP);
 
-    return this.organizationService.updateOrganization(id, updateOrganizationDto);
+  //   return this.organizationService.updateOrganization(id, updateOrganizationDto);
+  // }
+
+
+  @Get('max_test/:org_id')
+  fetchTotalTestOfOrgAndMaxTestByUser(@Param('org_id') org_id: number) {
+    Logger.debug(`fetchTotalTestOfOrgAndMaxTestByUser() org_id: ${org_id}`, APP);
+
+    return this.usersService.fetchTotalTestOfOrgAndMaxTestByUser(org_id)
   }
 
 }
