@@ -1,5 +1,6 @@
 import { HttpService } from '@nestjs/axios';
 import { ConflictException, Injectable, Logger, NotFoundException, UnprocessableEntityException } from '@nestjs/common';
+import { convertMultiFactorInfoToServerFormat } from 'firebase-admin/lib/auth/user-import-builder';
 import { catchError, concatMap, from, lastValueFrom, map, switchMap } from 'rxjs';
 import { DatabaseTable } from 'src/lib/database/database.decorator';
 import { DatabaseService } from 'src/lib/database/database.service';
@@ -72,6 +73,7 @@ export class UsersService {
           .then(doc => {
 
             userData['tests'] = doc
+            userData['total_test'] = doc.reduce((pre, acc) => pre + acc['total_tests'], 0);
             temp.push(userData);
             return userData
           })
@@ -151,5 +153,51 @@ export class UsersService {
       }),
 
     )
+  }
+
+  fetchTotalTestOfOrgAndMaxTestByUser(org_id: number){
+    Logger.debug(`fetchTotalTestOfOrgAndMaxTestByUser() org_id: ${org_id}`, APP);
+
+    return this.userProductJunctionService.fetchUserProductJunctionDataByOrgId(org_id).pipe(
+      map(userProductDoc=>{
+        console.log("USERPRODUCTDOC",userProductDoc)
+        const total_tests_of_org = userProductDoc.reduce((pre, acc) => pre + acc['total_tests'], 0);
+        //  for (let i=0; i<userProductDoc.length; i++){
+           
+        //  }
+        
+        return {"total_tests_of_org": total_tests_of_org}
+      }),
+      switchMap(total_tests_of_org=>{
+       return this.userDb.find({org_id: org_id }).pipe(
+          map(userDoc=>this.fetchTestDetails(userDoc,total_tests_of_org))
+        ) 
+      })
+    )
+   
+  }
+
+
+
+  fetchTestDetails(userDTO: UserDTO[], total_tests_of_org) {
+    Logger.debug(`fetchTestDetails() userDTO:${JSON.stringify(userDTO)} `, APP);
+
+
+    let temp: UserDTO[] = [];
+    temp.push(total_tests_of_org)
+    return lastValueFrom(from(userDTO).pipe(
+      concatMap(async userData => {
+        try {
+          const doc = await lastValueFrom(this.userProductJunctionService.fetchUserProductJunctionDataByUserId(userData.id));
+          console.log("userData", userData);
+          const total_tests_of_user = doc.reduce((pre, acc) => pre + acc['total_tests'], 0);
+          userData['tests_by_user'] = total_tests_of_user;
+          total_tests_of_org['user'] = userData;
+          
+        } catch (err) {
+          throw new UnprocessableEntityException(err.message);
+        }
+      }),
+    )).then(_doc => temp)
   }
 }
