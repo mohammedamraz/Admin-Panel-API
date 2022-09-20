@@ -42,19 +42,19 @@ export class VideoToVitalsService {
     private readonly usersService: UsersService,
     private http: HttpService,
 
-  ) {}
+  ) { }
 
-  fetchAllVitalsPilot(id:number,queryParamsDto: QueryParamsDto) {
+  fetchAllVitalsPilot(id: number, queryParamsDto: QueryParamsDto) {
     Logger.debug(`fetchAllVitalsPilot() product_id:${id}`, APP);
 
-    if (queryParamsDto.type == "latest"){
+    if (queryParamsDto.type == "latest") {
       return this.organizationProductJunctionDb.fetchLatestFiveByProductId(id).pipe(
-        catchError(err => {throw new UnprocessableEntityException(err.message)}),
+        catchError(err => { throw new UnprocessableEntityException(err.message) }),
         map(doc => this.fetchotherDetails(doc)),
         switchMap(doc => this.organizationService.updateStatus(doc))
       );
     }
-    if (queryParamsDto.type == "active"){
+    if (queryParamsDto.type == "active") {
       return this.organizationProductJunctionDb.find({ product_id: id, status: "Active" }).pipe(
         catchError(err => { throw new UnprocessableEntityException(err.message) }),
         map(doc => {
@@ -68,7 +68,7 @@ export class VideoToVitalsService {
         switchMap(doc => this.organizationService.updateStatus(doc))
       );
     }
-    else{
+    else {
       return this.organizationProductJunctionDb.find({ product_id: id }).pipe(
         catchError(err => { throw new UnprocessableEntityException(err.message) }),
         map(doc => {
@@ -81,7 +81,7 @@ export class VideoToVitalsService {
         }),
         switchMap(doc => this.organizationService.updateStatus(doc))
       );
-    } 
+    }
   }
 
   fetchotherDetails(createOrganizationDto: CreateOrganizationDto[]) {
@@ -152,13 +152,13 @@ export class VideoToVitalsService {
     Logger.debug(`fetchPilotCount() product:${JSON.stringify(productDto)}`, APP);
     if (productDto.status) {
       return this.organizationProductJunctionDb.find({ product_id: CONVERTINNUMBER[productDto.product], status: CONVERTINACTIVE[productDto.status] }).pipe(
-        map(doc => ({ ['total_'+`${productDto.product}`+'_pilot_count']: `${doc.length}` })),
+        map(doc => ({ ['total_' + `${productDto.product}` + '_pilot_count']: `${doc.length}` })),
         catchError(err => { throw new UnprocessableEntityException(err.message) })
       )
     }
     else {
       return this.organizationProductJunctionDb.find({ product_id: CONVERTINNUMBER[productDto.product] }).pipe(
-        map(doc =>  ({ ['total_'+`${productDto.product}`+'_pilot_count']: `${doc.length}` }))
+        map(doc => ({ ['total_' + `${productDto.product}` + '_pilot_count']: `${doc.length}` }))
       )
     }
 
@@ -241,11 +241,11 @@ export class VideoToVitalsService {
 
   fetchAllVitalsTestCount(id: number) {
     Logger.debug(`fetchAllVitalsTestCount() product_id:${id} `, APP);
-  
+
     return this.userProductJunctionService.fetchUserProductJunctionDataByProductId(id).pipe(
       catchError(err => { throw new UnprocessableEntityException(err.message) }),
       map(doc => {
-        if (doc.length==0) throw new NotFoundException(`product not available with product id ${id}`)
+        if (doc.length == 0) throw new NotFoundException(`product not available with product id ${id}`)
         const total_tests = doc.reduce((pre, acc) => pre + acc['total_tests'], 0);
         return { "total_tests": total_tests }
       })
@@ -270,16 +270,16 @@ export class VideoToVitalsService {
                 return [userdoc, org_doc]
               }),
               switchMap(doc => {
-              console.log("url.", doc[1][0]['url'])
+                console.log("url.", doc[1][0]['url'])
                 var encryption = { user_id: doc[0][0]['id'] };
-                console.log("name",userDTO.user_name.substring(0, userDTO.user_name.indexOf(' ')))
+                console.log("name", userDTO.user_name.substring(0, userDTO.user_name.indexOf(' ')))
                 this.sendEmailService.sendEmailOnCreateOrgUser(
 
                   {
                     "email": userDTO.email,
                     "organisation_admin_name": doc[1][0]['admin_name'],
                     "fedo_app": "Fedo Vitals",
-                    "url": "https://www.fedo.ai/admin/"+doc[1][0]['url'] + "?" + encodeURIComponent(this.encryptPassword(JSON.stringify(encryption))),
+                    "url": "https://www.fedo.ai/admin/" + doc[1][0]['url'] + "?" + encodeURIComponent(this.encryptPassword(JSON.stringify(encryption))),
                     "name": userDTO.user_name.substring(0, userDTO.user_name.indexOf(' ')),
                     "organisation_admin_email": doc[1][0]['organization_email'],
                     "application_id": userDTO.application_id
@@ -415,15 +415,19 @@ export class VideoToVitalsService {
 
   }
 
-  updateUserByApplicationId(user_id: string) {
-    Logger.debug(`updateUserByApplicationId() id:${user_id} updateUserDTO:)} `, APP);
+  updateUserByApplicationId(user_id: string, product_id: number) {
+    Logger.debug(`updateUserByApplicationId() id:${user_id} product_id:${product_id} updateUserDTO:)} `, APP);
 
     return this.userDb.find({ id: user_id }).pipe(
       switchMap(res => {
         if (res.length == 0) throw new NotFoundException('user not found')
         else {
-          return this.userProductJunctionDb.find({ user_id: user_id }).pipe(switchMap(doc => {
-            return this.userProductJunctionDb.findandUpdate({ columnName: 'id', columnvalue: doc[doc.length-1].id.toString(), quries: { total_tests: doc[doc.length-1].total_tests + 1 } })
+          return this.userProductJunctionDb.find({ user_id: user_id }).pipe(map(doc => {
+            for (let i = 0; i <= doc.length; i++) {
+              if (doc[i].product_id == product_id) {
+                return this.userProductJunctionDb.findandUpdate({ columnName: 'id', columnvalue: doc[i].id.toString(), quries: { total_tests: doc[i].total_tests + 1 } })
+              }
+            }
           }))
         }
       }))
@@ -473,15 +477,16 @@ export class VideoToVitalsService {
             }),
             map((res: AxiosResponse) => {
               if (!res.data) throw new UnauthorizedException();
-              
-              else if(this.user_data[0].user_name){
+
+              else if (this.user_data[0].user_name) {
                 return {
-                jwtToken: res.data.idToken.jwtToken,
-                refreshToken: res.data.refreshToken,
-                accessToken: res.data.accessToken.jwtToken,
-                user_data: this.user_data
-              };}
-              else{
+                  jwtToken: res.data.idToken.jwtToken,
+                  refreshToken: res.data.refreshToken,
+                  accessToken: res.data.accessToken.jwtToken,
+                  user_data: this.user_data
+                };
+              }
+              else {
                 return {
                   jwtToken: res.data.idToken.jwtToken,
                   refreshToken: res.data.refreshToken,
@@ -667,9 +672,10 @@ export class VideoToVitalsService {
 
     RegisterUserdto.fedoApp = FEDO_USER_ADMIN_PANEL_POOL_NAME
     return this.http.post(`${AWS_COGNITO_USER_CREATION_URL_SIT}/`, { passcode: this.encryptPassword(RegisterUserdto) }).pipe(
-      map(doc => { console.log('doc',doc)
+      map(doc => {
+        console.log('doc', doc)
       }),
-      catchError(err => { console.log('err',err);return this.onAWSErrorResponse(err) }))
+      catchError(err => { console.log('err', err); return this.onAWSErrorResponse(err) }))
 
   }
 

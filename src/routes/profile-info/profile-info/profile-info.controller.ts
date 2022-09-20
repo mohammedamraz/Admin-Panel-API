@@ -50,8 +50,8 @@ export class ProfileInfoController {
     return this.profileInfoService.fetchProfileByOrgIdByQueryParams(params)
   }
 
-  @Patch('user/tests')
-  updateTotalTestsInProfileInfo( @Body() createProfileInfoDTO: CreateProfileInfoDTO) {
+  @Patch('user/tests/:application_id/:product_id')
+  updateTotalTestsInProfileInfo( @Param() createProfileInfoDTO: CreateProfileInfoDTO) {
     Logger.debug(`updateProfileInfo()  updateUserDTO:${JSON.stringify(createProfileInfoDTO)} `, APP);
 
     return this.profileInfoService.updateTotalTestsInProfileInfo( createProfileInfoDTO);
