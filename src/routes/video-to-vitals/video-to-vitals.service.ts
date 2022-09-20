@@ -279,7 +279,7 @@ export class VideoToVitalsService {
                     "email": userDTO.email,
                     "organisation_admin_name": doc[1][0]['admin_name'],
                     "fedo_app": "Fedo Vitals",
-                    "url": doc[1][0]['url'] + "?" + encodeURIComponent(this.encryptPassword(JSON.stringify(encryption))),
+                    "url": "https://www.fedo.ai/admin/"+doc[1][0]['url'] + "?" + encodeURIComponent(this.encryptPassword(JSON.stringify(encryption))),
                     "name": userDTO.user_name.substring(0, userDTO.user_name.indexOf(' ')),
                     "organisation_admin_email": doc[1][0]['organization_email'],
                     "application_id": userDTO.application_id
@@ -375,6 +375,8 @@ export class VideoToVitalsService {
     )
   }
 
+  
+
   fetchUserById(id: number) {
     Logger.debug(`fetchUserById() id:${id}} `, APP);
 
@@ -433,10 +435,10 @@ export class VideoToVitalsService {
   checkEmailIsPresentInUsersOrOrganisation(loginUserPasswordCheckDTO: LoginUserDTO) {
     Logger.debug(`checkEmailIsPresentInUsersOrOrganisation() loginUserDTO:${JSON.stringify(LoginUserDTO)} `, APP);
 
-    return this.userDb.find({ email: loginUserPasswordCheckDTO.username }).pipe(
+    return this.organizationDb.find({ organization_email: loginUserPasswordCheckDTO.username }).pipe(
       switchMap(doc => {
         if (doc.length == 0) {
-          return this.organizationDb.find({ organization_email: loginUserPasswordCheckDTO.username }).pipe(
+          return this.userDb.find({ email: loginUserPasswordCheckDTO.username }).pipe(
             map(doc => {
               if (doc.length == 0) throw new NotFoundException('user with this email is not found')
               else return doc
@@ -460,7 +462,7 @@ export class VideoToVitalsService {
 
 
     loginUserDTO.fedoApp = FEDO_USER_ADMIN_PANEL_POOL_NAME;
-    return this.checkEmailIsPresentInUsersOrOrganisation(loginUserDTO).pipe((map(doc => { this.user_data = doc })),
+    return this.checkEmailIsPresentInUsersOrOrganisation(loginUserDTO).pipe((map(doc => {console.log("dc",doc); this.user_data = doc })),
       switchMap(doc => {
         return this.http
           .post(

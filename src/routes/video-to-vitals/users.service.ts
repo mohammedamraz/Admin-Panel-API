@@ -1,5 +1,5 @@
 import { HttpService } from '@nestjs/axios';
-import { ConflictException, Injectable, Logger, NotFoundException, UnprocessableEntityException } from '@nestjs/common';
+import { BadRequestException, ConflictException, Injectable, Logger, NotFoundException, UnprocessableEntityException } from '@nestjs/common';
 import { catchError, concatMap, from, lastValueFrom, map, switchMap } from 'rxjs';
 import { DatabaseTable } from 'src/lib/database/database.decorator';
 import { DatabaseService } from 'src/lib/database/database.service';
@@ -30,10 +30,19 @@ export class UsersService {
     private readonly productService: ProductService,
     private readonly userProductJunctionService: UserProductJunctionService,
     private readonly sendEmailService: SendEmailService,
-    private readonly organizationService: OrganizationService,
+    // private readonly organizationService: OrganizationService,
     private http: HttpService,
 
   ) { }
+
+  saveUsersToUserDb(userDto: UserDTO) {
+    Logger.debug(`saveUsersToUserDb() data:${userDto}} `, APP);
+
+    return this.userDb.save(userDto).pipe(
+      map(doc => { return doc}),
+      catchError(err=>{throw new BadRequestException(err.message)})
+    )
+  }
 
   fetchAllUsers(org_id: number, userParamDto: UserParamDto) {
     Logger.debug(`fetchAllUsers()`, APP);

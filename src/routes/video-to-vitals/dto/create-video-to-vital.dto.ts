@@ -162,7 +162,7 @@ export class UpdateOrganizationDto {
 
 
 export class UserDTO {
-    id: number;
+    id?: number;
     user_name: string;
     designation: string;
     @IsNotEmpty()
@@ -172,10 +172,10 @@ export class UserDTO {
     @IsPhoneNumber()
     mobile: String;
     organization_name:string;
-    product_name:string;
+    product_name?:string;
     product_id?:number;
-    third_party_org_name:string;
-    password:string;
+    third_party_org_name?:string;
+    password?:string;
     application_id?:string;
     org_id:number;
 }
