@@ -681,7 +681,7 @@ export class TemplateService {
             Destination: {
                 ToAddresses: [content.email]
             },
-            Source: SES_SOURCE_SUPPORT_EMAIL,
+            Source: SES_SOURCE_NO_REPLY_EMAIL,
             Message: {
                 Body: {
                     Html: {
@@ -689,35 +689,31 @@ export class TemplateService {
                         Data: `<html lang="en"> 
                         <head> <link href="https://fonts.googleapis.com/css?family=Montserrat:400,700&display=swap" rel="stylesheet" type="text/css"></head> 
                         <body style="font-family:'Montserrat',sans-serif;">
-                           <div style="display:grid;justify-items:center;">
-                              <img src="https://fedo-file-server.s3.ap-south-1.amazonaws.com/images/logo.png"" width="25%" style="width:2%,max-width: 2%;" /> 
-                           </div>
                            <div style="display: grid;">
-                           <p>Dear <b>${content.organisation_admin_name}</b>, <br><br> Vitals Web Application has been enabled for <b>${content.organisation_name}</b>.<br> <br></p>
-                             <p>Here's the URL<br></p>
-                             <p><a href=${content.url}>VITALS WEB APP</a><br></p>
-                             <p><b>Two ways to use the Web App</b><br></p>
+                           <p>Dear <b>${content.organisation_admin_name}</b>, <br><br> Vitals Web Application has been enabled for <b>${content.organisation_name}</b>.</p>
+                             <p>Here's the URL<br><a href=${content.url}>VITALS WEB APP</a><br></p>
+                             <p><b>Two ways to use the Web App</b></p>
                              <ol>
-                             <li> Share the link to anyone so they can click the link, fill in the details in the screen, record 14 seconds video and get to know their Vitals.<br><br></li>
+                             <li> Share the link to anyone so they can click the link, fill in the details in the screen, record 14 seconds video and get to know their Vitals.</li>
                              <ul>
-                             <li><b>Note</b>: Every test (we call them <b>scans</b>) performed by anyone from this URL will be saved as a scan record of your organisation. The report will be made available to you at frequent intervals till the 'Report Module' is made available in your dashboard.<br><br></li>
+                             <li><b>Note</b>: Every test (we call them <b>scans</b>) performed by anyone from this URL will be saved as a scan record of your organisation. The report will be made available to you at frequent intervals till the 'Report Module' is made available in your dashboard.</li>
                              </ul>
-                             <li>If your company is having an in-house ERP,CRM or any Web Application to manage your customers data, you can integrate 'Vitals Web App' with your in-house application.<br><br></li>
+                             <li>If your company is having an in-house ERP,CRM or any Web Application to manage your customers data, you can integrate 'Vitals Web App' with your in-house application.</li>
                              <ul>
-                             <li>Your Tech Team can place the above link into your in-house application (Example: As a button or link).<br><br></li>
-                             <li>When your customer (who will be your policy holder) clicks on the button/link, pass the unique ID of the customer along with the URL. Our app identifies there is a unique ID associated with the URL and hence it skips the first screen and directly takes the customer to the video recording screen.<br><br></li>
+                             <li>Your Tech Team can place the above link into your in-house application (Example: As a button or link).</li>
+                             <li>When your customer (who will be your policy holder) clicks on the button/link, pass the unique ID of the customer along with the URL. Our app identifies there is a unique ID associated with the URL and hence it skips the first screen and directly takes the customer to the video recording screen.</li>
 
-                             <li>The app will keep track of the unique ID through the process till it's complete.<br><br></li>
-                             <li>When the customer completes their video recording, a 'Thank you' screen is displayed which they can close and exit. And the data will be saved against your organisation with the Unique ID of the customer so you can identify which customer's scan data it is.<br><br></li>
+                             <li>The app will keep track of the unique ID through the process till it's complete.</li>
+                             <li>When the customer completes their video recording, a 'Thank you' screen is displayed which they can close and exit. And the data will be saved against your organisation with the Unique ID of the customer so you can identify which customer's scan data it is.</li>
 
-                             <li>All scan records will be sent to you at frequent intervals till the 'Report Module' is made available in your dashboard.<br><br></li>
+                             <li>All scan records will be sent to you at frequent intervals till the 'Report Module' is made available in your dashboard.<br></li>
                              </ul>
                              </ol>
 
-                             <p>If you have any clarifications or would like to know more, you may write to <a>support@fedo.health</a> or call us. </p>
+                             <p>If you have any clarifications or would like to know more, you may write to <a>support@fedo.ai</a> or call us. </p>
                         
                              <p>Good Day!<br></p>
-                             <p><b>Team Fedo</b><br></p>
+                             <p><b>Team Fedo</b></p>
 
                            </div>
                           </body> 
@@ -730,7 +726,7 @@ export class TemplateService {
                 },
                 Subject: {
                     Charset: "UTF-8",
-                    Data: `${content.fedo_app}: Web Application Details`
+                    Data: `Fedo Vitals: Web Application Details`
                 }
             }
         };

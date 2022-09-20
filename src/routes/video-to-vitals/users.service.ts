@@ -35,12 +35,20 @@ export class UsersService {
 
   ) { }
 
-  saveUsersToUserDb(userDto: UserDTO) {
+  saveUsersToUserDb(userDto: UserDTO,product_user_list:any,org_id:number) {
     Logger.debug(`saveUsersToUserDb() data:${userDto}} `, APP);
 
+    console.log("doc",product_user_list)
     return this.userDb.save(userDto).pipe(
-      map(doc => { return doc}),
-      catchError(err=>{throw new BadRequestException(err.message)})
+      // map(doc => { return doc}),
+      catchError(err=>{throw new BadRequestException(err.message)}),
+      switchMap(doc => { console.log("doc",product_user_list)
+        product_user_list.map(res1 =>
+          this.userProductJunctionService.createUserProductJunction({ user_id: doc[0].id, org_id: org_id, product_id: Number(res1), total_tests: 0 }))
+        // doc["id"]
+        // this.userProfileDb.save({ application_id: doc['application_id'], user_id: doc['id'], org_id: doc['org_id'], name: doc['user_name'], is_editable: true })
+        return doc;
+      })
     )
   }
 

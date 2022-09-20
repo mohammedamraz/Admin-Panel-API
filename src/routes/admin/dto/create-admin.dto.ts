@@ -121,7 +121,7 @@ export class sendEmailOnCreationOfOrgAndUser {
   age?: string;
   // @IsNotEmpty()
   application_id?:string;
-  
+  org_junction_id?:string;
   mobile?:string;
   
   

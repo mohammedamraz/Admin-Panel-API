@@ -375,8 +375,6 @@ export class VideoToVitalsService {
     )
   }
 
-  
-
   fetchUserById(id: number) {
     Logger.debug(`fetchUserById() id:${id}} `, APP);
 
@@ -462,7 +460,7 @@ export class VideoToVitalsService {
 
 
     loginUserDTO.fedoApp = FEDO_USER_ADMIN_PANEL_POOL_NAME;
-    return this.checkEmailIsPresentInUsersOrOrganisation(loginUserDTO).pipe((map(doc => {console.log("dc",doc); this.user_data = doc })),
+    return this.checkEmailIsPresentInUsersOrOrganisation(loginUserDTO).pipe((map(doc => { this.user_data = doc })),
       switchMap(doc => {
         return this.http
           .post(
