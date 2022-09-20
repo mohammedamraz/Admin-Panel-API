@@ -349,7 +349,7 @@ export class OrganizationService {
     if (queryParamsDto.type) {
       return this.organizationDb.fetchLatestFive().pipe(
         catchError(err => { throw new UnprocessableEntityException(err.message) }),
-        map(doc => this.fetchotherDetails(doc)),
+        map(doc => this.fetchotherDetails(doc,queryParamsDto)),
         switchMap(doc => this.updateStatus(doc))
       );
     }
@@ -372,14 +372,14 @@ export class OrganizationService {
         catchError(err => { throw new UnprocessableEntityException(err.message) }),
         map(doc => {
           if (doc.length == 0) throw new NotFoundException('No Data available')
-          else { return this.fetchotherDetails(doc) }
+          else { return this.fetchotherDetails(doc,queryParamsDto) }
         }),
         switchMap(doc => this.updateStatus(doc))
       );
     }
   }
 
-  fetchotherDetails(createOrganizationDto: CreateOrganizationDto[]) {
+  fetchotherDetails(createOrganizationDto: CreateOrganizationDto[],queryParamsDto: QueryParamsDto) {
     Logger.debug(`fetchotherDetails() createOrganizationDto: ${JSON.stringify(createOrganizationDto)}`, APP);
 
     let userProfileData: CreateOrganizationDto[] = [];
@@ -397,10 +397,10 @@ export class OrganizationService {
             return orgData
           })
       }),
-    )).then(_doc => this.fetchotherMoreDetails(userProfileData))
+    )).then(_doc => this.fetchotherMoreDetails(userProfileData,queryParamsDto))
   }
 
-  fetchotherMoreDetails(createOrganizationDto: CreateOrganizationDto[]) {
+  fetchotherMoreDetails(createOrganizationDto: CreateOrganizationDto[], queryParamsDto: QueryParamsDto) {
     Logger.debug(`fetchotherMoreDetails() createOrganizationDto: ${JSON.stringify(createOrganizationDto)}`, APP);
 
     let orgData: CreateOrganizationDto[] = [];
@@ -408,54 +408,60 @@ export class OrganizationService {
       concatMap(orgJunData => {
         return lastValueFrom(this.orgProductJunctionService.fetchOrgProductJunctionDataByOrgId(orgJunData.id))
           .then(doc => {
-            doc.forEach(object => {
-              object['progress'] = this.fetchDate(object);
-            });
-            orgJunData['product'] = doc
-            orgData.push(orgJunData);
-            return orgJunData
+            let result: Array<object> = [];
+            let res = new Promise<void>(async (resolve, rejects) => {
+              (doc).forEach(async (object, index) => {
+                await lastValueFrom(this.productService.fetchProductById(object.product_id)).then(
+                  productDoc => {
+                    result.push(object);
+                    result[index]['progress'] = this.fetchDate(object);
+                    result[index]['product_detail'] = productDoc   
+                  }
+                ).catch(err=>{throw new UnprocessableEntityException(err.message) });
+                if (result.length == (await doc).length) {
+                  orgJunData['product'] = result
+                  orgData.push(orgJunData);
+                  resolve()
+                  return orgJunData 
+                }
+              });
+            })
+            return res.then((item) => {return item })
           })
       }),
     )).then(_doc => orgData)
+    // )).then(_doc => this.Paginator(orgData,queryParamsDto.page,queryParamsDto.per_page))
   }
 
   fetchProductDetails(createOrganizationDto: CreateOrganizationDto[]) {
-    Logger.debug(`fetchotherMoreDetails() createOrganizationDto: ${JSON.stringify(createOrganizationDto)}`, APP);
+    Logger.debug(`fetchProductDetails() createOrganizationDto: ${JSON.stringify(createOrganizationDto)}`, APP);
 
     let orgData: CreateOrganizationDto[] = [];
     return lastValueFrom(from(createOrganizationDto).pipe(
-      concatMap(orgJunData => {
-        let doc = lastValueFrom(this.orgProductJunctionService.fetchOrgProductJunctionDataByOrgId(orgJunData.id))
-
-
+      concatMap(async orgJunData => {
+        let doc = await lastValueFrom(this.orgProductJunctionService.fetchOrgProductJunctionDataByOrgId(orgJunData.id))
         let result: Array<object> = [];
-
         let res = new Promise<void>(async (resolve, rejects) => {
-          (await doc).forEach(async (object, index) => {
+          (doc).forEach(async (object, index) => {
             await lastValueFrom(this.productService.fetchProductById(object.product_id)).then(
               productDoc => {
                 result.push(object);
                 result[index]['progress'] = this.fetchDate(object);
-                result[index]['url'] = productDoc
-
+                result[index]['url'] = productDoc   
               }
-            );
+            ).catch(err=>{throw new UnprocessableEntityException(err.message) });
             if (result.length == (await doc).length) {
               orgJunData['product'] = result
               orgData.push(orgJunData);
               resolve()
-              return orgJunData
+              return orgJunData 
             }
           });
-
-
         })
-
-        return res.then((item) => { return item })
-
-
+        return res.then((item) => {return item })
       }),
     )).then(_doc => orgData)
+   .catch(err=>{throw new UnprocessableEntityException(err.message) })
   }
 
   fetchDate(createOrgProductJunctionDto: CreateOrgProductJunctionDto) {
@@ -739,17 +745,17 @@ export class OrganizationService {
   }
 
 
-  fetchFiveLatestOrganization() {
-    Logger.debug(`fetchFiveLatestOrganization()`, APP);
+  // fetchFiveLatestOrganization() {
+  //   Logger.debug(`fetchFiveLatestOrganization()`, APP);
 
-    return this.organizationDb.fetchLatestFive().pipe(
-      catchError(err => {
-        throw new UnprocessableEntityException(err.message)
-      }),
-      map(doc => this.fetchotherDetails(doc))
-    );
+  //   return this.organizationDb.fetchLatestFive().pipe(
+  //     catchError(err => {
+  //       throw new UnprocessableEntityException(err.message)
+  //     }),
+  //     map(doc => this.fetchotherDetails(doc,queryParamsDto))
+  //   );
 
-  }
+  // }
 
   findAllProductsMappedWithOrganization(id: any) {
     Logger.debug(`findAllProductsMappedWithOrganization() `, APP);

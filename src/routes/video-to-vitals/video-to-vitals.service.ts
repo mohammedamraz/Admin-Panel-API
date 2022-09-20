@@ -34,8 +34,6 @@ export class VideoToVitalsService {
     @DatabaseTable('user_profile_info')
     private readonly userProfileDb: DatabaseService<UserProfileDTO>,
     @DatabaseTable('product')
-    private readonly productDb: DatabaseService<CreateProductDto>,
-    private readonly productService: ProductService,
     private readonly userProductJunctionService: UserProductJunctionService,
     private readonly sendEmailService: SendEmailService,
     private readonly organizationService: OrganizationService,
@@ -44,13 +42,13 @@ export class VideoToVitalsService {
 
   ) { }
 
-  fetchAllVitalsPilot(id: number, queryParamsDto: QueryParamsDto) {
-    Logger.debug(`fetchAllVitalsPilot() product_id:${id}`, APP);
+  fetchAllVitalsPilot(id:number,queryParamsDto: QueryParamsDto) {
+    Logger.debug(`fetchAllVitalsPilot() product_id:${id} queryParamsDto:${JSON.stringify(queryParamsDto)}`, APP);
 
     if (queryParamsDto.type == "latest") {
       return this.organizationProductJunctionDb.fetchLatestFiveByProductId(id).pipe(
-        catchError(err => { throw new UnprocessableEntityException(err.message) }),
-        map(doc => this.fetchotherDetails(doc)),
+        catchError(err => {throw new UnprocessableEntityException(err.message)}),
+        map(doc => this.fetchotherDetails(doc,queryParamsDto)),
         switchMap(doc => this.organizationService.updateStatus(doc))
       );
     }
@@ -62,7 +60,7 @@ export class VideoToVitalsService {
             throw new NotFoundException('No Data available')
           }
           else {
-            return this.fetchotherDetails(doc)
+            return this.fetchotherDetails(doc,queryParamsDto)
           }
         }),
         switchMap(doc => this.organizationService.updateStatus(doc))
@@ -76,7 +74,7 @@ export class VideoToVitalsService {
             throw new NotFoundException('No Data available')
           }
           else {
-            return this.fetchotherDetails(doc)
+            return this.fetchotherDetails(doc,queryParamsDto)
           }
         }),
         switchMap(doc => this.organizationService.updateStatus(doc))
@@ -84,8 +82,8 @@ export class VideoToVitalsService {
     }
   }
 
-  fetchotherDetails(createOrganizationDto: CreateOrganizationDto[]) {
-    Logger.debug(`fetchotherDetails() createOrganizationDto: ${JSON.stringify(createOrganizationDto)}`, APP);
+  fetchotherDetails(createOrganizationDto: CreateOrganizationDto[],queryParamsDto: QueryParamsDto) {
+    Logger.debug(`fetchotherDetails() createOrganizationDto: ${JSON.stringify(createOrganizationDto)} queryParamsDto:${JSON.stringify(queryParamsDto)}`, APP);
 
     let userProfileData: CreateOrganizationDto[] = [];
     return lastValueFrom(from(createOrganizationDto).pipe(
@@ -98,11 +96,11 @@ export class VideoToVitalsService {
             return orgData
           })
       }),
-    )).then(_doc => this.fetchotherMoreDetails(userProfileData)).catch(err => { throw new UnprocessableEntityException(err.message) })
+    )).then(_doc => this.fetchotherMoreDetails(userProfileData,queryParamsDto)).catch(err => { throw new UnprocessableEntityException(err.message) })
   }
 
-  fetchotherMoreDetails(createOrganizationDto: CreateOrganizationDto[]) {
-    Logger.debug(`fetchotherMoreDetails() createOrganizationDto: ${JSON.stringify(createOrganizationDto)}`, APP);
+  fetchotherMoreDetails(createOrganizationDto: CreateOrganizationDto[],queryParamsDto:QueryParamsDto) {
+    Logger.debug(`fetchotherMoreDetails() createOrganizationDto: ${JSON.stringify(createOrganizationDto)} queryParamsDto:${JSON.stringify(queryParamsDto)}`, APP);
 
     let orgData: CreateOrganizationDto[] = [];
     return lastValueFrom(from(createOrganizationDto).pipe(
@@ -116,7 +114,10 @@ export class VideoToVitalsService {
 
           })
       }),
-    )).then(_doc => orgData).catch(err => { throw new UnprocessableEntityException(err.message) })
+    ))
+    .then(_doc => orgData ).catch(err => { throw new UnprocessableEntityException(err.message) })
+
+    // .then(_doc => this.organizationService.Paginator(orgData,queryParamsDto.page,queryParamsDto.per_page) ).catch(err => { throw new UnprocessableEntityException(err.message) })
   }
 
   fetchDate(createOrganizationDto: CreateOrganizationDto) {
