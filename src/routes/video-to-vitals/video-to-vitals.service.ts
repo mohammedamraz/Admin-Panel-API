@@ -270,16 +270,17 @@ export class VideoToVitalsService {
                 return [userdoc, org_doc]
               }),
               switchMap(doc => {
+              console.log("url.", doc[1][0]['url'])
                 var encryption = { user_id: doc[0][0]['id'] };
+                console.log("name",userDTO.user_name.substring(0, userDTO.user_name.indexOf(' ')))
                 this.sendEmailService.sendEmailOnCreateOrgUser(
 
                   {
                     "email": userDTO.email,
                     "organisation_admin_name": doc[1][0]['admin_name'],
-                    "fedo_app": "FEDO VITALS",
+                    "fedo_app": "Fedo Vitals",
                     "url": doc[1][0]['url'] + "?" + encodeURIComponent(this.encryptPassword(JSON.stringify(encryption))),
-                    "name": userDTO.user_name,
-                    "pilot_duration": doc[1][0]['pilot_duration'],
+                    "name": userDTO.user_name.substring(0, userDTO.user_name.indexOf(' ')),
                     "organisation_admin_email": doc[1][0]['organization_email'],
                     "application_id": userDTO.application_id
                   }

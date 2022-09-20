@@ -77,8 +77,8 @@ export class OrganizationService {
                   this.sendEmailService.sendEmailOnCreateOrg(
                     {
                       "email": createOrganizationDto.organization_email,
-                      "organisation_admin_name": createOrganizationDto.admin_name,
-                      "fedo_app": "FEDO VITALS",
+                      "organisation_admin_name": createOrganizationDto.admin_name.substring(0, createOrganizationDto.admin_name.indexOf(' ')),
+                      "fedo_app": "Fedo Vitals",
                       "url": createOrganizationDto.url + "?" + encodeURIComponent(this.encryptPassword(encryption)),
                       "pilot_duration": this.respilot_duration,
                       "application_id": (res[0].application_id)

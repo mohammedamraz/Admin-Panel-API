@@ -4,7 +4,7 @@
 import AWS from 'aws-sdk';
 import { Injectable, Logger } from '@nestjs/common';
 import { EmailDTO, TypeDTO } from 'src/routes/admin/dto/template.dto'
-import { AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, SES_SOURCE_EMAIL, SES_SOURCE_HELLO_SUPPORT__EMAIL, SES_SOURCE_SUPPORT_EMAIL, SES_SOURCE_SUPPORT_EMAIL_AI, STATIC_IMAGES } from 'src/constants';
+import { AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, SES_SOURCE_EMAIL, SES_SOURCE_NO_REPLY_EMAIL, SES_SOURCE_SUPPORT_EMAIL, SES_SOURCE_SUPPORT_EMAIL_AI, STATIC_IMAGES } from 'src/constants';
 import { PasswordResetDTO, sendEmailOnCreationOfDirectSalesPartner, sendEmailOnCreationOfOrgAndUser, sendEmailOnIncorrectBankDetailsDto } from 'src/routes/admin/dto/create-admin.dto';
 import { EmailOtpDto } from 'src/routes/individual-user/dto/create-individual-user.dto';
 
@@ -336,7 +336,7 @@ export class TemplateService {
             Destination: {
                 ToAddresses: [content.email]
             },
-            Source: SES_SOURCE_SUPPORT_EMAIL,
+            Source: SES_SOURCE_NO_REPLY_EMAIL,
             Message: {
                 Body: {
                     Html: {
@@ -344,25 +344,21 @@ export class TemplateService {
                         Data: `<html lang="en"> 
                         <head> <link href="https://fonts.googleapis.com/css?family=Montserrat:400,700&display=swap" rel="stylesheet" type="text/css"></head> 
                         <body style="font-family:'Montserrat',sans-serif;">
-                           <div style="display:grid;justify-items:center;">
-                              <img src="https://fedo-file-server.s3.ap-south-1.amazonaws.com/images/logo.png"" width="25%" style="width:2%,max-width: 2%;" /> 
-                           </div>
                            <div style="display: grid;">
                            <p>Dear <b>${content.organisation_admin_name}</b>, <br><br> Thank you so much for showing interest in ${content.fedo_app}.<br> <br></p>
-                             <p>Your pilot is all set.</p>
-                             <p>You may click the below link and sign up to view your dashboard</p>
-                             <p>Note that you will be asked to set a new password for once.<br></p>
-                             <p><b>Your Custom Pilot URL:</b><br></p>
-                             <p><a href=${content.url}>ADMIN PANEL SIGNUP</a><br></p>
+                             <p>Your pilot is all set. You may click the below link and sign up to view your dashboard. Note that you will be asked to set a new password for once.<br></p>
+                             <p><b>Your Custom Pilot URL:</b><br><a href=${content.url}>ADMIN PANEL SIGNUP</a><br></p>
                              <p><b>First Steps After Sign In</b><br></p>
-                             <p>* Check and ensure your organisation name is entered correctly. If not, edit it.</p>
-                             <p>* Your company logo is uploaded. If not, upload your company logo to brand the app.</p>
-                             <p>* Add users whom you would like to give access to use the app during Pilot.<br></p>
-                             <p>* You can use your Org Admin sign in credentials to sign into our app.<br></p>
-                             <p>* If you would like to do the test for yourself, you must always use your unique application no. And your unique application no. is <b>${content.application_id}</b>.<br></p>
-                             <p><b>Pilot Duration</b><br></p>
-                             <p>Your Pilot is set for ${content.pilot_duration} days.</p>
-                             <p>For any assistance, you may write to <a>support@fedo.health</a>.</p>
+                             <ul>
+                             <li>Check and ensure your organisation name is entered correctly. If not, edit it.</li>
+                             <li>Your company logo is uploaded. If not, upload your company logo to brand the app.</li>
+                             <li>Add users whom you would like to give access to use the app during Pilot.</li>
+                             <li>You can use your Org Admin sign in credentials to sign into our app.</li>
+                             <li>If you would like to do the test for yourself, you must always use your unique application no. And your unique application no. is <b>${content.application_id}</b>.<br></li>
+                             </ul>
+                             <p><b>Pilot Duration</b></p>
+                             <p>Your Pilot is set for ${content.pilot_duration} days.<br></p>
+                             <p>For any assistance, you may write to <a>support@fedo.ai</a>.<br></p>
                              <p>Great Day!<br></p>
                              <p><b>Team Fedo</b><br></p>
 
@@ -392,7 +388,7 @@ export class TemplateService {
             Destination: {
                 ToAddresses: [content.email]
             },
-            Source: SES_SOURCE_SUPPORT_EMAIL,
+            Source: SES_SOURCE_NO_REPLY_EMAIL,
             Message: {
                 Body: {
                     Html: {
@@ -400,25 +396,20 @@ export class TemplateService {
                         Data: `<html lang="en"> 
                         <head> <link href="https://fonts.googleapis.com/css?family=Montserrat:400,700&display=swap" rel="stylesheet" type="text/css"></head> 
                         <body style="font-family:'Montserrat',sans-serif;">
-                           <div style="display:grid;justify-items:center;">
-                              <img src="https://fedo-file-server.s3.ap-south-1.amazonaws.com/images/logo.png"" width="25%" style="width:2%,max-width: 2%;" /> 
-                           </div>
                            <div style="display: grid;">
-                           <p>Dear <b>${content.name}</b>, <br><br> You’ve been invited by <b>${content.organisation_admin_name}</b> to try ${content.fedo_app} mobile app.<br> <br></p>
-                             <p>Your pilot is all set.</p>
-                             <p>You may click the below link and sign up to view your dashboard</p>
-                             <p>Note that you will be asked to set a new password for once.<br></p>
-                             <p><b>Your Custom Pilot URL:</b><br></p>
-                             <p><a href=${content.url}>ADMIN PANEL SIGNUP</a><br></p>
+                           <p>Dear <b>${content.name}</b>, <br><br> You’ve been invited by <b>${content.organisation_admin_name}</b> to try ${content.fedo_app} mobile app.<br></p>
+                             <p>Your pilot is all set. You may click the below link and sign up to view your dashboard. Note that you will be asked to set a new password for once.<br></p>
+                             <p><b>Your Custom Pilot URL:</b><br>
+                             <a href=${content.url}>ADMIN PANEL SIGNUP</a><br></p>
                              <p><b>First Steps After Sign In</b><br></p>
-                             <p>* You will see PlayStore and iOS Store buttons. Click on the respective button and download the app.</p>
-                             <p>* Use your dashboard sign in credentials to sign in to the app.</p>
-                             <p>* If you would like to do the test for yourself, you must always use your unique application no. And your unique application no. is <b>${content.application_id}</b>.<br></p>
-                             <p><b>Pilot Duration</b><br></p>
-                             <p>Your Pilot is set for ${content.pilot_duration} days.</p>
-                             <p>For any assistance, you may contact <b>${content.organisation_admin_name}</b> at <b>${content.organisation_admin_email}</b>.</p>
+                             <ul>
+                             <li>You will see PlayStore and iOS Store buttons. Click on the respective button and download the app.</li>
+                             <li>Use your dashboard sign in credentials to sign in to the app.</li>
+                             <li>If you would like to do the test for yourself, you must always use your unique application no. And your unique application no. is <b>${content.application_id}</b>.</li>
+                             </ul>
+                             <p>For any assistance, you may contact <b>${content.organisation_admin_name}</b> at <b>${content.organisation_admin_email}</b>.<br></p>
                              <p>Great Day!<br></p>
-                             <p><b>Team Fedo</b><br></p>
+                             <p><b>Team Fedo</b></p>
 
                            </div>
                           </body> 
@@ -442,11 +433,11 @@ export class TemplateService {
     sendEmailOnPilotExpire( content: sendEmailOnCreationOfOrgAndUser) {
         Logger.debug(`sendEmailOnPilotExpire(), DTO: ${JSON.stringify(content)}`, APP);
 
-        content.email=SES_SOURCE_HELLO_SUPPORT__EMAIL;
+        // content.email=SES_SOURCE_HELLO_SUPPORT__EMAIL;
         const ses = new AWS.SES({ apiVersion: '2010-12-01' });
         const params = {
             Destination: {
-                ToAddresses: [SES_SOURCE_HELLO_SUPPORT__EMAIL]
+                ToAddresses: [SES_SOURCE_SUPPORT_EMAIL_AI]
             },
             Source: SES_SOURCE_SUPPORT_EMAIL,
             Message: {
@@ -493,11 +484,11 @@ export class TemplateService {
     sendEmailOnNotAbleToIdentifyOrganisation( content: sendEmailOnCreationOfOrgAndUser) {
         Logger.debug(`sendEmailOnNotAbleToIdentifyOrganisation(), DTO: ${JSON.stringify(content)}`, APP);
 
-        content.email=SES_SOURCE_HELLO_SUPPORT__EMAIL;
+        // content.email=SES_SOURCE_HELLO_SUPPORT__EMAIL;
         const ses = new AWS.SES({ apiVersion: '2010-12-01' });
         const params = {
             Destination: {
-                ToAddresses: [SES_SOURCE_HELLO_SUPPORT__EMAIL]
+                ToAddresses: [SES_SOURCE_SUPPORT_EMAIL_AI]
             },
             Source: SES_SOURCE_SUPPORT_EMAIL,
             Message: {
@@ -542,7 +533,7 @@ export class TemplateService {
         const ses = new AWS.SES({ apiVersion: '2010-12-01' });
         const params = {
             Destination: {
-                ToAddresses: [SES_SOURCE_HELLO_SUPPORT__EMAIL]
+                ToAddresses: [SES_SOURCE_SUPPORT_EMAIL_AI]
             },
             Source: SES_SOURCE_EMAIL,
             Message: {
