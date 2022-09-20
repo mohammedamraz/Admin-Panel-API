@@ -33,7 +33,7 @@ export class VideoToVitalsService {
     private readonly userDb: DatabaseService<UserDTO>,
     @DatabaseTable('user_profile_info')
     private readonly userProfileDb: DatabaseService<UserProfileDTO>,
-    @DatabaseTable('product')
+    // @DatabaseTable('product')
     private readonly userProductJunctionService: UserProductJunctionService,
     private readonly sendEmailService: SendEmailService,
     private readonly organizationService: OrganizationService,
