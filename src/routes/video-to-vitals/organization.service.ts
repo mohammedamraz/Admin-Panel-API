@@ -191,7 +191,7 @@ export class OrganizationService {
                         "email": createOrganizationDto.organization_email,
                         "organisation_admin_name": createOrganizationDto.admin_name,
                         "fedo_app": "Fedo Vitals",
-                        "url": "https://www.fedo.ai/admin/" + createOrganizationDto.url + "?" + encodeURIComponent(this.encryptPassword(encryption)),
+                        "url": "https://www.fedo.ai/admin/vital/" + createOrganizationDto.url + "?" + encodeURIComponent(this.encryptPassword(encryption)),
                         "pilot_duration": this.respilot_duration,
                         "application_id": (res[0].application_id)
                       })
@@ -253,7 +253,7 @@ export class OrganizationService {
                         "email": createOrganizationDto.organization_email,
                         "organisation_admin_name": createOrganizationDto.admin_name,
                         "fedo_app": "Fedo Vitals",
-                        "url": "https://www.fedo.ai/admin/" + createOrganizationDto.url + "?" + encodeURIComponent(this.encryptPassword(encryption)),
+                        "url": "https://www.fedo.ai/admin/vital/" + createOrganizationDto.url + "?" + encodeURIComponent(this.encryptPassword(encryption)),
                         "pilot_duration": this.respilot_duration,
                         "application_id": (res[0].application_id)
                       })
@@ -477,7 +477,7 @@ export class OrganizationService {
     if (queryParamsDto.type) {
       return this.organizationDb.fetchLatestFive().pipe(
         catchError(err => { throw new UnprocessableEntityException(err.message) }),
-        map(doc => this.fetchotherDetails(doc, queryParamsDto)),
+        map(doc => this.fetchotherDetails(doc)),
         switchMap(doc => this.updateStatus(doc))
       );
     }
@@ -500,14 +500,14 @@ export class OrganizationService {
         catchError(err => { throw new UnprocessableEntityException(err.message) }),
         map(doc => {
           if (doc.length == 0) throw new NotFoundException('No Data available')
-          else { return this.fetchotherDetails(doc, queryParamsDto) }
+          else { return this.fetchotherDetails(doc) }
         }),
         switchMap(doc => this.updateStatus(doc))
       );
     }
   }
 
-  fetchotherDetails(createOrganizationDto: CreateOrganizationDto[], queryParamsDto: QueryParamsDto) {
+  fetchotherDetails(createOrganizationDto: CreateOrganizationDto[]) {
     Logger.debug(`fetchotherDetails() createOrganizationDto: ${JSON.stringify(createOrganizationDto)}`, APP);
 
     let userProfileData: CreateOrganizationDto[] = [];
@@ -516,19 +516,19 @@ export class OrganizationService {
         return lastValueFrom(this.userProductJunctionService.fetchUserProductJunctionDataByOrgId(orgData.id))
 
           .then(doc => {
-            let data = [];
-
-
+          let  data=[];
+          
+            
             orgData['total_users'] = new Set(doc.map((item) => item.user_id)).size
             orgData['total_tests'] = doc.reduce((pre, acc) => pre + acc['total_tests'], 0);
             userProfileData.push(orgData);
             return orgData
           })
       }),
-    )).then(_doc => this.fetchotherMoreDetails(userProfileData, queryParamsDto))
+    )).then(_doc => this.fetchotherMoreDetails(userProfileData))
   }
 
-  fetchotherMoreDetails(createOrganizationDto: CreateOrganizationDto[], queryParamsDto: QueryParamsDto) {
+  fetchotherMoreDetails(createOrganizationDto: CreateOrganizationDto[]) {
     Logger.debug(`fetchotherMoreDetails() createOrganizationDto: ${JSON.stringify(createOrganizationDto)}`, APP);
 
     let orgData: CreateOrganizationDto[] = [];
@@ -536,29 +536,15 @@ export class OrganizationService {
       concatMap(orgJunData => {
         return lastValueFrom(this.orgProductJunctionService.fetchOrgProductJunctionDataByOrgId(orgJunData.id))
           .then(doc => {
-            let result: Array<object> = [];
-            let res = new Promise<void>(async (resolve, rejects) => {
-              (doc).forEach(async (object, index) => {
-                await lastValueFrom(this.productService.fetchProductById(object.product_id)).then(
-                  productDoc => {
-                    result.push(object);
-                    result[index]['progress'] = this.fetchDate(object);
-                    result[index]['product_detail'] = productDoc
-                  }
-                ).catch(err => { throw new UnprocessableEntityException(err.message) });
-                if (result.length == (await doc).length) {
-                  orgJunData['product'] = result
-                  orgData.push(orgJunData);
-                  resolve()
-                  return orgJunData
-                }
-              });
-            })
-            return res.then((item) => { return item })
+            doc.forEach(object => {
+              object['progress'] = this.fetchDate(object);
+            });
+            orgJunData['product'] = doc
+            orgData.push(orgJunData);
+            return orgJunData
           })
       }),
     )).then(_doc => orgData)
-    // )).then(_doc => this.Paginator(orgData,queryParamsDto.page,queryParamsDto.per_page))
   }
 
   fetchProductDetails(createOrganizationDto: CreateOrganizationDto[]) {
