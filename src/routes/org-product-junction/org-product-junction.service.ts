@@ -5,7 +5,6 @@ import { map } from 'rxjs';
 import { DatabaseTable } from 'src/lib/database/database.decorator';
 import { DatabaseService } from 'src/lib/database/database.service';
 import { CreateOrgProductJunctionDto } from './dto/create-org-product-junction.dto';
-import { UpdateOrgProductJunctionDto } from './dto/update-org-product-junction.dto';
 const APP = 'OrgProductJunctionService';
 @Injectable()
 export class OrgProductJunctionService {
@@ -41,4 +40,18 @@ export class OrgProductJunctionService {
   //     }),
   //   );
   // }
+
+  fetchOrgDetailsByOrgProductJunctionId(id: number){
+    Logger.debug(`fetchOrgDetailsByOrgProductJunctionId() id:${id}} `, APP);
+
+  return this.organizationProductJunctionDb.find({id:id}).pipe(
+    
+    map(doc=>{
+      if (doc.length==0) throw new NotFoundException("data not found");
+      else return doc
+    }),
+  )
+  }
+
+  
 }

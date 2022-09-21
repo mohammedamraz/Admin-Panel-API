@@ -19,6 +19,7 @@ export class CreateProfileInfoDTO {
     user_id:string;
     // password:string;
     org_id:number;
+    product_id?:number;
 }
 
 

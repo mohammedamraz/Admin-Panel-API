@@ -8,6 +8,7 @@ import { ProductService } from '../product/product.service';
 import { SendEmailService } from '../send-email/send-email.service';
 import { UserProductJunctionService } from '../user-product-junction/user-product-junction.service';
 import { OrganizationService } from '../video-to-vitals/organization.service';
+import { UsersService } from '../video-to-vitals/users.service';
 import { ThirdpartyOrganizationController } from './thirdparty-organization.controller';
 import { ThirdpartyOrganizationService } from './thirdparty-organization.service';
 
@@ -34,7 +35,7 @@ import { ThirdpartyOrganizationService } from './thirdparty-organization.service
 
 ],
   controllers: [ThirdpartyOrganizationController],
-  providers: [ThirdpartyOrganizationService,OrganizationService,ProductService,UserProductJunctionService,SendEmailService,TemplateService,OrgProductJunctionService],
+  providers: [ThirdpartyOrganizationService,UsersService,OrganizationService,ProductService,UserProductJunctionService,SendEmailService,TemplateService,OrgProductJunctionService],
   exports:[ThirdpartyOrganizationService]
 })
 export class ThirdpartyOrganizationModule {}

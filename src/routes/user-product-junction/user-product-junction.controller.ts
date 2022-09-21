@@ -15,5 +15,10 @@ export class UserProductJunctionController {
       return this.userProductJunctionService.createUserProductJunction(createUserProductJunctionDto);
   }
 
-  
+  // @Get(':org_id')
+  // fetchTotalTestOfOrganizationByOrgId(@Param('org_id') org_id: number){
+  //   Logger.debug(`fetchTestDataByOrgId() id:${org_id}} `, APP);
+
+  //  return this.userProductJunctionService.fetchTotalTestOfOrganizationByOrgId(org_id)
+  // }
 }

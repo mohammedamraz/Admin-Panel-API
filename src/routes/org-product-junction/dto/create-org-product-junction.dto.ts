@@ -1,4 +1,5 @@
 export class CreateOrgProductJunctionDto {
+    id: number;
     product_id: number;
     org_id: number;
     start_date: Date;

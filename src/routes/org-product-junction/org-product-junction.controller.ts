@@ -9,6 +9,13 @@ export class OrgProductJunctionController {
   constructor(private readonly orgProductJunctionService: OrgProductJunctionService) {}
 
 
+  @Get(':id')
+  fetchOrgDetailsByOrgProductJunctionId(@Param('id')id: number){
+    Logger.debug(`fetchOrgDetailsByOrgProductJunctionId() id:${id}} `, APP);
+
+   return this.orgProductJunctionService.fetchOrgDetailsByOrgProductJunctionId(id)
+  }
+
   // @Get()
   // findAll() {
   //   return this.orgProductJunctionService.findAll();

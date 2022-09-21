@@ -13,9 +13,7 @@ export class UserProductJunctionService {
 
   createUserProductJunction(createUserProductJunctionDto:CreateUserProductJunctionDto){
     
-   return this.userProductJunctionDb.save(createUserProductJunctionDto).pipe(
-    map(doc=>doc)
-   )
+   return this.userProductJunctionDb.save(createUserProductJunctionDto)
   }
 
   fetchUserProductJunctionDataByOrgId(org_id:number){
@@ -41,6 +39,13 @@ export class UserProductJunctionService {
       map(doc=>doc)
     )
   }
+
+  // fetchTotalTestOfOrganizationByOrgId(org_id: number){
+
+     
+   
+
+  // }
 
 
 }
