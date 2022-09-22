@@ -172,7 +172,7 @@ export class UsersService {
   changeUserRegisterStatusOnceConfirmed(id: number) {
     Logger.debug(`changeUserRegisterStatusOnceConfirmed() id:${id} `, APP);
 
-    return this.organizationDb.find({ id: id }).pipe(
+    return this.userDb.find({ id: id }).pipe(
       map(doc => {
         if (doc.length == 0) {
           throw new NotFoundException('user not found')
