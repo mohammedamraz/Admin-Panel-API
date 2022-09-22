@@ -26,21 +26,23 @@ export class ProfileInfoService {
 
     }
 
-    updateProfileInfo(createProfileInfoDTO: CreateProfileInfoDTO) {
+    updateProfileInfo(id: number, createProfileInfoDTO: CreateProfileInfoDTO) {
         Logger.debug(`updateUser() updateUserDTO:${JSON.stringify(createProfileInfoDTO)} `, APP);
 
-        return this.userProfileDb.find({ user_id: createProfileInfoDTO.user_id }).pipe(
+        return this.userProfileDb.find({ id: id }).pipe(
             switchMap(res => {
-                if (res.length == 0) {
+                if (res.length == 0) throw new NotFoundException('profile info not found')
 
-                    return this.userProfileDb.find({ org_id: createProfileInfoDTO.org_id }).pipe(
-                        switchMap(res => {
-                            if (res.length == 0) throw new NotFoundException('profile info not found')
-                            else if (res[0].is_editable == true) return this.userProfileDb.findandUpdate({ columnName: 'org_id', columnvalue: createProfileInfoDTO.org_id.toString(), quries: createProfileInfoDTO })
-                            else throw new BadRequestException('profile info cannot be editable')
-                        }))
-                }
-                else if (res[0].is_editable == true) return this.userProfileDb.findandUpdate({ columnName: 'user_id', columnvalue: createProfileInfoDTO.user_id, quries: createProfileInfoDTO })
+                //     return this.userProfileDb.find({ org_id: createProfileInfoDTO.org_id }).pipe(
+                //         switchMap(res => {
+                //             if (res.length == 0) throw new NotFoundException('profile info not found')
+                //             else if (res[0].is_editable == true) return this.userProfileDb.findandUpdate({ columnName: 'org_id', columnvalue: createProfileInfoDTO.org_id.toString(), quries: createProfileInfoDTO })
+                //             else throw new BadRequestException('profile info cannot be editable')
+                //         }))
+                // }
+
+
+                else if (res[0].is_editable == true) return this.userProfileDb.findandUpdate({ columnName: 'id', columnvalue: id.toString(), quries: createProfileInfoDTO })
                 else throw new BadRequestException('profile info cannot be editable')
 
             }))
