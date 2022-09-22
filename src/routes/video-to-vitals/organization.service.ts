@@ -764,7 +764,7 @@ export class OrganizationService {
     return this.organizationDb.find({ organization_name: orgDTO.organization_name, organization_email: orgDTO.organization_email, organization_mobile: orgDTO.organization_mobile }).pipe(
       map(doc => {
         if (doc.length != 0) {
-          throw new ConflictException("organization exist with organization name, email id and mobile no.")
+          throw new ConflictException("This email, name, mobile is already in use. Please try with a different email, name and mobile number")
         }
         else { return doc }
       })
@@ -776,7 +776,7 @@ export class OrganizationService {
     return this.organizationDb.find({ organization_name: orgDTO.organization_name, organization_email: orgDTO.organization_email }).pipe(
       map(doc => {
         if (doc.length != 0) {
-          throw new ConflictException("organization exist with organization name, email id ")
+          throw new ConflictException("This email, name is already in use. Please try with a different email and email ")
         }
         else { return doc }
       })
@@ -789,7 +789,7 @@ export class OrganizationService {
     return this.organizationDb.find({ organization_email: orgDTO.organization_email, organization_mobile: orgDTO.organization_mobile }).pipe(
       map(doc => {
         if (doc.length != 0) {
-          throw new ConflictException("organization exist with email id and mobile no.")
+          throw new ConflictException("This email, mobile is already in use. Please try with a different email and mobile number")
         }
         else { return doc }
       })
@@ -801,7 +801,7 @@ export class OrganizationService {
     return this.organizationDb.find({ organization_name: orgDTO.organization_name, organization_mobile: orgDTO.organization_mobile }).pipe(
       map(doc => {
         if (doc.length != 0) {
-          throw new ConflictException("organization exist with organization name, mobile no. ")
+          throw new ConflictException("This name, mobile is already in use. Please try with a different name and mobile number ")
         }
         else { return doc }
       })
@@ -813,7 +813,7 @@ export class OrganizationService {
     return this.organizationDb.find({ organization_name: organization_name }).pipe(
       map(doc => {
         if (doc.length != 0) {
-          throw new ConflictException(`organization exist with organization_name`)
+          throw new ConflictException(`This name is already in use. Please try with a different name`)
         }
         else { return doc }
       }),
@@ -839,7 +839,7 @@ export class OrganizationService {
     return this.organizationDb.find({ organization_email: orgDTO.organization_email }).pipe(
       map(doc => {
         if (doc.length != 0) {
-          throw new ConflictException("organization exist with email id.")
+          throw new ConflictException("This email is already in use. Please try with a different email")
         }
         else { return doc }
       })
@@ -851,7 +851,7 @@ export class OrganizationService {
     return this.organizationDb.find({ organization_mobile: orgDTO.organization_mobile }).pipe(
       map(doc => {
         if (doc.length != 0) {
-          throw new ConflictException("organization exist with mobile no.")
+          throw new ConflictException("This mobile number is already in use. Please try with a different mobile number.")
         }
         else { return doc }
       })
