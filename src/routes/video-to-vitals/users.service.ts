@@ -154,6 +154,21 @@ export class UsersService {
     )
   }
 
+  fetchAllUsersByApplicationId(application_id: string, data:any) {
+    Logger.debug(`fetchAllUsersByApplicationId() addUserDTO:${JSON.stringify(application_id)} `, APP);
+
+    return this.userDb.find({ application_id: application_id }).pipe(
+      map(doc => {
+        
+        if (doc.length == 0) {
+          return data
+        }
+        else {data.push(doc[0])
+           return data }
+      })
+    )
+  }
+
   changeUserRegisterStatusOnceConfirmed(id: number) {
     Logger.debug(`changeUserRegisterStatusOnceConfirmed() id:${id} `, APP);
 

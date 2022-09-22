@@ -449,7 +449,7 @@ export class VideoToVitalsService {
             })
           )
         }
-        else return [doc]
+        else return this.usersService.fetchAllUsersByApplicationId(doc[0].application_id,doc)
       }),
     )
   }
