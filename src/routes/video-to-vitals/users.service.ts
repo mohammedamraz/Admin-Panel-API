@@ -1,6 +1,6 @@
 import { HttpService } from '@nestjs/axios';
 import { BadRequestException, ConflictException, Injectable, Logger, NotFoundException, UnprocessableEntityException } from '@nestjs/common';
-// import { ConflictException, Injectable, Logger, NotFoundException, UnprocessableEntityException } from '@nestjs/common';
+// import { ConflictException, Injectable, Logger, NotFoundException, UnprocessableEntityExcepti on } from '@nestjs/common';
 import { convertMultiFactorInfoToServerFormat } from 'firebase-admin/lib/auth/user-import-builder';
 import { catchError, concatMap, from, lastValueFrom, map, switchMap } from 'rxjs';
 import { DatabaseTable } from 'src/lib/database/database.decorator';
@@ -121,7 +121,7 @@ export class UsersService {
     return this.userDb.find({ email: userDTO.email, mobile: userDTO.mobile }).pipe(
       map(doc => {
         if (doc.length != 0) {
-          throw new ConflictException("user exist with email id and mobile no.")
+          throw new ConflictException("This email, mobile is already in use. Please try with a different email and mobile")
         }
         else { return doc }
       })
@@ -134,7 +134,7 @@ export class UsersService {
     return this.userDb.find({ email: userDTO.email }).pipe(
       map(doc => {
         if (doc.length != 0) {
-          throw new ConflictException("user exist with email id")
+          throw new ConflictException("This email is already in use. Please try with a different email")
         }
         else { return doc }
       })
@@ -147,7 +147,7 @@ export class UsersService {
     return this.userDb.find({ mobile: userDTO.mobile }).pipe(
       map(doc => {
         if (doc.length != 0) {
-          throw new ConflictException("user exist with mobile number")
+          throw new ConflictException("This mobile is already in use. Please try with a different mobile number")
         }
         else { return doc }
       })
