@@ -541,7 +541,7 @@ export class VideoToVitalsService {
     if (err.response.status === 401)
       throw new UnauthorizedException(err.response.data);
     if (err.response.status === 422)
-      throw new UnprocessableEntityException(err);
+      throw new UnprocessableEntityException(err.response.data);
     if (err.response.status === 404)
       throw new NotFoundException(err.response.data);
     if (err.response.status === 409)
