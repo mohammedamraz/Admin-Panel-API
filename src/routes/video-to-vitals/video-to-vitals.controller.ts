@@ -32,6 +32,13 @@ export class VideoToVitalsController {
     return this.organizationService.fetchOrgCount()
   }
 
+  @Get('org/max_test')
+  fetchTotalTestOfOrgAndMaxTestByUser() {
+    Logger.debug(`fetchTotalTestOfOrgAndMaxTestByUser() `, APP);
+
+    return this.usersService.fetchTotalTestOfOrgAndMaxTestByUser()
+  }
+
   @Get('org')
   fetchAllOrganization(@Query() queryParamsDto: QueryParamsDto) {
     Logger.debug(`fetchAllOrganization() queryParamsDto: ${JSON.stringify(queryParamsDto)}`, APP);
@@ -285,14 +292,6 @@ export class VideoToVitalsController {
 
   //   return this.organizationService.updateOrganization(id, updateOrganizationDto);
   // }
-
-
-  @Get('max_test/:org_id')
-  fetchTotalTestOfOrgAndMaxTestByUser(@Param('org_id') org_id: number) {
-    Logger.debug(`fetchTotalTestOfOrgAndMaxTestByUser() org_id: ${org_id}`, APP);
-
-    return this.usersService.fetchTotalTestOfOrgAndMaxTestByUser(org_id)
-  }
 
 }
 
