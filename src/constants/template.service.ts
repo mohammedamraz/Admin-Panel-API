@@ -404,10 +404,12 @@ export class TemplateService {
                              <p><b>First Steps After Sign In</b><br></p>
                              <ul>
                              <li>You will see PlayStore and iOS Store buttons. Click on the respective button and download the app.</li>
-                             <li>Use your dashboard sign in credentials to sign in to the app.</li>
+                             <li>As you continue from one screen to the other in the app, you will reach a screen where it asks you "Do you have sign in credentials?". You must click on "Yes" here and continue. It will take you to the sign in screen.</li>
+                             <li>Use your dashboard sign in credentials to sign in here.</li>
                              <li>If you would like to do the test for yourself, you must always use your unique application no. And your unique application no. is <b>${content.application_id}</b>.</li>
                              </ul>
-                             <p>For any assistance, you may contact <b>${content.organisation_admin_name}</b> at <b>${content.organisation_admin_email}</b>.<br></p>
+                             <p>For any assistance, you may write to <a>support@fedo.ai</a>.<br></p>
+
                              <p>Great Day!<br></p>
                              <p><b>Team Fedo</b></p>
 

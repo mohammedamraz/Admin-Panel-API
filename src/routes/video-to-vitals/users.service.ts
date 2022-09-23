@@ -1,5 +1,6 @@
 import { HttpService } from '@nestjs/axios';
 import { BadRequestException, ConflictException, Injectable, Logger, NotFoundException, UnprocessableEntityException } from '@nestjs/common';
+import { application } from 'express';
 // import { ConflictException, Injectable, Logger, NotFoundException, UnprocessableEntityExcepti on } from '@nestjs/common';
 import { convertMultiFactorInfoToServerFormat } from 'firebase-admin/lib/auth/user-import-builder';
 import { catchError, concatMap, from, lastValueFrom, map, switchMap } from 'rxjs';
@@ -229,5 +230,12 @@ export class UsersService {
         }
       }),
     )).then(_doc => temp)
+  }
+
+  patchUserByApplicationId(application_id : string, data : any){
+    Logger.debug(`fetchTestDetails() userDTO:${JSON.stringify(data)} `, APP);
+
+    return this.userDb.findandUpdate({columnName: 'application_id', columnvalue: application_id, quries:{user_name:data.admin_name,mobile:data.organization_mobile}})
+    // switchMap(doc => this.db.findandUpdate({ columnName: 'sales_code', columnvalue: createSalesPartner.refered_by, quries: { sales_invitation_count: doc.length } })));
   }
 }
