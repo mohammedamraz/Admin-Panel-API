@@ -33,6 +33,14 @@ export class VideoToVitalsController {
     return this.organizationService.fetchOrgCount()
   }
 
+  //this should be checked if this is working properly with other controllers 
+  @Get('org/max_test/users')
+  fetchTotalTestOfOrgAndMaxTestByUser() {
+    Logger.debug(`fetchTotalTestOfOrgAndMaxTestByUser() `, APP);
+
+    return this.usersService.fetchTotalTestOfOrgAndMaxTestByUser()
+  }
+
   @Get('org')
   fetchAllOrganization(@Query() queryParamsDto: QueryParamsDto) {
     Logger.debug(`fetchAllOrganization() queryParamsDto: ${JSON.stringify(queryParamsDto)}`, APP);
@@ -286,14 +294,6 @@ export class VideoToVitalsController {
 
   //   return this.organizationService.updateOrganization(id, updateOrganizationDto);
   // }
-
-
-  @Get('max_test/:org_id')
-  fetchTotalTestOfOrgAndMaxTestByUser(@Param('org_id') org_id: number) {
-    Logger.debug(`fetchTotalTestOfOrgAndMaxTestByUser() org_id: ${org_id}`, APP);
-
-    return this.usersService.fetchTotalTestOfOrgAndMaxTestByUser(org_id)
-  }
 
 }
 
