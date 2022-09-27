@@ -1,6 +1,7 @@
 import { HttpService } from '@nestjs/axios';
 import { BadRequestException, ConflictException, Injectable, Logger, NotFoundException, UnprocessableEntityException } from '@nestjs/common';
-// import { ConflictException, Injectable, Logger, NotFoundException, UnprocessableEntityException } from '@nestjs/common';
+import { application } from 'express';
+// import { ConflictException, Injectable, Logger, NotFoundException, UnprocessableEntityExcepti on } from '@nestjs/common';
 import { convertMultiFactorInfoToServerFormat } from 'firebase-admin/lib/auth/user-import-builder';
 import { catchError, concatMap, from, lastValueFrom, map, switchMap } from 'rxjs';
 import { DatabaseTable } from 'src/lib/database/database.decorator';
@@ -121,7 +122,7 @@ export class UsersService {
     return this.userDb.find({ email: userDTO.email, mobile: userDTO.mobile }).pipe(
       map(doc => {
         if (doc.length != 0) {
-          throw new ConflictException("user exist with email id and mobile no.")
+          throw new ConflictException("This email, mobile is already in use. Please try with a different email and mobile")
         }
         else { return doc }
       })
@@ -134,7 +135,7 @@ export class UsersService {
     return this.userDb.find({ email: userDTO.email }).pipe(
       map(doc => {
         if (doc.length != 0) {
-          throw new ConflictException("user exist with email id")
+          throw new ConflictException("This email is already in use. Please try with a different email")
         }
         else { return doc }
       })
@@ -147,9 +148,24 @@ export class UsersService {
     return this.userDb.find({ mobile: userDTO.mobile }).pipe(
       map(doc => {
         if (doc.length != 0) {
-          throw new ConflictException("user exist with mobile number")
+          throw new ConflictException("This mobile is already in use. Please try with a different mobile number")
         }
         else { return doc }
+      })
+    )
+  }
+
+  fetchAllUsersByApplicationId(application_id: string, data:any) {
+    Logger.debug(`fetchAllUsersByApplicationId() addUserDTO:${JSON.stringify(application_id)} `, APP);
+
+    return this.userDb.find({ application_id: application_id }).pipe(
+      map(doc => {
+        
+        if (doc.length == 0) {
+          return data
+        }
+        else {data.push(doc[0])
+           return data }
       })
     )
   }
@@ -157,7 +173,7 @@ export class UsersService {
   changeUserRegisterStatusOnceConfirmed(id: number) {
     Logger.debug(`changeUserRegisterStatusOnceConfirmed() id:${id} `, APP);
 
-    return this.organizationDb.find({ id: id }).pipe(
+    return this.userDb.find({ id: id }).pipe(
       map(doc => {
         if (doc.length == 0) {
           throw new NotFoundException('user not found')
@@ -231,4 +247,10 @@ export class UsersService {
     )).then(_doc => (mainData))
   }
 
+  patchUserByApplicationId(application_id : string, data : any){
+    Logger.debug(`fetchTestDetails() userDTO:${JSON.stringify(data)} `, APP);
+
+    return this.userDb.findandUpdate({columnName: 'application_id', columnvalue: application_id, quries:{user_name:data.admin_name,mobile:data.organization_mobile}})
+    // switchMap(doc => this.db.findandUpdate({ columnName: 'sales_code', columnvalue: createSalesPartner.refered_by, quries: { sales_invitation_count: doc.length } })));
+  }
 }

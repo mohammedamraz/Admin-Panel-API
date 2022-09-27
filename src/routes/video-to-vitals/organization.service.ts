@@ -220,7 +220,7 @@ export class OrganizationService {
         }),
         switchMap(res => {
           this.create_organization_response = res
-          return this.usersService.saveUsersToUserDb({ user_name: createOrganizationDto.admin_name, org_id: Number(res[0].id), designation: createOrganizationDto.designation, email: createOrganizationDto.organization_email, application_id: res[0].application_id, organization_name: createOrganizationDto.organization_name, mobile: createOrganizationDto.organization_mobile }, productlist, Number(res[0].id))
+          return this.usersService.saveUsersToUserDb({ user_name: createOrganizationDto.admin_name+' (OA)', org_id: Number(res[0].id), designation: createOrganizationDto.designation, email: createOrganizationDto.organization_email, application_id: res[0].application_id, organization_name: createOrganizationDto.organization_name, mobile: createOrganizationDto.organization_mobile }, productlist, Number(res[0].id))
         }),
         switchMap(res => {
           this.userProfileDb.save({ application_id: res.application_id, user_id: res.id, org_id: res.org_id });
@@ -282,7 +282,7 @@ export class OrganizationService {
         }),
         switchMap(res => {
           this.create_organization_response = res
-          return this.usersService.saveUsersToUserDb({ user_name: createOrganizationDto.admin_name, org_id: Number(res[0].id), designation: createOrganizationDto.designation, email: createOrganizationDto.organization_email, application_id: res[0].application_id, organization_name: createOrganizationDto.organization_name, mobile: createOrganizationDto.organization_mobile }, productlist, Number(res[0].id))
+          return this.usersService.saveUsersToUserDb({ user_name: createOrganizationDto.admin_name+' (OA)', org_id: Number(res[0].id), designation: createOrganizationDto.designation, email: createOrganizationDto.organization_email, application_id: res[0].application_id, organization_name: createOrganizationDto.organization_name, mobile: createOrganizationDto.organization_mobile }, productlist, Number(res[0].id))
         }),
         switchMap(res => {
           this.userProfileDb.save({ application_id: res.application_id, user_id: res.id, org_id: res.org_id });
@@ -761,7 +761,7 @@ export class OrganizationService {
     return this.organizationDb.find({ organization_name: orgDTO.organization_name, organization_email: orgDTO.organization_email, organization_mobile: orgDTO.organization_mobile }).pipe(
       map(doc => {
         if (doc.length != 0) {
-          throw new ConflictException("organization exist with organization name, email id and mobile no.")
+          throw new ConflictException("This email, name, mobile is already in use. Please try with a different email, name and mobile number")
         }
         else { return doc }
       })
@@ -773,7 +773,7 @@ export class OrganizationService {
     return this.organizationDb.find({ organization_name: orgDTO.organization_name, organization_email: orgDTO.organization_email }).pipe(
       map(doc => {
         if (doc.length != 0) {
-          throw new ConflictException("organization exist with organization name, email id ")
+          throw new ConflictException("This email, name is already in use. Please try with a different email and email ")
         }
         else { return doc }
       })
@@ -786,7 +786,7 @@ export class OrganizationService {
     return this.organizationDb.find({ organization_email: orgDTO.organization_email, organization_mobile: orgDTO.organization_mobile }).pipe(
       map(doc => {
         if (doc.length != 0) {
-          throw new ConflictException("organization exist with email id and mobile no.")
+          throw new ConflictException("This email, mobile is already in use. Please try with a different email and mobile number")
         }
         else { return doc }
       })
@@ -798,7 +798,7 @@ export class OrganizationService {
     return this.organizationDb.find({ organization_name: orgDTO.organization_name, organization_mobile: orgDTO.organization_mobile }).pipe(
       map(doc => {
         if (doc.length != 0) {
-          throw new ConflictException("organization exist with organization name, mobile no. ")
+          throw new ConflictException("This name, mobile is already in use. Please try with a different name and mobile number ")
         }
         else { return doc }
       })
@@ -810,7 +810,7 @@ export class OrganizationService {
     return this.organizationDb.find({ organization_name: organization_name }).pipe(
       map(doc => {
         if (doc.length != 0) {
-          throw new ConflictException(`organization exist with organization_name`)
+          throw new ConflictException(`This name is already in use. Please try with a different name`)
         }
         else { return doc }
       }),
@@ -836,7 +836,7 @@ export class OrganizationService {
     return this.organizationDb.find({ organization_email: orgDTO.organization_email }).pipe(
       map(doc => {
         if (doc.length != 0) {
-          throw new ConflictException("organization exist with email id.")
+          throw new ConflictException("This email is already in use. Please try with a different email")
         }
         else { return doc }
       })
@@ -848,7 +848,7 @@ export class OrganizationService {
     return this.organizationDb.find({ organization_mobile: orgDTO.organization_mobile }).pipe(
       map(doc => {
         if (doc.length != 0) {
-          throw new ConflictException("organization exist with mobile no.")
+          throw new ConflictException("This mobile number is already in use. Please try with a different mobile number.")
         }
         else { return doc }
       })
@@ -912,7 +912,10 @@ export class OrganizationService {
     return this.organizationDb.find({ id: id, is_deleted: false }).pipe(
       map(res => {
         if (res.length == 0) throw new NotFoundException('organization not found')
-        else return this.organizationDb.findByIdandUpdate({ id: id.toString(), quries: updateOrganizationDto })
+        else{ this.usersService.patchUserByApplicationId(res[0].application_id,updateOrganizationDto)
+           this.organizationDb.findByIdandUpdate({ id: id.toString(), quries: updateOrganizationDto })
+        }
+      
       }))
   };
 

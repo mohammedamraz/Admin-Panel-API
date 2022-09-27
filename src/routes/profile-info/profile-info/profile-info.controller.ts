@@ -8,11 +8,11 @@ export class ProfileInfoController {
     constructor(private readonly profileInfoService: ProfileInfoService) { }
 
 
-    @Patch('info')
-  updateProfileInfo( @Body() createProfileInfoDTO: CreateProfileInfoDTO) {
+    @Patch('info/:id')
+  updateProfileInfo( @Param('id') id:number,@Body() createProfileInfoDTO: CreateProfileInfoDTO) {
     Logger.debug(`updateProfileInfo()  updateUserDTO:${JSON.stringify(createProfileInfoDTO)} `, APP);
 
-    return this.profileInfoService.updateProfileInfo( createProfileInfoDTO);
+    return this.profileInfoService.updateProfileInfo( id, createProfileInfoDTO);
   }
 
   @Post('profile')
