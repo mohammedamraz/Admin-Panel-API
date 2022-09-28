@@ -189,7 +189,7 @@ export class OrganizationService {
                     this.sendEmailService.sendEmailOnCreateOrg(
                       {
                         "email": createOrganizationDto.organization_email,
-                        "organisation_admin_name": createOrganizationDto.admin_name,
+                        "organisation_admin_name": createOrganizationDto.admin_name.split(' ')[0],
                         "fedo_app": "Fedo Vitals",
                         "url": "https://www.fedo.ai/admin/vital/" + createOrganizationDto.url + "?" + encodeURIComponent(this.encryptPassword(encryption)),
                         "pilot_duration": this.respilot_duration,
@@ -251,7 +251,7 @@ export class OrganizationService {
                     this.sendEmailService.sendEmailOnCreateOrg(
                       {
                         "email": createOrganizationDto.organization_email,
-                        "organisation_admin_name": createOrganizationDto.admin_name,
+                        "organisation_admin_name": createOrganizationDto.admin_name.split(' ')[0],
                         "fedo_app": "Fedo Vitals",
                         "url": "https://www.fedo.ai/admin/vital/" + createOrganizationDto.url + "?" + encodeURIComponent(this.encryptPassword(encryption)),
                         "pilot_duration": this.respilot_duration,
@@ -516,9 +516,6 @@ export class OrganizationService {
         return lastValueFrom(this.userProductJunctionService.fetchUserProductJunctionDataByOrgId(orgData.id))
 
           .then(doc => {
-          let  data=[];
-          
-            
             orgData['total_users'] = new Set(doc.map((item) => item.user_id)).size
             orgData['total_tests'] = doc.reduce((pre, acc) => pre + acc['total_tests'], 0);
             userProfileData.push(orgData);

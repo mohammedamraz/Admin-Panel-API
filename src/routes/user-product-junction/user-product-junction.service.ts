@@ -1,10 +1,11 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { map } from 'rxjs';
 import { DatabaseTable } from 'src/lib/database/database.decorator';
 import { DatabaseService } from 'src/lib/database/database.service';
 import { CreateUserProductJunctionDto } from './dto/create-user-product-junction.dto';
 import { UpdateUserProductJunctionDto } from './dto/update-user-product-junction.dto';
 
+const APP = "UserProductJunctionService"
 @Injectable()
 export class UserProductJunctionService {
 
@@ -29,6 +30,8 @@ export class UserProductJunctionService {
   }
 
   fetchUserProductJunctionDataByUserId(user_id:number){
+    Logger.debug(`fetchUserProductJunctionDataByUserId() userDTO:${JSON.stringify(user_id)} `, APP);
+
     return this.userProductJunctionDb.find({user_id:user_id}).pipe(
       map(doc=>doc)
     )

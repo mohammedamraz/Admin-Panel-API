@@ -129,27 +129,17 @@ export class ProfileInfoService {
     }
 
 
-    fetchProfileByOrgIdByQueryParams(params: ZQueryParamsDto) {
+    fetchProfileByOrgIdByQueryParams(createProfileInfoDTO: CreateProfileInfoDTO) {
         Logger.debug(`fetchProfileByOrgId()  `, APP);
 
-        return this.userProfileDb.find({ user_id: params.user_id }).pipe(
-            map(doc => doc),
+        return this.userProfileDb.find({ application_id: createProfileInfoDTO.application_id, org_id: createProfileInfoDTO.org_id }).pipe(
             map(doc => {
-                if (doc.length == 0) {
-                    return this.userProfileDb.find({ org_id: params.org_id }).pipe(
-                        map(doc => doc),
-                        // this has to change source source returning 
-                        switchMap(doc => {
-                            if (doc.length == 0) throw new NotFoundException('user not found');
-                            return doc
-                        })
-                    )
-                }
+                if (doc.length == 0) throw new NotFoundException('user not found');
                 return doc
             })
+
+
         )
-
-
     }
 
 

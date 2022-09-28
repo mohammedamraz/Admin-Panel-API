@@ -281,7 +281,7 @@ export class VideoToVitalsService {
                     "organisation_admin_name": doc[1][0]['admin_name'],
                     "fedo_app": "Fedo Vitals",
                     "url": "https://www.fedo.ai/admin/vital/" + doc[1][0]['url'] + "?" + encodeURIComponent(this.encryptPassword(encryption)),
-                    "name": userDTO.user_name.substring(0, userDTO.user_name.indexOf(' ')),
+                    "name": userDTO.user_name.split(' ')[0],
                     "organisation_admin_email": doc[1][0]['organization_email'],
                     "application_id": userDTO.application_id
                   }

@@ -186,56 +186,71 @@ export class UsersService {
     )
   }
 
-  fetchTotalTestOfOrgAndMaxTestByUser(org_id: number){
-    Logger.debug(`fetchTotalTestOfOrgAndMaxTestByUser() org_id: ${org_id}`, APP);
+  fetchTotalTestOfOrgAndMaxTestByUser(){
+    Logger.debug(`fetchTotalTestOfOrgAndMaxTestByUser() `, APP);
 
-    return this.userProductJunctionService.fetchUserProductJunctionDataByOrgId(org_id).pipe(
-      map(userProductDoc=>{
-        console.log("USERPRODUCTDOC",userProductDoc)
-        const total_tests_of_org = userProductDoc.reduce((pre, acc) => pre + acc['total_tests'], 0);
-        //  for (let i=0; i<userProductDoc.length; i++){
-           
-        //  }
-        
-        return {"total_tests_of_org": total_tests_of_org}
+    return this.organizationDb.find({ is_deleted: false }).pipe(
+      catchError(err => { throw new UnprocessableEntityException(err.message) }),
+      map(doc => {
+        if (doc.length == 0) throw new NotFoundException('No Data available')
+        else { return this.fetcTestDetails(doc) }
       }),
-      switchMap(total_tests_of_org=>{
-       return this.userDb.find({org_id: org_id }).pipe(
-          map(userDoc=>this.fetchTestDetails(userDoc,total_tests_of_org))
-        ) 
-      })
-    )
-   
+    );
   }
+ 
+  fetcTestDetails(createOrganizationDto: CreateOrganizationDto[]) {
+    Logger.debug(`fetchotherDetails() createOrganizationDto: ${JSON.stringify(createOrganizationDto)}`, APP);
 
-
-
-  fetchTestDetails(userDTO: UserDTO[], total_tests_of_org) {
-    Logger.debug(`fetchTestDetails() userDTO:${JSON.stringify(userDTO)} `, APP);
-
-
-    let temp: UserDTO[] = [];
-    temp.push(total_tests_of_org)
-    return lastValueFrom(from(userDTO).pipe(
-      concatMap(async userData => {
-        try {
-          const doc = await lastValueFrom(this.userProductJunctionService.fetchUserProductJunctionDataByUserId(userData.id));
-          console.log("userData", userData);
-          const total_tests_of_user = doc.reduce((pre, acc) => pre + acc['total_tests'], 0);
-          userData['tests_by_user'] = total_tests_of_user;
-          total_tests_of_org['user'] = userData;
-          
-        } catch (err) {
-          throw new UnprocessableEntityException(err.message);
+    let mainData= [];
+    return lastValueFrom(from(createOrganizationDto).pipe(
+      concatMap(async orgData => {
+        const doc = await lastValueFrom(this.userProductJunctionService.fetchUserProductJunctionDataByOrgId(orgData.id));
+        console.log("doc",doc)
+        if (doc.length==0) {
+          const org_id = orgData.id
+          const org_name =orgData.organization_name
+          const total_org_tests = doc.reduce((pre, acc) => pre + acc['total_tests'], 0); 
+          mainData.push({org_id, org_name, total_org_tests})
         }
+        else{
+          var holder = []
+          doc.forEach( object => {
+            const data = holder.find( doc => doc.user_id=== object.user_id)
+            if(!data){
+              holder.push({user_id:object.user_id,total_tests:object.total_tests})
+            }
+            else{
+             data.total_tests = (data.total_tests) + (object.total_tests)
+            }
+          });
+          const max_test_by_user= Math.max.apply(Math, holder.map(doc=>doc.total_tests)) 
+          if  (max_test_by_user==0){        
+           const org_id = orgData.id
+           const org_name =orgData.organization_name
+           const total_org_tests = doc.reduce((pre, acc) => pre + acc['total_tests'], 0);    
+           mainData.push({org_id, org_name, total_org_tests, max_test_by_user})
+          }
+          else{ 
+           const userData = holder.find(doc=>doc.total_tests=== max_test_by_user)
+           const userDoc = await lastValueFrom(this.userDb.find({id:userData.user_id}));
+        
+           const org_id = orgData.id
+           const org_name =orgData.organization_name
+           const total_org_tests = doc.reduce((pre, acc) => pre + acc['total_tests'], 0);
+           const user_email = userDoc[0]?.email
+           mainData.push({org_id, org_name, total_org_tests, max_test_by_user, user_email})
+          }
+        
+        }
+       
       }),
-    )).then(_doc => temp)
+    )).then(_doc => (mainData))
   }
 
   patchUserByApplicationId(application_id : string, data : any){
     Logger.debug(`fetchTestDetails() userDTO:${JSON.stringify(data)} `, APP);
 
-    return this.userDb.findandUpdate({columnName: 'application_id', columnvalue: application_id, quries:{user_name:data.admin_name,mobile:data.organization_mobile}})
+    return this.userDb.findandUpdate({columnName: 'application_id', columnvalue: application_id, quries:{user_name:data.admin_name+'(OA)',mobile:data.organization_mobile}})
     // switchMap(doc => this.db.findandUpdate({ columnName: 'sales_code', columnvalue: createSalesPartner.refered_by, quries: { sales_invitation_count: doc.length } })));
   }
 }
