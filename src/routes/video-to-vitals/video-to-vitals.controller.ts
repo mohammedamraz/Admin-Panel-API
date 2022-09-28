@@ -220,7 +220,7 @@ export class VideoToVitalsController {
   }
 
   @Post('signup/user')
-  @UseInterceptors(LoggingInterceptor)
+  // @UseInterceptors(LoggingInterceptor)
   registerUserbyEmail(@Body() RegisterUserdto: RegisterUserDTO) {
     Logger.debug(`registerUserbyEmail()  loginUserDTO:${JSON.stringify(RegisterUserdto)} `, APP);
 
@@ -228,7 +228,7 @@ export class VideoToVitalsController {
   }
 
   @Post('confirm/signup')
-  @UseInterceptors(LoggingInterceptor)
+  // @UseInterceptors(LoggingInterceptor)
   confirmSignupUserByEmail(@Body() registerUserdto: RegisterUserDTO) {
     Logger.debug(`confirmSignupUserByEmail() [${JSON.stringify(Object.keys(registerUserdto))} values ${JSON.stringify(Object.values(registerUserdto).length)}]`, APP);
 
@@ -236,7 +236,7 @@ export class VideoToVitalsController {
   }
 
   @Post('login/user')
-  @UseInterceptors(LoggingInterceptor)
+  // @UseInterceptors(LoggingInterceptor)
   loginUserByEmail(@Body() loginUserDTO: LoginUserDTO) {
     Logger.debug(`loginUserByEmail()  loginUserDTO:${JSON.stringify(loginUserDTO)} `, APP);
 
@@ -259,7 +259,7 @@ export class VideoToVitalsController {
   }
 
   @Post('password')
-  @UseInterceptors(LoggingInterceptor)
+  // @UseInterceptors(LoggingInterceptor)
   forgotPassword(@Body() forgotPasswordDTO: ForgotPasswordDTO) {
     Logger.debug(`forgotPassword() forgotPasswordDTO:[${JSON.stringify(forgotPasswordDTO,)}]`,);
 
@@ -267,7 +267,7 @@ export class VideoToVitalsController {
   }
 
   @Post('password/otp')
-  @UseInterceptors(LoggingInterceptor)
+  // @UseInterceptors(LoggingInterceptor)
   confirmForgotPassword(@Body() confirmForgotPasswordDTO: ConfirmForgotPasswordDTO,) {
     Logger.debug(`confirmForgotPassword() confirmForgotPasswordDTO:[${JSON.stringify(confirmForgotPasswordDTO,)}]`,);
 
