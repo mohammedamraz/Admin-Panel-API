@@ -100,7 +100,7 @@ export class DatabaseService<T> implements DatabaseInterface<T> {
     Object.entries(condition).map((_, index1) => { index.push(`$${index1 + 1}`), values.push((`${_[0]}=$${index1 + 1}`)), variables.push(_[1]) });
 
     const values$ = JSON.stringify(values).replace(/,/g, " AND ").replace("[", "").replace("]", "").replace(/"/g, "");
-    const query = `SELECT * FROM ${this.tableName} WHERE ${values$}`;
+    const query = `SELECT * FROM ${this.tableName} WHERE ${values$} ORDER BY id ASC`;
     return this.runQuery(query, variables);
   }
 

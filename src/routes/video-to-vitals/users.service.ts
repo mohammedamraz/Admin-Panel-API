@@ -60,7 +60,7 @@ export class UsersService {
         map(doc => {
           if (doc.length == 0) { throw new NotFoundException(`user Not available for organization id ${org_id}`) }
           else {
-            return this.fetchUsersTestDetails(doc)
+            return this.fetchUsersTestDetails(doc,userParamDto)
           }
         })
       )
@@ -71,14 +71,14 @@ export class UsersService {
         map(doc => {
           if (doc.length == 0) { throw new NotFoundException(`user Not available for organization id ${org_id}`) }
           else {
-            return this.fetchUsersTestDetails(doc)
+            return this.fetchUsersTestDetails(doc,userParamDto)
           }
         })
       )
     }
   }
 
-  fetchUsersTestDetails(userDTO: UserDTO[]) {
+  fetchUsersTestDetails(userDTO: UserDTO[],userParamDto: UserParamDto) {
     Logger.debug(`fetchUsersotherDetails() userDTO:${JSON.stringify(userDTO)} `, APP);
 
 
@@ -95,7 +95,7 @@ export class UsersService {
           })
           .catch(err => { throw new UnprocessableEntityException(err.message) })
       }),
-    )).then(_doc => temp)
+    )).then(_doc => this.Paginator(temp, userParamDto.page,userParamDto.per_page))
   }
 
   fetchUserByCondition(userDTO: UserDTO) {
@@ -252,5 +252,24 @@ export class UsersService {
 
     return this.userDb.findandUpdate({columnName: 'application_id', columnvalue: application_id, quries:{user_name:data.admin_name+'(OA)',mobile:data.organization_mobile}})
     // switchMap(doc => this.db.findandUpdate({ columnName: 'sales_code', columnvalue: createSalesPartner.refered_by, quries: { sales_invitation_count: doc.length } })));
+  }
+
+  Paginator(items: any, page: any, per_page: any) {
+
+    var page = page || 1,
+      per_page = per_page || 10,
+      offset = (page - 1) * per_page,
+
+      paginatedItems = items.slice(offset).slice(0, per_page),
+      total_pages = Math.ceil(items.length / per_page);
+    return {
+      page: page,
+      per_page: per_page,
+      pre_page: page - 1 ? page - 1 : null,
+      next_page: (total_pages > page) ? page + 1 : null,
+      total: items.length,
+      total_pages: total_pages,
+      data: paginatedItems
+    };
   }
 }

@@ -319,5 +319,11 @@ export class UserParamDto {
     @IsNotEmpty()
     @IsEnum(Typo)
     type: Typo
+    @IsNotEmpty()
+    @IsOptional()
+    page: number;
+    @IsNotEmpty()
+    @IsOptional()
+    per_page: number;
 
 }
