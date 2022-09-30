@@ -43,11 +43,11 @@ export class ProfileInfoController {
     return this.profileInfoService.fetchProfileByOrgId(org_id)
   }
 
-  @Get('profile/info/query')
-  fetchProfileByOrgIdByQueryParams(@Query() params: ZQueryParamsDto) {
-    Logger.debug(`fetchProfileByOrgId() params:${JSON.stringify(params)}`, APP);
+  @Get('profile/info/list/:application_id/:org_id')
+  fetchProfileByOrgIdByQueryParams( @Param() createProfileInfoDTO: CreateProfileInfoDTO) {
+    Logger.debug(`fetchProfileByOrgId() params:${JSON.stringify(createProfileInfoDTO)}`, APP);
 
-    return this.profileInfoService.fetchProfileByOrgIdByQueryParams(params)
+    return this.profileInfoService.fetchProfileByOrgIdByQueryParams(createProfileInfoDTO)
   }
 
   @Patch('user/tests/:application_id/:product_id')

@@ -189,7 +189,7 @@ export class OrganizationService {
                     this.sendEmailService.sendEmailOnCreateOrg(
                       {
                         "email": createOrganizationDto.organization_email,
-                        "organisation_admin_name": createOrganizationDto.admin_name,
+                        "organisation_admin_name": createOrganizationDto.admin_name.split(' ')[0],
                         "fedo_app": "Fedo Vitals",
                         "url": "https://www.fedo.ai/admin/vital/" + createOrganizationDto.url + "?" + encodeURIComponent(this.encryptPassword(encryption)),
                         "pilot_duration": this.respilot_duration,
@@ -251,7 +251,7 @@ export class OrganizationService {
                     this.sendEmailService.sendEmailOnCreateOrg(
                       {
                         "email": createOrganizationDto.organization_email,
-                        "organisation_admin_name": createOrganizationDto.admin_name,
+                        "organisation_admin_name": createOrganizationDto.admin_name.split(' ')[0],
                         "fedo_app": "Fedo Vitals",
                         "url": "https://www.fedo.ai/admin/vital/" + createOrganizationDto.url + "?" + encodeURIComponent(this.encryptPassword(encryption)),
                         "pilot_duration": this.respilot_duration,

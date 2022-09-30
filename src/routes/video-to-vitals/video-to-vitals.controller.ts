@@ -6,6 +6,7 @@ import { PasswordResetDTO } from '../admin/dto/create-admin.dto';
 import { ConfirmForgotPasswordDTO, ForgotPasswordDTO } from '../admin/dto/login.dto';
 import { OrganizationService } from './organization.service';
 import { UsersService } from './users.service';
+import { LoggingInterceptor } from 'src/interceptors/interceptor';
 
 
 const APP = "VideoToVitalsController"
@@ -32,7 +33,8 @@ export class VideoToVitalsController {
     return this.organizationService.fetchOrgCount()
   }
 
-  @Get('org/max_test')
+  //this should be checked if this is working properly with other controllers 
+  @Get('org/max_test/users')
   fetchTotalTestOfOrgAndMaxTestByUser() {
     Logger.debug(`fetchTotalTestOfOrgAndMaxTestByUser() `, APP);
 

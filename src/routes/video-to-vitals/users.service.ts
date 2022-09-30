@@ -250,7 +250,7 @@ export class UsersService {
   patchUserByApplicationId(application_id : string, data : any){
     Logger.debug(`fetchTestDetails() userDTO:${JSON.stringify(data)} `, APP);
 
-    return this.userDb.findandUpdate({columnName: 'application_id', columnvalue: application_id, quries:{user_name:data.admin_name,mobile:data.organization_mobile}})
+    return this.userDb.findandUpdate({columnName: 'application_id', columnvalue: application_id, quries:{user_name:data.admin_name+'(OA)',mobile:data.organization_mobile}})
     // switchMap(doc => this.db.findandUpdate({ columnName: 'sales_code', columnvalue: createSalesPartner.refered_by, quries: { sales_invitation_count: doc.length } })));
   }
 }
