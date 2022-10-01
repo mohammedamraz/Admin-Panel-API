@@ -42,6 +42,7 @@ export class CreateOrganizationDto {
     web_fedoscore?: boolean;
     web_url?: string;
     type?: string;
+    event_mode?:string;
 }
 
 export class UpdateWholeOrganizationDto {
@@ -87,6 +88,7 @@ export class UpdateWholeOrganizationDto {
     web_url?: string;
     type?: string;
     updated_date?: Date;
+    event_mode?:string;
 }
 
 export class OrgDTO {
