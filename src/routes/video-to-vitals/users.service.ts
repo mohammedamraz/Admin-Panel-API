@@ -81,8 +81,29 @@ export class UsersService {
   fetchUsersTestDetails(userDTO: UserDTO[],userParamDto: UserParamDto) {
     Logger.debug(`fetchUsersotherDetails() userDTO:${JSON.stringify(userDTO)} `, APP);
 
-
     let temp: UserDTO[] = [];
+    if (userParamDto.product_id){
+      
+      return lastValueFrom(from(userDTO).pipe(
+        concatMap(userData => {
+          
+          return lastValueFrom(this.userProductJunctionService.fetchUserProductJunctionDataByUserIdAndProductId(userData.id,userParamDto.product_id))
+            .then(doc => {
+              
+              userData['tests'] = doc
+              userData['total_test'] = doc.reduce((pre, acc) => pre + acc['total_tests'], 0);
+              temp.push(userData);temp = temp.filter(item => item.tests.length != 0)
+              temp.sort((a: { id?: number; },b: { id?: number; })=> b.id-a.id);
+              return userData
+            })
+            .catch(err => { throw new UnprocessableEntityException(err.message) })
+        }),
+      )).then(_doc => this.Paginator(temp, userParamDto.page,10))
+
+    }
+
+    else{
+    
     return lastValueFrom(from(userDTO).pipe(
       concatMap(userData => {
         return lastValueFrom(this.userProductJunctionService.fetchUserProductJunctionDataByUserId(userData.id))
@@ -91,11 +112,14 @@ export class UsersService {
             userData['tests'] = doc
             userData['total_test'] = doc.reduce((pre, acc) => pre + acc['total_tests'], 0);
             temp.push(userData);
+            temp.sort((a: { id?: number; },b: { id?: number; })=> b.id-a.id);
             return userData
           })
           .catch(err => { throw new UnprocessableEntityException(err.message) })
       }),
     )).then(_doc => this.Paginator(temp, userParamDto.page,userParamDto.per_page))
+    }
+
   }
 
   fetchUserByCondition(userDTO: UserDTO) {

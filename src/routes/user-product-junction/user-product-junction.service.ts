@@ -1,5 +1,5 @@
-import { Injectable, Logger } from '@nestjs/common';
-import { map } from 'rxjs';
+import { Injectable, Logger, NotFoundException } from '@nestjs/common';
+import { concatMap, map } from 'rxjs';
 import { DatabaseTable } from 'src/lib/database/database.decorator';
 import { DatabaseService } from 'src/lib/database/database.service';
 import { CreateUserProductJunctionDto } from './dto/create-user-product-junction.dto';
@@ -37,18 +37,34 @@ export class UserProductJunctionService {
     )
   }
 
-  fetchUserProductJunctionDataByUserIdAndProductId(user_id:number,product_id:number){
-    return this.userProductJunctionDb.find({user_id:user_id,product_id:product_id}).pipe(
-      map(doc=>doc)
-    )
+  
+
+  fetchUserProductJunctionDataByUserIdOrOrgIdAndProductId(createUserProductJunctionDto:CreateUserProductJunctionDto){
+    Logger.debug(`fetchUserProductJunctionDataByUserIdOrOrgIdAndProductId() userDTO:${JSON.stringify(createUserProductJunctionDto)} `, APP);
+
+    if(createUserProductJunctionDto.user_id){
+    return this.userProductJunctionDb.find({user_id:createUserProductJunctionDto.user_id,product_id:createUserProductJunctionDto.product_id}).pipe(
+      map(doc=>{
+        if(doc.length==0) throw new NotFoundException()
+        return {total_tests:doc[0].total_tests}})
+    )}
+    else if (createUserProductJunctionDto.org_id){
+      return this.userProductJunctionDb.find({org_id:createUserProductJunctionDto.org_id,product_id:createUserProductJunctionDto.product_id}).pipe(
+        concatMap(async orgData=>{
+           const total_tests= await orgData.reduce((pre, acc) => pre + acc['total_tests'], 0); 
+            return {total_tests: total_tests}
+
+          })
+      )}
   }
 
-  // fetchTotalTestOfOrganizationByOrgId(org_id: number){
-
-     
+  fetchUserProductJunctionDataByUserIdAndProductId(user_id : number, product_id: number){
    
+    return this.userProductJunctionDb.find({user_id:user_id,product_id:product_id}).pipe(
+      map(doc=>doc)
+    )}
+  
 
-  // }
 
 
 }

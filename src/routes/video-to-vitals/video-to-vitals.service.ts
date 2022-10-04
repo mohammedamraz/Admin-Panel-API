@@ -110,6 +110,8 @@ export class VideoToVitalsService {
             orgJunData['progress'] = this.fetchDate(orgJunData);
             orgJunData['organization_name'] = doc[0].organization_name
             orgData.push(orgJunData);
+            orgData.sort((a: { id?: number; },b: { id?: number; })=> b.id-a.id);
+            
             return orgJunData
 
           })

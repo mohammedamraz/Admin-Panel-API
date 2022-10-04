@@ -554,6 +554,8 @@ export class OrganizationService {
             if (result.length == doc.length) {
               orgJunData['product'] = result;
               orgData.push(orgJunData);
+              orgData.sort((a: { id?: number; },b: { id?: number; })=> b.id-a.id);
+
               resolve();
               return orgJunData;
             }

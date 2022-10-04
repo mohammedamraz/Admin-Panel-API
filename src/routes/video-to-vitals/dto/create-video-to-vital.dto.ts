@@ -180,6 +180,7 @@ export class UserDTO {
     password?:string;
     application_id?:string;
     org_id:number;
+    tests?:any
 }
 
 
@@ -327,5 +328,6 @@ export class UserParamDto {
     @IsNotEmpty()
     @IsOptional()
     per_page: number;
+    product_id?:number;
 
 }
