@@ -1,5 +1,8 @@
+import { IsNotEmpty } from "class-validator";
+
 export class CreateThirdPartyOrganizationDto {
     // id:number;
+    @IsNotEmpty()
     tpa_name: string;
     id?: string;
     org_id: string;
