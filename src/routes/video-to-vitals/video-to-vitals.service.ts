@@ -39,6 +39,8 @@ export class VideoToVitalsService {
     private readonly organizationService: OrganizationService,
     private readonly usersService: UsersService,
     private http: HttpService,
+    private readonly productService: ProductService,
+
 
   ) { }
 
@@ -382,6 +384,26 @@ export class VideoToVitalsService {
     return this.userDb.find({ id: id }).pipe(
       map(doc => doc)
     )
+  }
+
+  fetchUserProductDetailsById(id: number) {
+    Logger.debug(`fetchUserById() id:${id}} `, APP);
+
+    return this.userDb.find({ id: id }).pipe(
+          concatMap((userData:any)=>{
+        return lastValueFrom(this.userProductJunctionService.fetchUserProductJunctionDataByUserId(userData[0].id))
+       }),
+            switchMap(async doc=>{
+              for (let index=0;index<=doc.length-1;index++) {
+                await lastValueFrom(this.productService.fetchProductById(doc[index].product_id)).then(
+                  (productDoc:any) => {
+                    Object.keys(productDoc).map((doc1,indexn)=>{
+                      doc[index][doc1]=productDoc[doc1]
+                    })
+                  } )}
+                return doc
+              }))
+            
   }
 
 
