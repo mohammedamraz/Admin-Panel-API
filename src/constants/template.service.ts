@@ -441,7 +441,7 @@ export class TemplateService {
             Destination: {
                 ToAddresses: [SES_SOURCE_SUPPORT_EMAIL_AI]
             },
-            Source: SES_SOURCE_SUPPORT_EMAIL,
+            Source: SES_SOURCE_NO_REPLY_EMAIL,
             Message: {
                 Body: {
                     Html: {
@@ -492,7 +492,7 @@ export class TemplateService {
             Destination: {
                 ToAddresses: [SES_SOURCE_SUPPORT_EMAIL_AI]
             },
-            Source: SES_SOURCE_SUPPORT_EMAIL,
+            Source: SES_SOURCE_NO_REPLY_EMAIL,
             Message: {
                 Body: {
                     Html: {
@@ -537,7 +537,7 @@ export class TemplateService {
             Destination: {
                 ToAddresses: [SES_SOURCE_SUPPORT_EMAIL_AI]
             },
-            Source: SES_SOURCE_HELLO_FEDO_EMAIL,
+            Source: SES_SOURCE_NO_REPLY_EMAIL,
             Message: {
                 Body: {
                     Html: {
