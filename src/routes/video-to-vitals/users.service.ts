@@ -98,7 +98,7 @@ export class UsersService {
             })
             .catch(err => { throw new UnprocessableEntityException(err.message) })
         }),
-      )).then(_doc => this.Paginator(temp, userParamDto.page,10))
+      )).then(_doc => this.Paginator(temp, userParamDto.page,userParamDto.per_page))
 
     }
 
