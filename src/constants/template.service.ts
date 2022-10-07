@@ -535,7 +535,7 @@ export class TemplateService {
         const ses = new AWS.SES({ apiVersion: '2010-12-01' });
         const params = {
             Destination: {
-                ToAddresses: [SES_SOURCE_SUPPORT_EMAIL_AI]
+                ToAddresses: [SES_SOURCE_HELLO_FEDO_EMAIL]
             },
             Source: SES_SOURCE_NO_REPLY_EMAIL,
             Message: {
