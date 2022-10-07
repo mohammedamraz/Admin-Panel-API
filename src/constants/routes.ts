@@ -8,6 +8,7 @@ import { SendEmailModule } from 'src/routes/send-email/send-email.module';
 import { UserProductJunctionModule } from 'src/routes/user-product-junction/user-product-junction.module';
 import { VideoToVitalsModule } from 'src/routes/video-to-vitals/video-to-vitals.module';
 import { OrgProductJunctionModule } from 'src/routes/org-product-junction/org-product-junction.module';
+import { GenericUrlModule } from 'src/routes/generic/generic-url.module';
 /**
  * NOTE: Routes are picked on 'first-match'
  *       So the order is important
@@ -52,5 +53,9 @@ export const APP_ROUTES = [
   {
     path: 'tpa',
     module: ThirdpartyOrganizationModule,
+  },
+  {
+    path: 'generic',
+    module: GenericUrlModule,
   },
 ];

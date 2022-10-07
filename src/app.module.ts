@@ -17,6 +17,7 @@ import { IndividualUserModule } from './routes/individual-user/individual-user.m
 import { ProfileInfoModule } from './routes/profile-info/profile-info/profile-info.module';
 import { ThirdpartyOrganizationModule } from './routes/thirdparty-organization/thirdparty-organization.module';
 import { SendEmailModule } from './routes/send-email/send-email.module';
+import { GenericUrlModule } from './routes/generic/generic-url.module';
 
 @Module({
   imports: [
@@ -37,7 +38,8 @@ import { SendEmailModule } from './routes/send-email/send-email.module';
     OrgProductJunctionModule,
     IndividualUserModule,
     ProfileInfoModule,
-    ThirdpartyOrganizationModule
+    ThirdpartyOrganizationModule,
+    GenericUrlModule
     
   ],
   controllers: [AppController],
