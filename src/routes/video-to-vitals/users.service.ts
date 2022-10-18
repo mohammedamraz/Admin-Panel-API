@@ -66,7 +66,7 @@ export class UsersService {
       )
     }
     else {
-      return this.userDb.find({ org_id: org_id }).pipe(
+      return this.userDb.find({ org_id: org_id, is_deleted :userParamDto.is_deleted }).pipe(
         catchError(err => { throw new UnprocessableEntityException(err.message) }),
         map(doc => {
           if (doc.length == 0) { throw new NotFoundException(`user Not available for organization id ${org_id}`) }

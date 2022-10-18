@@ -508,7 +508,7 @@ export class OrganizationService {
 
     }
     else {
-      return this.organizationDb.find({ is_deleted: false }).pipe(
+      return this.organizationDb.find({ is_deleted: queryParamsDto.is_deleted }).pipe(
         catchError(err => { throw new UnprocessableEntityException(err.message) }),
         map(async doc => {
           if (doc.length == 0) throw new NotFoundException('No Data available')
