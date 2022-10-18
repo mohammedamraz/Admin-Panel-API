@@ -508,6 +508,7 @@ export class OrganizationService {
 
     }
     else {
+      if(Boolean(queryParamsDto.is_deleted) === true){
       return this.organizationDb.find({ is_deleted: queryParamsDto.is_deleted }).pipe(
         catchError(err => { throw new UnprocessableEntityException(err.message) }),
         map(async doc => {
@@ -516,6 +517,18 @@ export class OrganizationService {
         }),
         switchMap(doc => this.updateStatus(doc))
       );
+      }
+      else{
+        return this.organizationDb.fetchAll().pipe(
+          catchError(err => { throw new UnprocessableEntityException(err.message) }),
+          map(async doc => {
+            if (doc.length == 0) throw new NotFoundException('No Data available')
+            else {  return await this.fetchotherDetails(doc,queryParamsDto) }
+          }),
+          switchMap(doc => this.updateStatus(doc))
+        );
+
+      }
     }
   }
 
