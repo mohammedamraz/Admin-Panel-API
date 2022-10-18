@@ -947,7 +947,7 @@ export class OrganizationService {
   updateOrganization(id: number, updateOrganizationDto: UpdateOrganizationDto) {
     Logger.debug(`updateOrganization() id:${id} updateOrganizationDto: ${JSON.stringify(updateOrganizationDto)} `, APP);
 
-    return this.organizationDb.find({ id: id, is_deleted: false }).pipe(
+    return this.organizationDb.find({ id: id }).pipe(
       map(res => {
         if (res.length == 0) throw new NotFoundException('organization not found')
         else{ this.usersService.patchUserByApplicationId(res[0].application_id,updateOrganizationDto)
