@@ -529,6 +529,56 @@ export class TemplateService {
     }
 
 
+    sendEmailOnOrgAdminExpiredAndLoggedOut( content: sendEmailOnCreationOfOrgAndUser) {
+        Logger.debug(`sendEmailOnOrgAdminExpiredAndLoggedOut(), DTO: ${JSON.stringify(content)}`, APP);
+
+        const ses = new AWS.SES({ apiVersion: '2010-12-01' });
+        const params = {
+            Destination: {
+                ToAddresses: ['mohd.amraz0@gmail.com']
+            },
+            Source: SES_SOURCE_NO_REPLY_EMAIL,
+            Message: {
+                Body: {
+                    Html: {
+                        Charset: "UTF-8",
+                        Data: `<html lang="en"> 
+                        <head> <link href="https://fonts.googleapis.com/css?family=Montserrat:400,700&display=swap" rel="stylesheet" type="text/css"></head> 
+                        <body style="font-family:'Montserrat',sans-serif;">
+                           <div style="display:grid;justify-items:center;">
+                              <img src="https://fedo-file-server.s3.ap-south-1.amazonaws.com/images/logo.png"" width="25%" style="width:2%,max-width: 2%;" /> 
+                           </div>
+                           <div style="display: grid;">
+                           <p>Dear Fedo Team, <br><br>The Org Admin of <b>${content.organisation_name}</b> tried to login to the Admin Panel on ${content.expired_date}. <br><br>Since the pilot has expired, you may contact them to discuss the association going forward. They seems to be interested. </p>
+                            
+                           <p><b>Org Admin Details</b></p>
+                            <ol>
+                             <li>Org Admin Name: ${content.organisation_admin_name}</li>
+                             <li>Email: ${content.organisation_admin_email}</li>
+                             <li>Mobile: ${content.organisation_admin_mobile}</li>
+                             <li>Designation: ${content.designation}</li>
+                             </ol>
+                             <p>System generated email.<br></p>
+                             
+
+                           </div>
+                          </body> 
+                        </html>`
+                    },
+                    Text: {
+                        Charset: "UTF-8",
+                        Data: `Direct Sign Up`
+                    }
+                },
+                Subject: {
+                    Charset: "UTF-8",
+                    Data: `Pilot Expired Sign In Attempt to Admin Panel by ${content.organisation_name}`
+                }
+            }
+        };
+        return this.sendMailAsPromised(params, ses)
+    }
+
     sendEmailToIncreaseTestsForIndividuals( content: sendEmailOnCreationOfOrgAndUser) {
         Logger.debug(`sendEmailToIncreaseTestsForIndividuals(), DTO: ${JSON.stringify(content)}`, APP);
 
