@@ -705,7 +705,7 @@ export class OrganizationService {
   fetchOrganizationById(id: number) {
     Logger.debug(`fetchOrganizationById() id:${id} `, APP);
 
-    return this.organizationDb.find({ id: id, is_deleted: false }).pipe(
+    return this.organizationDb.find({ id: id }).pipe(
       catchError(err => { throw new UnprocessableEntityException(err.message) }),
       map(doc => {
         if (doc.length == 0) {
