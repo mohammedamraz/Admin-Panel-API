@@ -31,5 +31,11 @@ export class SendEmailController {
       return this.sendEmailService.sendEmailOnNotAbleToIdentifyOrganisation(body)
     }
 
+    @Post('logout/notification')
+    sendEmailOnOrgAdminExpiredAndLoggedOut(@Body() body:sendEmailOnCreationOfDirectSalesPartner) {
+      Logger.debug(`sendEmailOnOrgAdminExpiredAndLoggedOut() body: [${JSON.stringify(body)}]`, APP);
+  
+      return this.sendEmailService.sendEmailOnOrgAdminExpiredAndLoggedOut(body)
+    }
 
 }

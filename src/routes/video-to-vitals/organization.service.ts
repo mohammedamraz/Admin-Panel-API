@@ -508,7 +508,8 @@ export class OrganizationService {
 
     }
     else {
-      return this.organizationDb.find({ is_deleted: false }).pipe(
+      if(Boolean(queryParamsDto.is_deleted) === true){
+      return this.organizationDb.find({ is_deleted: queryParamsDto.is_deleted }).pipe(
         catchError(err => { throw new UnprocessableEntityException(err.message) }),
         map(async doc => {
           if (doc.length == 0) throw new NotFoundException('No Data available')
@@ -516,6 +517,18 @@ export class OrganizationService {
         }),
         switchMap(doc => this.updateStatus(doc))
       );
+      }
+      else{
+        return this.organizationDb.fetchAll().pipe(
+          catchError(err => { throw new UnprocessableEntityException(err.message) }),
+          map(async doc => {
+            if (doc.length == 0) throw new NotFoundException('No Data available')
+            else {  return await this.fetchotherDetails(doc,queryParamsDto) }
+          }),
+          switchMap(doc => this.updateStatus(doc))
+        );
+
+      }
     }
   }
 
@@ -692,7 +705,7 @@ export class OrganizationService {
   fetchOrganizationById(id: number) {
     Logger.debug(`fetchOrganizationById() id:${id} `, APP);
 
-    return this.organizationDb.find({ id: id, is_deleted: false }).pipe(
+    return this.organizationDb.find({ id: id }).pipe(
       catchError(err => { throw new UnprocessableEntityException(err.message) }),
       map(doc => {
         if (doc.length == 0) {
@@ -934,7 +947,7 @@ export class OrganizationService {
   updateOrganization(id: number, updateOrganizationDto: UpdateOrganizationDto) {
     Logger.debug(`updateOrganization() id:${id} updateOrganizationDto: ${JSON.stringify(updateOrganizationDto)} `, APP);
 
-    return this.organizationDb.find({ id: id, is_deleted: false }).pipe(
+    return this.organizationDb.find({ id: id }).pipe(
       map(res => {
         if (res.length == 0) throw new NotFoundException('organization not found')
         else{ this.usersService.patchUserByApplicationId(res[0].application_id,updateOrganizationDto)

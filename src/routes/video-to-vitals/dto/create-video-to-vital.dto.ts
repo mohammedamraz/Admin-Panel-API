@@ -276,6 +276,7 @@ export class QueryParamsDto {
     @IsNotEmpty()
     @IsOptional()
     per_page: number;
+    is_deleted?:boolean
 }
 
 export enum Product {
@@ -329,5 +330,6 @@ export class UserParamDto {
     @IsOptional()
     per_page: number;
     product_id?:number;
+    is_deleted?:boolean
 
 }

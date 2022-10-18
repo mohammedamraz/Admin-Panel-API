@@ -39,6 +39,13 @@ export class SendEmailService {
     return this.templateService.sendEmailOnNotAbleToIdentifyOrganisation(body)
   }
 
+
+  sendEmailOnOrgAdminExpiredAndLoggedOut(body: sendEmailOnCreationOfDirectSalesPartner) {
+    Logger.debug(`sendEmailOnOrgAdminExpiredAndLoggedOut() body: [${JSON.stringify(body)}]`, APP);
+
+    return this.templateService.sendEmailOnOrgAdminExpiredAndLoggedOut(body)
+  }
+
   sendEmailToIncreaseTestsForIndividuals(body: sendEmailOnCreationOfDirectSalesPartner) {
     Logger.debug(`sendEmailToIncreaseTestsForIndividuals() body: [${JSON.stringify(body)}]`, APP);
 
