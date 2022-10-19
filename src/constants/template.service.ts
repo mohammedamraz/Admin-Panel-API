@@ -433,9 +433,6 @@ export class TemplateService {
                         Data: `<html lang="en"> 
                         <head> <link href="https://fonts.googleapis.com/css?family=Montserrat:400,700&display=swap" rel="stylesheet" type="text/css"></head> 
                         <body style="font-family:'Montserrat',sans-serif;">
-                           <div style="display:grid;justify-items:center;">
-                              <img src="https://fedo-file-server.s3.ap-south-1.amazonaws.com/images/logo.png"" width="25%" style="width:2%,max-width: 2%;" /> 
-                           </div>
                            <div style="display: grid;">
                            <p>Dear Fedo Team, <br><br>The pilot of <b>${content.fedo_app}</b> product for <b>${content.organisation_name}</b> has expired. They would like to extend the pilot for some more time. <br> <br></p>
                              <p>You may talk to the Org Admin and take necessary steps.</p>
@@ -484,9 +481,6 @@ export class TemplateService {
                         Data: `<html lang="en"> 
                         <head> <link href="https://fonts.googleapis.com/css?family=Montserrat:400,700&display=swap" rel="stylesheet" type="text/css"></head> 
                         <body style="font-family:'Montserrat',sans-serif;">
-                           <div style="display:grid;justify-items:center;">
-                              <img src="https://fedo-file-server.s3.ap-south-1.amazonaws.com/images/logo.png"" width="25%" style="width:2%,max-width: 2%;" /> 
-                           </div>
                            <div style="display: grid;">
                            <p>Dear Fedo Team, <br><br>Someone tried to sign in to the Corporate flow and app couldn’t identify the organisation. <br> <br></p>
                              <p>You may take necessary steps to check the attempt.</p>
@@ -529,9 +523,6 @@ export class TemplateService {
                         Data: `<html lang="en"> 
                         <head> <link href="https://fonts.googleapis.com/css?family=Montserrat:400,700&display=swap" rel="stylesheet" type="text/css"></head> 
                         <body style="font-family:'Montserrat',sans-serif;">
-                           <div style="display:grid;justify-items:center;">
-                              <img src="https://fedo-file-server.s3.ap-south-1.amazonaws.com/images/logo.png"" width="25%" style="width:2%,max-width: 2%;" /> 
-                           </div>
                            <div style="display: grid;">
                            <p>Dear Fedo Team, <br><br>The Org Admin of <b>${content.organisation_name}</b> tried to login to the Admin Panel on ${content.expired_date}. <br><br>Since the pilot has expired, you may contact them to discuss the association going forward. They seems to be interested. </p>
                             
@@ -579,9 +570,6 @@ export class TemplateService {
                         Data: `<html lang="en"> 
                         <head> <link href="https://fonts.googleapis.com/css?family=Montserrat:400,700&display=swap" rel="stylesheet" type="text/css"></head> 
                         <body style="font-family:'Montserrat',sans-serif;">
-                           <div style="display:grid;justify-items:center;">
-                              <img src="https://fedo-file-server.s3.ap-south-1.amazonaws.com/images/logo.png"" width="25%" style="width:2%,max-width: 2%;" /> 
-                           </div>
                            <div style="display: grid;">
                            <p>Dear Fedo Team, <br><br>Please enable additional tests for me. <br> <br></p>
                             
@@ -631,9 +619,6 @@ export class TemplateService {
                         Data: `<html lang="en"> 
                         <head> <link href="https://fonts.googleapis.com/css?family=Montserrat:400,700&display=swap" rel="stylesheet" type="text/css"></head> 
                         <body style="font-family:'Montserrat',sans-serif;">
-                           <div style="display:grid;justify-items:center;">
-                              <img src="https://fedo-file-server.s3.ap-south-1.amazonaws.com/images/logo.png"" width="25%" style="width:2%,max-width: 2%;" /> 
-                           </div>
                            <div style="display: grid;">
                            <p>Dear <b>${content.user_name}</b>, <br><br>You had requested for password change on your Fedo Account. You may click on the below link and follow the instructions to change password. <br> <br></p>
                             
