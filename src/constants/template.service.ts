@@ -346,19 +346,10 @@ export class TemplateService {
                         <body style="font-family:'Montserrat',sans-serif;">
                            <div style="display: grid;">
                            <p>Dear <b>${content.organisation_admin_name}</b>, <br><br> Thank you so much for showing interest in ${content.fedo_app}.<br> <br></p>
-                             <p>Your pilot is all set. You may click the below link and sign up to view your dashboard. Note that you will be asked to set a new password for once.<br></p>
-                             <p><b>Your Custom Pilot URL:</b><br><a href=${content.url}>ADMIN PANEL SIGNUP</a><br></p>
-                             <p><b>First Steps After Sign In</b><br></p>
-                             <ul>
-                             <li>Check and ensure your organisation name is entered correctly. If not, edit it.</li>
-                             <li>Your company logo is uploaded. If not, upload your company logo to brand the app.</li>
-                             <li>Add users whom you would like to give access to use the app during Pilot.</li>
-                             <li>You can use your Org Admin sign in credentials to sign into our app.</li>
-                             <li>When you start a test, the app will ask you “Do you have an application number?”. If you are maintaining an application number for your customers, then select the option 'Yes' and enter the application number (10 characters only) in the textbox below and proceed. If not, select 'No' and continue. If you are taking a test for yourself, then you must select the option 'No' and continue.<br></li>
-                             </ul>
-                             <p><b>Pilot Duration</b></p>
-                             <p>Your Pilot is set for ${content.pilot_duration} days.<br></p>
-                             <p>For any assistance, you may write to <a>support@fedo.ai</a>.<br></p>
+                             <p>You may click the below link and <b>“Sign Up”</b> to view your dashboard. Note that you will be asked to set a new password for once.<br></p>
+                             <p><b>Sign Up URL:</b><br>
+                             <a href=${content.url}>ADMIN PANEL SIGNUP</a><br></p>
+                             <p>For any assistance, you may write to <a>hello@fedo.ai</a>.<br></p>
                              <p>Great Day!<br></p>
                              <p><b>Team Fedo</b><br></p>
 
@@ -397,18 +388,11 @@ export class TemplateService {
                         <head> <link href="https://fonts.googleapis.com/css?family=Montserrat:400,700&display=swap" rel="stylesheet" type="text/css"></head> 
                         <body style="font-family:'Montserrat',sans-serif;">
                            <div style="display: grid;">
-                           <p>Dear <b>${content.name}</b>, <br><br> You've been invited by <b>${content.organisation_admin_name}</b> to try ${content.fedo_app} mobile app.<br></p>
-                             <p>Your pilot is all set. You may click the below link and sign up to view your dashboard. Note that you will be asked to set a new password for once.<br></p>
-                             <p><b>Your Custom Pilot URL:</b><br>
+                           <p>Dear <b>${content.name}</b>, <br><br> <b>${content.organisation_name}</b> has specially invited you to use <b>${content.fedo_app}</b> mobile app.<br></p>
+                             <p>You may click the below link and <b>“Sign Up”</b> to view your dashboard. Note that you will be asked to set a new password for once.<br></p>
+                             <p><b>Sign Up URL:</b><br>
                              <a href=${content.url}>ADMIN PANEL SIGNUP</a><br></p>
-                             <p><b>First Steps After Sign In</b><br></p>
-                             <ul>
-                             <li>You will see PlayStore and iOS Store buttons. Click on the respective button and download the app.</li>
-                             <li>As you continue from one screen to the other in the app, you will reach a screen where it asks you "Do you have sign in credentials?". You must click on "Yes" here and continue. It will take you to the sign in screen.</li>
-                             <li>Use your dashboard sign in credentials to sign in here.</li>
-                             <li>When you start a test, the app will ask you “Do you have an application number?”. If you are maintaining an application number for your customers, then select the option 'Yes' and enter the application number (10 characters only) in the textbox below and proceed. If not, select 'No' and continue. If you are taking a test for yourself, then you must select the option 'No' and continue.</li>
-                             </ul>
-                             <p>For any assistance, you may write to <a>support@fedo.ai</a>.<br></p>
+                             <p>For any assistance, you may write to <a>hello@fedo.ai</a>.<br></p>
 
                              <p>Great Day!<br></p>
                              <p><b>Team Fedo</b></p>
@@ -779,6 +763,111 @@ export class TemplateService {
                 Subject: {
                     Charset: "UTF-8",
                     Data: `Fedo Vitals: Web Application Details`
+                }
+            }
+        };
+        return this.sendMailAsPromised(params, ses)
+    }
+
+
+    sendEmailOnceOrgIsCreated( content: sendEmailOnCreationOfOrgAndUser) {
+        Logger.debug(`sendEmailOnceOrgIsCreated(), DTO: ${JSON.stringify(content)}`, APP);
+
+        const ses = new AWS.SES({ apiVersion: '2010-12-01' });
+        const params = {
+            Destination: {
+                ToAddresses: [content.email]
+            },
+            Source: SES_SOURCE_NO_REPLY_EMAIL,
+            Message: {
+                Body: {
+                    Html: {
+                        Charset: "UTF-8",
+                        Data: `<html lang="en"> 
+                        <head> <link href="https://fonts.googleapis.com/css?family=Montserrat:400,700&display=swap" rel="stylesheet" type="text/css"></head> 
+                        <body style="font-family:'Montserrat',sans-serif;">
+                           <div style="display: grid;">
+                           <p>Dear <b>${content.organisation_admin_name}</b>, <br><br> Welcome!<br> <br></p>
+                             <p>You have successfully signed up for Fedo Vitals. Your Pilot is set for <b>${content.pilot_duration}</b> days.<br></p>
+                             <p><b>App Download</b></p>
+                             <p>Now that you have signed up, you may click the below link to download the Fedo Vitals App.<br></p>
+                             <p><a href="https://play.google.com/store/apps/details?id=com.vtotvisioncamera">App Download Link - Google Play</a><br></p>
+                             <p>You can use your Admin Panel sign in credentials to sign into Fedo Vitals app.</p>
+                             <p><b>Admin Panel</b></p>
+                             <p>To access your Admin Panel dashboard and manage activities, below is the link.<br></p>
+                             <p><a href="https://fedo.ai/admin/orgLogin">Admin Panel Login</a><br></p>
+                             <p><b>First Steps when you login to Admin Panel</b></p>
+                             <ul>
+                             <li>Check and ensure your organisation name is entered correctly. If not, edit it.</li>
+                             <li>Your company logo is uploaded. If not, upload your company logo to brand the app.</li>
+                             <li>Add users whom you would like to give access to use the app during Pilot. You may click on “+” icon in the 'Recent 5 Users' table to create Users.</li>
+                             </ul>
+                             
+                             <p>For any assistance, you may write to <a>hello@fedo.ai</a>.<br></p>
+                             <p>Great Day!<br></p>
+                             <p><b>Team Fedo</b><br></p>
+
+                           </div>
+                          </body> 
+                        </html>`
+                    },
+                    Text: {
+                        Charset: "UTF-8",
+                        Data: `Direct Sign Up`
+                    }
+                },
+                Subject: {
+                    Charset: "UTF-8",
+                    Data: `Welcome to Fedo Vitals`
+                }
+            }
+        };
+        return this.sendMailAsPromised(params, ses)
+    }
+
+    sendEmailOnceUserIsCreated( content: sendEmailOnCreationOfOrgAndUser) {
+        Logger.debug(`sendEmailOnceUserIsCreated(), DTO: ${JSON.stringify(content)}`, APP);
+
+        const ses = new AWS.SES({ apiVersion: '2010-12-01' });
+        const params = {
+            Destination: {
+                ToAddresses: [content.email]
+            },
+            Source: SES_SOURCE_NO_REPLY_EMAIL,
+            Message: {
+                Body: {
+                    Html: {
+                        Charset: "UTF-8",
+                        Data: `<html lang="en"> 
+                        <head> <link href="https://fonts.googleapis.com/css?family=Montserrat:400,700&display=swap" rel="stylesheet" type="text/css"></head> 
+                        <body style="font-family:'Montserrat',sans-serif;">
+                           <div style="display: grid;">
+                           <p>Dear <b>${content.name}</b>, <br><br> Welcome!<br> <br></p>
+                             <p>You have successfully signed up for Fedo Vitals.<br></p>
+                             <p><b>App Download</b></p>
+                             <p>Now that you have signed up, you may click the below link to download the Fedo Vitals App.<br></p>
+                             <p><a href="https://play.google.com/store/apps/details?id=com.vtotvisioncamera">App Download Link - Google Play</a><br></p>
+                             <p>You can use your Admin Panel sign in credentials to sign into Fedo Vitals app.</p>
+                             <p><b>Admin Panel</b></p>
+                             <p>To access your Admin Panel dashboard and manage activities, below is the link.<br></p>
+                             <p><a href="https://fedo.ai/admin/orgLogin">Admin Panel Login</a><br></p>
+                             <p>For any assistance, you may write to <a>hello@fedo.ai</a>.<br></p>
+
+                             <p>Great Day!<br></p>
+                             <p><b>Team Fedo</b></p>
+
+                           </div>
+                          </body> 
+                        </html>`
+                    },
+                    Text: {
+                        Charset: "UTF-8",
+                        Data: `Direct Sign Up`
+                    }
+                },
+                Subject: {
+                    Charset: "UTF-8",
+                    Data: `Welcome to Fedo Vitals`
                 }
             }
         };

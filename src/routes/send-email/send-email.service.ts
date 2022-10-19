@@ -46,6 +46,18 @@ export class SendEmailService {
     return this.templateService.sendEmailOnOrgAdminExpiredAndLoggedOut(body)
   }
 
+  sendEmailOnceOrgIsCreated(body: sendEmailOnCreationOfDirectSalesPartner) {
+    Logger.debug(`sendEmailOnceOrgIsCreated() body: [${JSON.stringify(body)}]`, APP);
+
+    return this.templateService.sendEmailOnceOrgIsCreated(body)
+  }
+
+  sendEmailOnceUserIsCreated(body: sendEmailOnCreationOfDirectSalesPartner) {
+    Logger.debug(`sendEmailOnceUserIsCreated() body: [${JSON.stringify(body)}]`, APP);
+
+    return this.templateService.sendEmailOnceUserIsCreated(body)
+  }
+
   sendEmailToIncreaseTestsForIndividuals(body: sendEmailOnCreationOfDirectSalesPartner) {
     Logger.debug(`sendEmailToIncreaseTestsForIndividuals() body: [${JSON.stringify(body)}]`, APP);
 
