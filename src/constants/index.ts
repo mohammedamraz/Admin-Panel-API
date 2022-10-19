@@ -9,7 +9,7 @@ export const FEDO_APP_CLIENT_ID = process.env.FEDO_APP || '4iaahrh33ojt8sh0vq96t
 
 
 // export const FEDO_USER_POOL_NAME = process.env.FEDO_USER_POOL_NAME || 'HSA-SALES-ADMIN';
-export const FEDO_USER_ADMIN_PANEL_POOL_NAME = process.env.FEDO_USER_ADMIN_PANEL_POOL_NAME || 'HSA-Admin-Panel';
+export const FEDO_USER_ADMIN_PANEL_POOL_NAME = process.env.FEDO_USER_ADMIN_PANEL_POOL_NAME || 'Admin-Panel-AppClient';
 export const FEDO_APP_ADMIN_PANEL_CLIENT_NAME = process.env.FEDO_APP_ADMIN_PANEL_CLIENT_NAME || 'HSA-AdminPanel-AppClient';
 export const FEDO_APP_ADMIN_PANEL_CLIENT_ID = process.env.FEDO_APP_ADMIN_PANEL_CLIENT_ID || 'c4uk66lomohv83evjhmt5qu3h';
 
@@ -57,6 +57,7 @@ export const FEDO_HSA_USER_CONNECTION_URL = process.env.FEDO_HSA_USER_CONNECTION
 
 
 export const AWS_COGNITO_USER_CREATION_URL_SIT = process.env.FEDO_AWS_COGNITO_USER_CREATION_URL || 'https://dev.fedo.health/hsa/fis/v1/users';
+export const AWS_COGNITO_USER_CREATION_URL_SIT_ADMIN_PANEL = process.env.FEDO_AWS_COGNITO_USER_CREATION_URL_ADMIN_PANEL || 'https://dev.fedo.health/hsa/fis/v1/admin/users';
 // export const AWS_COGNITO_USER_CREATION_URL_SIT = process.env.FEDO_AWS_COGNITO_USER_CREATION_URL || 'http://0.0.0.0:36000/users';
 export const PUBLIC_KEY =
 	'-----BEGIN PUBLIC KEY-----\n' +
