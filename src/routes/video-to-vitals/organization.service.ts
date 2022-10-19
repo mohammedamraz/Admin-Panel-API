@@ -187,16 +187,16 @@ export class OrganizationService {
                 delete createOrganizationDto.event_mode;
                 return this.organizationDb.save(createOrganizationDto).pipe(
                   map(res => {
-                    // var encryption = { org_id: res[0].id };
-                    // this.sendEmailService.sendEmailOnCreateOrg(
-                    //   {
-                    //     "email": createOrganizationDto.organization_email,
-                    //     "organisation_admin_name": createOrganizationDto.admin_name.split(' ')[0],
-                    //     "fedo_app": "Fedo Vitals",
-                    //     "url": "https://www.fedo.ai/admin/vital/" + createOrganizationDto.url + "?" + encodeURIComponent(this.encryptPassword(encryption)),
-                    //     "pilot_duration": this.respilot_duration,
-                    //     "application_id": (res[0].application_id)
-                    //   })
+                    var encryption = { org_id: res[0].id };
+                    this.sendEmailService.sendEmailOnCreateOrg(
+                      {
+                        "email": createOrganizationDto.organization_email,
+                        "organisation_admin_name": createOrganizationDto.admin_name.split(' ')[0],
+                        "fedo_app": "Fedo Vitals",
+                        "url": "https://www.fedo.ai/admin/vital/" + createOrganizationDto.url + "?" + encodeURIComponent(this.encryptPassword(encryption)),
+                        "pilot_duration": this.respilot_duration,
+                        "application_id": (res[0].application_id)
+                      })
                     return res
                   }))
               }))
@@ -251,16 +251,16 @@ export class OrganizationService {
                 delete createOrganizationDto.event_mode;
                 return this.organizationDb.save(createOrganizationDto).pipe(
                   map(res => {
-                    // var encryption = { org_id: res[0].id };
-                    // this.sendEmailService.sendEmailOnCreateOrg(
-                    //   {
-                    //     "email": createOrganizationDto.organization_email,
-                    //     "organisation_admin_name": createOrganizationDto.admin_name.split(' ')[0],
-                    //     "fedo_app": "Fedo Vitals",
-                    //     "url": "https://www.fedo.ai/admin/vital/" + createOrganizationDto.url + "?" + encodeURIComponent(this.encryptPassword(encryption)),
-                    //     "pilot_duration": this.respilot_duration,
-                    //     "application_id": (res[0].application_id)
-                    //   })
+                    var encryption = { org_id: res[0].id };
+                    this.sendEmailService.sendEmailOnCreateOrg(
+                      {
+                        "email": createOrganizationDto.organization_email,
+                        "organisation_admin_name": createOrganizationDto.admin_name.split(' ')[0],
+                        "fedo_app": "Fedo Vitals",
+                        "url": "https://www.fedo.ai/admin/vital/" + createOrganizationDto.url + "?" + encodeURIComponent(this.encryptPassword(encryption)),
+                        "pilot_duration": this.respilot_duration,
+                        "application_id": (res[0].application_id)
+                      })
                     return res
                   }))
               }))
