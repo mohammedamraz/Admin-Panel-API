@@ -7,6 +7,8 @@ import { ConfirmForgotPasswordDTO, ForgotPasswordDTO } from '../admin/dto/login.
 import { OrganizationService } from './organization.service';
 import { UsersService } from './users.service';
 import { LoggingInterceptor } from 'src/interceptors/interceptor';
+import { ZQueryParamsDto } from '../org-product-junction/dto/create-org-product-junction.dto';
+import { Cron } from '@nestjs/schedule';
 
 
 const APP = "VideoToVitalsController"
@@ -302,6 +304,21 @@ export class VideoToVitalsController {
 
   //   return this.organizationService.updateOrganization(id, updateOrganizationDto);
   // }
+
+  @Cron('30 6 0 * * *', { timeZone: 'Asia/Kolkata', })
+  fetchOrgDetailsByExpiryDateForDays(@Query() params: ZQueryParamsDto){
+    Logger.debug(`fetchOrgDetailsByExpiryDateForDays() params:${params}} `, APP);
+
+   return this.organizationService.fetchOrgDetailsByExpiryDateForDays(params)
+  }
+
+
+  @Cron('30 6 0 * * *', { timeZone: 'Asia/Kolkata', })
+  fetchOrgDetailsByExpiryDateOrgExpired(@Query() params: ZQueryParamsDto){
+    Logger.debug(`fetchOrgDetailsByExpiryDateOrgExpired() params:${params}} `, APP);
+
+   return this.organizationService.fetchOrgDetailsByExpiryDateOrgExpired(params)
+  }
 
 }
 

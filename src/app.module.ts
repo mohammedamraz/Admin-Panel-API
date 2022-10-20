@@ -18,6 +18,7 @@ import { ProfileInfoModule } from './routes/profile-info/profile-info/profile-in
 import { ThirdpartyOrganizationModule } from './routes/thirdparty-organization/thirdparty-organization.module';
 import { SendEmailModule } from './routes/send-email/send-email.module';
 import { GenericUrlModule } from './routes/generic/generic-url.module';
+import { ScheduleModule } from '@nestjs/schedule';
 
 @Module({
   imports: [
@@ -39,7 +40,8 @@ import { GenericUrlModule } from './routes/generic/generic-url.module';
     IndividualUserModule,
     ProfileInfoModule,
     ThirdpartyOrganizationModule,
-    GenericUrlModule
+    GenericUrlModule,
+    ScheduleModule.forRoot()
     
   ],
   controllers: [AppController],

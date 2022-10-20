@@ -8,7 +8,7 @@ import { AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, PUBLIC_KEY } from 'src/consta
 import { S3 } from 'aws-sdk';
 import { v4 as uuidv4 } from 'uuid';
 import { OrgProductJunctionService } from '../org-product-junction/org-product-junction.service';
-import { CreateOrgProductJunctionDto } from '../org-product-junction/dto/create-org-product-junction.dto';
+import { CreateOrgProductJunctionDto, ZQueryParamsDto } from '../org-product-junction/dto/create-org-product-junction.dto';
 import { UserProductJunctionService } from '../user-product-junction/user-product-junction.service';
 import { SendEmailService } from '../send-email/send-email.service';
 import { ProductService } from '../product/product.service';
@@ -187,16 +187,16 @@ export class OrganizationService {
                 delete createOrganizationDto.event_mode;
                 return this.organizationDb.save(createOrganizationDto).pipe(
                   map(res => {
-                    // var encryption = { org_id: res[0].id };
-                    // this.sendEmailService.sendEmailOnCreateOrg(
-                    //   {
-                    //     "email": createOrganizationDto.organization_email,
-                    //     "organisation_admin_name": createOrganizationDto.admin_name.split(' ')[0],
-                    //     "fedo_app": "Fedo Vitals",
-                    //     "url": "https://www.fedo.ai/admin/vital/" + createOrganizationDto.url + "?" + encodeURIComponent(this.encryptPassword(encryption)),
-                    //     "pilot_duration": this.respilot_duration,
-                    //     "application_id": (res[0].application_id)
-                    //   })
+                    var encryption = { org_id: res[0].id };
+                    this.sendEmailService.sendEmailOnCreateOrg(
+                      {
+                        "email": createOrganizationDto.organization_email,
+                        "organisation_admin_name": createOrganizationDto.admin_name.split(' ')[0],
+                        "fedo_app": "Fedo Vitals",
+                        "url": "https://www.fedo.ai/admin/vital/" + createOrganizationDto.url + "?" + encodeURIComponent(this.encryptPassword(encryption)),
+                        "pilot_duration": this.respilot_duration,
+                        "application_id": (res[0].application_id)
+                      })
                     return res
                   }))
               }))
@@ -251,16 +251,16 @@ export class OrganizationService {
                 delete createOrganizationDto.event_mode;
                 return this.organizationDb.save(createOrganizationDto).pipe(
                   map(res => {
-                    // var encryption = { org_id: res[0].id };
-                    // this.sendEmailService.sendEmailOnCreateOrg(
-                    //   {
-                    //     "email": createOrganizationDto.organization_email,
-                    //     "organisation_admin_name": createOrganizationDto.admin_name.split(' ')[0],
-                    //     "fedo_app": "Fedo Vitals",
-                    //     "url": "https://www.fedo.ai/admin/vital/" + createOrganizationDto.url + "?" + encodeURIComponent(this.encryptPassword(encryption)),
-                    //     "pilot_duration": this.respilot_duration,
-                    //     "application_id": (res[0].application_id)
-                    //   })
+                    var encryption = { org_id: res[0].id };
+                    this.sendEmailService.sendEmailOnCreateOrg(
+                      {
+                        "email": createOrganizationDto.organization_email,
+                        "organisation_admin_name": createOrganizationDto.admin_name.split(' ')[0],
+                        "fedo_app": "Fedo Vitals",
+                        "url": "https://www.fedo.ai/admin/vital/" + createOrganizationDto.url + "?" + encodeURIComponent(this.encryptPassword(encryption)),
+                        "pilot_duration": this.respilot_duration,
+                        "application_id": (res[0].application_id)
+                      })
                     return res
                   }))
               }))
@@ -1048,5 +1048,48 @@ export class OrganizationService {
 
   }
 
+  async fetchOrgDetailsByExpiryDateForDays(params: ZQueryParamsDto){
+    Logger.debug(`fetchOrgDetailsByExpiryDateForDays() params:${params}} `, APP);
+
+    let dateParams=['0','2','6']
+    for(let i=0 ;i<=dateParams.length-1 ; i++){
+    var date= (d => new Date(d.setDate(d.getDate()+Number(dateParams[i]))).toISOString().split("T")[0])(new Date());
+    params.date=date
+    await lastValueFrom(this.orgProductJunctionService.fetchOrgDetailsByExpiryDateForDays(params).pipe(
+      map(doc=>{
+      doc.forEach(doc=>{
+        return this.fetchOrganizationDetailsById(doc.org_id).subscribe({
+          next: doc=>{
+           this.sendEmailService.sendFinalEmailWhenDaysLeftToPilotExpire({
+            email:doc[0].organization_email,
+            organisation_name : doc[0].organization_name,
+            organisation_admin_name : doc[0].admin_name.split(' ')[0],
+            expired_date : (Number(dateParams[i])+1).toString()
+          })          
+        }
+      })})
+      })))
+    }
+    }
+
+    fetchOrgDetailsByExpiryDateOrgExpired(params: ZQueryParamsDto){
+      Logger.debug(`fetchOrgDetailsByExpiryDateOrgExpired() params:${params}} `, APP);
+  
+      var date= (d => new Date(d.setDate(d.getDate()-1)).toISOString().split("T")[0])(new Date());
+      params.date=date
+      return this.orgProductJunctionService.fetchOrgDetailsByExpiryDateForDays(params).pipe(
+        map(doc=>{
+        doc.forEach(doc=>{
+          return this.fetchOrganizationDetailsById(doc.org_id).subscribe({
+            next: doc=>{
+            return this.sendEmailService.sendFinalEmailOncePilotIsExpired({
+              email:doc[0].organization_email,
+              organisation_name : doc[0].organization_name,
+              organisation_admin_name : doc[0].admin_name.split(' ')[0],
+              expired_date : date
+            })            
+          }})})
+        }))
+      }
 
 }

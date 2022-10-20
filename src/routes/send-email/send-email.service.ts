@@ -83,5 +83,17 @@ export class SendEmailService {
     return this.templateService.sendEmailOnVitalsWebAppAccess(body)
   }
 
+  sendFinalEmailOncePilotIsExpired(body: sendEmailOnCreationOfOrgAndUser) {
+    Logger.debug(`sendFinalEmailOncePilotIsExpired() body: [${JSON.stringify(body)}]`, APP);
+
+    return this.templateService.sendFinalEmailOncePilotIsExpired(body)
+  }
+
+  sendFinalEmailWhenDaysLeftToPilotExpire(body: sendEmailOnCreationOfOrgAndUser) {
+    Logger.debug(`sendFinalEmailWhenDaysLeftToPilotExpire() body: [${JSON.stringify(body)}]`, APP);
+
+    return this.templateService.sendFinalEmailWhenDaysLeftToPilotExpire(body)
+  }
+
 
 }

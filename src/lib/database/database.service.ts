@@ -296,6 +296,23 @@ export class DatabaseService<T> implements DatabaseInterface<T> {
     }
   }
 
+  findByEndDateOfOrganization(findbyConditionParams: findByDateParams): Observable<T[]> {
+    Logger.debug(`find_by_date(): params ${[JSON.stringify(findbyConditionParams)]}`, APP);
+
+    let variables = [];
+    let values = []
+    let params = findbyConditionParams
+    const number = params.number_of_rows * params.number_of_pages
+    delete params.name;
+    delete params.is_active
+    delete params.number_of_rows
+    delete params.number_of_pages
+    Object.values(params).map((params, index) => { variables.push(params), values.push((`$${index + 1}`)) })    
+    const query = `SELECT * FROM ${this.tableName} WHERE end_date BETWEEN ${values[0]} and ${values[0]}`
+    return this.runQuery(query, variables);
+
+  }
+
 
   findByPeriod(findByPeriodParams: findByPeriodParams): Observable<T[]> {
     Logger.debug(`findByPeriod(): params ${[JSON.stringify(findByPeriodParams)]}`, APP);
