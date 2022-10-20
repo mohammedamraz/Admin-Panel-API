@@ -1,3 +1,6 @@
+import { IsOptional, IsEnum } from "class-validator";
+import { Is_active } from "src/routes/sales/dto/create-sale.dto";
+
 export class CreateOrgProductJunctionDto {
     id: number;
     product_id: number;
@@ -8,4 +11,24 @@ export class CreateOrgProductJunctionDto {
     fedo_score: boolean;
     status:Boolean;
     stage:string;
+}
+
+
+export class ZQueryParamsDto {
+
+    @IsOptional()
+    name?: string;
+
+    @IsOptional()
+    date?: string;
+
+    @IsOptional()
+    number_of_pages?: number;
+
+    @IsOptional()
+    number_of_rows?: number;
+
+    @IsOptional()
+    @IsEnum(Is_active)
+    is_active: Is_active;
 }

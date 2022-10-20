@@ -8,7 +8,7 @@ import { AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, PUBLIC_KEY } from 'src/consta
 import { S3 } from 'aws-sdk';
 import { v4 as uuidv4 } from 'uuid';
 import { OrgProductJunctionService } from '../org-product-junction/org-product-junction.service';
-import { CreateOrgProductJunctionDto } from '../org-product-junction/dto/create-org-product-junction.dto';
+import { CreateOrgProductJunctionDto, ZQueryParamsDto } from '../org-product-junction/dto/create-org-product-junction.dto';
 import { UserProductJunctionService } from '../user-product-junction/user-product-junction.service';
 import { SendEmailService } from '../send-email/send-email.service';
 import { ProductService } from '../product/product.service';
@@ -1048,5 +1048,41 @@ export class OrganizationService {
 
   }
 
+  fetchOrgDetailsByExpiryDateFor7Days(params: ZQueryParamsDto){
+    Logger.debug(`fetchOrgDetailsByOrgProductJunctionId() params:${params}} `, APP);
+
+    // params.number_of_pages=1
+    // params.number_of_rows=1000
+    params.date='30'
+
+  return this.orgProductJunctionService.fetchOrgDetailsByExpiryDateFor7Days(params).pipe(
+    
+    map(doc=>{
+      // for(let i=0; i<= doc.length;i++){
+      //   console.log("id",this.organizationDb.find({id:doc[i].id}))
+      //   return this.organizationDb.find({id:doc[i].id})
+      //   // .pipe(switchMap(doc=>{
+      //   //         console.log("doc",doc);
+      //   //         return doc
+                
+      //   //       })
+      //   //       )
+
+      // }
+      // if (doc.length==0) throw new NotFoundException("data not found");
+     return doc
+    //  .forEach(doc=>{
+    //     console.log("dataaa",doc.id);
+    //     console.log("dataattatta",this.fetchOrganizationDetailsById(doc.id));
+        
+    //     return this.fetchOrganizationDetailsById(doc.id).pipe(switchMap(doc=>{
+    //       console.log("doc",doc);
+    //       return doc
+          
+    //     }))
+    //   })
+    }),
+  )
+  }
 
 }

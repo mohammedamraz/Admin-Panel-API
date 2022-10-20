@@ -4,13 +4,16 @@ import { Injectable } from '@nestjs/common';
 import { map } from 'rxjs';
 import { DatabaseTable } from 'src/lib/database/database.decorator';
 import { DatabaseService } from 'src/lib/database/database.service';
-import { CreateOrgProductJunctionDto } from './dto/create-org-product-junction.dto';
+import { CreateOrgProductJunctionDto, ZQueryParamsDto } from './dto/create-org-product-junction.dto';
+import { OrganizationService } from '../video-to-vitals/organization.service';
 const APP = 'OrgProductJunctionService';
 @Injectable()
 export class OrgProductJunctionService {
 
   constructor(@DatabaseTable('organization_product_junction')
-  private readonly organizationProductJunctionDb: DatabaseService<CreateOrgProductJunctionDto>){}
+  private readonly organizationProductJunctionDb: DatabaseService<CreateOrgProductJunctionDto>,
+  // private organizationService: OrganizationService
+  ){}
 
     fetchOrgProductJunctionDataByOrgId(org_id:number){
       Logger.debug(`fetchOrgProductJunctionDataByOrgId() body: ${JSON.stringify(org_id)}`, APP);
@@ -49,6 +52,20 @@ export class OrgProductJunctionService {
     map(doc=>{
       if (doc.length==0) throw new NotFoundException("data not found");
       else return doc
+    }),
+  )
+  }
+
+  fetchOrgDetailsByExpiryDateFor7Days(params: ZQueryParamsDto){
+    Logger.debug(`fetchOrgDetailsByOrgProductJunctionId() params:${params}} `, APP);
+
+    params.number_of_pages=1
+    params.number_of_rows=1000
+
+  return this.organizationProductJunctionDb.findByEndDateOfOrganization(params).pipe(
+    
+    map(doc=>{
+      return doc
     }),
   )
   }

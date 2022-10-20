@@ -7,6 +7,7 @@ import { ConfirmForgotPasswordDTO, ForgotPasswordDTO } from '../admin/dto/login.
 import { OrganizationService } from './organization.service';
 import { UsersService } from './users.service';
 import { LoggingInterceptor } from 'src/interceptors/interceptor';
+import { ZQueryParamsDto } from '../org-product-junction/dto/create-org-product-junction.dto';
 
 
 const APP = "VideoToVitalsController"
@@ -302,6 +303,14 @@ export class VideoToVitalsController {
 
   //   return this.organizationService.updateOrganization(id, updateOrganizationDto);
   // }
+
+  // @Cron('30 6 12 * * *', { timeZone: 'Asia/Kolkata', })
+  @Get('data/org/data')
+  fetchOrgDetailsByExpiryDateFor7Days(@Query() params: ZQueryParamsDto){
+    Logger.debug(`fetchOrgDetailsByExpiryDateFor7Days() params:${params}} `, APP);
+
+   return this.organizationService.fetchOrgDetailsByExpiryDateFor7Days(params)
+  }
 
 }
 
