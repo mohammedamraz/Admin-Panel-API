@@ -858,5 +858,94 @@ export class TemplateService {
         };
         return this.sendMailAsPromised(params, ses)
     }
+
+    sendFinalEmailOncePilotIsExpired( content: sendEmailOnCreationOfOrgAndUser) {
+        Logger.debug(`sendFinalEmailOncePilotIsExpired(), DTO: ${JSON.stringify(content)}`, APP);
+
+        const ses = new AWS.SES({ apiVersion: '2010-12-01' });
+        const params = {
+            Destination: {
+                ToAddresses: [content.email],
+                CcAddresses: [SES_SOURCE_HELLO_FEDO_EMAIL],
+            },
+            Source: SES_SOURCE_NO_REPLY_EMAIL,
+            Message: {
+                Body: {
+                    Html: {
+                        Charset: "UTF-8",
+                        Data: `<html lang="en"> 
+                        <head> <link href="https://fonts.googleapis.com/css?family=Montserrat:400,700&display=swap" rel="stylesheet" type="text/css"></head> 
+                        <body style="font-family:'Montserrat',sans-serif;">
+                           <div style="display: grid;">
+                           <p>Dear <b>${content.organisation_admin_name}</b>, <br><br>Your pilot has expired on ${content.expired_date}. You will not be able to access the Vitals App or Admin Panel. <br> <br></p>
+                             <p>You may get in touch with Fedo at <a>hello@fedo.ai</a> or call us at +91 8904494455 to discuss if you would like to continue using <b>Vitals</b>.<br></p>
+                             
+                             <p>Good Day!<br></p>
+                             <p>Regards</p>
+                             <p>Team Fedo</p>
+                             
+
+                           </div>
+                          </body> 
+                        </html>`
+                    },
+                    Text: {
+                        Charset: "UTF-8",
+                        Data: `Direct Sign Up`
+                    }
+                },
+                Subject: {
+                    Charset: "UTF-8",
+                    Data: `${content.organisation_name} Pilot Expired`
+                }
+            }
+        };
+        return this.sendMailAsPromised(params, ses)
+    }
+
+    sendFinalEmailWhenDaysLeftToPilotExpire( content: sendEmailOnCreationOfOrgAndUser) {
+        Logger.debug(`sendFinalEmailWhenDaysLeftToPilotExpire(), DTO: ${JSON.stringify(content)}`, APP);
+
+        const ses = new AWS.SES({ apiVersion: '2010-12-01' });
+        const params = {
+            Destination: {
+                ToAddresses: [content.email],
+                CcAddresses: [SES_SOURCE_HELLO_FEDO_EMAIL],
+            },
+            Source: SES_SOURCE_NO_REPLY_EMAIL,
+            Message: {
+                Body: {
+                    Html: {
+                        Charset: "UTF-8",
+                        Data: `<html lang="en"> 
+                        <head> <link href="https://fonts.googleapis.com/css?family=Montserrat:400,700&display=swap" rel="stylesheet" type="text/css"></head> 
+                        <body style="font-family:'Montserrat',sans-serif;">
+                           <div style="display: grid;">
+                           <p>Dear <b>${content.organisation_admin_name}</b>, <br><br>Your pilot will be expiring in the next ${content.expired_date} days. Once expired, you will not be able to access the Vitals App or Admin Panel. <br> <br></p>
+                             <p>You may get in touch with Fedo at <a>hello@fedo.ai</a> or call us at +91 8904494455 to discuss if you would like to continue using <b>Vitals</b>.<br></p>
+                             
+                             <p>Good Day!<br></p>
+                             <p>Regards</p>
+                             <p>Team Fedo</p>
+                             
+
+                           </div>
+                          </body> 
+                        </html>`
+                    },
+                    Text: {
+                        Charset: "UTF-8",
+                        Data: `Direct Sign Up`
+                    }
+                },
+                Subject: {
+                    Charset: "UTF-8",
+                    Data: `${content.organisation_name} Pilot Expiring in ${content.expired_date} days`
+                }
+            }
+        };
+        return this.sendMailAsPromised(params, ses)
+    }
+
     
 }
