@@ -56,14 +56,10 @@ export class OrgProductJunctionService {
   )
   }
 
-  fetchOrgDetailsByExpiryDateFor7Days(params: ZQueryParamsDto){
-    Logger.debug(`fetchOrgDetailsByOrgProductJunctionId() params:${params}} `, APP);
-
-    params.number_of_pages=1
-    params.number_of_rows=1000
+  fetchOrgDetailsByExpiryDateForDays(params: ZQueryParamsDto){
+    Logger.debug(`fetchOrgDetailsByExpiryDateForDays() params:${params}} `, APP);
 
   return this.organizationProductJunctionDb.findByEndDateOfOrganization(params).pipe(
-    
     map(doc=>{
       return doc
     }),

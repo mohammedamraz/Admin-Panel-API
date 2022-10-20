@@ -1048,41 +1048,48 @@ export class OrganizationService {
 
   }
 
-  fetchOrgDetailsByExpiryDateFor7Days(params: ZQueryParamsDto){
-    Logger.debug(`fetchOrgDetailsByOrgProductJunctionId() params:${params}} `, APP);
+  async fetchOrgDetailsByExpiryDateForDays(params: ZQueryParamsDto){
+    Logger.debug(`fetchOrgDetailsByExpiryDateForDays() params:${params}} `, APP);
 
-    // params.number_of_pages=1
-    // params.number_of_rows=1000
-    params.date='30'
+    let dateParams=['0','2','6']
+    for(let i=0 ;i<=dateParams.length-1 ; i++){
+    var date= (d => new Date(d.setDate(d.getDate()+Number(dateParams[i]))).toISOString().split("T")[0])(new Date());
+    params.date=date
+    await lastValueFrom(this.orgProductJunctionService.fetchOrgDetailsByExpiryDateForDays(params).pipe(
+      map(doc=>{
+      doc.forEach(doc=>{
+        return this.fetchOrganizationDetailsById(doc.org_id).subscribe({
+          next: doc=>{
+           this.sendEmailService.sendFinalEmailWhenDaysLeftToPilotExpire({
+            email:doc[0].organization_email,
+            organisation_name : doc[0].organization_name,
+            organisation_admin_name : doc[0].admin_name.split(' ')[0],
+            expired_date : (Number(dateParams[i])+1).toString()
+          })          
+        }
+      })})
+      })))
+    }
+    }
 
-  return this.orgProductJunctionService.fetchOrgDetailsByExpiryDateFor7Days(params).pipe(
-    
-    map(doc=>{
-      // for(let i=0; i<= doc.length;i++){
-      //   console.log("id",this.organizationDb.find({id:doc[i].id}))
-      //   return this.organizationDb.find({id:doc[i].id})
-      //   // .pipe(switchMap(doc=>{
-      //   //         console.log("doc",doc);
-      //   //         return doc
-                
-      //   //       })
-      //   //       )
-
-      // }
-      // if (doc.length==0) throw new NotFoundException("data not found");
-     return doc
-    //  .forEach(doc=>{
-    //     console.log("dataaa",doc.id);
-    //     console.log("dataattatta",this.fetchOrganizationDetailsById(doc.id));
-        
-    //     return this.fetchOrganizationDetailsById(doc.id).pipe(switchMap(doc=>{
-    //       console.log("doc",doc);
-    //       return doc
-          
-    //     }))
-    //   })
-    }),
-  )
-  }
+    fetchOrgDetailsByExpiryDateOrgExpired(params: ZQueryParamsDto){
+      Logger.debug(`fetchOrgDetailsByExpiryDateOrgExpired() params:${params}} `, APP);
+  
+      var date= (d => new Date(d.setDate(d.getDate()-1)).toISOString().split("T")[0])(new Date());
+      params.date=date
+      return this.orgProductJunctionService.fetchOrgDetailsByExpiryDateForDays(params).pipe(
+        map(doc=>{
+        doc.forEach(doc=>{
+          return this.fetchOrganizationDetailsById(doc.org_id).subscribe({
+            next: doc=>{
+            return this.sendEmailService.sendFinalEmailOncePilotIsExpired({
+              email:doc[0].organization_email,
+              organisation_name : doc[0].organization_name,
+              organisation_admin_name : doc[0].admin_name.split(' ')[0],
+              expired_date : date
+            })            
+          }})})
+        }))
+      }
 
 }

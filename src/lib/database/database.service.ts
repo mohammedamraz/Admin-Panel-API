@@ -306,10 +306,10 @@ export class DatabaseService<T> implements DatabaseInterface<T> {
     delete params.name;
     delete params.is_active
     delete params.number_of_rows
-    Object.values(params).map((params, index) => { variables.push(params), values.push((`$${index + 1}`)) })
-    const query = `SELECT * FROM ${this.tableName} WHERE end_date > CURRENT_DATE - (interval '1 day' * ${values[0]})  ORDER BY end_date LIMIT  ${number} OFFSET ${values[1]}`
+    delete params.number_of_pages
+    Object.values(params).map((params, index) => { variables.push(params), values.push((`$${index + 1}`)) })    
+    const query = `SELECT * FROM ${this.tableName} WHERE end_date BETWEEN ${values[0]} and ${values[0]}`
     return this.runQuery(query, variables);
-    // const query = `SELECT * FROM ${this.tableName} WHERE end_date > CURRENT_DATE - (interval '1 day' * ${values[1]}) AND end_date < CURRENT_DATE  ORDER BY end_date LIMIT  ${number} OFFSET ${values[0]}`
 
   }
 
