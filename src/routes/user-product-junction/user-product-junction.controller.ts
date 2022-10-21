@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Logger } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Logger, Query } from '@nestjs/common';
 import { UserProductJunctionService } from './user-product-junction.service';
 import { CreateUserProductJunctionDto } from './dto/create-user-product-junction.dto';
 import { UpdateUserProductJunctionDto } from './dto/update-user-product-junction.dto';
@@ -13,6 +13,13 @@ export class UserProductJunctionController {
       Logger.debug(`createUserProductJunction createUserProductJunctionDto: ${JSON.stringify(createUserProductJunctionDto)}`, APP);
 
       return this.userProductJunctionService.createUserProductJunction(createUserProductJunctionDto);
+  }
+
+  @Get('tests')
+  fetchUserProductJunctionDataByUserIdOrOrgIdAndProductId(@Query() createUserProductJunctionDto: CreateUserProductJunctionDto){
+    Logger.debug(`fetchUserProductJunctionDataByUserIdAndProductId() id:${createUserProductJunctionDto}} `, APP);
+
+   return this.userProductJunctionService.fetchUserProductJunctionDataByUserIdOrOrgIdAndProductId(createUserProductJunctionDto)
   }
 
   

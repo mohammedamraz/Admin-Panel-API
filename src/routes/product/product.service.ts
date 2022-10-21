@@ -1,5 +1,5 @@
-import { ConflictException, Injectable, Logger, NotFoundException } from '@nestjs/common';
-import { map, switchMap } from 'rxjs';
+import { BadRequestException, ConflictException, Injectable, Logger, NotFoundException, UnprocessableEntityException } from '@nestjs/common';
+import { catchError, map, switchMap } from 'rxjs';
 // import { CreateProductModel } from 'src/lib/config/model/product.model';
 import { DatabaseTable } from 'src/lib/database/database.decorator';
 import { DatabaseService } from 'src/lib/database/database.service';
@@ -23,7 +23,8 @@ export class ProductService {
       }),
       switchMap(doc => {
         return this.productDb.save(createProductDto).pipe(
-          map(doc => doc)
+          map(doc => doc),
+          catchError(err=>{throw new BadRequestException(err.message)})
         );
       })
     )
@@ -49,6 +50,37 @@ export class ProductService {
       })
       
     )
+  }
+
+  fetchAllProducts() {
+    Logger.debug(`fetchAllProducts() `, APP);
+
+    return this.productDb.find({is_active:true}).pipe(
+      catchError(err => { throw new UnprocessableEntityException(err.message) }),
+      map(doc => {
+        if (doc.length == 0) {
+          throw new NotFoundException('No Products Found')
+        }
+        else {
+          return doc
+        }
+      }),
+    );
+  }
+
+  fetchProductById(id: number) {
+    Logger.debug(`fetchProductById() id:${id}`, APP);
+    return this.productDb.find({id:id}).pipe(
+      catchError(err => { throw new UnprocessableEntityException(err.message) }),
+      switchMap(doc => {
+        if (doc.length == 0) {
+          throw new NotFoundException('No Products Found')
+        }
+        else {
+          return doc
+        }
+      }),
+    );
   }
 }
 

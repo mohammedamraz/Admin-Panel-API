@@ -10,9 +10,9 @@
 //     org_id: string
 // }
 
-export class CreateProductDto {
+export class CreateGenericTableDto {
     id:number;
-    product_name: string;
-    web_url?:string;
-    mobile_url?:string;
+    motion_det_url: string;
+    ps_verion?:string;
+    // mobile_url?:string;
 }

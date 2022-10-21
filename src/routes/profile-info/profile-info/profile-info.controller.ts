@@ -8,11 +8,11 @@ export class ProfileInfoController {
     constructor(private readonly profileInfoService: ProfileInfoService) { }
 
 
-    @Patch('info')
-  updateProfileInfo( @Body() createProfileInfoDTO: CreateProfileInfoDTO) {
+    @Patch('info/:id')
+  updateProfileInfo( @Param('id') id:number,@Body() createProfileInfoDTO: CreateProfileInfoDTO) {
     Logger.debug(`updateProfileInfo()  updateUserDTO:${JSON.stringify(createProfileInfoDTO)} `, APP);
 
-    return this.profileInfoService.updateProfileInfo( createProfileInfoDTO);
+    return this.profileInfoService.updateProfileInfo( id, createProfileInfoDTO);
   }
 
   @Post('profile')
@@ -43,15 +43,15 @@ export class ProfileInfoController {
     return this.profileInfoService.fetchProfileByOrgId(org_id)
   }
 
-  @Get('profile/info/query')
-  fetchProfileByOrgIdByQueryParams(@Query() params: ZQueryParamsDto) {
-    Logger.debug(`fetchProfileByOrgId() params:${JSON.stringify(params)}`, APP);
+  @Get('profile/info/list/:application_id/:org_id')
+  fetchProfileByOrgIdByQueryParams( @Param() createProfileInfoDTO: CreateProfileInfoDTO) {
+    Logger.debug(`fetchProfileByOrgId() params:${JSON.stringify(createProfileInfoDTO)}`, APP);
 
-    return this.profileInfoService.fetchProfileByOrgIdByQueryParams(params)
+    return this.profileInfoService.fetchProfileByOrgIdByQueryParams(createProfileInfoDTO)
   }
 
-  @Patch('user/tests')
-  updateTotalTestsInProfileInfo( @Body() createProfileInfoDTO: CreateProfileInfoDTO) {
+  @Patch('user/tests/:application_id/:product_id')
+  updateTotalTestsInProfileInfo( @Param() createProfileInfoDTO: CreateProfileInfoDTO) {
     Logger.debug(`updateProfileInfo()  updateUserDTO:${JSON.stringify(createProfileInfoDTO)} `, APP);
 
     return this.profileInfoService.updateTotalTestsInProfileInfo( createProfileInfoDTO);

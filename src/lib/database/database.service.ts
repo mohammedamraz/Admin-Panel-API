@@ -100,7 +100,7 @@ export class DatabaseService<T> implements DatabaseInterface<T> {
     Object.entries(condition).map((_, index1) => { index.push(`$${index1 + 1}`), values.push((`${_[0]}=$${index1 + 1}`)), variables.push(_[1]) });
 
     const values$ = JSON.stringify(values).replace(/,/g, " AND ").replace("[", "").replace("]", "").replace(/"/g, "");
-    const query = `SELECT * FROM ${this.tableName} WHERE ${values$}`;
+    const query = `SELECT * FROM ${this.tableName} WHERE ${values$} ORDER BY id ASC`;
     return this.runQuery(query, variables);
   }
 
@@ -222,6 +222,18 @@ export class DatabaseService<T> implements DatabaseInterface<T> {
     return this.runQuery(query);
   }
 
+  findByAlphabetForTpa(org_id:string,findbyConditionParams: findByDateParams): Observable<T[]> {
+    Logger.debug(`findByAlphabetForTpa(): params ${[JSON.stringify(findbyConditionParams)]}`, APP);
+
+
+    let variables = [];
+    let values = []
+    let params = findbyConditionParams
+    Object.values(params).map((params, index) => { variables.push(params), values.push((`$${index + 1}`)) })
+    const query = `SELECT * FROM ${this.tableName} WHERE org_id=${org_id} AND tpa_name like '${params.name}%' `;
+    return this.runQuery(query);
+  }
+
 
   findByConditionSales(id: string, findbyConditionParams: findByDateParams) {
     Logger.debug(`findByConditionSales(): params ${[JSON.stringify(findbyConditionParams)]}`, APP);
@@ -282,6 +294,23 @@ export class DatabaseService<T> implements DatabaseInterface<T> {
       const query = `SELECT * FROM ${this.tableName} WHERE created_date > CURRENT_DATE - (interval '1 day' * ${values[1]})  ORDER BY created_date LIMIT  ${values[0]} OFFSET ${number}`
       return this.runQuery(query, variables);
     }
+  }
+
+  findByEndDateOfOrganization(findbyConditionParams: findByDateParams): Observable<T[]> {
+    Logger.debug(`find_by_date(): params ${[JSON.stringify(findbyConditionParams)]}`, APP);
+
+    let variables = [];
+    let values = []
+    let params = findbyConditionParams
+    const number = params.number_of_rows * params.number_of_pages
+    delete params.name;
+    delete params.is_active
+    delete params.number_of_rows
+    delete params.number_of_pages
+    Object.values(params).map((params, index) => { variables.push(params), values.push((`$${index + 1}`)) })    
+    const query = `SELECT * FROM ${this.tableName} WHERE end_date BETWEEN ${values[0]} and ${values[0]}`
+    return this.runQuery(query, variables);
+
   }
 
 
@@ -349,9 +378,16 @@ export class DatabaseService<T> implements DatabaseInterface<T> {
     return this.runQuery(query)
   }
 
+  fetchLatestFiveUserByOrgId(org_id:number): Observable<T[]> {
+    Logger.debug(`fetchLatestFive()`, APP);
+    const query = `SELECT * FROM users WHERE is_deleted = false and org_id = ${org_id} ORDER BY id DESC LIMIT 5 `
+
+    return this.runQuery(query)
+  }
+
   fetchLatestFiveByProductId(product_id:number): Observable<T[]> {
     Logger.debug(`fetchLatestFiveByProductId()`, APP);
-    const query = `SELECT * FROM organization WHERE is_deleted = false and product_id = ${product_id} ORDER BY id DESC LIMIT 5 `
+    const query = `SELECT * FROM organization_product_junction WHERE  product_id = ${product_id} ORDER BY id DESC LIMIT 5 `
 
     return this.runQuery(query)
   }
@@ -366,7 +402,7 @@ export class DatabaseService<T> implements DatabaseInterface<T> {
   updateColumnByCondition(): Observable<T[]>{
     Logger.debug(`updateColumnByCondition()`, APP);
 
-    const query = `UPDATE organization SET status = CASE WHEN CURRENT_DATE< end_date  THEN 'Active' ELSE 'Expired' END `
+    const query = `UPDATE organization_product_junction SET status = CASE WHEN CURRENT_DATE< end_date  THEN 'Active' ELSE 'Expired' END `
     return this.runQuery(query)
 
   }

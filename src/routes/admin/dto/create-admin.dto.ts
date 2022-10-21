@@ -112,6 +112,7 @@ export class sendEmailOnCreationOfOrgAndUser {
   organisation_admin_name? : string;
   organisation_admin_email? : string;
   organisation_admin_mobile? : string;
+  designation?:string;
   fedo_app?: string;
   pilot_duration? : number;
   name?: string;
@@ -121,8 +122,9 @@ export class sendEmailOnCreationOfOrgAndUser {
   age?: string;
   // @IsNotEmpty()
   application_id?:string;
-  
+  org_junction_id?:string;
   mobile?:string;
+  expired_date?:string;
   
   
 
