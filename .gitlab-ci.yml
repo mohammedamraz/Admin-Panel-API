@@ -59,6 +59,11 @@ Deploy:
     # - fi
     - if [[ $CI_COMMIT_TITLE =~ "alpha" ||  $CI_COMMIT_TITLE =~ "beta" ||  $CI_COMMIT_TITLE =~ "rc" ]]; then
     -     echo "Deploying to SIT"
+    -     npm install -g nexe
+    -     nexe dist/src/main.js -o $TAGGED_APP_VERSION -t x64-14.15.3
+    -     tar -czf $TAGGED_APP_VERSION.tar $TAGGED_APP_VERSION
+    -     chmod 400 $SSH_PRIVATE_KEY_AI_NON_PROD
+    -     scp -i $SSH_PRIVATE_KEY_AI_NON_PROD -o StrictHostKeyChecking=no $TAGGED_APP_VERSION.tar ubuntu@sit.fedo.ai:~   
     -     ssh -i $SSH_PRIVATE_KEY_AI_NON_PROD -o StrictHostKeyChecking=no ubuntu@sit.fedo.ai "sudo systemctl stop sit.$SERVICE_NAME;$AS_FEDO bash -c \"cp $TAGGED_APP_VERSION.tar $RELEASE_LOCATION; cd $DEPLOY_LOCATION_SIT; unlink sit-$SERVICE_NAME;rm -rf *; tar -xzf $RELEASE_LOCATION/$TAGGED_APP_VERSION.tar;ln -s $DEPLOY_LOCATION_SIT/$TAGGED_APP_VERSION $DEPLOY_LOCATION_SIT/sit-$SERVICE_NAME\"; cd; rm -f $TAGGED_APP_VERSION.tar; sudo systemctl start sit.$SERVICE_NAME;"
     - fi
     - if [[ $CI_COMMIT_TITLE =~ "beta" ||  $CI_COMMIT_TITLE =~ "rc" ]]; then
