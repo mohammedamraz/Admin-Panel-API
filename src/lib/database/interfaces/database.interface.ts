@@ -86,6 +86,15 @@ export class findByDateParams {
   is_active: string;
 }
 
+export class findByDateParamsStatistics {
+
+  period?: string;
+  org_id? :string;
+  product_id?:string;
+}
+
+
+
 export interface findByPeriodParams {
   columnName: string;
   columnvalue: string;

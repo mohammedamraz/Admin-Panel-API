@@ -19,6 +19,7 @@ import { ThirdpartyOrganizationModule } from './routes/thirdparty-organization/t
 import { SendEmailModule } from './routes/send-email/send-email.module';
 import { GenericUrlModule } from './routes/generic/generic-url.module';
 import { ScheduleModule } from '@nestjs/schedule';
+import { ProductTestsModule } from './routes/product_tests/product_tests/product_tests.module';
 
 @Module({
   imports: [
@@ -41,6 +42,7 @@ import { ScheduleModule } from '@nestjs/schedule';
     ProfileInfoModule,
     ThirdpartyOrganizationModule,
     GenericUrlModule,
+    ProductTestsModule,
     ScheduleModule.forRoot()
     
   ],

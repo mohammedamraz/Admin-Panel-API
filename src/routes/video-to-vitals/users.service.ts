@@ -34,7 +34,7 @@ export class UsersService {
     private readonly userProductJunctionService: UserProductJunctionService,
     private readonly sendEmailService: SendEmailService,
     // private readonly organizationService: OrganizationService,
-    private http: HttpService,
+    // private http: HttpService,
 
   ) { }
 
@@ -177,6 +177,12 @@ export class UsersService {
         else { return doc }
       })
     )
+  }
+
+  fetchUserById(user_id:any){
+    Logger.debug(`fetchUserById() addUserDTO:${JSON.stringify(user_id)} `, APP);
+
+    return this.userDb.find({id:user_id}).pipe(map(doc=>doc))
   }
 
   fetchAllUsersByMobile(userDTO: UserDTO) {
