@@ -223,7 +223,7 @@ export class OrganizationService {
         }),
         switchMap(res => {
           this.create_organization_response = res
-          return this.usersService.saveUsersToUserDb({ user_name: createOrganizationDto.admin_name+' (OA)', org_id: Number(res[0].id), designation: createOrganizationDto.designation, email: createOrganizationDto.organization_email, application_id: res[0].application_id, organization_name: createOrganizationDto.organization_name, mobile: createOrganizationDto.organization_mobile }, productlist, Number(res[0].id))
+          return this.usersService.saveUsersToUserDb({ user_name: createOrganizationDto.admin_name, org_id: Number(res[0].id), designation: createOrganizationDto.designation, email: createOrganizationDto.organization_email, application_id: res[0].application_id, organization_name: createOrganizationDto.organization_name, mobile: createOrganizationDto.organization_mobile, type : 'OrgAdmin'}, productlist, Number(res[0].id))
         }),
         switchMap(res => {
           this.userProfileDb.save({ application_id: res.application_id, user_id: res.id, org_id: res.org_id });
@@ -288,7 +288,7 @@ export class OrganizationService {
         }),
         switchMap(res => {
           this.create_organization_response = res
-          return this.usersService.saveUsersToUserDb({ user_name: createOrganizationDto.admin_name+' (OA)', org_id: Number(res[0].id), designation: createOrganizationDto.designation, email: createOrganizationDto.organization_email, application_id: res[0].application_id, organization_name: createOrganizationDto.organization_name, mobile: createOrganizationDto.organization_mobile }, productlist, Number(res[0].id))
+          return this.usersService.saveUsersToUserDb({ user_name: createOrganizationDto.admin_name, org_id: Number(res[0].id), designation: createOrganizationDto.designation, email: createOrganizationDto.organization_email, application_id: res[0].application_id, organization_name: createOrganizationDto.organization_name, mobile: createOrganizationDto.organization_mobile , type : 'OrgAdmin'}, productlist, Number(res[0].id))
         }),
         switchMap(res => {
           this.userProfileDb.save({ application_id: res.application_id, user_id: res.id, org_id: res.org_id });
