@@ -180,7 +180,8 @@ export class UserDTO {
     password?:string;
     application_id?:string;
     org_id:number;
-    tests?:any
+    tests?:any;
+    type? :any;
 }
 
 
