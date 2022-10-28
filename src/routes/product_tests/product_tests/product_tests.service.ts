@@ -66,6 +66,12 @@ export class ProductTestsService {
         return mainData
 
 }
+saveTestsToProductTests(data:ProductTestsDto){
+    Logger.debug(`saveTestsToProductTests() addUserDTO:${JSON.stringify(data)} `, APP);
+
+    return this.productTestDB.save(data).pipe(map(doc=>doc))
+  }
+
 
 async fetchTotalTestsOfUsers(params:ProductTestsDto){
     Logger.debug(`fetchTotalTestsOfOrg() params:${params}} `, APP);
@@ -120,9 +126,45 @@ async fetchTotalTestsOfUsers(params:ProductTestsDto){
 
 }
 
+date_array : any
+period : any
+
 async fetchTotalTestsOfOrgByTime(params:ProductTestsDto){
     Logger.debug(`fetchTotalTestsOfOrgByTime() params:${params}} `, APP);
     let mainData= [];
+
+    if(params.period=='daily'){
+      this.period = params.period
+   this.date_array=[(d => new Date(d.setDate(d.getDate())).toISOString().split("T")[0])(new Date()),(d => new Date(d.setDate(d.getDate()-1)).toISOString().split("T")[0])(new Date())]
+  }
+  else if(params.period=='weekly'){
+    // params.period= 'daily'
+    this.period = params.period
+    this.date_array=[(d => new Date(d.setDate(d.getDate()-6)).toISOString().split("T")[0])(new Date()),(d => new Date(d.setDate(d.getDate()-13)).toISOString().split("T")[0])(new Date())]
+   }
+
+  else if(params.period=='monthly'){
+    this.period = params.period
+    this.date_array=[(d => new Date(d.setMonth(d.getMonth())).toISOString().split("T")[0])(new Date()),(d => new Date(d.setMonth(d.getMonth()-1)).toISOString().split("T")[0])(new Date())]
+   }
+   else if(params.period=='quarterly'){
+    // params.period= 'monthly'
+    this.period = params.period
+    this.date_array=[(d => new Date(d.setMonth(d.getMonth()-3)).toISOString().split("T")[0])(new Date()),(d => new Date(d.setMonth(d.getMonth()-6)).toISOString().split("T")[0])(new Date())]
+   }
+   else if(params.period=='yearly'){
+    this.period = params.period
+    this.date_array=[(d => new Date(d.setFullYear(d.getFullYear())).toISOString().split("T")[0])(new Date()),(d => new Date(d.setMonth(d.getMonth()-1)).toISOString().split("T")[0])(new Date())]
+   }
+  // const quarterDate= (d => new Date(d.setMonth(d.getMonth()-3)).toISOString().split("T")[0])(new Date());
+
+  console.log("length",this.date_array.length);
+  console.log("length",this.date_array);
+  
+  for( let i = 0 ; i<= this.date_array.length-1 ; i++){
+    params.test_date= this.date_array[i];
+    console.log("period",params.period)
+    params.period = this.period;
 
     const doc = await lastValueFrom(this.productTestDB.findTotalTestsByOrganizationStatistics(params));
         console.log("doc",doc)
@@ -172,7 +214,13 @@ async fetchTotalTestsOfOrgByTime(params:ProductTestsDto){
           }
         
         }
-        return mainData
+        // return mainData
+        console.log("maindata",mainData);
+        
+
+}
+let variance = mainData
+return mainData
 
 }
 

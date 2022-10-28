@@ -91,6 +91,7 @@ export class findByDateParamsStatistics {
   period?: string;
   org_id? :string;
   product_id?:string;
+  test_date? : string;
 }
 
 

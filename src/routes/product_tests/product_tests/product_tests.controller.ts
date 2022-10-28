@@ -29,4 +29,11 @@ export class ProductTestsController {
     return this.ProductTestsService.fetchTotalTestsOfOrgByTime(params)
   }
 
+  @Get('tests/users')
+  fetchTotalTestsOfUsersByTime(@Query() params :ProductTestsDto) {
+    Logger.debug(`fetchTotalTestsOfUsersByTime()`, APP);
+
+    return this.ProductTestsService.fetchTotalTestsOfOrgByTime(params)
+  }
+
 }
