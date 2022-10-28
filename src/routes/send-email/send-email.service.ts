@@ -27,38 +27,73 @@ export class SendEmailService {
     return this.templateService.sendEmailOnCreateOrgUser(body)
   }
 
-  sendEmailOnPilotExpire(body: sendEmailOnCreationOfDirectSalesPartner) {
+  sendEmailOnPilotExpire(body: sendEmailOnCreationOfOrgAndUser) {
     Logger.debug(`sendEmailOnPilotExpire() body: [${JSON.stringify(body)}]`, APP);
 
     return this.templateService.sendEmailOnPilotExpire(body)
   }
 
-  sendEmailOnNotAbleToIdentifyOrganisation(body: sendEmailOnCreationOfDirectSalesPartner) {
+  sendEmailOnNotAbleToIdentifyOrganisation(body: sendEmailOnCreationOfOrgAndUser) {
     Logger.debug(`sendEmailOnNotAbleToIdentifyOrganisation() body: [${JSON.stringify(body)}]`, APP);
 
     return this.templateService.sendEmailOnNotAbleToIdentifyOrganisation(body)
   }
 
 
-  sendEmailOnOrgAdminExpiredAndLoggedOut(body: sendEmailOnCreationOfDirectSalesPartner) {
+  sendEmailOnOrgAdminExpiredAndLoggedOut(body: sendEmailOnCreationOfOrgAndUser) {
     Logger.debug(`sendEmailOnOrgAdminExpiredAndLoggedOut() body: [${JSON.stringify(body)}]`, APP);
 
     return this.templateService.sendEmailOnOrgAdminExpiredAndLoggedOut(body)
   }
 
-  sendEmailOnceOrgIsCreated(body: sendEmailOnCreationOfDirectSalesPartner) {
+  sendEmailOnceOrgIsCreated(body: sendEmailOnCreationOfOrgAndUser) {
     Logger.debug(`sendEmailOnceOrgIsCreated() body: [${JSON.stringify(body)}]`, APP);
 
     return this.templateService.sendEmailOnceOrgIsCreated(body)
   }
 
-  sendEmailOnceUserIsCreated(body: sendEmailOnCreationOfDirectSalesPartner) {
+  sendEmailOnceUserIsCreated(body: sendEmailOnCreationOfOrgAndUser) {
     Logger.debug(`sendEmailOnceUserIsCreated() body: [${JSON.stringify(body)}]`, APP);
 
     return this.templateService.sendEmailOnceUserIsCreated(body)
   }
 
-  sendEmailToIncreaseTestsForIndividuals(body: sendEmailOnCreationOfDirectSalesPartner) {
+  SendEmailOnceUserIsBackActive(body: sendEmailOnCreationOfOrgAndUser) {
+    Logger.debug(`SendEmailOnceUserIsBackActive() body: [${JSON.stringify(body)}]`, APP);
+
+    body.name = body.name.split(' ')[0]
+    return this.templateService.SendEmailOnceUserIsBackActive(body)
+  }
+
+  SendEmailOnceOrgIsBackActive(body: sendEmailOnCreationOfOrgAndUser) {
+    Logger.debug(`SendEmailOnceOrgIsBackActive() body: [${JSON.stringify(body)}]`, APP);
+
+    body.organisation_admin_name = body.organisation_admin_name.split(' ')[0]
+    return this.templateService.SendEmailOnceOrgIsBackActive(body)
+  }
+
+  ResendInvitationEmailForOrg(body: sendEmailOnCreationOfOrgAndUser) {
+    Logger.debug(`ResendInvitationEmailForOrg() body: [${JSON.stringify(body)}]`, APP);
+
+    var encryption = { org_id: body.org_id }
+    body.organisation_admin_name = body.organisation_admin_name.split(' ')[0]
+    body.url = "https://www.fedo.ai/admin/vital/" + body.url + "?" + encodeURIComponent(encryptPassword(encryption))
+    body.fedo_app = "Fedo Vitals"
+    return this.templateService.sendEmailOnOrgCreation(body)
+  }
+
+  ResendInvitationEmailForUser(body: sendEmailOnCreationOfOrgAndUser) {
+    Logger.debug(`ResendInvitationEmailForUser() body: [${JSON.stringify(body)}]`, APP);
+
+    var encryption = { user_id: body.user_id }
+    body.name = body.name.split(' ')[0]
+    body.url = "https://www.fedo.ai/admin/vital/" + body.url + "?" + encodeURIComponent(encryptPassword(encryption))
+    body.fedo_app = "Fedo Vitals"
+    // body.organisation_name = "Fedo"
+    return this.templateService.sendEmailOnCreateOrgUser(body)
+  }
+
+  sendEmailToIncreaseTestsForIndividuals(body: sendEmailOnCreationOfOrgAndUser) {
     Logger.debug(`sendEmailToIncreaseTestsForIndividuals() body: [${JSON.stringify(body)}]`, APP);
 
     return this.templateService.sendEmailToIncreaseTestsForIndividuals(body)

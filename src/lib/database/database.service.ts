@@ -422,14 +422,14 @@ export class DatabaseService<T> implements DatabaseInterface<T> {
 
   fetchLatestFive(): Observable<T[]> {
     Logger.debug(`fetchLatestFive()`, APP);
-    const query = `SELECT * FROM organization WHERE is_deleted = false ORDER BY id DESC LIMIT 5 `
+    const query = `SELECT * FROM organization ORDER BY id DESC LIMIT 5 `
 
     return this.runQuery(query)
   }
 
   fetchLatestFiveUserByOrgId(org_id:number): Observable<T[]> {
     Logger.debug(`fetchLatestFive()`, APP);
-    const query = `SELECT * FROM users WHERE is_deleted = false and org_id = ${org_id} ORDER BY id DESC LIMIT 5 `
+    const query = `SELECT * FROM users WHERE org_id = ${org_id} ORDER BY id DESC LIMIT 5 `
 
     return this.runQuery(query)
   }
