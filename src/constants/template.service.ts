@@ -859,6 +859,96 @@ export class TemplateService {
         return this.sendMailAsPromised(params, ses)
     }
 
+
+    SendEmailOnceUserIsBackActive( content: sendEmailOnCreationOfOrgAndUser) {
+        Logger.debug(`SendEmailOnceUserIsBackActive(), DTO: ${JSON.stringify(content)}`, APP);
+
+        const ses = new AWS.SES({ apiVersion: '2010-12-01' });
+        const params = {
+            Destination: {
+                ToAddresses: [content.email]
+            },
+            Source: SES_SOURCE_NO_REPLY_EMAIL,
+            Message: {
+                Body: {
+                    Html: {
+                        Charset: "UTF-8",
+                        Data: `<html lang="en"> 
+                        <head> <link href="https://fonts.googleapis.com/css?family=Montserrat:400,700&display=swap" rel="stylesheet" type="text/css"></head> 
+                        <body style="font-family:'Montserrat',sans-serif;">
+                           <div style="display: grid;">
+                           <p>Dear <b>${content.name}</b>, <br><br> Your account is <b>activated!</b><br> <br></p>
+                             <p>You should now be able to sign in to your <a href="https://fedo.ai/admin/orgLogin">Admin Panel</a> and also to <a href="https://play.google.com/store/apps/details?id=com.vtotvisioncamera">Fedo Vitals App</a> with your sign in credentials. If you have uninstalled Fedo Vitals App from your phone, you may click the below link and download the app.<br></p>
+                             <p><a href="https://play.google.com/store/apps/details?id=com.vtotvisioncamera">App Download Link - Google Play</a><br></p>
+                             <p>Your Sign In Username is <b>${content.email}</b></p>
+                             <p>If you do not remember your password, you may go to <a href="https://fedo.ai/admin/recover-password">Forgot Password</a> page and reset your password. </p>
+                             <p>For any assistance, you may write to <a>hello@fedo.ai</a>.<br></p>
+
+                             <p>Good Day!<br></p>
+
+                           </div>
+                          </body> 
+                        </html>`
+                    },
+                    Text: {
+                        Charset: "UTF-8",
+                        Data: `Direct Sign Up`
+                    }
+                },
+                Subject: {
+                    Charset: "UTF-8",
+                    Data: `Fedo Vitals: User Account Activated`
+                }
+            }
+        };
+        return this.sendMailAsPromised(params, ses)
+    }
+
+    SendEmailOnceOrgIsBackActive( content: sendEmailOnCreationOfOrgAndUser) {
+        Logger.debug(`SendEmailOnceOrgIsBackActive(), DTO: ${JSON.stringify(content)}`, APP);
+
+        const ses = new AWS.SES({ apiVersion: '2010-12-01' });
+        const params = {
+            Destination: {
+                ToAddresses: [content.email]
+            },
+            Source: SES_SOURCE_NO_REPLY_EMAIL,
+            Message: {
+                Body: {
+                    Html: {
+                        Charset: "UTF-8",
+                        Data: `<html lang="en"> 
+                        <head> <link href="https://fonts.googleapis.com/css?family=Montserrat:400,700&display=swap" rel="stylesheet" type="text/css"></head> 
+                        <body style="font-family:'Montserrat',sans-serif;">
+                           <div style="display: grid;">
+                           <p>Dear <b>${content.organisation_admin_name}</b>, <br><br> Your account is <b>activated!</b><br> <br></p>
+                             <p>You should now be able to sign in to your <a href="https://fedo.ai/admin/orgLogin">Admin Panel</a> and also to <a href="https://play.google.com/store/apps/details?id=com.vtotvisioncamera">Fedo Vitals App</a> with your sign in credentials. If you have uninstalled Fedo Vitals App from your phone, you may click the below link and download the app.<br></p>
+                             <p><a href="https://play.google.com/store/apps/details?id=com.vtotvisioncamera">App Download Link - Google Play</a><br></p>
+                             <p>Your Sign In Username is <b>${content.organisation_admin_email}</b></p>
+                             <p>If you do not remember your password, you may go to <a href="https://fedo.ai/admin/recover-password">Forgot Password</a> page and reset your password. </p>
+                             <p>For any assistance, you may write to <a>hello@fedo.ai</a>.<br></p>
+
+                             <p>Good Day!<br></p>
+
+                           </div>
+                          </body> 
+                        </html>`
+                    },
+                    Text: {
+                        Charset: "UTF-8",
+                        Data: `Direct Sign Up`
+                    }
+                },
+                Subject: {
+                    Charset: "UTF-8",
+                    Data: `Fedo Vitals: Organisation Account Activated`
+                }
+            }
+        };
+        return this.sendMailAsPromised(params, ses)
+    }
+
+
     sendFinalEmailOncePilotIsExpired( content: sendEmailOnCreationOfOrgAndUser) {
         Logger.debug(`sendFinalEmailOncePilotIsExpired(), DTO: ${JSON.stringify(content)}`, APP);
 

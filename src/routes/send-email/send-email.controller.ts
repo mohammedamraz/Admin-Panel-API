@@ -45,11 +45,39 @@ export class SendEmailController {
       return this.sendEmailService.sendEmailOnceOrgIsCreated(body)
     }
 
+    @Post('resend/email/user')
+    ResendInvitationEmailForUser(@Body() body:sendEmailOnCreationOfDirectSalesPartner) {
+      Logger.debug(`ResendInvitationEmailForUser() body: [${JSON.stringify(body)}]`, APP);
+  
+      return this.sendEmailService.ResendInvitationEmailForUser(body)
+    }
+
+    @Post('resend/email/org')
+    ResendInvitationEmailForOrg(@Body() body:sendEmailOnCreationOfDirectSalesPartner) {
+      Logger.debug(`ResendInvitationEmailForOrg() body: [${JSON.stringify(body)}]`, APP);
+  
+      return this.sendEmailService.ResendInvitationEmailForOrg(body)
+    }
+
     @Post('signup/user/email')
     sendEmailOnceUserIsCreated(@Body() body:sendEmailOnCreationOfDirectSalesPartner) {
       Logger.debug(`sendEmailOnceUserIsCreated() body: [${JSON.stringify(body)}]`, APP);
   
       return this.sendEmailService.sendEmailOnceUserIsCreated(body)
+    }
+
+    @Post('email/user/active')
+    SendEmailOnceUserIsBackActive(@Body() body:sendEmailOnCreationOfDirectSalesPartner) {
+      Logger.debug(`SendEmailOnceUserIsBackActive() body: [${JSON.stringify(body)}]`, APP);
+  
+      return this.sendEmailService.SendEmailOnceUserIsBackActive(body)
+    }
+
+    @Post('email/org/active')
+    SendEmailOnceOrgIsBackActive(@Body() body:sendEmailOnCreationOfDirectSalesPartner) {
+      Logger.debug(`SendEmailOnceOrgIsBackActive() body: [${JSON.stringify(body)}]`, APP);
+  
+      return this.sendEmailService.SendEmailOnceOrgIsBackActive(body)
     }
 
 }

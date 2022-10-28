@@ -125,6 +125,8 @@ export class sendEmailOnCreationOfOrgAndUser {
   org_junction_id?:string;
   mobile?:string;
   expired_date?:string;
+  org_id? : string;
+  user_id? :string;
   
   
 
