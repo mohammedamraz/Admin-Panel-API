@@ -20,6 +20,7 @@ export class CreateProfileInfoDTO {
     // password:string;
     org_id:number;
     product_id?:number;
+    event_mode?:boolean
 }
 
 
