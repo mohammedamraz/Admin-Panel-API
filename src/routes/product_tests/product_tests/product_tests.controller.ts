@@ -33,7 +33,7 @@ export class ProductTestsController {
   fetchTotalTestsOfUsersByTime(@Query() params :ProductTestsDto) {
     Logger.debug(`fetchTotalTestsOfUsersByTime()`, APP);
 
-    return this.ProductTestsService.fetchTotalTestsOfOrgByTime(params)
+    return this.ProductTestsService.fetchTotalTestsOfUsersByTime(params)
   }
 
 }
