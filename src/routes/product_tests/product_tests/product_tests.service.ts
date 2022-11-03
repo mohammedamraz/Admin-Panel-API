@@ -20,17 +20,19 @@ export class ProductTestsService {
     let mainData= [];
 
     const date = new Date(params.test_date);
-    const date_onedaybefore= (d => new Date(d.setDate(date.getDate()-1)).toISOString().split("T")[0])(new Date());
-    const date_twodaybefore= (d => new Date(d.setDate(date.getDate()-2)).toISOString().split("T")[0])(new Date());
+    const date_onedaybefore= new Date(date.setDate(date.getDate()-1)).toISOString().split("T")[0];
+    const date_twodaybefore= new Date(date.setDate(date.getDate()-1)).toISOString().split("T")[0];
     const doc = await lastValueFrom(this.productTestDB.find({org_id:params.org_id,product_id:params.product_id,test_date:params.test_date}));
     const doc_onedaybefore = await lastValueFrom(this.productTestDB.find({org_id:params.org_id,product_id:params.product_id,test_date:date_onedaybefore}));
     const doc_twodaybefore = await lastValueFrom(this.productTestDB.find({org_id:params.org_id,product_id:params.product_id,test_date:date_twodaybefore}));
     const doc_standard = await lastValueFrom(this.productTestDB.find({org_id:params.org_id,product_id:params.product_id,event_mode:false,test_date:params.test_date}));
     const doc_event = await lastValueFrom(this.productTestDB.find({org_id:params.org_id,product_id:params.product_id,event_mode:true,test_date:params.test_date}));
         if (doc.length==0) {
-          const org_id = Number(params.org_id)
+          const org_id = Number(params.org_id);
           const total_org_tests = doc.reduce((pre, acc) => pre + acc['tests'], 0); 
-          mainData.push({org_id, total_org_tests})
+          const total_org_tests_onedaybefore = doc_onedaybefore.reduce((pre, acc) => pre + acc['tests'], 0); 
+          const total_org_tests_twodaybefore = doc_twodaybefore.reduce((pre, acc) => pre + acc['tests'], 0); 
+          mainData.push({org_id, total_org_tests,total_org_tests_onedaybefore,total_org_tests_twodaybefore})
         }
         else{
           var holder = []
@@ -78,8 +80,8 @@ async fetchTotalTestsOfUsers(params:ProductTestsDto){
     let mainData= [];
 
     const date = new Date(params.test_date);
-    const date_onedaybefore= (d => new Date(d.setDate(date.getDate()-1)).toISOString().split("T")[0])(new Date());
-    const date_twodaybefore= (d => new Date(d.setDate(date.getDate()-2)).toISOString().split("T")[0])(new Date());
+    const date_onedaybefore= new Date(date.setDate(date.getDate()-1)).toISOString().split("T")[0];
+    const date_twodaybefore= new Date(date.setDate(date.getDate()-1)).toISOString().split("T")[0];
     const doc = await lastValueFrom(this.productTestDB.find({user_id:params.user_id,product_id:params.product_id,test_date:params.test_date}));
     const doc_onedaybefore = await lastValueFrom(this.productTestDB.find({user_id:params.user_id,product_id:params.product_id,test_date:date_onedaybefore}));
     const doc_twodaybefore = await lastValueFrom(this.productTestDB.find({user_id:params.user_id,product_id:params.product_id,test_date:date_twodaybefore}));
@@ -88,7 +90,9 @@ async fetchTotalTestsOfUsers(params:ProductTestsDto){
         if (doc.length==0) {
           const user_id = Number(params.user_id)
           const total_user_tests = doc.reduce((pre, acc) => pre + acc['tests'], 0); 
-          mainData.push({user_id, total_user_tests})
+          const total_user_tests_onedaybefore = doc_onedaybefore.reduce((pre, acc) => pre + acc['tests'], 0); 
+          const total_user_tests_twodaybefore = doc_twodaybefore.reduce((pre, acc) => pre + acc['tests'], 0); 
+          mainData.push({user_id, total_user_tests,total_user_tests_onedaybefore,total_user_tests_twodaybefore})
         }
         else{
           var holder = []

@@ -330,8 +330,8 @@ export class DatabaseService<T> implements DatabaseInterface<T> {
   else if(findbyConditionParams.period=='weekly'){
     delete params.period;
     Object.values(params).map((params, index) => { variables.push(params), values.push((`$${index + 1}`)) })
-    const date = new Date(params.test_date);  
-    const currentDate = (d => new Date(d.setDate(date.getDate()+6)).toISOString().split("T")[0])(new Date());
+    const date = new Date(params.test_date);    
+    const currentDate = new Date(date.setDate(date.getDate()+6)).toISOString().split("T")[0];
     const queryWeek = `SELECT * FROM ${this.tableName} WHERE org_id = ${values[0]} AND product_id = ${values[1]} AND test_date BETWEEN ${values[2]} and '${currentDate}'` 
     return this.runQuery(queryWeek, variables);
   }
