@@ -482,7 +482,7 @@ export class TemplateService {
                         <head> <link href="https://fonts.googleapis.com/css?family=Montserrat:400,700&display=swap" rel="stylesheet" type="text/css"></head> 
                         <body style="font-family:'Montserrat',sans-serif;">
                            <div style="display: grid;">
-                           <p>Dear Fedo Team, <br><br>Someone tried to sign in to the Corporate flow and app couldn’t identify the organisation. <br> <br></p>
+                           <p>Dear Fedo Team, <br><br>Someone used this email ${content.email} to sign in to the Corporate flow and app couldn’t identify the organisation. Hence the sign in attempt was unsuccessful. <br> <br></p>
                              <p>You may take necessary steps to check the attempt.</p>
                              
                              <p>Good Day!<br></p>
