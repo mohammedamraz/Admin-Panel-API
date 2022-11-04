@@ -2,7 +2,7 @@
 import { Injectable, Logger, ParseArrayPipe, Type } from '@nestjs/common';
 import { Pool } from 'pg';
 import { from, Observable, of } from 'rxjs';
-import { DatabaseFeatureOptions, DatabaseInterface, findAllParamsandUpdate, findAndUpdateParams, findByConditionParams, findByConditionParamsAlign, findByDateParams, findByIDAndUpdateParams, findParams, InsertParams, QueryParams, findByPeriodParams, DateRangeParams, fetchByYearAndMonthParams, findByDateParamsStatistics } from './interfaces/database.interface';
+import { DatabaseFeatureOptions, DatabaseInterface, findAllParamsandUpdate, findAndUpdateParams, findByConditionParams, findByConditionParamsAlign, findByDateParams, findByIDAndUpdateParams, findParams, InsertParams, QueryParams, findByPeriodParams, DateRangeParams, fetchByYearAndMonthParams, findByDateParamsStatistics, findByDateParamsStatisticsPerformanceChart } from './interfaces/database.interface';
 
 const APP = "DatabaseService"
 @Injectable()
@@ -313,6 +313,33 @@ export class DatabaseService<T> implements DatabaseInterface<T> {
 
   }
 
+  findOrgDataForThePerformanceChart(findbyConditionParams: findByDateParamsStatisticsPerformanceChart): Observable<T[]> {
+    Logger.debug(`find_by_date(): params ${[JSON.stringify(findbyConditionParams)]}`, APP);
+
+    let variables = [];
+    let values = []
+    let params = findbyConditionParams
+    delete params.period;
+    Object.values(params).map((params, index) => { variables.push(params), values.push((`$${index + 1}`)) })        
+    const query = `SELECT * FROM ${this.tableName} WHERE org_id = ${values[0]} AND product_id = ${values[1]} AND test_date BETWEEN ${values[2]} and ${values[3]}`
+    return this.runQuery(query, variables);
+
+  }
+
+
+  findUserDataForThePerformanceChart(findbyConditionParams: findByDateParamsStatisticsPerformanceChart): Observable<T[]> {
+    Logger.debug(`find_by_date(): params ${[JSON.stringify(findbyConditionParams)]}`, APP);
+
+    let variables = [];
+    let values = []
+    let params = findbyConditionParams
+    delete params.period;
+    Object.values(params).map((params, index) => { variables.push(params), values.push((`$${index + 1}`)) })        
+    const query = `SELECT * FROM ${this.tableName} WHERE user_id = ${values[0]} AND product_id = ${values[1]} AND test_date BETWEEN ${values[2]} and ${values[3]}`
+    return this.runQuery(query, variables);
+
+  }
+
   findTotalTestsByOrganizationStatistics(findbyConditionParams: findByDateParamsStatistics): Observable<T[]> {
     Logger.debug(`findTotalTestsByOrganizationStatistics(): params ${[JSON.stringify(findbyConditionParams)]}`, APP);
 
@@ -389,7 +416,7 @@ export class DatabaseService<T> implements DatabaseInterface<T> {
     delete params.period;
     Object.values(params).map((params, index) => { variables.push(params), values.push((`$${index + 1}`)) })
     const date = new Date(params.test_date);  
-    const currentDate = (d => new Date(d.setDate(date.getDate()+6)).toISOString().split("T")[0])(new Date());
+    const currentDate = new Date(date.setDate(date.getDate()+6)).toISOString().split("T")[0];
     const queryWeek = `SELECT * FROM ${this.tableName} WHERE user_id = ${values[0]} AND product_id = ${values[1]} AND test_date BETWEEN ${values[2]} and '${currentDate}'` 
     return this.runQuery(queryWeek, variables);
   }

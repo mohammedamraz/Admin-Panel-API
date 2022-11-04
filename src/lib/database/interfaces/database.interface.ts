@@ -94,6 +94,16 @@ export class findByDateParamsStatistics {
   test_date? : string;
 }
 
+export class findByDateParamsStatisticsPerformanceChart {
+
+  period?: string;
+  org_id? :string;
+  product_id?:string;
+  test_date? : string;
+  test_end_date? : string;
+
+}
+
 
 
 export interface findByPeriodParams {

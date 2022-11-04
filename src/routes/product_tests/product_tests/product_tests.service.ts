@@ -132,6 +132,15 @@ async fetchTotalTestsOfUsers(params:ProductTestsDto){
 
 date_array : any
 period : any
+quarter_one : any
+quarter_one_next : any
+quarter_two : any
+quarter_two_next : any
+quarter_three : any
+quarter_three_next : any
+quarter_four : any
+quarter_four_next : any
+start_date : any
 
 async fetchTotalTestsOfOrgByTime(params:ProductTestsDto){
     Logger.debug(`fetchTotalTestsOfOrgByTime() params:${params}} `, APP);
@@ -162,8 +171,61 @@ async fetchTotalTestsOfOrgByTime(params:ProductTestsDto){
   for( let i = 0 ; i<= this.date_array.length-1 ; i++){
     params.test_date= this.date_array[i];
     params.period = this.period;
+    if(params.period=='weekly'){
+      const date = new Date(params.test_date);  
+      this.start_date =  new Date(date.setDate(date.getDate())).toISOString().split("T")[0];
+      this.quarter_one = new Date(date.setDate(date.getDate()+1)).toISOString().split("T")[0];
+      this.quarter_one_next = new Date(date.setDate(date.getDate()+1)).toISOString().split("T")[0];
+      this.quarter_two = new Date(date.setDate(date.getDate()+1)).toISOString().split("T")[0];
+      this.quarter_two_next = new Date(date.setDate(date.getDate()+1)).toISOString().split("T")[0];
+      this.quarter_three = new Date(date.setDate(date.getDate()+1)).toISOString().split("T")[0];
+      this.quarter_three_next = new Date(date.setDate(date.getDate()+1)).toISOString().split("T")[0];
+      this.quarter_four = new Date(date.setDate(date.getDate())).toISOString().split("T")[0];
+    }
+    if(params.period=='monthly'){
+      const date = new Date(params.test_date);  
+      date.setDate(1)  
+      this.start_date = date.toISOString().split("T")[0];
+      this.quarter_one = new Date(date.setDate(date.getDate()+7)).toISOString().split("T")[0];
+      this.quarter_one_next = new Date(date.setDate(date.getDate()+1)).toISOString().split("T")[0];
+      this.quarter_two = new Date(date.setDate(date.getDate()+6)).toISOString().split("T")[0];
+      this.quarter_two_next = new Date(date.setDate(date.getDate()+1)).toISOString().split("T")[0];
+      this.quarter_three = new Date(date.setDate(date.getDate()+6)).toISOString().split("T")[0];
+      this.quarter_three_next = new Date(date.setDate(date.getDate()+1)).toISOString().split("T")[0];
+      this.quarter_four = new Date(date.setDate(31)).toISOString().split("T")[0];
+    }
+    if(params.period=='quarterly'){      
+      const date = new Date(params.test_date);
+      date.setMonth(date.getMonth()+2)
+      date.setDate(1)
+      this.start_date = date.toISOString().split("T")[0];
+      this.quarter_one = new Date(date.setDate(date.getDate()+21)).toISOString().split("T")[0];
+      this.quarter_one_next = new Date(date.setDate(date.getDate()+1)).toISOString().split("T")[0];
+      this.quarter_two = new Date(date.setDate(date.getDate()+22)).toISOString().split("T")[0];
+      this.quarter_two_next = new Date(date.setDate(date.getDate()+1)).toISOString().split("T")[0];
+      this.quarter_three = new Date(date.setDate(date.getDate()+22)).toISOString().split("T")[0];
+      this.quarter_three_next = new Date(date.setDate(date.getDate()+1)).toISOString().split("T")[0];
+      this.quarter_four = new Date(date.setDate(31)).toISOString().split("T")[0];
+    }
+    if(params.period=='yearly'){
+      const date = new Date(params.test_date);
+      date.setMonth(0)
+      date.setDate(1)
+      this.start_date = date.toISOString().split("T")[0];
+      this.quarter_one = new Date(date.setDate(date.getDate()+90)).toISOString().split("T")[0];
+      this.quarter_one_next = new Date(date.setDate(date.getDate()+1)).toISOString().split("T")[0];
+      this.quarter_two = new Date(date.setDate(date.getDate()+91)).toISOString().split("T")[0];
+      this.quarter_two_next = new Date(date.setDate(date.getDate()+1)).toISOString().split("T")[0];
+      this.quarter_three = new Date(date.setDate(date.getDate()+91)).toISOString().split("T")[0];
+      this.quarter_three_next = new Date(date.setDate(date.getDate()+1)).toISOString().split("T")[0];
+      this.quarter_four = new Date(date.setDate(date.getDate()+89)).toISOString().split("T")[0];
+    }    
 
     const doc = await lastValueFrom(this.productTestDB.findTotalTestsByOrganizationStatistics(params));
+    const doc_quarter_one = await lastValueFrom(this.productTestDB.findOrgDataForThePerformanceChart({org_id:params.org_id,product_id:params.product_id,test_date:this.start_date,test_end_date:this.quarter_one}));
+    const doc_quarter_two = await lastValueFrom(this.productTestDB.findOrgDataForThePerformanceChart({org_id:params.org_id,product_id:params.product_id,test_date:this.quarter_one_next,test_end_date:this.quarter_two}));
+    const doc_quarter_three = await lastValueFrom(this.productTestDB.findOrgDataForThePerformanceChart({org_id:params.org_id,product_id:params.product_id,test_date:this.quarter_two_next,test_end_date:this.quarter_three}));
+    const doc_quarter_four = await lastValueFrom(this.productTestDB.findOrgDataForThePerformanceChart({org_id:params.org_id,product_id:params.product_id,test_date:this.quarter_three_next,test_end_date:this.quarter_four}));
         if (doc.length==0) {
           const org_id = params.org_id
           const total_org_tests = doc.reduce((pre, acc) => pre + acc['tests'], 0); 
@@ -192,9 +254,13 @@ async fetchTotalTestsOfOrgByTime(params:ProductTestsDto){
            const userDoc = await lastValueFrom(this.UsersService.fetchUserById(userData.user_id));
            const org_id = params.org_id
            const total_org_tests = doc.reduce((pre, acc) => pre + acc['tests'], 0);
+           const quarter_one_tests = doc_quarter_one.reduce((pre, acc) => pre + acc['tests'], 0);
+           const quarter_two_tests = doc_quarter_two.reduce((pre, acc) => pre + acc['tests'], 0);
+           const quarter_three_tests = doc_quarter_three.reduce((pre, acc) => pre + acc['tests'], 0);
+           const quarter_four_tests = doc_quarter_four.reduce((pre, acc) => pre + acc['tests'], 0);
            const user_email = userDoc[0]?.email
            const user_name = userDoc[0]?.user_name
-           mainData.push({org_id, total_org_tests, max_test_by_user, user_email, user_name})
+           mainData.push({org_id, total_org_tests,quarter_one_tests,quarter_two_tests,quarter_three_tests,quarter_four_tests, max_test_by_user, user_email, user_name})
           }
         
         }
@@ -242,8 +308,61 @@ else if(params.period=='monthly'){
 for( let i = 0 ; i<= this.date_array_users.length-1 ; i++){
   params.test_date= this.date_array_users[i];
   params.period = this.period_users;
+  if(params.period=='weekly'){
+    const date = new Date(params.test_date);  
+    this.start_date =  new Date(date.setDate(date.getDate())).toISOString().split("T")[0];
+    this.quarter_one = new Date(date.setDate(date.getDate()+1)).toISOString().split("T")[0];
+    this.quarter_one_next = new Date(date.setDate(date.getDate()+1)).toISOString().split("T")[0];
+    this.quarter_two = new Date(date.setDate(date.getDate()+1)).toISOString().split("T")[0];
+    this.quarter_two_next = new Date(date.setDate(date.getDate()+1)).toISOString().split("T")[0];
+    this.quarter_three = new Date(date.setDate(date.getDate()+1)).toISOString().split("T")[0];
+    this.quarter_three_next = new Date(date.setDate(date.getDate()+1)).toISOString().split("T")[0];
+    this.quarter_four = new Date(date.setDate(date.getDate())).toISOString().split("T")[0];
+  }
+  if(params.period=='monthly'){
+    const date = new Date(params.test_date);  
+    date.setDate(1)  
+    this.start_date = date.toISOString().split("T")[0];
+    this.quarter_one = new Date(date.setDate(date.getDate()+7)).toISOString().split("T")[0];
+    this.quarter_one_next = new Date(date.setDate(date.getDate()+1)).toISOString().split("T")[0];
+    this.quarter_two = new Date(date.setDate(date.getDate()+6)).toISOString().split("T")[0];
+    this.quarter_two_next = new Date(date.setDate(date.getDate()+1)).toISOString().split("T")[0];
+    this.quarter_three = new Date(date.setDate(date.getDate()+6)).toISOString().split("T")[0];
+    this.quarter_three_next = new Date(date.setDate(date.getDate()+1)).toISOString().split("T")[0];
+    this.quarter_four = new Date(date.setDate(31)).toISOString().split("T")[0];
+  }
+  if(params.period=='quarterly'){      
+    const date = new Date(params.test_date);
+    date.setMonth(date.getMonth()+2)
+    date.setDate(1)
+    this.start_date = date.toISOString().split("T")[0];
+    this.quarter_one = new Date(date.setDate(date.getDate()+21)).toISOString().split("T")[0];
+    this.quarter_one_next = new Date(date.setDate(date.getDate()+1)).toISOString().split("T")[0];
+    this.quarter_two = new Date(date.setDate(date.getDate()+22)).toISOString().split("T")[0];
+    this.quarter_two_next = new Date(date.setDate(date.getDate()+1)).toISOString().split("T")[0];
+    this.quarter_three = new Date(date.setDate(date.getDate()+22)).toISOString().split("T")[0];
+    this.quarter_three_next = new Date(date.setDate(date.getDate()+1)).toISOString().split("T")[0];
+    this.quarter_four = new Date(date.setDate(31)).toISOString().split("T")[0];
+  }
+  if(params.period=='yearly'){
+    const date = new Date(params.test_date);
+    date.setMonth(0)
+    date.setDate(1)
+    this.start_date = date.toISOString().split("T")[0];
+    this.quarter_one = new Date(date.setDate(date.getDate()+90)).toISOString().split("T")[0];
+    this.quarter_one_next = new Date(date.setDate(date.getDate()+1)).toISOString().split("T")[0];
+    this.quarter_two = new Date(date.setDate(date.getDate()+91)).toISOString().split("T")[0];
+    this.quarter_two_next = new Date(date.setDate(date.getDate()+1)).toISOString().split("T")[0];
+    this.quarter_three = new Date(date.setDate(date.getDate()+91)).toISOString().split("T")[0];
+    this.quarter_three_next = new Date(date.setDate(date.getDate()+1)).toISOString().split("T")[0];
+    this.quarter_four = new Date(date.setDate(date.getDate()+89)).toISOString().split("T")[0];
+  }
 
   const doc = await lastValueFrom(this.productTestDB.findTotalTestsByUsersStatistics(params));
+  const doc_quarter_one = await lastValueFrom(this.productTestDB.findUserDataForThePerformanceChart({org_id:params.user_id,product_id:params.product_id,test_date:this.start_date,test_end_date:this.quarter_one}));
+    const doc_quarter_two = await lastValueFrom(this.productTestDB.findUserDataForThePerformanceChart({org_id:params.user_id,product_id:params.product_id,test_date:this.quarter_one_next,test_end_date:this.quarter_two}));
+    const doc_quarter_three = await lastValueFrom(this.productTestDB.findUserDataForThePerformanceChart({org_id:params.user_id,product_id:params.product_id,test_date:this.quarter_two_next,test_end_date:this.quarter_three}));
+    const doc_quarter_four = await lastValueFrom(this.productTestDB.findUserDataForThePerformanceChart({org_id:params.user_id,product_id:params.product_id,test_date:this.quarter_three_next,test_end_date:this.quarter_four}));
       if (doc.length==0) {
         const user_id = params.user_id
         const total_org_tests = doc.reduce((pre, acc) => pre + acc['tests'], 0); 
@@ -272,9 +391,13 @@ for( let i = 0 ; i<= this.date_array_users.length-1 ; i++){
          const userDoc = await lastValueFrom(this.UsersService.fetchUserById(userData.user_id));
          const user_id = params.user_id
          const total_org_tests = doc.reduce((pre, acc) => pre + acc['tests'], 0);
+         const quarter_one_tests = doc_quarter_one.reduce((pre, acc) => pre + acc['tests'], 0);
+           const quarter_two_tests = doc_quarter_two.reduce((pre, acc) => pre + acc['tests'], 0);
+           const quarter_three_tests = doc_quarter_three.reduce((pre, acc) => pre + acc['tests'], 0);
+           const quarter_four_tests = doc_quarter_four.reduce((pre, acc) => pre + acc['tests'], 0);
          const user_email = userDoc[0]?.email
          const user_name = userDoc[0]?.user_name
-         mainData.push({user_id, total_org_tests, max_test_by_user, user_email, user_name})
+         mainData.push({user_id, total_org_tests,quarter_one_tests,quarter_two_tests,quarter_three_tests,quarter_four_tests, max_test_by_user, user_email, user_name})
         }
       
       }
