@@ -1,8 +1,8 @@
 /* eslint-disable max-lines */
-import { Injectable, Logger, Type } from '@nestjs/common';
+import { Injectable, Logger, ParseArrayPipe, Type } from '@nestjs/common';
 import { Pool } from 'pg';
 import { from, Observable, of } from 'rxjs';
-import { DatabaseFeatureOptions, DatabaseInterface, findAllParamsandUpdate, findAndUpdateParams, findByConditionParams, findByConditionParamsAlign, findByDateParams, findByIDAndUpdateParams, findParams, InsertParams, QueryParams, findByPeriodParams, DateRangeParams, fetchByYearAndMonthParams } from './interfaces/database.interface';
+import { DatabaseFeatureOptions, DatabaseInterface, findAllParamsandUpdate, findAndUpdateParams, findByConditionParams, findByConditionParamsAlign, findByDateParams, findByIDAndUpdateParams, findParams, InsertParams, QueryParams, findByPeriodParams, DateRangeParams, fetchByYearAndMonthParams, findByDateParamsStatistics, findByDateParamsStatisticsPerformanceChart } from './interfaces/database.interface';
 
 const APP = "DatabaseService"
 @Injectable()
@@ -313,6 +313,146 @@ export class DatabaseService<T> implements DatabaseInterface<T> {
 
   }
 
+  findOrgDataForThePerformanceChart(findbyConditionParams: findByDateParamsStatisticsPerformanceChart): Observable<T[]> {
+    Logger.debug(`find_by_date(): params ${[JSON.stringify(findbyConditionParams)]}`, APP);
+
+    let variables = [];
+    let values = []
+    let params = findbyConditionParams
+    delete params.period;
+    Object.values(params).map((params, index) => { variables.push(params), values.push((`$${index + 1}`)) })        
+    const query = `SELECT * FROM ${this.tableName} WHERE org_id = ${values[0]} AND product_id = ${values[1]} AND test_date BETWEEN ${values[2]} and ${values[3]}`
+    return this.runQuery(query, variables);
+
+  }
+
+
+  findUserDataForThePerformanceChart(findbyConditionParams: findByDateParamsStatisticsPerformanceChart): Observable<T[]> {
+    Logger.debug(`find_by_date(): params ${[JSON.stringify(findbyConditionParams)]}`, APP);
+
+    let variables = [];
+    let values = []
+    let params = findbyConditionParams
+    delete params.period;
+    Object.values(params).map((params, index) => { variables.push(params), values.push((`$${index + 1}`)) })        
+    const query = `SELECT * FROM ${this.tableName} WHERE user_id = ${values[0]} AND product_id = ${values[1]} AND test_date BETWEEN ${values[2]} and ${values[3]}`
+    return this.runQuery(query, variables);
+
+  }
+
+  findTotalTestsByOrganizationStatistics(findbyConditionParams: findByDateParamsStatistics): Observable<T[]> {
+    Logger.debug(`findTotalTestsByOrganizationStatistics(): params ${[JSON.stringify(findbyConditionParams)]}`, APP);
+
+    let variables = [];
+    let values = []
+    let params = findbyConditionParams
+
+  if(findbyConditionParams.period=='daily'){
+    delete params.period;
+    Object.values(params).map((params, index) => { variables.push(params), values.push((`$${index + 1}`)) }) 
+    console.log("values",variables)
+    const queryDay = `SELECT * FROM ${this.tableName} WHERE org_id = ${values[0]} AND product_id = ${values[1]} AND test_date BETWEEN ${values[2]} and ${values[2]}` 
+    return this.runQuery(queryDay, variables);
+  }  
+  else if(findbyConditionParams.period=='weekly'){
+    delete params.period;
+    Object.values(params).map((params, index) => { variables.push(params), values.push((`$${index + 1}`)) })
+    const date = new Date(params.test_date);    
+    const currentDate = new Date(date.setDate(date.getDate()+6)).toISOString().split("T")[0];
+    const queryWeek = `SELECT * FROM ${this.tableName} WHERE org_id = ${values[0]} AND product_id = ${values[1]} AND test_date BETWEEN ${values[2]} and '${currentDate}'` 
+    return this.runQuery(queryWeek, variables);
+  }
+  else if(findbyConditionParams.period=='monthly'){ 
+     
+    delete params.period
+    const test_date = new Date(params.test_date).toISOString();
+    delete params.test_date;
+    Object.values(params).map((params, index) => { variables.push(params), values.push((`$${index + 1}`)) }) 
+    console.log("values",values,variables)
+    
+    const query = `SELECT * FROM ${this.tableName} where org_id = ${values[0]} AND product_id = ${values[1]} AND extract(YEAR FROM test_date) = extract(YEAR FROM now()) and extract(MONTH FROM test_date) = extract(MONTH FROM Date '${test_date}')`
+    return this.runQuery(query, variables);
+  }
+  else if(findbyConditionParams.period=='quarterly'){
+    const date = new Date(params.test_date);
+    delete params.period
+    const test_date = (d => new Date(d.setMonth(date.getMonth()+1)).toISOString().split("T")[0])(new Date());
+    const currentDate = (d => new Date(d.setMonth(date.getMonth()+5)).toISOString().split("T")[0])(new Date());
+    delete params.test_date
+    Object.values(params).map((params, index) => { variables.push(params), values.push((`$${index + 1}`)) }) 
+    
+
+    console.log("variable",variables,currentDate);
+    
+    const queryQuarter = `SELECT * FROM ${this.tableName} where org_id = ${values[0]} AND product_id = ${values[1]} AND extract(YEAR FROM test_date) = extract(YEAR FROM now()) and extract(MONTH FROM test_date) > extract(MONTH FROM Date '${test_date}') and extract(MONTH FROM test_date) < extract(MONTH FROM Date '${currentDate}')`
+    return this.runQuery(queryQuarter, variables);
+  }
+  else if(findbyConditionParams.period=='yearly'){
+    const test_date = new Date(params.test_date).toISOString();
+    delete params.period
+    delete params.test_date
+
+    Object.values(params).map((params, index) => { variables.push(params), values.push((`$${index + 1}`)) }) 
+    const queryYear = `SELECT * FROM ${this.tableName} where org_id = ${values[0]} AND product_id = ${values[1]} AND extract(YEAR FROM test_date) = extract(YEAR FROM Date '${test_date}')`
+    return this.runQuery(queryYear, variables);
+  }
+
+  }
+
+  findTotalTestsByUsersStatistics(findbyConditionParams: findByDateParamsStatistics): Observable<T[]> {
+    Logger.debug(`findTotalTestsByOrganizationStatistics(): params ${[JSON.stringify(findbyConditionParams)]}`, APP);
+
+    let variables = [];
+    let values = []
+    let params = findbyConditionParams
+
+  if(findbyConditionParams.period=='daily'){
+    delete params.period;
+    Object.values(params).map((params, index) => { variables.push(params), values.push((`$${index + 1}`)) }) 
+    const queryDay = `SELECT * FROM ${this.tableName} WHERE user_id = ${values[0]} AND product_id = ${values[1]} AND test_date BETWEEN ${values[2]} and ${values[2]}` 
+    return this.runQuery(queryDay, variables);
+  }  
+  else if(findbyConditionParams.period=='weekly'){
+    delete params.period;
+    Object.values(params).map((params, index) => { variables.push(params), values.push((`$${index + 1}`)) })
+    const date = new Date(params.test_date);  
+    const currentDate = new Date(date.setDate(date.getDate()+6)).toISOString().split("T")[0];
+    const queryWeek = `SELECT * FROM ${this.tableName} WHERE user_id = ${values[0]} AND product_id = ${values[1]} AND test_date BETWEEN ${values[2]} and '${currentDate}'` 
+    return this.runQuery(queryWeek, variables);
+  }
+  else if(findbyConditionParams.period=='monthly'){ 
+     
+    delete params.period
+    const test_date = new Date(params.test_date).toISOString();
+    delete params.test_date;
+    Object.values(params).map((params, index) => { variables.push(params), values.push((`$${index + 1}`)) }) 
+  
+    const query = `SELECT * FROM ${this.tableName} where user_id = ${values[0]} AND product_id = ${values[1]} AND extract(YEAR FROM test_date) = extract(YEAR FROM now()) and extract(MONTH FROM test_date) = extract(MONTH FROM Date '${test_date}')`
+    return this.runQuery(query, variables);
+  }
+  else if(findbyConditionParams.period=='quarterly'){
+    const date = new Date(params.test_date);
+    delete params.period
+    const test_date = (d => new Date(d.setMonth(date.getMonth()+1)).toISOString().split("T")[0])(new Date());
+    const currentDate = (d => new Date(d.setMonth(date.getMonth()+5)).toISOString().split("T")[0])(new Date());
+    delete params.test_date
+    Object.values(params).map((params, index) => { variables.push(params), values.push((`$${index + 1}`)) }) 
+   
+    const queryQuarter = `SELECT * FROM ${this.tableName} where user_id = ${values[0]} AND product_id = ${values[1]} AND extract(YEAR FROM test_date) = extract(YEAR FROM now()) and extract(MONTH FROM test_date) > extract(MONTH FROM Date '${test_date}') and extract(MONTH FROM test_date) < extract(MONTH FROM Date '${currentDate}')`
+    return this.runQuery(queryQuarter, variables);
+  }
+  else if(findbyConditionParams.period=='yearly'){
+    const test_date = new Date(params.test_date).toISOString();
+    delete params.period
+    delete params.test_date
+
+    Object.values(params).map((params, index) => { variables.push(params), values.push((`$${index + 1}`)) }) 
+    const queryYear = `SELECT * FROM ${this.tableName} where user_id = ${values[0]} AND product_id = ${values[1]} AND extract(YEAR FROM test_date) = extract(YEAR FROM Date '${test_date}')`
+    return this.runQuery(queryYear, variables);
+  }
+
+  }
+
 
   findByPeriod(findByPeriodParams: findByPeriodParams): Observable<T[]> {
     Logger.debug(`findByPeriod(): params ${[JSON.stringify(findByPeriodParams)]}`, APP);
@@ -373,14 +513,14 @@ export class DatabaseService<T> implements DatabaseInterface<T> {
 
   fetchLatestFive(): Observable<T[]> {
     Logger.debug(`fetchLatestFive()`, APP);
-    const query = `SELECT * FROM organization WHERE is_deleted = false ORDER BY id DESC LIMIT 5 `
+    const query = `SELECT * FROM organization ORDER BY id DESC LIMIT 5 `
 
     return this.runQuery(query)
   }
 
   fetchLatestFiveUserByOrgId(org_id:number): Observable<T[]> {
     Logger.debug(`fetchLatestFive()`, APP);
-    const query = `SELECT * FROM users WHERE is_deleted = false and org_id = ${org_id} ORDER BY id DESC LIMIT 5 `
+    const query = `SELECT * FROM users WHERE org_id = ${org_id} ORDER BY id DESC LIMIT 5 `
 
     return this.runQuery(query)
   }

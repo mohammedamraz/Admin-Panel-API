@@ -9,6 +9,7 @@ import { UserProductJunctionModule } from 'src/routes/user-product-junction/user
 import { VideoToVitalsModule } from 'src/routes/video-to-vitals/video-to-vitals.module';
 import { OrgProductJunctionModule } from 'src/routes/org-product-junction/org-product-junction.module';
 import { GenericUrlModule } from 'src/routes/generic/generic-url.module';
+import { ProductTestsModule } from 'src/routes/product_tests/product_tests/product_tests.module';
 /**
  * NOTE: Routes are picked on 'first-match'
  *       So the order is important
@@ -57,5 +58,9 @@ export const APP_ROUTES = [
   {
     path: 'generic',
     module: GenericUrlModule,
+  },
+  {
+    path: 'product_tests',
+    module: ProductTestsModule,
   },
 ];

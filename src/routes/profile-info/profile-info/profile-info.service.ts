@@ -4,6 +4,7 @@ import { catchError, map, switchMap } from 'rxjs';
 // import { GOOGLE_APPLICATION_CREDENTIALS } from 'src/constants';
 import { DatabaseTable } from 'src/lib/database/database.decorator';
 import { DatabaseService } from 'src/lib/database/database.service';
+import { ProductTestsService } from 'src/routes/product_tests/product_tests/product_tests.service';
 import { CreateOrganizationDto, UserDTO } from 'src/routes/video-to-vitals/dto/create-video-to-vital.dto';
 import { OrganizationService } from 'src/routes/video-to-vitals/organization.service';
 import { VideoToVitalsService } from 'src/routes/video-to-vitals/video-to-vitals.service';
@@ -19,6 +20,7 @@ export class ProfileInfoService {
         //     @DatabaseTable('users')
         // private readonly userDb: DatabaseService<UserDTO>,
         private readonly videoToVitalsService: VideoToVitalsService,
+        private readonly productTestsService: ProductTestsService,
         private readonly organizationService: OrganizationService,
         // @DatabaseTable('organization')
         // private readonly organizationDb: DatabaseService<CreateOrganizationDto>,
@@ -122,6 +124,7 @@ export class ProfileInfoService {
                 if (res.length == 0) throw new NotFoundException('profile info not found')
                 else {
                     this.userProfileDb.findandUpdate({ columnName: 'application_id', columnvalue: createProfileInfoDTO.application_id, quries: { total_tests: Number(res[0].total_tests) + 1 } });
+                    this.productTestsService.saveTestsToProductTests({user_id: res[0].user_id , org_id: res[0].org_id.toString() , product_id : createProfileInfoDTO.product_id.toString() , event_mode : createProfileInfoDTO.event_mode, })
                     return this.videoToVitalsService.updateUserByApplicationId(res[0].user_id, createProfileInfoDTO.product_id)
                 }
             }))
