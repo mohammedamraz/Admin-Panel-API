@@ -3,6 +3,8 @@
 //     tpa_name: string;
 // }
 
+import { IsOptional } from "class-validator";
+
 
 // export class UpdateThirdPartyOrganizationJunctionDto {
 //     // id:number;
@@ -40,4 +42,10 @@ export class ProductTestsDto {
     bp_status?: string;
     rbs?: string;
     ecg_url?: string;
+    //  @IsNotEmpty()
+    @IsOptional()
+    page?: number;
+    // @IsNotEmpty()
+    @IsOptional()
+    per_page?: number;
 }
