@@ -1,4 +1,4 @@
-import { Controller, Get, Logger, Query } from '@nestjs/common';
+import { Body, Controller, Get, Logger, Param, Patch, Query } from '@nestjs/common';
 import { ProductTestsDto } from './dto/create-product_tests.dto';
 import { ProductTestsService } from './product_tests.service';
 const APP = "VideoToVitalsController"
@@ -34,6 +34,13 @@ export class ProductTestsController {
     Logger.debug(`fetchTotalTestsOfUsersByTime()`, APP);
 
     return this.ProductTestsService.fetchTotalTestsOfUsersByTime(params)
+  }
+
+  @Patch('vitals/report')
+  updateTestReportInProductTest( @Query() params :ProductTestsDto,@Body()data :ProductTestsDto) {
+    Logger.debug(`updateTestReportInProductTest()  updateUserDTO:${JSON.stringify(params)} `, APP);
+
+    return this.ProductTestsService.updateTestReportInProductTest( params,data);
   }
 
 }

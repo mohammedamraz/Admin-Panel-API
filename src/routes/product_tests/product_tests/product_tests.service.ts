@@ -64,16 +64,25 @@ export class ProductTestsService {
            mainData.push({org_id,total_org_tests_standard,total_org_tests_onedaybefore,total_org_tests_twodaybefore, total_org_tests_event, total_org_tests, max_test_by_user, user_email, user_name})
           }
         
-        }
+        }        
+        mainData[0]['data'] = doc 
         return mainData
 
 }
-saveTestsToProductTests(data:ProductTestsDto){
+updateTestReportInProductTest(params :ProductTestsDto ,data:ProductTestsDto){
+    Logger.debug(`updateTestReportInProductTest() addUserDTO:${JSON.stringify(data)} `, APP);
+
+    if(!params.id){
+    return this.productTestDB.save(data).pipe(map(doc=>doc))}
+    else return this.productTestDB.findByIdandUpdate({id:params.id.toString(),quries:data})
+  }
+
+
+  saveTestsToProductTests(data:ProductTestsDto){
     Logger.debug(`saveTestsToProductTests() addUserDTO:${JSON.stringify(data)} `, APP);
 
     return this.productTestDB.save(data).pipe(map(doc=>doc))
   }
-
 
 async fetchTotalTestsOfUsers(params:ProductTestsDto){
     Logger.debug(`fetchTotalTestsOfOrg() params:${params}} `, APP);
@@ -126,6 +135,7 @@ async fetchTotalTestsOfUsers(params:ProductTestsDto){
         //   }
         
         }
+        mainData[0]['data'] = doc 
         return mainData
 
 }

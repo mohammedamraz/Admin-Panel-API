@@ -477,7 +477,7 @@ export class OrganizationService {
   fetchOrgCount() {
     Logger.debug(`fetchOrgCount() `, APP);
 
-    return this.organizationDb.find({ is_deleted: false }).pipe(
+    return this.organizationDb.fetchAll().pipe(
       map(doc => { return { "total_organizations_count": doc.length } }),
       catchError(err => { throw new UnprocessableEntityException(err.message) })
     )

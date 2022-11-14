@@ -46,6 +46,13 @@ export class SendEmailService {
     return this.templateService.sendEmailOnOrgAdminExpiredAndLoggedOut(body)
   }
 
+  sendEmailOnOrgAdminInactiveAndLoggedOut(body: sendEmailOnCreationOfOrgAndUser) {
+    Logger.debug(`sendEmailOnOrgAdminInactiveAndLoggedOut() body: [${JSON.stringify(body)}]`, APP);
+
+    body.expired_date = new Date().toISOString().split("T")[0]
+    return this.templateService.sendEmailOnOrgAdminInactiveAndLoggedOut(body)
+  }
+
   sendEmailOnceOrgIsCreated(body: sendEmailOnCreationOfOrgAndUser) {
     Logger.debug(`sendEmailOnceOrgIsCreated() body: [${JSON.stringify(body)}]`, APP);
 

@@ -1,6 +1,6 @@
 import { BadRequestException, ConflictException, Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { applicationDefault, initializeApp } from 'firebase-admin/app';
-import { catchError, map, switchMap } from 'rxjs';
+import { catchError, lastValueFrom, map, switchMap } from 'rxjs';
 // import { GOOGLE_APPLICATION_CREDENTIALS } from 'src/constants';
 import { DatabaseTable } from 'src/lib/database/database.decorator';
 import { DatabaseService } from 'src/lib/database/database.service';
@@ -120,12 +120,12 @@ export class ProfileInfoService {
 
         // application_id and product_id is mandatory fields
         return this.userProfileDb.find({ application_id: createProfileInfoDTO.application_id }).pipe(
-            switchMap(res => {
+            switchMap(async res => {
                 if (res.length == 0) throw new NotFoundException('profile info not found')
                 else {
-                    this.userProfileDb.findandUpdate({ columnName: 'application_id', columnvalue: createProfileInfoDTO.application_id, quries: { total_tests: Number(res[0].total_tests) + 1 } });
-                    this.productTestsService.saveTestsToProductTests({user_id: res[0].user_id , org_id: res[0].org_id.toString() , product_id : createProfileInfoDTO.product_id.toString() , event_mode : createProfileInfoDTO.event_mode, })
-                    return this.videoToVitalsService.updateUserByApplicationId(res[0].user_id, createProfileInfoDTO.product_id)
+                    await lastValueFrom(this.userProfileDb.findandUpdate({ columnName: 'application_id', columnvalue: createProfileInfoDTO.application_id, quries: { total_tests: Number(res[0].total_tests) + 1 } }));
+                    var product_test_details = await lastValueFrom(this.productTestsService.saveTestsToProductTests({user_id: res[0].user_id , org_id: res[0].org_id.toString() , product_id : createProfileInfoDTO.product_id.toString() , event_mode : createProfileInfoDTO.event_mode, }))
+                    return await lastValueFrom(this.videoToVitalsService.updateUserByApplicationId(res[0].user_id, createProfileInfoDTO.product_id)),product_test_details
                 }
             }))
 

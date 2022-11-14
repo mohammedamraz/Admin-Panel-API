@@ -38,6 +38,13 @@ export class SendEmailController {
       return this.sendEmailService.sendEmailOnOrgAdminExpiredAndLoggedOut(body)
     }
 
+    @Post('logout/inactive/notification')
+    sendEmailOnOrgAdminInactiveAndLoggedOut(@Body() body:sendEmailOnCreationOfDirectSalesPartner) {
+      Logger.debug(`sendEmailOnOrgAdminInactiveAndLoggedOut() body: [${JSON.stringify(body)}]`, APP);
+  
+      return this.sendEmailService.sendEmailOnOrgAdminInactiveAndLoggedOut(body)
+    }
+
     @Post('signup/org/email')
     sendEmailOnceOrgIsCreated(@Body() body:sendEmailOnCreationOfDirectSalesPartner) {
       Logger.debug(`sendEmailOnceOrgIsCreated() body: [${JSON.stringify(body)}]`, APP);
