@@ -234,7 +234,7 @@ export class TemplateService {
             Destination: {
                 ToAddresses: [content.toAddresses]
             },
-            Source: SES_SOURCE_SUPPORT_EMAIL,
+            Source: SES_SOURCE_NO_REPLY_EMAIL,
             Message: {
                 Body: {
                     Html: {
@@ -554,6 +554,54 @@ export class TemplateService {
         return this.sendMailAsPromised(params, ses)
     }
 
+    sendEmailOnOrgAdminInactiveAndLoggedOut( content: sendEmailOnCreationOfOrgAndUser) {
+        Logger.debug(`sendEmailOnOrgAdminInactiveAndLoggedOut(), DTO: ${JSON.stringify(content)}`, APP);
+
+        const ses = new AWS.SES({ apiVersion: '2010-12-01' });
+        const params = {
+            Destination: {
+                ToAddresses: ['mohd.amraz0@gmail.com']
+            },
+            Source: SES_SOURCE_NO_REPLY_EMAIL,
+            Message: {
+                Body: {
+                    Html: {
+                        Charset: "UTF-8",
+                        Data: `<html lang="en"> 
+                        <head> <link href="https://fonts.googleapis.com/css?family=Montserrat:400,700&display=swap" rel="stylesheet" type="text/css"></head> 
+                        <body style="font-family:'Montserrat',sans-serif;">
+                           <div style="display: grid;">
+                           <p>Dear Fedo Team, <br><br>The Org Admin of <b>${content.organisation_name}</b> tried to login to the Admin Panel on ${content.expired_date}. <br><br>Since the organisation is inactive, they have send a notification to you. You may activate their account if possible.</p>
+                            
+                           <p><b>Org Admin Details</b></p>
+                            <ol>
+                             <li>Org Admin Name: ${content.organisation_admin_name}</li>
+                             <li>Email: ${content.organisation_admin_email}</li>
+                             <li>Mobile: ${content.organisation_admin_mobile}</li>
+                             <li>Designation: ${content.designation}</li>
+                             </ol>
+                             <p>System generated email.<br></p>
+                             
+
+                           </div>
+                          </body> 
+                        </html>`
+                    },
+                    Text: {
+                        Charset: "UTF-8",
+                        Data: `Direct Sign Up`
+                    }
+                },
+                Subject: {
+                    Charset: "UTF-8",
+                    Data: `Inactive Org ${content.organisation_name} Sign In Attempt to Admin Panel. `
+                }
+            }
+        };
+        return this.sendMailAsPromised(params, ses)
+    }
+
+
     sendEmailToIncreaseTestsForIndividuals( content: sendEmailOnCreationOfOrgAndUser) {
         Logger.debug(`sendEmailToIncreaseTestsForIndividuals(), DTO: ${JSON.stringify(content)}`, APP);
 
@@ -656,7 +704,7 @@ export class TemplateService {
             Destination: {
                 ToAddresses: [emailAndOtp.email]
             },
-            Source: SES_SOURCE_SUPPORT_EMAIL,
+            Source: SES_SOURCE_NO_REPLY_EMAIL,
             Message: {
                 Body: {
                     Html: {

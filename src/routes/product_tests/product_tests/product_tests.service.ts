@@ -15,6 +15,28 @@ export class ProductTestsService {
         private readonly UsersService : UsersService)
 {}
 
+
+
+
+Paginator(items: any, page: any, per_page: any) {
+
+  var page = page || 1,
+    per_page = per_page || 10,
+    offset = (page - 1) * per_page,
+
+    paginatedItems = items.slice(offset).slice(0, per_page),
+    total_pages = Math.ceil(items.length / per_page);
+  return {
+    page: page,
+    per_page: per_page,
+    pre_page: page - 1 ? page - 1 : null,
+    next_page: (total_pages > page) ? page + 1 : null,
+    total: items.length,
+    total_pages: total_pages,
+    data: paginatedItems
+  };
+}
+
     async fetchTotalTestsOfOrg(params:ProductTestsDto){
     Logger.debug(`fetchTotalTestsOfOrg() params:${params}} `, APP);
     let mainData= [];
@@ -64,16 +86,34 @@ export class ProductTestsService {
            mainData.push({org_id,total_org_tests_standard,total_org_tests_onedaybefore,total_org_tests_twodaybefore, total_org_tests_event, total_org_tests, max_test_by_user, user_email, user_name})
           }
         
-        }
+        }     
+        doc.sort((a: { id?: number; },b: { id?: number; })=> b.id-a.id);   
+        mainData[0]['data'] = this.Paginator(doc,params.page,params.per_page) 
         return mainData
 
 }
-saveTestsToProductTests(data:ProductTestsDto){
+updateTestReportInProductTest(params :ProductTestsDto ,data:ProductTestsDto){
+    Logger.debug(`updateTestReportInProductTest() addUserDTO:${JSON.stringify(data)} `, APP);
+
+    if(!params.id){
+    return this.productTestDB.save(data).pipe(map(doc=>doc))}
+    else return this.productTestDB.findByIdandUpdate({id:params.id.toString(),quries:data})
+  }
+
+  fetchProductTestUsingApplicationId(application_id:any,product_id :any){
+    Logger.debug(`updateTestReportInProductTest() addUserDTO:${JSON.stringify(application_id)} `, APP);
+
+    return this.productTestDB.find({vitals_id : application_id, product_id : product_id}).pipe(
+      map(doc=>doc)
+    )
+  }
+
+
+  saveTestsToProductTests(data:ProductTestsDto){
     Logger.debug(`saveTestsToProductTests() addUserDTO:${JSON.stringify(data)} `, APP);
 
     return this.productTestDB.save(data).pipe(map(doc=>doc))
   }
-
 
 async fetchTotalTestsOfUsers(params:ProductTestsDto){
     Logger.debug(`fetchTotalTestsOfOrg() params:${params}} `, APP);
@@ -126,6 +166,8 @@ async fetchTotalTestsOfUsers(params:ProductTestsDto){
         //   }
         
         }
+        doc.sort((a: { id?: number; },b: { id?: number; })=> b.id-a.id);   
+        mainData[0]['data'] = this.Paginator(doc,params.page,params.per_page) 
         return mainData
 
 }

@@ -1,6 +1,6 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Logger } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Logger, Query } from '@nestjs/common';
 import { IndividualUserService } from './individual-user.service';
-import { CreateIndividualUserDto, EmailOtpDto, FreeQuotaExhaustedDto, MobileNumberAndOtpDtO, MobileNumberDtO, UpdateUserDto } from './dto/create-individual-user.dto';
+import { CreateIndividualUserDto, EmailOtpDto, FreeQuotaExhaustedDto, MobileNumberAndOtpDtO, MobileNumberDtO, QueryParamsDto, UpdateUserDto } from './dto/create-individual-user.dto';
 import { UpdateIndividualUserDto } from './dto/update-individual-user.dto';
 
 const APP = "IndividualUserController"
@@ -50,6 +50,14 @@ export class IndividualUserController {
   @Post('notify')
   sendEmailOnQuotaExhaustion(@Body() sendEmailOnQuotaExhaustion: FreeQuotaExhaustedDto) {
     return this.individualUserService.sendEmailOnQuotaExhaustion(sendEmailOnQuotaExhaustion);
+  }
+
+
+  @Get('list/users')
+  fetchAllIndividualUserList(@Query() queryParamsDto: QueryParamsDto) {
+    Logger.debug(`fetchAllIndividualUserList() ${queryParamsDto} `, APP);
+
+    return this.individualUserService.fetchAllIndividualUserList(queryParamsDto);
   }
 
 }
