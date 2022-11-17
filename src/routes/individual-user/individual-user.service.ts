@@ -1,11 +1,12 @@
 import { HttpService } from '@nestjs/axios';
 import { ConflictException, HttpException, HttpStatus, Injectable, Logger, NotFoundException, UnprocessableEntityException } from '@nestjs/common';
-import { catchError, map, switchMap } from 'rxjs';
+import { catchError, concatMap, from, lastValueFrom, map, switchMap } from 'rxjs';
 import { GUPSHUP_OTP_MESSAGE_FORMAT, GUPSHUP_OTP_VERIFICATION } from 'src/constants';
 import { DatabaseTable } from 'src/lib/database/database.decorator';
 import { DatabaseService } from 'src/lib/database/database.service';
+import { ProductTestsService } from '../product_tests/product_tests/product_tests.service';
 import { SendEmailService } from '../send-email/send-email.service';
-import { CreateIndividualUserDto, EmailOtpDto, FreeQuotaExhaustedDto, MobileNumberAndOtpDtO, MobileNumberDtO, UpdateUserDto } from './dto/create-individual-user.dto';
+import { CreateIndividualReferenceDto, CreateIndividualUserDto, EmailOtpDto, FetchIndividualUserData, FreeQuotaExhaustedDto, MobileNumberAndOtpDtO, MobileNumberDtO, QueryParamsDto, UpdateUserDto } from './dto/create-individual-user.dto';
 import { UpdateIndividualUserDto } from './dto/update-individual-user.dto';
 
 const APP = "IndividualUserService"
@@ -15,8 +16,12 @@ export class IndividualUserService {
 
   constructor(@DatabaseTable('individual_user')
   private readonly individualUserDb: DatabaseService<CreateIndividualUserDto>,
-    private http: HttpService,
-    private readonly emailService: SendEmailService
+  @DatabaseTable('individual_user_reference_junction')
+  private readonly individual_referencedb: DatabaseService<CreateIndividualReferenceDto>,
+  private http: HttpService,
+    private readonly emailService: SendEmailService,
+    private readonly productTestsService: ProductTestsService,
+
   ) { }
   userRegistration(createIndividualUserDto: CreateIndividualUserDto) {
     Logger.debug(`userRegistration() createIndividualUserDto: [${JSON.stringify(createIndividualUserDto,)}]`, APP,);
@@ -138,8 +143,10 @@ export class IndividualUserService {
             email: emailOtpDto.email,
             otp: randomSixDigitNumber
           }
-          return this.emailService.sendOtpToEmail(emailAndOtp).then(v => {
-            this.individualUserDb.save({ email: emailAndOtp.email, fedo_score: true, attempts: 0, is_verified: false });
+          return this.emailService.sendOtpToEmail(emailAndOtp).then(async v => {
+            return await lastValueFrom(this.saveToRandomIdDB());
+          }).then(doc => {
+            this.individualUserDb.save({ email: emailAndOtp.email, fedo_score: true, attempts: 3, total_tests : 3  ,  is_verified: false , product_id : 2 , unique_id : doc[0].unique_id  });
             return emailAndOtp;
           }).catch(err => {
             throw new UnprocessableEntityException('Failed to send OTP. Please try again')
@@ -154,8 +161,10 @@ export class IndividualUserService {
             otp: randomSixDigitNumber
           }
           if (res[0].is_verified == false) {
-            return this.emailService.sendOtpToEmail(emailAndOtp).then(v => {
-              this.individualUserDb.save({ email: emailAndOtp.email, fedo_score: true, attempts: 0, is_verified: false });
+            return this.emailService.sendOtpToEmail(emailAndOtp).then(async v => {
+              return await lastValueFrom(this.saveToRandomIdDB());
+            }).then(doc => {
+              this.individualUserDb.save({ email: emailAndOtp.email, fedo_score: true, attempts: 3, total_tests : 3 ,  is_verified: false , product_id : 2 , unique_id : doc[0].unique_id  });
               return emailAndOtp;
             }).catch(err => {
               throw new UnprocessableEntityException('Failed to send OTP. Please try again')
@@ -167,6 +176,66 @@ export class IndividualUserService {
         }
       }),
     )
+  }
+
+
+  fetchAllIndividualUserList(queryParamsDto: QueryParamsDto){
+    Logger.debug(`fetchAllIndividualUserList() ${queryParamsDto}`, APP,);
+
+    return this.individualUserDb.find({product_id:queryParamsDto.product_id}).pipe(
+      map(async (res: any) => {
+        res.sort((a: { id?: number; },b: { id?: number; })=> b.id-a.id);    
+        return await this.fetchotherDetails(res,queryParamsDto) 
+      })
+      )
+  }
+
+  fetchotherDetails(FetchIndividualUserData : FetchIndividualUserData[],queryParamsDto: QueryParamsDto) {
+    Logger.debug(`fetchotherDetails() createOrganizationDto: ${JSON.stringify(FetchIndividualUserData)}`, APP);
+
+    let userProfileData: FetchIndividualUserData[] = [];
+    return lastValueFrom(from(FetchIndividualUserData).pipe(
+      concatMap(async individualUser => {        
+        const doc = await lastValueFrom(this.productTestsService.fetchProductTestUsingApplicationId(individualUser.unique_id,queryParamsDto.product_id));
+        console.log("datay",doc[0].test_date,doc[doc.length-1].test_date);
+        
+        individualUser['total_tests'] = doc?.reduce((pre, acc) => pre + acc['tests'], 0);
+        individualUser['first_scan'] = new Date(doc[0]?.test_date).toISOString().split("T")[0];
+        individualUser['last_scan'] = new Date(doc[doc.length-1]?.test_date).toISOString().split("T")[0];
+        individualUser['data'] = doc
+        userProfileData.push(individualUser);
+        return this.Paginator(userProfileData,queryParamsDto.page,queryParamsDto.per_page) 
+      }),
+    ))
+  }
+
+  Paginator(items: any, page: any, per_page: any) {
+
+    var page = page || 1,
+      per_page = per_page || 10,
+      offset = (page - 1) * per_page,
+  
+      paginatedItems = items.slice(offset).slice(0, per_page),
+      total_pages = Math.ceil(items.length / per_page);
+    return {
+      page: page,
+      per_page: per_page,
+      pre_page: page - 1 ? page - 1 : null,
+      next_page: (total_pages > page) ? page + 1 : null,
+      total: items.length,
+      total_pages: total_pages,
+      data: paginatedItems
+    };
+  }
+
+  saveToRandomIdDB() {
+    Logger.debug(`saveToRandomIdDB() id $}`, APP)
+
+    let minimumNumber = 1000000;
+    let maximumNumber = 9999999;
+    let randomSevenDigitNumber = Math.floor(Math.random() * (maximumNumber - minimumNumber + 1)) + minimumNumber;
+    return this.individual_referencedb.save({  unique_id : "VIU"+randomSevenDigitNumber }).pipe(catchError(err => { return this.saveToRandomIdDB(); }),
+      map(res =>   res ))
   }
 
 

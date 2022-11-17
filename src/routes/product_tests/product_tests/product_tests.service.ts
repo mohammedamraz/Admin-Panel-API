@@ -100,6 +100,14 @@ updateTestReportInProductTest(params :ProductTestsDto ,data:ProductTestsDto){
     else return this.productTestDB.findByIdandUpdate({id:params.id.toString(),quries:data})
   }
 
+  fetchProductTestUsingApplicationId(application_id:any,product_id :any){
+    Logger.debug(`updateTestReportInProductTest() addUserDTO:${JSON.stringify(application_id)} `, APP);
+
+    return this.productTestDB.find({vitals_id : application_id, product_id : product_id}).pipe(
+      map(doc=>doc)
+    )
+  }
+
 
   saveTestsToProductTests(data:ProductTestsDto){
     Logger.debug(`saveTestsToProductTests() addUserDTO:${JSON.stringify(data)} `, APP);

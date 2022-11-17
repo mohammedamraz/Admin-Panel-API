@@ -8,6 +8,17 @@ export class CreateIndividualUserDto {
   name: string;
 }
 
+export class CreateIndividualReferenceDto {
+
+  // @IsNotEmpty()
+  // @IsString()
+  id?: number;
+  unique_id? : string;
+  viu_id?: string;
+}
+
+
+
 export class MobileNumberDtO {
 
   @IsNotEmpty()
@@ -60,4 +71,37 @@ export class FreeQuotaExhaustedDto {
   mobile: string;
   gender: string;
   age: string;
+}
+
+export class QueryParamsDto {
+
+  // @IsOptional()
+  // @IsEnum(Type)
+  // type: Type;
+  // @IsOptional()
+  // @IsNotEmpty()
+  // url: string;
+  product_id? : string;
+  @IsNotEmpty()
+  @IsOptional()
+  page: number;
+  @IsNotEmpty()
+  @IsOptional()
+  per_page: number;
+  is_deleted?:boolean
+}
+
+export class FetchIndividualUserData {
+  email? : string;
+  name? : string;
+  mobile? : string;
+  gender? : string;
+  age? : string;
+  phone_number? : string;
+  attempts? : string;
+  fedo_score? : string;
+  id? : number;
+  is_verified? : string;
+  product_id? : string;
+  unique_id? : string;
 }
