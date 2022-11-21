@@ -87,8 +87,9 @@ Paginator(items: any, page: any, per_page: any) {
           }
         
         }     
-        doc.sort((a: { id?: number; },b: { id?: number; })=> b.id-a.id);   
-        mainData[0]['data'] = this.Paginator(doc,params.page,params.per_page) 
+        doc.sort((a: { id?: number; },b: { id?: number; })=> b.id-a.id); 
+        const filteredDoc =  doc.filter((doc:any)=>doc.policy_number!==null);
+        mainData[0]['data'] = this.Paginator(filteredDoc,params.page,params.per_page) ;
         return mainData
 
 }
@@ -167,7 +168,8 @@ async fetchTotalTestsOfUsers(params:ProductTestsDto){
         
         }
         doc.sort((a: { id?: number; },b: { id?: number; })=> b.id-a.id);   
-        mainData[0]['data'] = this.Paginator(doc,params.page,params.per_page) 
+        const filteredDoc =  doc.filter((doc:any)=>doc.policy_number!==null);
+        mainData[0]['data'] = this.Paginator(filteredDoc,params.page,params.per_page) ;
         return mainData
 
 }
