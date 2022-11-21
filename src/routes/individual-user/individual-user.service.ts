@@ -195,13 +195,13 @@ export class IndividualUserService {
 
     let userProfileData: FetchIndividualUserData[] = [];
     return lastValueFrom(from(FetchIndividualUserData).pipe(
-      concatMap(async individualUser => {        
+      concatMap(async individualUser => {      
         const doc = await lastValueFrom(this.productTestsService.fetchProductTestUsingApplicationId(individualUser.unique_id,queryParamsDto.product_id));
-        console.log("datay",doc[0].test_date,doc[doc.length-1].test_date);
-        
-        individualUser['total_tests'] = doc?.reduce((pre, acc) => pre + acc['tests'], 0);
-        individualUser['first_scan'] = new Date(doc[0]?.test_date).toISOString().split("T")[0];
-        individualUser['last_scan'] = new Date(doc[doc.length-1]?.test_date).toISOString().split("T")[0];
+        if(doc.length!=0){
+          individualUser['total_tests_viu'] = doc?.reduce((pre, acc) => pre + acc['tests'], 0);
+          individualUser['first_scan'] = new Date(doc[0]?.test_date).toISOString().split("T")[0];
+          individualUser['last_scan'] = new Date(doc[doc.length-1]?.test_date).toISOString().split("T")[0];
+        }        
         individualUser['data'] = doc
         userProfileData.push(individualUser);
         return this.Paginator(userProfileData,queryParamsDto.page,queryParamsDto.per_page) 
