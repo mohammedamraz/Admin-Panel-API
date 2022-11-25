@@ -28,6 +28,14 @@ export class VideoToVitalsController {
     return this.organizationService.createOrganization(createOrganizationDto, file);
   }
 
+  @Post('org/direct')
+  @UseInterceptors(FileInterceptor('file'))
+  createOrganizationAndDirectRegister(@Body() createOrganizationDto: CreateOrganizationDto, @UploadedFile() file) {
+    Logger.debug(`createOrganizationAndDirectRegister() createOrganizationDto:${JSON.stringify(createOrganizationDto)} file:${JSON.stringify(file)}`, APP);
+
+    return this.organizationService.createOrganizationAndDirectRegister(createOrganizationDto, file);
+  }
+
   @Get('org/count')
   fetchOrgCount() {
     Logger.debug(`fetchOrgByCount()`, APP);

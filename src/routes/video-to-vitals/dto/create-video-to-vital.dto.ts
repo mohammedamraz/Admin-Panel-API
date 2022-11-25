@@ -43,6 +43,8 @@ export class CreateOrganizationDto {
     web_url?: string;
     type?: string;
     event_mode?:string;
+    password? : any;
+    is_register : boolean ;
 }
 
 export class UpdateWholeOrganizationDto {

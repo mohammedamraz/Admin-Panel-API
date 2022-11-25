@@ -566,36 +566,6 @@ export class VideoToVitalsService {
 
   }
 
-  // loginOrganizationByEmail(loginUserDTO: LoginUserDTO) {
-  //   Logger.debug(`loginOrganizationByEmail() loginUserDTO:${JSON.stringify(loginUserDTO)} `, APP);
-
-
-  //   loginUserDTO.fedoApp = FEDO_APP;
-  //   return this.getOrganisationDetailsByEmail(loginUserDTO).pipe((map(doc => { this.org_data = doc })),
-  //     switchMap(doc => {
-  //       return this.http
-  //         .post(
-  //           `${AWS_COGNITO_USER_CREATION_URL_SIT}/token`,
-  //           { passcode: this.encryptPassword(loginUserDTO) },
-  //         )
-  //         .pipe(
-  //           catchError((err) => {
-  //             return this.onAWSErrorResponse(err);
-  //           }),
-  //           map((res: AxiosResponse) => {
-  //             if (!res.data) throw new UnauthorizedException();
-  //             return {
-  //               jwtToken: res.data.idToken.jwtToken,
-  //               refreshToken: res.data.refreshToken,
-  //               accessToken: res.data.accessToken.jwtToken,
-  //               user_data: this.org_data
-  //             };
-  //           }),
-  //         );
-  //     })
-  //   )
-
-  // }
 
   private readonly onAWSErrorResponse = async (err) => {
     Logger.debug('onAWSErrorResponse(), ' + err, APP);
