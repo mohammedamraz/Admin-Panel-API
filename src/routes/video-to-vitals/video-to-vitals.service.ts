@@ -471,12 +471,31 @@ export class VideoToVitalsService {
 
   updateUser(id: string, updateUserDTO: UpdateUserDTO) {
     Logger.debug(`updateUser() id:${id} updateUserDTO:${JSON.stringify(updateUserDTO)} `, APP);
+    let productlist = updateUserDTO.product_id?.split(",")
+    let product_junctionlist = updateUserDTO.product_junction_id?.split(",")
 
     return this.userDb.find({ id: id }).pipe(
       map(res => {
-        if (res.length == 0) throw new NotFoundException('organization not found')
-        return this.userDb.findByIdandUpdate({ id: id.toString(), quries: updateUserDTO })
-      }))
+        delete updateUserDTO.product_id
+        delete updateUserDTO.product_junction_id
+        if (res.length == 0) throw new NotFoundException('User not found')
+        lastValueFrom(this.userDb.findByIdandUpdate({ id: id.toString(), quries: updateUserDTO }))
+        return res
+      }),
+      switchMap(async res => {
+        if(productlist != undefined){
+        for (let index = 0; index < productlist.length; index++) {
+          await lastValueFrom(this.userProductJunctionDb.find({ id: product_junctionlist[index] }).pipe(
+            map(async doc => {
+               if (doc.length == 0) await lastValueFrom(this.userProductJunctionDb.save({ user_id: id,  product_id: productlist[index], org_id : res[0].org_id, total_tests : 0}))
+               else return doc
+            })
+          )
+          )
+        }}
+        else return []
+      })
+      )
 
   }
 

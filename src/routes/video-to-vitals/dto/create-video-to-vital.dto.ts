@@ -231,6 +231,16 @@ export class UpdateUserDTO {
     @IsOptional()
     @IsPhoneNumber()
     mobile: String;
+    product_name?:string;
+    product_id?:any;
+    product_junction_id? : any;
+    third_party_org_name?:string;
+    password?:string;
+    application_id?:string;
+    org_id?:number;
+    tests?:any;
+    type? :any;
+    is_register? : boolean
 
 }
 
