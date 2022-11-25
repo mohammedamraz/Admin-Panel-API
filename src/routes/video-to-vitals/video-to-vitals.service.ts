@@ -301,6 +301,48 @@ export class VideoToVitalsService {
       }))
   }
 
+  addUserAndDirectRegister(userDTO: UserDTO) {
+    Logger.debug(`addUserAndDirectRegister() addUserDTO:${JSON.stringify(userDTO)} `, APP);
+
+    let product_user_list = userDTO.product_id.toString().split(",")
+    return this.usersService.fetchUserByCondition(userDTO).pipe(
+      map(user_doc => user_doc),
+      switchMap(user_doc => {
+        return this.organizationService.fetchOrganizationByIdDetails(userDTO.org_id).pipe(
+          map(org_doc => { return org_doc }),
+          switchMap(org_doc => {
+            userDTO.application_id = userDTO.mobile.slice(3, 14);
+            userDTO.organization_name = org_doc[0].organization_name;
+            let aws_password = userDTO.password
+            delete userDTO.product_id;
+            delete userDTO.password;
+            userDTO.is_register = true;
+            return this.userDb.save(userDTO).pipe(
+              map(userdoc => {
+                return [userdoc, org_doc]
+              }),
+              switchMap(async doc => {
+                await lastValueFrom(this.registerUserbyEmail(
+                  {
+                    "email": userDTO.email,
+                    "username": userDTO.email,
+                    "password": aws_password 
+                  }
+                ))
+                return doc[0][0]
+              }))
+          }),
+          map(async doc => {            
+            product_user_list.map(async res1 =>
+             await lastValueFrom(this.userProductJunctionService.createUserProductJunction({ user_id: doc["id"], org_id: userDTO["org_id"], product_id: Number(res1), total_tests: 0 }))
+             );
+            await lastValueFrom(this.userProfileDb.save({ application_id: doc['application_id'], user_id: doc['id'], org_id: doc['org_id'], name: doc['user_name'], is_editable: true }))
+            return doc;
+          }))
+      }))
+  }
+
+
 
   // addUser(userDTO: UserDTO) {
   //   Logger.debug(`addUser() addUserDTO:${JSON.stringify(userDTO)} `, APP);

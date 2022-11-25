@@ -170,6 +170,12 @@ export class VideoToVitalsController {
     return this.videoToVitalsService.addUser(userDTO)
   }
 
+  @Post('users/direct')
+  addUserAndDirectRegister(@Body() userDTO: UserDTO) {
+    Logger.debug(`addUserAndDirectRegister() addUserDTO:${JSON.stringify(userDTO)} `, APP);
+
+    return this.videoToVitalsService.addUserAndDirectRegister(userDTO)
+  }
   
   @Get('junction/domain/:url')
   fetchOrgByUrlFromJunction(@Param('url') url: string) {

@@ -104,13 +104,13 @@ export class OrgDTO {
 }
 
 export class RegisterUserDTO {
-    fedoApp: string;
+    fedoApp?: string;
     // @IsNotEmpty()
     email: string;
     @IsNotEmpty()
     password: string;
     username: string;
-    ConfirmationCode: string;
+    ConfirmationCode?: string;
 }
 
 export class EmailConfirmationDTO {
@@ -182,6 +182,7 @@ export class UserDTO {
     org_id:number;
     tests?:any;
     type? :any;
+    is_register? : boolean
 }
 
 
