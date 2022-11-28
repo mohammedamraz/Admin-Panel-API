@@ -1,5 +1,5 @@
 import { BadRequestException, ConflictException, Injectable, Logger, NotFoundException, UnauthorizedException, UnprocessableEntityException } from '@nestjs/common';
-import { catchError, concatMap, from, lastValueFrom, map, switchMap, throwError } from 'rxjs';
+import { catchError, concatMap, from, lastValueFrom, map, of, switchMap, throwError } from 'rxjs';
 import { DatabaseTable } from 'src/lib/database/database.decorator';
 import { DatabaseService } from 'src/lib/database/database.service';
 import { PasswordResetDTO } from '../admin/dto/create-admin.dto';
@@ -425,6 +425,30 @@ export class VideoToVitalsService {
 
     return this.userDb.find({ id: id }).pipe(
       map(doc => doc)
+    )
+  }
+
+  fetchUserDetailsById(id: number) {
+    Logger.debug(`fetchUserDetailsById() id:${id}} `, APP);
+
+    return this.userDb.find({ id: id }).pipe(
+      switchMap((userData:UserDTO[]) => {        
+        let user_data = userData[0]        
+        return this.userProductJunctionService.fetchUserProductJunctionDataByUserId(userData[0].id)
+            .pipe(switchMap(async doc => {
+              for (let index=0;index<=doc.length-1;index++) {
+                await lastValueFrom(this.productService.fetchProductById(doc[index].product_id).pipe(
+                  map(productDoc => {
+                      doc[index]['product']=productDoc
+                      user_data['tests'] = doc
+                      user_data['total_test'] = doc.reduce((pre, acc) => pre + acc['total_tests'], 0);
+                  }
+                  )))
+                }
+                return [user_data]               
+            }))
+            // .catch(err => { throw new UnprocessableEntityException(err.message) })
+      })
     )
   }
 

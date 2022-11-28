@@ -184,7 +184,8 @@ export class UserDTO {
     org_id:number;
     tests?:any;
     type? :any;
-    is_register? : boolean
+    is_register? : boolean;
+    total_test? : any;
 }
 
 

@@ -215,10 +215,10 @@ export class VideoToVitalsController {
   }
 
   @Get('users/data/list/:id')
-  fetchUserById(@Param('id', ParseIntPipe) id: number) {
-    Logger.debug(`fetchUserById()`, APP);
+  fetchUserDetailsById(@Param('id', ParseIntPipe) id: number) {
+    Logger.debug(`fetchUserDetailsById()`, APP);
 
-    return this.videoToVitalsService.fetchUserById(id)
+    return this.videoToVitalsService.fetchUserDetailsById(id)
   }
 
   @Get('users/data/product/list/:id')
