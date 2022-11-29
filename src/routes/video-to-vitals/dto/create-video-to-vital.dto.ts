@@ -91,6 +91,11 @@ export class UpdateWholeOrganizationDto {
     type?: string;
     updated_date?: Date;
     event_mode?:string;
+    country? : any;
+    zip? : any;
+    state? : any;
+    city? : any;
+    address? : any;
 }
 
 export class OrgDTO {
@@ -362,7 +367,13 @@ export const format_organisation=(res)=>{
     stage:res?.stage || null,
     application_id:res.application_id,
     is_register:res?.is_register|| false,
-    type:res?.type || null}
+    type:res?.type || null,
+    country:res?.country || null,
+    state:res?.state || null,
+    zip:res?.zip || null,
+    city:res?.city || null,
+    address:res?.address || null
+}
 
     return data
     
@@ -379,8 +390,8 @@ export const format_org_product_juction=(res,index,id)=>{
         product_id: res.product_id[index], 
         fedoscore: res.fedo_score[index], 
         web_access: res.productaccess_web ? res.productaccess_web[index] : false ,  
-        web_fedoscore: res.web_fedoscore ? res.web_fedoscore[index] : false, 
-        web_url: res.web_url ? res.web_url[index]: false,
+        ios_access: res.ios_access ? res.ios_access[index] : false, 
+        // web_url: res.web_url ? res.web_url[index]: false,
         status: "Active"
     }
     return data

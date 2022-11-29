@@ -8,7 +8,7 @@ export class JoiValidationPipe implements PipeTransform<any> {
 
   transform(value: any, metadata: ArgumentMetadata) {
     
-    if(value!=undefined)Object.keys(value).map((res,index)=>{if(['product_id','pilot_duration','fedo_score','productaccess_web','web_fedoscore','product_id','web_url'].includes(res)) {value[res] =value[res]?.toString().split(",")||[]}});
+    if(value!=undefined)Object.keys(value).map((res,index)=>{if(['product_id','pilot_duration','fedo_score','productaccess_web','ios_access','product_id'].includes(res)) {value[res] =value[res]?.toString().split(",")||[]}});
    
     return value
   }
