@@ -118,6 +118,7 @@ export class VideoToVitalsController {
   }
 
   @Patch(':id')
+  @UsePipes(new JoiValidationPipe())
   @UseInterceptors(FileInterceptor('file'))
 
   updateOrganizationByFedoAdmin(@Param('id', ParseIntPipe) id: number, @Body() updateWholeOrganizationDto: UpdateWholeOrganizationDto, @UploadedFile() file) {

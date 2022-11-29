@@ -42,7 +42,7 @@ export class CreateOrganizationDto {
     web_fedoscore?: Array<string>;
     web_url?: Array<string>;
     type?: string;
-    event_mode?:string;
+    event_mode?:Array<string>;
     password? : any;
     is_register : boolean ;
 }
@@ -386,12 +386,11 @@ export const format_org_product_juction=(res,index,id)=>{
    let data={ org_id: id, 
         end_date: end_date, 
         pilot_duration: res.pilot_duration[index] ,
-        // status: res.status, 
+        event_mode: res.event_mode ? res.event_mode[index] : 0, 
         product_id: res.product_id[index], 
         fedoscore: res.fedo_score[index], 
         web_access: res.productaccess_web ? res.productaccess_web[index] : false ,  
         ios_access: res.ios_access ? res.ios_access[index] : false, 
-        // web_url: res.web_url ? res.web_url[index]: false,
         status: "Active"
     }
     return data
