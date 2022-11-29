@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Logger, ParseIntPipe, UseInterceptors, UploadedFile, Query } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Logger, ParseIntPipe, UseInterceptors, UploadedFile, Query, UsePipes } from '@nestjs/common';
 import { VideoToVitalsService } from './video-to-vitals.service';
 import { CreateOrganizationDto, LoginUserDTO, LoginUserPasswordCheckDTO, OrgDTO, ProductDto, QueryParamsDto, RegisterUserDTO, UpdateOrganizationDto, UpdateUserDTO, UpdateWholeOrganizationDto, UserDTO, UserParamDto, VitalUserDTO } from './dto/create-video-to-vital.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
@@ -9,6 +9,7 @@ import { UsersService } from './users.service';
 import { LoggingInterceptor } from 'src/interceptors/interceptor';
 import { ZQueryParamsDto } from '../org-product-junction/dto/create-org-product-junction.dto';
 import { Cron } from '@nestjs/schedule';
+import { JoiValidationPipe } from 'src/constants/pipes';
 
 
 const APP = "VideoToVitalsController"
@@ -21,6 +22,7 @@ export class VideoToVitalsController {
   ) { }
 
   @Post('org')
+  @UsePipes(new JoiValidationPipe())
   @UseInterceptors(FileInterceptor('file'))
   createOrganization(@Body() createOrganizationDto: CreateOrganizationDto, @UploadedFile() file) {
     Logger.debug(`createOrganization() createOrganizationDto:${JSON.stringify(createOrganizationDto)} file:${JSON.stringify(file)}`, APP);
@@ -29,6 +31,7 @@ export class VideoToVitalsController {
   }
 
   @Post('org/direct')
+  @UsePipes(new JoiValidationPipe())
   @UseInterceptors(FileInterceptor('file'))
   createOrganizationAndDirectRegister(@Body() createOrganizationDto: CreateOrganizationDto, @UploadedFile() file) {
     Logger.debug(`createOrganizationAndDirectRegister() createOrganizationDto:${JSON.stringify(createOrganizationDto)} file:${JSON.stringify(file)}`, APP);

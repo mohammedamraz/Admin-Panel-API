@@ -25,22 +25,22 @@ export class CreateOrganizationDto {
     start_date: Date;
     end_date: Date;
     @IsOptional()
-    fedo_score: boolean;
+    fedo_score: [];
     @IsOptional()
     logo: string;
-    pilot_duration: number;
-    product_name: string;
-    product_id: string;
+    pilot_duration: Array<string>;
+    product_name: string;    
+    product_id: Array<string>;
     id: number;
     status: string;
     total_tests: number;
     application_id: string;
     stage?: string;
     org_id: string;
-    productaccess_web?: boolean;
-    productaccess_mobile?: boolean;
-    web_fedoscore?: boolean;
-    web_url?: string;
+    productaccess_web?: Array<string>;
+    productaccess_mobile?: Array<string>;
+    web_fedoscore?: Array<string>;
+    web_url?: Array<string>;
     type?: string;
     event_mode?:string;
     password? : any;
@@ -348,3 +348,41 @@ export class UserParamDto {
     is_deleted?:boolean
 
 }
+
+export const format_organisation=(res)=>{
+    let data=
+    {organization_name:res.organization_name,
+    admin_name:res.admin_name,
+    organization_email:res.organization_email,
+    organization_mobile:res.organization_mobile,
+    logo:res?.logo || null,
+    attempts:res?.attempts || 0,
+    designation:res.designation,
+    url:res.url,
+    stage:res?.stage || null,
+    application_id:res.application_id,
+    is_register:res?.is_register|| false,
+    type:res?.type || null}
+
+    return data
+    
+}
+
+export const format_org_product_juction=(res,index,id)=>{
+    console.log("format_org_product_juction() const" ,res ,index, id)
+    const tomorrow = new Date();
+    let end_date = new Date(tomorrow.setDate(tomorrow.getDate() + Number(res.pilot_duration[index])));
+   let data={ org_id: id, 
+        end_date: end_date, 
+        pilot_duration: res.pilot_duration[index] ,
+        // status: res.status, 
+        product_id: res.product_id[index], 
+        fedoscore: res.fedo_score[index], 
+        web_access: res.productaccess_web ? res.productaccess_web[index] : false ,  
+        web_fedoscore: res.web_fedoscore ? res.web_fedoscore[index] : false, 
+        web_url: res.web_url ? res.web_url[index]: false,
+        status: "Active"
+    }
+    return data
+}
+
