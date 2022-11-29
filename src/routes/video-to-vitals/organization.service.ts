@@ -1,7 +1,7 @@
 import { HttpService } from '@nestjs/axios';
 import { BadRequestException, ConflictException, Injectable, Logger, NotFoundException, UnauthorizedException, UnprocessableEntityException } from '@nestjs/common';
 import { DatabaseTable } from 'src/lib/database/database.decorator';
-import { CreateOrganizationDto, format_organisation, format_org_product_juction, OrgDTO, QueryParamsDto, RegisterUserDTO, UpdateOrganizationDto, UpdateWholeOrganizationDto, UserProfileDTO } from './dto/create-video-to-vital.dto';
+import { CreateOrganizationDto, format_organisation, format_organisation_update, format_org_product_juction, OrgDTO, QueryParamsDto, RegisterUserDTO, UpdateOrganizationDto, UpdateWholeOrganizationDto, UserProfileDTO } from './dto/create-video-to-vital.dto';
 import { DatabaseService } from 'src/lib/database/database.service';
 import { catchError, concatMap, from, lastValueFrom, map, switchMap, throwError } from 'rxjs';
 import { AWS_ACCESS_KEY_ID, AWS_COGNITO_USER_CREATION_URL_SIT_ADMIN_PANEL, AWS_SECRET_ACCESS_KEY, FEDO_USER_ADMIN_PANEL_POOL_NAME, PUBLIC_KEY } from 'src/constants';
@@ -159,20 +159,10 @@ export class OrganizationService {
 
     return this.fetchOrganizationByIdDetails(id).pipe(
       map(doc => { return doc }),
-      // switchMap((doc) => {
-      //   // updateWholeOrganizationDto.application_id = updateWholeOrganizationDto.organization_mobile?.slice(3, 14);
-      //   delete updateWholeOrganizationDto.product_id;
-      //   delete updateWholeOrganizationDto.pilot_duration;
-      //   delete updateWholeOrganizationDto.fedo_score;
-      //   delete updateWholeOrganizationDto.productaccess_mobile;
-      //   delete updateWholeOrganizationDto.productaccess_web;
-      //   delete updateWholeOrganizationDto.web_fedoscore;
-      //   delete updateWholeOrganizationDto.web_url;
-      //   delete updateWholeOrganizationDto.product_junction_id;
-      //   delete updateWholeOrganizationDto.event_mode;
-      //   updateWholeOrganizationDto.updated_date = new Date();
-      //   return this.organizationDb.findByIdandUpdate({ id: String(id), quries: updateWholeOrganizationDto })
-      // }),
+      switchMap((doc) => {
+        updateWholeOrganizationDto.updated_date = new Date();
+        return this.organizationDb.findByIdandUpdate({ id: String(id), quries: format_organisation_update(updateWholeOrganizationDto,doc[0]) })
+      }),
       switchMap(async res => {
         for (let index = 0; index < updateWholeOrganizationDto.product_id.length; index++) {
           await lastValueFrom(this.organizationProductJunctionDb.find({ id: updateWholeOrganizationDto.product_junction_id[index] }).pipe(
