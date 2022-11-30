@@ -16,26 +16,6 @@ export class OrgProductJunctionController {
    return this.orgProductJunctionService.fetchOrgDetailsByOrgProductJunctionId(id)
   }
 
-  // @Get()
-  // findAll() {
-  //   return this.orgProductJunctionService.findAll();
-  // }
-
-  // @Get(':id')
-  // findOne(@Param('id') id: string) {
-  //   return this.orgProductJunctionService.findOne(+id);
-  // }
-
-  // @Patch(':id')
-  // update(@Param('id') id: string, @Body() updateOrgProductJunctionDto: UpdateOrgProductJunctionDto) {
-  //   return this.orgProductJunctionService.update(+id, updateOrgProductJunctionDto);
-  // }
-
-  // @Delete(':id')
-  // remove(@Param('id') id: string) {
-  //   return this.orgProductJunctionService.remove(+id);
-  // }
-
   // @Get(':id')
   // findAllProductsMappedWithOrganization(@Param('id') id: string) {
   //   Logger.debug(`fetchAllProducts()`, APP);

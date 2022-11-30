@@ -38,20 +38,6 @@ export class ProductService {
     )
   }
 
-  fetchProductByNewName(name: string) {
-    Logger.debug(`fetchProductByNewName() name:${name} }`, APP);
-  
-    return this.productDb.find({ product_name: name }).pipe(
-      map(doc => {
-        if (doc.length == 0) {
-          throw new NotFoundException('product not exist')
-        }
-        else {return doc}
-      })
-      
-    )
-  }
-
   fetchAllProducts() {
     Logger.debug(`fetchAllProducts() `, APP);
 
