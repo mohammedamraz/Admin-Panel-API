@@ -159,16 +159,20 @@ export class OrganizationService {
 
     return this.fetchOrganizationByIdDetails(id).pipe(
       map(doc => { return doc }),
-      switchMap((doc) => {
+      switchMap(async (doc) => {
         updateWholeOrganizationDto.updated_date = new Date();
-        return this.organizationDb.findByIdandUpdate({ id: String(id), quries: format_organisation_update(updateWholeOrganizationDto,doc[0]) })
+        await lastValueFrom(this.organizationDb.findByIdandUpdate({ id: String(id), quries: format_organisation_update(updateWholeOrganizationDto,doc[0]) }))
+        return doc
       }),
       switchMap(async res => {
         for (let index = 0; index < updateWholeOrganizationDto.product_id.length; index++) {
           await lastValueFrom(this.organizationProductJunctionDb.find({ id: updateWholeOrganizationDto.product_junction_id[index] }).pipe(
             map(async doc => {
               if (doc.length != 0) await lastValueFrom(this.organizationProductJunctionDb.findByIdandUpdate({ id: updateWholeOrganizationDto.product_junction_id[index], quries: format_org_product_juction(updateWholeOrganizationDto,index,id)}))
-              else await lastValueFrom(this.organizationProductJunctionDb.save(format_org_product_juction(updateWholeOrganizationDto,index,id)))
+              else {
+                await lastValueFrom(this.organizationProductJunctionDb.save(format_org_product_juction(updateWholeOrganizationDto,index,id)));
+                await lastValueFrom(this.usersService.updateOrgUserByApplicationId(res[0].application_id,Number(updateWholeOrganizationDto.product_id[index])));
+              }
             })
           )
           )

@@ -315,4 +315,14 @@ export class UsersService {
       data: paginatedItems
     };
   }
+
+  updateOrgUserByApplicationId(application_id: string, product_id: number) {
+    Logger.debug(`updateOrgUserByApplicationId() id:${application_id} product_id:${product_id} updateUserDTO:)} `, APP);
+
+    return this.userDb.find({ application_id: application_id }).pipe(
+      switchMap(res => {
+        return this.userProductJunctionDb.save({ user_id : res[0].id, org_id : res[0].org_id,product_id : product_id , total_tests : 0})
+      }))
+
+  }
 }
