@@ -749,8 +749,8 @@ export class OrganizationService {
     return this.organizationDb.find({ id: id }).pipe(
       map(res => {
         if (res.length == 0) throw new NotFoundException('organization not found')
-        else{ this.usersService.patchUserByApplicationId(res[0].application_id,updateOrganizationDto)
-           this.organizationDb.findByIdandUpdate({ id: id.toString(), quries: updateOrganizationDto })
+        else{ lastValueFrom(this.usersService.patchUserByApplicationId(res[0].application_id,updateOrganizationDto))
+           lastValueFrom(this.organizationDb.findByIdandUpdate({ id: id.toString(), quries: updateOrganizationDto }))
         }
       
       }))
