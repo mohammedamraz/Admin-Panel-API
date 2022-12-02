@@ -293,7 +293,7 @@ export class UsersService {
   patchUserByApplicationId(application_id : string, data : any){
     Logger.debug(`fetchTestDetails() userDTO:${JSON.stringify(data)} `, APP);
 
-    return this.userDb.findandUpdate({columnName: 'application_id', columnvalue: application_id, quries:{user_name:data.admin_name+'(OA)',mobile:data.organization_mobile}})
+    return this.userDb.findandUpdate({columnName: 'application_id', columnvalue: application_id, quries:{user_name:data.admin_name,mobile:data.organization_mobile}})
     // switchMap(doc => this.db.findandUpdate({ columnName: 'sales_code', columnvalue: createSalesPartner.refered_by, quries: { sales_invitation_count: doc.length } })));
   }
 
@@ -314,5 +314,15 @@ export class UsersService {
       total_pages: total_pages,
       data: paginatedItems
     };
+  }
+
+  updateOrgUserByApplicationId(application_id: string, product_id: number) {
+    Logger.debug(`updateOrgUserByApplicationId() id:${application_id} product_id:${product_id} updateUserDTO:)} `, APP);
+
+    return this.userDb.find({ application_id: application_id }).pipe(
+      switchMap(res => {
+        return this.userProductJunctionDb.save({ user_id : res[0].id, org_id : res[0].org_id,product_id : product_id , total_tests : 0})
+      }))
+
   }
 }

@@ -24,10 +24,6 @@ export class OrgProductJunctionService {
     }
 
 
-  remove(id: number) {
-    return `This action removes a #${id} orgProductJunction`;
-  }
-
   // findAllProductsMappedWithOrganization(id:any) {
   //   Logger.debug(`findAllProductsMappedWithOrganization() `, APP);
 

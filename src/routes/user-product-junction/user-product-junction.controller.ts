@@ -8,12 +8,6 @@ const APP = "UserProductJunctionController"
 export class UserProductJunctionController {
   constructor(private readonly userProductJunctionService: UserProductJunctionService) {}
 
-  @Post()
-  createUserProductJunction(@Body() createUserProductJunctionDto: CreateUserProductJunctionDto) {
-      Logger.debug(`createUserProductJunction createUserProductJunctionDto: ${JSON.stringify(createUserProductJunctionDto)}`, APP);
-
-      return this.userProductJunctionService.createUserProductJunction(createUserProductJunctionDto);
-  }
 
   @Get('tests')
   fetchUserProductJunctionDataByUserIdOrOrgIdAndProductId(@Query() createUserProductJunctionDto: CreateUserProductJunctionDto){

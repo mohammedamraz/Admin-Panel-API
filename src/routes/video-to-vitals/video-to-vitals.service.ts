@@ -1,5 +1,5 @@
 import { BadRequestException, ConflictException, Injectable, Logger, NotFoundException, UnauthorizedException, UnprocessableEntityException } from '@nestjs/common';
-import { catchError, concatMap, from, lastValueFrom, map, switchMap, throwError } from 'rxjs';
+import { catchError, concatMap, from, lastValueFrom, map, of, switchMap, throwError } from 'rxjs';
 import { DatabaseTable } from 'src/lib/database/database.decorator';
 import { DatabaseService } from 'src/lib/database/database.service';
 import { PasswordResetDTO } from '../admin/dto/create-admin.dto';
@@ -301,6 +301,48 @@ export class VideoToVitalsService {
       }))
   }
 
+  addUserAndDirectRegister(userDTO: UserDTO) {
+    Logger.debug(`addUserAndDirectRegister() addUserDTO:${JSON.stringify(userDTO)} `, APP);
+
+    let product_user_list = userDTO.product_id.toString().split(",")
+    return this.usersService.fetchUserByCondition(userDTO).pipe(
+      map(user_doc => user_doc),
+      switchMap(user_doc => {
+        return this.organizationService.fetchOrganizationByIdDetails(userDTO.org_id).pipe(
+          map(org_doc => { return org_doc }),
+          switchMap(org_doc => {
+            userDTO.application_id = userDTO.mobile.slice(3, 14);
+            userDTO.organization_name = org_doc[0].organization_name;
+            let aws_password = userDTO.password
+            delete userDTO.product_id;
+            delete userDTO.password;
+            userDTO.is_register = true;
+            return this.userDb.save(userDTO).pipe(
+              map(userdoc => {
+                return [userdoc, org_doc]
+              }),
+              switchMap(async doc => {
+                await lastValueFrom(this.registerUserbyEmail(
+                  {
+                    "email": userDTO.email,
+                    "username": userDTO.email,
+                    "password": aws_password 
+                  }
+                ))
+                return doc[0][0]
+              }))
+          }),
+          map(async doc => {            
+            product_user_list.map(async res1 =>
+             await lastValueFrom(this.userProductJunctionService.createUserProductJunction({ user_id: doc["id"], org_id: userDTO["org_id"], product_id: Number(res1), total_tests: 0 }))
+             );
+            await lastValueFrom(this.userProfileDb.save({ application_id: doc['application_id'], user_id: doc['id'], org_id: doc['org_id'], name: doc['user_name'], is_editable: true }))
+            return doc;
+          }))
+      }))
+  }
+
+
 
   // addUser(userDTO: UserDTO) {
   //   Logger.debug(`addUser() addUserDTO:${JSON.stringify(userDTO)} `, APP);
@@ -386,6 +428,30 @@ export class VideoToVitalsService {
     )
   }
 
+  fetchUserDetailsById(id: number) {
+    Logger.debug(`fetchUserDetailsById() id:${id}} `, APP);
+
+    return this.userDb.find({ id: id }).pipe(
+      switchMap((userData:UserDTO[]) => {        
+        let user_data = userData[0]        
+        return this.userProductJunctionService.fetchUserProductJunctionDataByUserId(userData[0].id)
+            .pipe(switchMap(async doc => {
+              for (let index=0;index<=doc.length-1;index++) {
+                await lastValueFrom(this.productService.fetchProductById(doc[index].product_id).pipe(
+                  map(productDoc => {
+                      doc[index]['product']=productDoc
+                      user_data['tests'] = doc
+                      user_data['total_test'] = doc.reduce((pre, acc) => pre + acc['total_tests'], 0);
+                  }
+                  )))
+                }
+                return [user_data]               
+            }))
+            // .catch(err => { throw new UnprocessableEntityException(err.message) })
+      })
+    )
+  }
+
   fetchUserProductDetailsById(id: number) {
     Logger.debug(`fetchUserById() id:${id}} `, APP);
 
@@ -429,12 +495,31 @@ export class VideoToVitalsService {
 
   updateUser(id: string, updateUserDTO: UpdateUserDTO) {
     Logger.debug(`updateUser() id:${id} updateUserDTO:${JSON.stringify(updateUserDTO)} `, APP);
+    let productlist = updateUserDTO.product_id?.split(",")
+    let product_junctionlist = updateUserDTO.product_junction_id?.split(",")
 
     return this.userDb.find({ id: id }).pipe(
       map(res => {
-        if (res.length == 0) throw new NotFoundException('organization not found')
-        return this.userDb.findByIdandUpdate({ id: id.toString(), quries: updateUserDTO })
-      }))
+        delete updateUserDTO.product_id
+        delete updateUserDTO.product_junction_id
+        if (res.length == 0) throw new NotFoundException('User not found')
+        lastValueFrom(this.userDb.findByIdandUpdate({ id: id.toString(), quries: updateUserDTO }))
+        return res
+      }),
+      switchMap(async res => {
+        if(productlist != undefined){
+        for (let index = 0; index < productlist.length; index++) {
+          await lastValueFrom(this.userProductJunctionDb.find({ id: product_junctionlist[index] }).pipe(
+            map(async doc => {
+               if (doc.length == 0) await lastValueFrom(this.userProductJunctionDb.save({ user_id: id,  product_id: productlist[index], org_id : res[0].org_id, total_tests : 0}))
+               else return doc
+            })
+          )
+          )
+        }}
+        else return []
+      })
+      )
 
   }
 
@@ -524,36 +609,6 @@ export class VideoToVitalsService {
 
   }
 
-  // loginOrganizationByEmail(loginUserDTO: LoginUserDTO) {
-  //   Logger.debug(`loginOrganizationByEmail() loginUserDTO:${JSON.stringify(loginUserDTO)} `, APP);
-
-
-  //   loginUserDTO.fedoApp = FEDO_APP;
-  //   return this.getOrganisationDetailsByEmail(loginUserDTO).pipe((map(doc => { this.org_data = doc })),
-  //     switchMap(doc => {
-  //       return this.http
-  //         .post(
-  //           `${AWS_COGNITO_USER_CREATION_URL_SIT}/token`,
-  //           { passcode: this.encryptPassword(loginUserDTO) },
-  //         )
-  //         .pipe(
-  //           catchError((err) => {
-  //             return this.onAWSErrorResponse(err);
-  //           }),
-  //           map((res: AxiosResponse) => {
-  //             if (!res.data) throw new UnauthorizedException();
-  //             return {
-  //               jwtToken: res.data.idToken.jwtToken,
-  //               refreshToken: res.data.refreshToken,
-  //               accessToken: res.data.accessToken.jwtToken,
-  //               user_data: this.org_data
-  //             };
-  //           }),
-  //         );
-  //     })
-  //   )
-
-  // }
 
   private readonly onAWSErrorResponse = async (err) => {
     Logger.debug('onAWSErrorResponse(), ' + err, APP);

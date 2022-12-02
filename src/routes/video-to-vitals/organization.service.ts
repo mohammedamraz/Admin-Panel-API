@@ -1,10 +1,10 @@
 import { HttpService } from '@nestjs/axios';
 import { BadRequestException, ConflictException, Injectable, Logger, NotFoundException, UnauthorizedException, UnprocessableEntityException } from '@nestjs/common';
 import { DatabaseTable } from 'src/lib/database/database.decorator';
-import { CreateOrganizationDto, OrgDTO, QueryParamsDto, UpdateOrganizationDto, UpdateWholeOrganizationDto, UserProfileDTO } from './dto/create-video-to-vital.dto';
+import { CreateOrganizationDto, format_organisation, format_organisation_update, format_org_product_juction, OrgDTO, QueryParamsDto, RegisterUserDTO, UpdateOrganizationDto, UpdateWholeOrganizationDto, UserProfileDTO } from './dto/create-video-to-vital.dto';
 import { DatabaseService } from 'src/lib/database/database.service';
 import { catchError, concatMap, from, lastValueFrom, map, switchMap, throwError } from 'rxjs';
-import { AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, PUBLIC_KEY } from 'src/constants';
+import { AWS_ACCESS_KEY_ID, AWS_COGNITO_USER_CREATION_URL_SIT_ADMIN_PANEL, AWS_SECRET_ACCESS_KEY, FEDO_USER_ADMIN_PANEL_POOL_NAME, PUBLIC_KEY } from 'src/constants';
 import { S3 } from 'aws-sdk';
 import { v4 as uuidv4 } from 'uuid';
 import { OrgProductJunctionService } from '../org-product-junction/org-product-junction.service';
@@ -51,142 +51,14 @@ export class OrganizationService {
     }
     else delete createOrganizationDto.logo
 
-    let productlist = createOrganizationDto.product_id.split(",")
-    let productlist_pilotduration = (createOrganizationDto.pilot_duration)?.toString().split(",")
-    let productlist_fedoscore = (createOrganizationDto.fedo_score)?.toString().split(",")
-    let productlist_webApp = (createOrganizationDto.productaccess_web)?.toString().split(",") || []
-    let productlist_webFedoscore = (createOrganizationDto.web_fedoscore)?.toString().split(",") || []
-    let productlist_weburl = (createOrganizationDto.web_url)?.toString().split(",") || []
-    let productlist_event_mode = (createOrganizationDto.event_mode)?.toString().split(",") || []
-    // if (productlist_webApp[0] != null) {
-    //   return this.fetchOrgByUrlBoth(createOrganizationDto.url, productlist_weburl[0]).pipe(
-    //     map(doc => {
-    //       return this.fetchOrgByCondition(createOrganizationDto)
-    //     }),
-    //     switchMap(doc => {
-    //       this.respilot_duration = Number(productlist_pilotduration[0]);
-    //       createOrganizationDto.application_id = createOrganizationDto.organization_mobile.slice(3, 14);
-    //       delete createOrganizationDto.product_id;
-    //       delete createOrganizationDto.pilot_duration;
-    //       delete createOrganizationDto.fedo_score;
-    //       delete createOrganizationDto.productaccess_mobile;
-    //       delete createOrganizationDto.productaccess_web;
-    //       delete createOrganizationDto.web_fedoscore;
-    //       delete createOrganizationDto.web_url;
-    //       return this.organizationDb.save(createOrganizationDto)
-    //     }),
-    //     switchMap(res => {
-    //       var encryption = { org_id: res[0].id };
-    //       this.sendEmailService.sendEmailOnCreateOrg(
-    //         {
-    //           "email": createOrganizationDto.organization_email,
-    //           "organisation_admin_name": createOrganizationDto.admin_name.substring(0, createOrganizationDto.admin_name.indexOf(' ')),
-    //           "fedo_app": "Fedo Vitals",
-    //           "url": "https://www.fedo.ai/admin/" + createOrganizationDto.url + "?" + encodeURIComponent(this.encryptPassword(encryption)),
-    //           "pilot_duration": this.respilot_duration,
-    //           "application_id": (res[0].application_id)
-    //         })
-    //       return res
-    //     }),
-    //     switchMap(async res => {
-
-    //       for (let index = 0; index < productlist.length; index++) {
-    //         // console.log("url",productlist_weburl[index].length)
-    //         if ((productlist_webApp[index] == undefined) || (productlist_webApp[index].toString().length < 1)) productlist_webApp.push('false')
-    //         if ((productlist_webFedoscore[index] == undefined) || (productlist_webFedoscore[index].toString()?.length < 1)) productlist_webFedoscore.push('false')
-    //         if ((productlist_weburl[index] == undefined) || (productlist_weburl[index].toString().length == 0) || (productlist_weburl[index].toString()=='')) {console.log("inside");productlist_weburl.push(null)}
-    //         createOrganizationDto.status = "Active"
-    //         const tomorrow = new Date();
-    //         const duration = productlist_pilotduration[index]
-    //         createOrganizationDto.end_date = new Date(tomorrow.setDate(tomorrow.getDate() + Number(duration)));
-    //         await lastValueFrom(this.organizationProductJunctionDb.save({ org_id: res.id, end_date: createOrganizationDto.end_date, pilot_duration: productlist_pilotduration[index], status: createOrganizationDto.status, product_id: productlist[index], fedoscore: productlist_fedoscore[index], web_access: productlist_webApp[index], web_fedoscore: productlist_webFedoscore[index], web_url: productlist_weburl[index] }))
-    //       }
-    //       return res
-    //     }),
-    //     switchMap(res => { 
-    //       this.create_organization_response=res          
-    //       return this.usersService.saveUsersToUserDb({ user_name: createOrganizationDto.admin_name, org_id: Number(res.id), designation: createOrganizationDto.designation, email: createOrganizationDto.organization_email, application_id: res.application_id, organization_name: createOrganizationDto.organization_name, mobile: createOrganizationDto.organization_mobile }, productlist, Number(res.id))
-    //     }),
-    //     switchMap(res => {
-    //       this.userProfileDb.save({ application_id: res.application_id, user_id: res.id, org_id: res.org_id });
-    //       return [this.create_organization_response]
-    //     })
-    //   )
-    // }
-
-
-    // else {
-    //   return this.fetchOrgByUrl(createOrganizationDto.url).pipe(
-    //     map(doc => {
-    //       return this.fetchOrgByCondition(createOrganizationDto)
-    //     }),
-    //     switchMap(doc => {
-    //       this.respilot_duration = Number(productlist_pilotduration[0]);
-    //       createOrganizationDto.application_id = createOrganizationDto.organization_mobile.slice(3, 14);
-    //       delete createOrganizationDto.product_id;
-    //       delete createOrganizationDto.pilot_duration;
-    //       delete createOrganizationDto.fedo_score;
-    //       delete createOrganizationDto.productaccess_mobile;
-    //       delete createOrganizationDto.productaccess_web;
-    //       delete createOrganizationDto.web_fedoscore;
-    //       delete createOrganizationDto.web_url;
-    //       return this.organizationDb.save(createOrganizationDto)
-    //     }),
-    //     switchMap(res => {
-    //       var encryption = { org_id: res[0].id };
-    //       this.sendEmailService.sendEmailOnCreateOrg(
-    //         {
-    //           "email": createOrganizationDto.organization_email,
-    //           "organisation_admin_name": createOrganizationDto.admin_name.substring(0, createOrganizationDto.admin_name.indexOf(' ')),
-    //           "fedo_app": "Fedo Vitals",
-    //           "url": "https://www.fedo.ai/admin/" + createOrganizationDto.url + "?" + encodeURIComponent(this.encryptPassword(encryption)),
-    //           "pilot_duration": this.respilot_duration,
-    //           "application_id": (res[0].application_id)
-    //         })
-    //       return res
-    //     }),
-    //     switchMap(async res => {
-    //       for (let index = 0; index < productlist.length; index++) {
-    //         if ((productlist_webApp[index] == undefined) || (productlist_webApp[index].toString().length < 1)) productlist_webApp.push('false')
-    //         if ((productlist_webFedoscore[index] == undefined) || (productlist_webFedoscore[index].toString().length < 1)) productlist_webFedoscore.push('false')
-    //         if ((productlist_weburl[index] == undefined) || (productlist_weburl[index].toString().length < 1)) productlist_weburl.push('')
-    //         createOrganizationDto.status = "Active"
-    //         const tomorrow = new Date();
-    //         const duration = productlist_pilotduration[index]
-    //         createOrganizationDto.end_date = new Date(tomorrow.setDate(tomorrow.getDate() + Number(duration)));
-    //         await lastValueFrom(this.organizationProductJunctionDb.save({ org_id: res.id, end_date: createOrganizationDto.end_date, pilot_duration: productlist_pilotduration[index], status: createOrganizationDto.status, product_id: productlist[index], fedoscore: productlist_fedoscore[index], web_access: productlist_webApp[index], web_fedoscore: productlist_webFedoscore[index], web_url: productlist_weburl[index] }))
-    //       }
-    //       return res
-    //     }),
-    //     switchMap(res => { 
-    //       this.create_organization_response=res          
-    //       return this.usersService.saveUsersToUserDb({ user_name: createOrganizationDto.admin_name, org_id: Number(res.id), designation: createOrganizationDto.designation, email: createOrganizationDto.organization_email, application_id: res.application_id, organization_name: createOrganizationDto.organization_name, mobile: createOrganizationDto.organization_mobile }, productlist, Number(res.id))
-    //     }),
-    //     switchMap(res => {
-    //       this.userProfileDb.save({ application_id: res.application_id, user_id: res.id, org_id: res.org_id });
-    //       return [this.create_organization_response]
-    //     })
-    //   )
-    // }
-    // console.log("data",productlist_weburl[0].length)
-    if (productlist_webApp[0] != null && productlist_weburl[0].length > 0) {
-      return this.fetchOrgByUrlBoth(createOrganizationDto.url, productlist_weburl[0]).pipe(
+      return this.fetchOrgByUrlBoth(createOrganizationDto).pipe(
         map(doc => {
-          if (doc.length == 0) {
             return this.fetchOrgByCondition(createOrganizationDto).pipe(
               map(doc => { return doc }),
               switchMap((doc) => {
-                this.respilot_duration = Number(productlist_pilotduration[0]);
+                this.respilot_duration = Number(createOrganizationDto.pilot_duration[0]);
                 createOrganizationDto.application_id = createOrganizationDto.organization_mobile.slice(3, 14);
-                delete createOrganizationDto.product_id;
-                delete createOrganizationDto.pilot_duration;
-                delete createOrganizationDto.fedo_score;
-                delete createOrganizationDto.productaccess_mobile;
-                delete createOrganizationDto.productaccess_web;
-                delete createOrganizationDto.web_fedoscore;
-                delete createOrganizationDto.web_url;
-                delete createOrganizationDto.event_mode;
-                return this.organizationDb.save(createOrganizationDto).pipe(
+                return this.organizationDb.save(format_organisation(createOrganizationDto)).pipe(
                   map(res => {
                     var encryption = { org_id: res[0].id };
                     this.sendEmailService.sendEmailOnCreateOrg(
@@ -201,69 +73,55 @@ export class OrganizationService {
                     return res
                   }))
               }))
-          }
-          else {
-            throw new ConflictException('domain already taken')
-          }
         }),
         switchMap(res => res),
         switchMap(async res => {
-          for (let index = 0; index < productlist.length; index++) {
-            if ((productlist_webApp[index] == undefined) || (productlist_webApp[index].toString().length < 1)) productlist_webApp.push('false')
-            if ((productlist_webFedoscore[index] == undefined) || (productlist_webFedoscore[index].toString().length < 1)) productlist_webFedoscore.push('false')
-            if ((productlist_weburl[index] == undefined) || (productlist_weburl[index].toString().length < 1)) productlist_weburl.push(null)
-            if ((productlist_event_mode[index] == null) || (productlist_event_mode[index].toString().length < 1)) productlist_event_mode.push('0')
-            createOrganizationDto.status = "Active"
-            const tomorrow = new Date();
-            const duration = productlist_pilotduration[index]
-            createOrganizationDto.end_date = new Date(tomorrow.setDate(tomorrow.getDate() + Number(duration)));
-            await lastValueFrom(this.organizationProductJunctionDb.save({ org_id: res[0].id, end_date: createOrganizationDto.end_date, pilot_duration: productlist_pilotduration[index], status: createOrganizationDto.status, product_id: productlist[index], fedoscore: productlist_fedoscore[index], web_access: productlist_webApp[index], web_fedoscore: productlist_webFedoscore[index], web_url: productlist_weburl[index],event_mode:productlist_event_mode[index] }))
+          for (let index = 0; index < createOrganizationDto.product_id.length; index++) {
+            await lastValueFrom(this.organizationProductJunctionDb.save(format_org_product_juction(createOrganizationDto,index,res[0].id)))
           }
-          // this.userProfileDb.save({ application_id: res[0].application_id, org_id: res[0].id });
           return res
         }),
         switchMap(res => {
           this.create_organization_response = res
-          return this.usersService.saveUsersToUserDb({ user_name: createOrganizationDto.admin_name, org_id: Number(res[0].id), designation: createOrganizationDto.designation, email: createOrganizationDto.organization_email, application_id: res[0].application_id, organization_name: createOrganizationDto.organization_name, mobile: createOrganizationDto.organization_mobile , type : 'OrgAdmin'}, productlist, Number(res[0].id))
+          return this.usersService.saveUsersToUserDb({ user_name: createOrganizationDto.admin_name, org_id: Number(res[0].id), designation: createOrganizationDto.designation, email: createOrganizationDto.organization_email, application_id: res[0].application_id, organization_name: createOrganizationDto.organization_name, mobile: createOrganizationDto.organization_mobile , type : 'OrgAdmin'}, createOrganizationDto.product_id, Number(res[0].id))
         }),
         switchMap(res => {
           this.userProfileDb.save({ application_id: res.application_id, user_id: res.id, org_id: res.org_id });
           return [this.create_organization_response]
         })
       )
-    }
-    else {
+  }
 
-      return this.fetchOrgByUrl(createOrganizationDto.url).pipe(
+  async createOrganizationAndDirectRegister(createOrganizationDto: CreateOrganizationDto, path: any) {
+    Logger.debug(`createOrganizationAndDirectRegister() createOrganizationDto:${JSON.stringify(createOrganizationDto,)} filename:${path}`, APP);
+
+    if (path != null) {
+      await this.upload(path);
+      createOrganizationDto.logo = this.urlAWSPhoto;
+    }
+    else delete createOrganizationDto.logo
+      return this.fetchOrgByUrlBoth(createOrganizationDto).pipe(
         map(doc => {
           if (doc.length == 0) {
             return this.fetchOrgByCondition(createOrganizationDto).pipe(
               map(doc => { return doc }),
-              switchMap((doc) => {
-                this.respilot_duration = Number(productlist_pilotduration[0]);
+              switchMap(async (doc) => {
+                // let aws_password = createOrganizationDto.password;  
+                createOrganizationDto.is_register = true;
+                this.respilot_duration = Number(createOrganizationDto.pilot_duration[0]);
                 createOrganizationDto.application_id = createOrganizationDto.organization_mobile.slice(3, 14);
-                delete createOrganizationDto.product_id;
-                delete createOrganizationDto.pilot_duration;
-                delete createOrganizationDto.fedo_score;
-                delete createOrganizationDto.productaccess_mobile;
-                delete createOrganizationDto.productaccess_web;
-                delete createOrganizationDto.web_fedoscore;
-                delete createOrganizationDto.web_url;
-                delete createOrganizationDto.event_mode;
-                return this.organizationDb.save(createOrganizationDto).pipe(
-                  map(res => {
-                    var encryption = { org_id: res[0].id };
-                    this.sendEmailService.sendEmailOnCreateOrg(
-                      {
-                        "email": createOrganizationDto.organization_email,
-                        "organisation_admin_name": createOrganizationDto.admin_name.split(' ')[0],
-                        "fedo_app": "Fedo Vitals",
-                        "url": "https://www.fedo.ai/admin/vital/" + createOrganizationDto.url + "?" + encodeURIComponent(this.encryptPassword(encryption)),
-                        "pilot_duration": this.respilot_duration,
-                        "application_id": (res[0].application_id)
-                      })
+                // delete createOrganizationDto.password;
+                return await lastValueFrom(this.organizationDb.save(format_organisation(createOrganizationDto)).pipe(
+                  map(async res => {
+                    await lastValueFrom(this.registerUserbyEmail(
+                  {
+                    "email": createOrganizationDto.organization_email,
+                    "username": createOrganizationDto.organization_email,
+                    "password": createOrganizationDto.password 
+                  }
+                ))
                     return res
-                  }))
+                  })))
               }))
           }
           else {
@@ -272,66 +130,23 @@ export class OrganizationService {
         }),
         switchMap(res => res),
         switchMap(async res => {
-          for (let index = 0; index < productlist.length; index++) {
-            if ((productlist_webApp[index] == undefined) || (productlist_webApp[index].toString().length < 1)) productlist_webApp.push('false')
-            if ((productlist_webFedoscore[index] == undefined) || (productlist_webFedoscore[index].toString().length < 1)) productlist_webFedoscore.push('false')
-            if ((productlist_weburl[index] == undefined) || (productlist_weburl[index].toString().length < 1)) productlist_weburl.push('')
-            if ((productlist_event_mode[index] == undefined) || (productlist_event_mode[index].toString().length < 1)) productlist_event_mode.push('0')
-
-            createOrganizationDto.status = "Active"
-            const tomorrow = new Date();
-            const duration = productlist_pilotduration[index]
-            createOrganizationDto.end_date = new Date(tomorrow.setDate(tomorrow.getDate() + Number(duration)));
-            await lastValueFrom(this.organizationProductJunctionDb.save({ org_id: res[0].id, end_date: createOrganizationDto.end_date, pilot_duration: productlist_pilotduration[index], status: createOrganizationDto.status, product_id: productlist[index], fedoscore: productlist_fedoscore[index], web_access: productlist_webApp[index], web_fedoscore: productlist_webFedoscore[index], web_url: productlist_weburl[index],event_mode: productlist_event_mode[index]}))
+          for (let index = 0; index < createOrganizationDto.product_id.length; index++) {
+            await lastValueFrom(this.organizationProductJunctionDb.save(format_org_product_juction(createOrganizationDto,index,res[0].id)))
           }
-          // this.userProfileDb.save({ application_id: res[0].application_id, org_id: res[0].id });
           return res
         }),
         switchMap(res => {
           this.create_organization_response = res
-            return this.usersService.saveUsersToUserDb({ user_name: createOrganizationDto.admin_name, org_id: Number(res[0].id), designation: createOrganizationDto.designation, email: createOrganizationDto.organization_email, application_id: res[0].application_id, organization_name: createOrganizationDto.organization_name, mobile: createOrganizationDto.organization_mobile , type : 'OrgAdmin'}, productlist, Number(res[0].id))
+          return this.usersService.saveUsersToUserDb({ user_name: createOrganizationDto.admin_name, org_id: Number(res[0].id), designation: createOrganizationDto.designation, email: createOrganizationDto.organization_email, application_id: res[0].application_id, organization_name: createOrganizationDto.organization_name, mobile: createOrganizationDto.organization_mobile , type : 'OrgAdmin'}, createOrganizationDto.product_id, Number(res[0].id))
         }),
         switchMap(res => {
           this.userProfileDb.save({ application_id: res.application_id, user_id: res.id, org_id: res.org_id });
           return [this.create_organization_response]
         })
       )
-
-    }
 
   }
 
-  // createOrganizationAfterUrlCheck(createOrganizationDto: CreateOrganizationDto) {
-  //   Logger.debug(`createOrganizationAfterUrlCheck() data:${createOrganizationDto}} `, APP);
-
-  //   return this.fetchOrgByCondition(createOrganizationDto).pipe(
-  //     map(doc => { return doc }),
-  //     switchMap((doc) => {
-  //       this.respilot_duration = Number(productlist_pilotduration[0]);
-  //       createOrganizationDto.application_id = createOrganizationDto.organization_mobile.slice(3, 14);
-  //       delete createOrganizationDto.product_id;
-  //       delete createOrganizationDto.pilot_duration;
-  //       delete createOrganizationDto.fedo_score;
-  //       delete createOrganizationDto.productaccess_mobile;
-  //       delete createOrganizationDto.productaccess_web;
-  //       delete createOrganizationDto.web_fedoscore;
-  //       delete createOrganizationDto.web_url;
-  //       return this.organizationDb.save(createOrganizationDto).pipe(
-  //         map(res => {
-  //           var encryption = { org_id: res[0].id };
-  //           this.sendEmailService.sendEmailOnCreateOrg(
-  //             {
-  //               "email": createOrganizationDto.organization_email,
-  //               "organisation_admin_name": createOrganizationDto.admin_name.substring(0, createOrganizationDto.admin_name.indexOf(' ')),
-  //               "fedo_app": "Fedo Vitals",
-  //               "url": "https://www.fedo.ai/admin/"+createOrganizationDto.url + "?" + encodeURIComponent(this.encryptPassword(encryption)),
-  //               "pilot_duration": this.respilot_duration,
-  //               "application_id": (res[0].application_id)
-  //             })
-  //           return res
-  //         }))
-  //     }))
-  // }
 
   async updateOrganizationByFedoAdmin(id: number, updateWholeOrganizationDto: UpdateWholeOrganizationDto, path: any) {
     Logger.debug(`createOrganization() createOrganizationDto:${JSON.stringify(updateWholeOrganizationDto)} filename:{path}`, APP);
@@ -341,61 +156,41 @@ export class OrganizationService {
       updateWholeOrganizationDto.logo = this.urlAWSPhoto;
     }
     else delete updateWholeOrganizationDto.logo
-    let productlist = updateWholeOrganizationDto.product_id?.split(",")
-    let productlist_junction = updateWholeOrganizationDto.product_junction_id?.split(",")
-    let productlist_pilotduration = (updateWholeOrganizationDto.pilot_duration)?.toString().split(",")
-    let productlist_fedoscore = (updateWholeOrganizationDto.fedo_score)?.toString().split(",")
-    let productlist_webApp = (updateWholeOrganizationDto.productaccess_web)?.toString().split(",") || []
-    let productlist_webFedoscore = (updateWholeOrganizationDto.web_fedoscore)?.toString().split(",") || []
-    let productlist_weburl = (updateWholeOrganizationDto.web_url)?.toString().split(",") || []
-    let productlist_event_mode = (updateWholeOrganizationDto.event_mode)?.toString().split(",")
-    console.log("event mode",productlist_event_mode)
 
     return this.fetchOrganizationByIdDetails(id).pipe(
       map(doc => { return doc }),
-      switchMap((doc) => {
-        // updateWholeOrganizationDto.application_id = updateWholeOrganizationDto.organization_mobile?.slice(3, 14);
-        delete updateWholeOrganizationDto.product_id;
-        delete updateWholeOrganizationDto.pilot_duration;
-        delete updateWholeOrganizationDto.fedo_score;
-        delete updateWholeOrganizationDto.productaccess_mobile;
-        delete updateWholeOrganizationDto.productaccess_web;
-        delete updateWholeOrganizationDto.web_fedoscore;
-        delete updateWholeOrganizationDto.web_url;
-        delete updateWholeOrganizationDto.product_junction_id;
-        delete updateWholeOrganizationDto.event_mode;
+      switchMap(async (doc) => {
         updateWholeOrganizationDto.updated_date = new Date();
-        return this.organizationDb.findByIdandUpdate({ id: String(id), quries: updateWholeOrganizationDto })
+        await lastValueFrom(this.organizationDb.findByIdandUpdate({ id: String(id), quries: format_organisation_update(updateWholeOrganizationDto,doc[0]) }))
+        return doc
       }),
       switchMap(async res => {
-        // for (let index = 0; index < productlist_junction.length; index++) {
-        //   if ((productlist_webApp[index] == undefined) || (productlist_webApp[index].toString().length < 1)) productlist_webApp.push('false')
-        //   if ((productlist_webFedoscore[index] == undefined) || (productlist_webFedoscore[index].toString().length < 1)) productlist_webFedoscore.push('false')
-        //   if ((productlist_weburl[index] == undefined) || (productlist_weburl[index].toString().length < 1)) productlist_weburl.push('')
-        //   const tomorrow = new Date();
-        //   const duration = productlist_pilotduration[index]
-        //   updateWholeOrganizationDto.end_date = new Date(tomorrow.setDate(tomorrow.getDate() + Number(duration)));
-        //   await lastValueFrom(this.organizationProductJunctionDb.findByIdandUpdate({ id: productlist_junction[index], quries: { org_id: id, end_date: updateWholeOrganizationDto.end_date, pilot_duration: productlist_pilotduration[index], fedoscore: productlist_fedoscore[index], web_access: productlist_webApp[index], web_fedoscore: productlist_webFedoscore[index], web_url: productlist_weburl[index] } }))
-        // }
-        for (let index = 0; index < productlist.length; index++) {
-
-          if ((productlist_webApp[index] == undefined) || (productlist_webApp[index].toString().length < 1)) productlist_webApp.push('false')
-          if ((productlist_webFedoscore[index] == undefined) || (productlist_webFedoscore[index].toString().length < 1)) productlist_webFedoscore.push('false')
-          if ((productlist_weburl[index] == undefined) || (productlist_weburl[index].toString().length < 1)) productlist_weburl.push('')
-          if ((productlist_event_mode[index] == undefined) || (productlist_event_mode[index].toString().length < 1)) productlist_event_mode.push('0')
-          const tomorrow = new Date();
-          const duration = productlist_pilotduration[index]
-          updateWholeOrganizationDto.end_date = new Date(tomorrow.setDate(tomorrow.getDate() + Number(duration)));
-          await lastValueFrom(this.organizationProductJunctionDb.find({ id: productlist_junction[index] }).pipe(
+        for (let index = 0; index < updateWholeOrganizationDto.product_id.length; index++) {
+          await lastValueFrom(this.organizationProductJunctionDb.find({ id: updateWholeOrganizationDto.product_junction_id[index] }).pipe(
             map(async doc => {
-              if (doc.length != 0) await lastValueFrom(this.organizationProductJunctionDb.findByIdandUpdate({ id: productlist_junction[index], quries: { org_id: id, end_date: updateWholeOrganizationDto.end_date, pilot_duration: productlist_pilotduration[index], fedoscore: productlist_fedoscore[index], web_access: productlist_webApp[index], web_fedoscore: productlist_webFedoscore[index], web_url: productlist_weburl[index] , event_mode:productlist_event_mode[index]} }))
-              else await lastValueFrom(this.organizationProductJunctionDb.save({ org_id: id, end_date: updateWholeOrganizationDto.end_date, pilot_duration: productlist_pilotduration[index], status: "Active", product_id: productlist[index], fedoscore: productlist_fedoscore[index], web_access: productlist_webApp[index], web_fedoscore: productlist_webFedoscore[index], web_url: productlist_weburl[index] ,event_mode:productlist_event_mode[index]}))
+              if (doc.length != 0) await lastValueFrom(this.organizationProductJunctionDb.findByIdandUpdate({ id: updateWholeOrganizationDto.product_junction_id[index], quries: format_org_product_juction(updateWholeOrganizationDto,index,id)}))
+              else {
+                await lastValueFrom(this.organizationProductJunctionDb.save(format_org_product_juction(updateWholeOrganizationDto,index,id)));
+                await lastValueFrom(this.usersService.updateOrgUserByApplicationId(res[0].application_id,Number(updateWholeOrganizationDto.product_id[index])));
+              }
             })
           )
           )
         }
       })
     )
+  }
+
+  registerUserbyEmail(RegisterUserdto: RegisterUserDTO) {
+    Logger.debug(`registerUserbyEmail(), RegisterUserdto:[${JSON.stringify(RegisterUserdto,)}] `);
+
+    RegisterUserdto.fedoApp = FEDO_USER_ADMIN_PANEL_POOL_NAME
+    return this.http.post(`${AWS_COGNITO_USER_CREATION_URL_SIT_ADMIN_PANEL}/`, { passcode: this.encryptPassword(RegisterUserdto) }).pipe(
+      map(doc => {
+        console.log('doc', doc)
+      }),
+      catchError(err => { console.log('err', err); return this.onAWSErrorResponse(err) }))
+
   }
 
   //this function can be used for the paginator function that we are using in the list of datas in the admin panel 
@@ -655,27 +450,30 @@ export class OrganizationService {
     )
   }
 
-  fetchOrgByUrlBoth(url: string, web_url: string) {
-    Logger.debug(`fetchOrgByUrlBoth() url:${url}`, APP);
+  fetchOrgByUrlBoth(createOrganizationDto:CreateOrganizationDto) {
+    Logger.debug(`fetchOrgByUrlBoth() url:${createOrganizationDto.url}`, APP);
+    console.log("in",createOrganizationDto.web_url)
 
-    return this.organizationDb.find({ url: url }).pipe(
+    return this.organizationDb.find({ url: createOrganizationDto.url }).pipe(
       switchMap(doc => {
-        if (doc.length == 0) {
-          return this.organizationProductJunctionDb.find({ web_url: web_url }).pipe(
-            map(doc => {
-              if (doc.length == 0) {
-                return []
-              }
-              else {
-                throw new ConflictException("web domain already taken")
-              }
-            })
-          )
-        }
-        else {
-          throw new ConflictException("domain already taken")
-        }
-      })
+        console.log(doc);
+        if (doc.length == 0){
+          
+          
+         
+        if((createOrganizationDto.web_url?.length == undefined)|| (createOrganizationDto.web_url == null)) {
+          console.log("in")
+           return [doc]
+        }else
+          { 
+            console.log("rsdzfxcersdX")
+            return lastValueFrom(this.organizationProductJunctionDb.find({ web_url:createOrganizationDto.web_url }).pipe(
+              map(doc => { if (doc.length == 0) {console.log("in web ",doc);return []}
+              else { console.log("doc web");throw new ConflictException(doc)}})
+              ))}}
+              else {throw new ConflictException("domain already taken")}
+          })
+        
     )
   }
 
@@ -951,8 +749,8 @@ export class OrganizationService {
     return this.organizationDb.find({ id: id }).pipe(
       map(res => {
         if (res.length == 0) throw new NotFoundException('organization not found')
-        else{ this.usersService.patchUserByApplicationId(res[0].application_id,updateOrganizationDto)
-           this.organizationDb.findByIdandUpdate({ id: id.toString(), quries: updateOrganizationDto })
+        else{ lastValueFrom(this.usersService.patchUserByApplicationId(res[0].application_id,updateOrganizationDto))
+           lastValueFrom(this.organizationDb.findByIdandUpdate({ id: id.toString(), quries: updateOrganizationDto }))
         }
       
       }))

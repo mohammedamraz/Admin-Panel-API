@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Logger, ParseIntPipe, UseInterceptors, UploadedFile, Query } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Logger, ParseIntPipe, UseInterceptors, UploadedFile, Query, UsePipes } from '@nestjs/common';
 import { VideoToVitalsService } from './video-to-vitals.service';
 import { CreateOrganizationDto, LoginUserDTO, LoginUserPasswordCheckDTO, OrgDTO, ProductDto, QueryParamsDto, RegisterUserDTO, UpdateOrganizationDto, UpdateUserDTO, UpdateWholeOrganizationDto, UserDTO, UserParamDto, VitalUserDTO } from './dto/create-video-to-vital.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
@@ -9,6 +9,7 @@ import { UsersService } from './users.service';
 import { LoggingInterceptor } from 'src/interceptors/interceptor';
 import { ZQueryParamsDto } from '../org-product-junction/dto/create-org-product-junction.dto';
 import { Cron } from '@nestjs/schedule';
+import { JoiValidationPipe } from 'src/constants/pipes';
 
 
 const APP = "VideoToVitalsController"
@@ -21,11 +22,21 @@ export class VideoToVitalsController {
   ) { }
 
   @Post('org')
+  @UsePipes(new JoiValidationPipe())
   @UseInterceptors(FileInterceptor('file'))
   createOrganization(@Body() createOrganizationDto: CreateOrganizationDto, @UploadedFile() file) {
     Logger.debug(`createOrganization() createOrganizationDto:${JSON.stringify(createOrganizationDto)} file:${JSON.stringify(file)}`, APP);
 
     return this.organizationService.createOrganization(createOrganizationDto, file);
+  }
+
+  @Post('org/direct')
+  @UsePipes(new JoiValidationPipe())
+  @UseInterceptors(FileInterceptor('file'))
+  createOrganizationAndDirectRegister(@Body() createOrganizationDto: CreateOrganizationDto, @UploadedFile() file) {
+    Logger.debug(`createOrganizationAndDirectRegister() createOrganizationDto:${JSON.stringify(createOrganizationDto)} file:${JSON.stringify(file)}`, APP);
+
+    return this.organizationService.createOrganizationAndDirectRegister(createOrganizationDto, file);
   }
 
   @Get('org/count')
@@ -107,6 +118,7 @@ export class VideoToVitalsController {
   }
 
   @Patch(':id')
+  @UsePipes(new JoiValidationPipe())
   @UseInterceptors(FileInterceptor('file'))
 
   updateOrganizationByFedoAdmin(@Param('id', ParseIntPipe) id: number, @Body() updateWholeOrganizationDto: UpdateWholeOrganizationDto, @UploadedFile() file) {
@@ -170,6 +182,12 @@ export class VideoToVitalsController {
     return this.videoToVitalsService.addUser(userDTO)
   }
 
+  @Post('users/direct')
+  addUserAndDirectRegister(@Body() userDTO: UserDTO) {
+    Logger.debug(`addUserAndDirectRegister() addUserDTO:${JSON.stringify(userDTO)} `, APP);
+
+    return this.videoToVitalsService.addUserAndDirectRegister(userDTO)
+  }
   
   @Get('junction/domain/:url')
   fetchOrgByUrlFromJunction(@Param('url') url: string) {
@@ -201,10 +219,10 @@ export class VideoToVitalsController {
   }
 
   @Get('users/data/list/:id')
-  fetchUserById(@Param('id', ParseIntPipe) id: number) {
-    Logger.debug(`fetchUserById()`, APP);
+  fetchUserDetailsById(@Param('id', ParseIntPipe) id: number) {
+    Logger.debug(`fetchUserDetailsById()`, APP);
 
-    return this.videoToVitalsService.fetchUserById(id)
+    return this.videoToVitalsService.fetchUserDetailsById(id)
   }
 
   @Get('users/data/product/list/:id')

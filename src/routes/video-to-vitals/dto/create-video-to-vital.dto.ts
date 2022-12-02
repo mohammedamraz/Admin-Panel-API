@@ -25,24 +25,26 @@ export class CreateOrganizationDto {
     start_date: Date;
     end_date: Date;
     @IsOptional()
-    fedo_score: boolean;
+    fedo_score: [];
     @IsOptional()
     logo: string;
-    pilot_duration: number;
-    product_name: string;
-    product_id: string;
+    pilot_duration: Array<string>;
+    product_name: string;    
+    product_id: Array<string>;
     id: number;
     status: string;
     total_tests: number;
     application_id: string;
     stage?: string;
     org_id: string;
-    productaccess_web?: boolean;
-    productaccess_mobile?: boolean;
-    web_fedoscore?: boolean;
-    web_url?: string;
+    productaccess_web?: Array<string>;
+    productaccess_mobile?: Array<string>;
+    web_fedoscore?: Array<string>;
+    web_url?: Array<string>;
     type?: string;
-    event_mode?:string;
+    event_mode?:Array<string>;
+    password? : any;
+    is_register : boolean ;
 }
 
 export class UpdateWholeOrganizationDto {
@@ -89,6 +91,11 @@ export class UpdateWholeOrganizationDto {
     type?: string;
     updated_date?: Date;
     event_mode?:string;
+    country? : any;
+    zip? : any;
+    state? : any;
+    city? : any;
+    address? : any;
 }
 
 export class OrgDTO {
@@ -104,13 +111,13 @@ export class OrgDTO {
 }
 
 export class RegisterUserDTO {
-    fedoApp: string;
+    fedoApp?: string;
     // @IsNotEmpty()
     email: string;
     @IsNotEmpty()
     password: string;
     username: string;
-    ConfirmationCode: string;
+    ConfirmationCode?: string;
 }
 
 export class EmailConfirmationDTO {
@@ -182,6 +189,8 @@ export class UserDTO {
     org_id:number;
     tests?:any;
     type? :any;
+    is_register? : boolean;
+    total_test? : any;
 }
 
 
@@ -228,6 +237,16 @@ export class UpdateUserDTO {
     @IsOptional()
     @IsPhoneNumber()
     mobile: String;
+    product_name?:string;
+    product_id?:any;
+    product_junction_id? : any;
+    third_party_org_name?:string;
+    password?:string;
+    application_id?:string;
+    org_id?:number;
+    tests?:any;
+    type? :any;
+    is_register? : boolean
 
 }
 
@@ -334,3 +353,71 @@ export class UserParamDto {
     is_deleted?:boolean
 
 }
+
+export const format_organisation=(res)=>{
+    let data=
+    {organization_name:res.organization_name,
+    admin_name:res.admin_name,
+    organization_email:res.organization_email,
+    organization_mobile:res.organization_mobile,
+    logo:res?.logo || null,
+    attempts:res?.attempts || 0,
+    designation:res.designation,
+    url:res.url,
+    stage:res?.stage || null,
+    application_id:res.application_id,
+    is_register:res?.is_register|| false,
+    type:res?.type || 'OrgAdmin',
+    country:res?.country || null,
+    state:res?.state || null,
+    zip:res?.zip || null,
+    city:res?.city || null,
+    address:res?.address || null
+}
+
+    return data
+    
+}
+
+export const format_organisation_update=(res,doc)=>{
+    let data=
+    {organization_name:res.organization_name? res.organization_name : doc.organization_name,
+    admin_name:res.admin_name?res.admin_name:doc.admin_name,
+    organization_email:res.organization_email?res.organization_email:doc.organization_email,
+    organization_mobile:res.organization_mobile?res.organization_mobile:doc.organization_mobile,
+    logo:res?.logo?res?.logo:doc?.logo,
+    attempts:res?.attempts?res?.attempts:doc?.attempts,
+    designation:res.designation?res.designation:doc.designation,
+    url:res.url?res.url:doc.url,
+    stage:res?.stage?res?.stage:doc?.stage ,
+    application_id:res.application_id?res.application_id:doc.application_id,
+    is_register:res?.is_register?res?.is_register:doc?.is_register,
+    type:res?.type?res?.type:doc?.type,
+    country:res?.country?res?.country:doc?.country,
+    state:res?.state?res?.state:doc?.state,
+    zip:res?.zip?res?.zip:doc?.zip,
+    city:res?.city?res?.city:doc?.city,
+    address:res?.address?res?.address:doc?.address,
+    updated_date:res.updated_date
+}
+return data
+    
+}
+
+export const format_org_product_juction=(res,index,id)=>{
+    console.log("format_org_product_juction() const" ,res ,index, id)
+    const tomorrow = new Date();
+    let end_date = new Date(tomorrow.setDate(tomorrow.getDate() + Number(res.pilot_duration[index])));
+   let data={ org_id: id, 
+        end_date: end_date, 
+        pilot_duration: res.pilot_duration[index] ,
+        event_mode: res.event_mode ? res.event_mode[index] : 0, 
+        product_id: res.product_id[index], 
+        fedoscore: res.fedo_score[index], 
+        web_access: res.productaccess_web ? res.productaccess_web[index] : false ,  
+        ios_access: res.ios_access ? res.ios_access[index] : false, 
+        status: "Active"
+    }
+    return data
+}
+
