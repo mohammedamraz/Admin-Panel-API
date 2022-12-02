@@ -416,6 +416,7 @@ export const format_org_product_juction=(res,index,id)=>{
         fedoscore: res.fedo_score[index], 
         web_access: res.productaccess_web ? res.productaccess_web[index] : false ,  
         ios_access: res.ios_access ? res.ios_access[index] : false, 
+        mobile_access: res.productaccess_mobile ? res.productaccess_mobile[index] : false, 
         status: "Active"
     }
     return data
