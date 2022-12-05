@@ -858,8 +858,8 @@ export class OrganizationService {
       map(doc=>{
       doc.forEach(doc=>{
         return this.fetchOrganizationDetailsById(doc.org_id).subscribe({
-          next: doc=>{
-           this.sendEmailService.sendFinalEmailWhenDaysLeftToPilotExpire({
+          next: async doc=>{
+           return await this.sendEmailService.sendFinalEmailWhenDaysLeftToPilotExpire({
             email:doc[0].organization_email,
             organisation_name : doc[0].organization_name,
             organisation_admin_name : doc[0].admin_name.split(' ')[0],
@@ -880,8 +880,8 @@ export class OrganizationService {
         map(doc=>{
         doc.forEach(doc=>{
           return this.fetchOrganizationDetailsById(doc.org_id).subscribe({
-            next: doc=>{
-            return this.sendEmailService.sendFinalEmailOncePilotIsExpired({
+            next: async doc=>{
+            return await this.sendEmailService.sendFinalEmailOncePilotIsExpired({
               email:doc[0].organization_email,
               organisation_name : doc[0].organization_name,
               organisation_admin_name : doc[0].admin_name.split(' ')[0],
