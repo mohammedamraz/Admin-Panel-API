@@ -44,7 +44,8 @@ export class CreateOrganizationDto {
     type?: string;
     event_mode?:Array<string>;
     password? : any;
-    is_register : boolean ;
+    is_register? : boolean ;
+    // org_details? : any;
 }
 
 export class UpdateWholeOrganizationDto {
@@ -281,6 +282,7 @@ export class LoginUserPasswordCheckDTO {
 export enum Type {
     "latest" = "latest",
     "active" = "active",
+    "expired" = "expired",
 }
 export class QueryParamsDto {
 
@@ -330,6 +332,11 @@ export const CONVERTINNUMBER = {
 
 export const CONVERTINACTIVE = {
     active: "Active"
+}
+
+export const CONVERTPILOTSTATUS = {
+    active: "Active",
+    expired: "Expired"
 }
 
 

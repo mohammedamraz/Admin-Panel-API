@@ -9,7 +9,7 @@ import { AWS_COGNITO_USER_CREATION_URL_SIT, AWS_COGNITO_USER_CREATION_URL_SIT_AD
 import { HttpService } from '@nestjs/axios';
 import { AxiosResponse } from 'axios';
 import { ConfirmForgotPasswordDTO, ForgotPasswordDTO } from '../admin/dto/login.dto';
-import { CreateOrganizationDto, LoginUserDTO, LoginUserPasswordCheckDTO, OrgDTO, CONVERTINNUMBER, ProductDto, RegisterUserDTO, UpdateOrganizationDto, UpdateUserDTO, UserDTO, UserProfileDTO, VitalUserDTO, CONVERTINACTIVE, QueryParamsDto, UserParamDto } from './dto/create-video-to-vital.dto';
+import { CreateOrganizationDto, LoginUserDTO, LoginUserPasswordCheckDTO, OrgDTO, CONVERTINNUMBER, ProductDto, RegisterUserDTO, UpdateOrganizationDto, UpdateUserDTO, UserDTO, UserProfileDTO, VitalUserDTO, CONVERTINACTIVE, QueryParamsDto, UserParamDto, CONVERTPILOTSTATUS } from './dto/create-video-to-vital.dto';
 import { v4 as uuidv4 } from 'uuid';
 import { CreateUserProductJunctionDto } from '../user-product-junction/dto/create-user-product-junction.dto';
 import { OrganizationService } from './organization.service';
@@ -54,8 +54,8 @@ export class VideoToVitalsService {
         switchMap(doc => this.organizationService.updateStatus(doc))
       );
     }
-    if (queryParamsDto.type == "active") {
-      return this.organizationProductJunctionDb.find({ product_id: id, status: "Active" }).pipe(
+    else if (queryParamsDto.type == "active" || queryParamsDto.type == "expired") {
+      return this.organizationProductJunctionDb.find({ product_id: id, status: CONVERTPILOTSTATUS[queryParamsDto.type] }).pipe(
         catchError(err => { throw new UnprocessableEntityException(err.message) }),
         map(doc => {
           if (doc.length == 0) {
@@ -111,6 +111,7 @@ export class VideoToVitalsService {
           .then(doc => {
             orgJunData['progress'] = this.fetchDate(orgJunData);
             orgJunData['organization_name'] = doc[0].organization_name
+            // orgJunData['org_details'] = doc[0];
             orgData.push(orgJunData);
             orgData.sort((a: { id?: number; },b: { id?: number; })=> b.id-a.id);
             
