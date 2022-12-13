@@ -376,15 +376,11 @@ export class DatabaseService<T> implements DatabaseInterface<T> {
   else if(findbyConditionParams.period=='quarterly'){
     const date = new Date(params.test_date);
     delete params.period
-    const test_date = (d => new Date(d.setMonth(date.getMonth()+1)).toISOString().split("T")[0])(new Date());
-    const currentDate = (d => new Date(d.setMonth(date.getMonth()+5)).toISOString().split("T")[0])(new Date());
+    const test_date = new Date(date.setDate(1)).toISOString().split("T")[0];
+    const currentDate = new Date(date.getFullYear(),date.getMonth()+3, 0, 23, 59, 59).toISOString().split("T")[0];
     delete params.test_date
     Object.values(params).map((params, index) => { variables.push(params), values.push((`$${index + 1}`)) }) 
-    
-
-    console.log("variable",variables,currentDate);
-    
-    const queryQuarter = `SELECT * FROM ${this.tableName} where org_id = ${values[0]} AND product_id = ${values[1]} AND extract(YEAR FROM test_date) = extract(YEAR FROM now()) and extract(MONTH FROM test_date) > extract(MONTH FROM Date '${test_date}') and extract(MONTH FROM test_date) < extract(MONTH FROM Date '${currentDate}')`
+    const queryQuarter = `SELECT * FROM ${this.tableName} where org_id = ${values[0]} AND product_id = ${values[1]} AND test_date BETWEEN '${test_date}' and '${currentDate}'`
     return this.runQuery(queryQuarter, variables);
   }
   else if(findbyConditionParams.period=='yearly'){
@@ -433,12 +429,12 @@ export class DatabaseService<T> implements DatabaseInterface<T> {
   else if(findbyConditionParams.period=='quarterly'){
     const date = new Date(params.test_date);
     delete params.period
-    const test_date = (d => new Date(d.setMonth(date.getMonth()+1)).toISOString().split("T")[0])(new Date());
-    const currentDate = (d => new Date(d.setMonth(date.getMonth()+5)).toISOString().split("T")[0])(new Date());
+    const test_date = new Date(date.setDate(1)).toISOString().split("T")[0];
+    const currentDate = new Date(date.getFullYear(),date.getMonth()+3, 0, 23, 59, 59).toISOString().split("T")[0];
     delete params.test_date
     Object.values(params).map((params, index) => { variables.push(params), values.push((`$${index + 1}`)) }) 
    
-    const queryQuarter = `SELECT * FROM ${this.tableName} where user_id = ${values[0]} AND product_id = ${values[1]} AND extract(YEAR FROM test_date) = extract(YEAR FROM now()) and extract(MONTH FROM test_date) > extract(MONTH FROM Date '${test_date}') and extract(MONTH FROM test_date) < extract(MONTH FROM Date '${currentDate}')`
+    const queryQuarter = `SELECT * FROM ${this.tableName} where user_id = ${values[0]} AND product_id = ${values[1]} AND test_date BETWEEN '${test_date}' and '${currentDate}'`
     return this.runQuery(queryQuarter, variables);
   }
   else if(findbyConditionParams.period=='yearly'){

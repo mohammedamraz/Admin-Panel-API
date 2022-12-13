@@ -283,6 +283,7 @@ export enum Type {
     "latest" = "latest",
     "active" = "active",
     "expired" = "expired",
+    '' =  ''
 }
 export class QueryParamsDto {
 
