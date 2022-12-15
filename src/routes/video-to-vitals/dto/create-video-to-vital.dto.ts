@@ -185,7 +185,7 @@ export class UserDTO {
     mobile: String;
     organization_name:string;
     product_name?:string;
-    product_id?:number;
+    product_id?:Array<string>;
     third_party_org_name?:string;
     password?:string;
     application_id?:string;
@@ -194,6 +194,7 @@ export class UserDTO {
     type? :any;
     is_register? : boolean;
     total_test? : any;
+    role? : Array<string>;
 }
 
 
@@ -250,6 +251,7 @@ export class UpdateUserDTO {
     tests?:any;
     type? :any;
     is_register? : boolean
+    role ? : any;
 
 }
 
@@ -362,6 +364,40 @@ export class UserParamDto {
     product_id?:number;
     is_deleted?:boolean
 
+}
+
+export const format_user=(res)=>{
+    let data=
+    {user_name:res.user_name,
+    tpa_name:res.tpa_name || null,
+    email:res.email,
+    mobile:res.mobile,
+    org_id:res?.org_id,
+    organization_name:res?.organization_name ,
+    designation:res.designation,
+    application_id:res.application_id,
+    is_register:res?.is_register|| false,
+}
+
+    return data
+    
+}
+
+export const format_user_update =(res,doc)=>{
+    let data=
+    {user_name:res.user_name? res.user_name : doc.user_name,
+    tpa_name:res.tpa_name ? res.tpa_name :doc.tpa_name,
+    email:res.email ? res.email :doc.email,
+    mobile:res.mobile ? res.mobile : doc.mobile,
+    org_id:res?.org_id ? res?.org_id :doc?.org_id,
+    organization_name:res?.organization_name ? res?.organization_name : doc?.organization_name ,
+    designation:res.designation ? res.designation : doc.designation,
+    application_id:res.application_id ? res.application_id : doc.application_id,
+    is_register:res?.is_register ? res?.is_register : doc?.is_register,
+}
+
+    return data
+    
 }
 
 export const format_organisation=(res)=>{

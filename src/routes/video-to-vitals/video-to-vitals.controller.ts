@@ -176,6 +176,7 @@ export class VideoToVitalsController {
   }
 
   @Post('users')
+  @UsePipes(new JoiValidationPipe())
   addUser(@Body() userDTO: UserDTO) {
     Logger.debug(`addUser() addUserDTO:${JSON.stringify(userDTO)} `, APP);
 
@@ -183,6 +184,7 @@ export class VideoToVitalsController {
   }
 
   @Post('users/direct')
+  @UsePipes(new JoiValidationPipe())
   addUserAndDirectRegister(@Body() userDTO: UserDTO) {
     Logger.debug(`addUserAndDirectRegister() addUserDTO:${JSON.stringify(userDTO)} `, APP);
 
@@ -241,6 +243,7 @@ export class VideoToVitalsController {
   }
 
   @Patch('users/:id')
+  @UsePipes(new JoiValidationPipe())
   updateUser(@Param('id') id: string, @Body() updateUserDTO: UpdateUserDTO) {
     Logger.debug(`updateUser() id:${id} updateUserDTO:${JSON.stringify(updateUserDTO)} `, APP);
 

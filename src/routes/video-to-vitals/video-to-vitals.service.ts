@@ -9,7 +9,7 @@ import { AWS_COGNITO_USER_CREATION_URL_SIT, AWS_COGNITO_USER_CREATION_URL_SIT_AD
 import { HttpService } from '@nestjs/axios';
 import { AxiosResponse } from 'axios';
 import { ConfirmForgotPasswordDTO, ForgotPasswordDTO } from '../admin/dto/login.dto';
-import { CreateOrganizationDto, LoginUserDTO, LoginUserPasswordCheckDTO, OrgDTO, CONVERTINNUMBER, ProductDto, RegisterUserDTO, UpdateOrganizationDto, UpdateUserDTO, UserDTO, UserProfileDTO, VitalUserDTO, CONVERTINACTIVE, QueryParamsDto, UserParamDto, CONVERTPILOTSTATUS } from './dto/create-video-to-vital.dto';
+import { CreateOrganizationDto, LoginUserDTO, LoginUserPasswordCheckDTO, OrgDTO, CONVERTINNUMBER, ProductDto, RegisterUserDTO, UpdateOrganizationDto, UpdateUserDTO, UserDTO, UserProfileDTO, VitalUserDTO, CONVERTINACTIVE, QueryParamsDto, UserParamDto, CONVERTPILOTSTATUS, format_user, format_user_update } from './dto/create-video-to-vital.dto';
 import { v4 as uuidv4 } from 'uuid';
 import { CreateUserProductJunctionDto } from '../user-product-junction/dto/create-user-product-junction.dto';
 import { OrganizationService } from './organization.service';
@@ -259,7 +259,6 @@ export class VideoToVitalsService {
   addUser(userDTO: UserDTO) {
     Logger.debug(`addUser() addUserDTO:${JSON.stringify(userDTO)} `, APP);
 
-    let product_user_list = userDTO.product_id.toString().split(",")
     return this.usersService.fetchUserByCondition(userDTO).pipe(
       map(user_doc => user_doc),
       switchMap(user_doc => {
@@ -268,15 +267,12 @@ export class VideoToVitalsService {
           switchMap(org_doc => {
             userDTO.application_id = userDTO.mobile.slice(3, 14);
             userDTO.organization_name = org_doc[0].organization_name;
-            delete userDTO.product_id;
-            return this.userDb.save(userDTO).pipe(
+            return this.userDb.save(format_user(userDTO)).pipe(
               map(userdoc => {
                 return [userdoc, org_doc]
               }),
               switchMap(doc => {
-                console.log("url.", doc[1][0]['url'])
                 var encryption = { user_id: doc[0][0]['id'] };
-                console.log("name", userDTO.user_name.substring(0, userDTO.user_name.indexOf(' ')))
                 this.sendEmailService.sendEmailOnCreateOrgUser(
 
                   {
@@ -292,11 +288,11 @@ export class VideoToVitalsService {
                 return doc[0]
               }))
           }),
-          map(doc => {
-            product_user_list.map(res1 =>
-              this.userProductJunctionService.createUserProductJunction({ user_id: doc["id"], org_id: userDTO["org_id"], product_id: Number(res1), total_tests: 0 }))
+          map(async doc => {
+            userDTO.product_id.map(async (res1,index) =>{
+              await lastValueFrom(this.userProductJunctionService.createUserProductJunction({ user_id: doc["id"], org_id: userDTO["org_id"], product_id: Number(userDTO.product_id[index]), total_tests: 0 , role : userDTO.role[index] }))})
             // doc["id"]
-            this.userProfileDb.save({ application_id: doc['application_id'], user_id: doc['id'], org_id: doc['org_id'], name: doc['user_name'], is_editable: true })
+            await lastValueFrom(this.userProfileDb.save({ application_id: doc['application_id'], user_id: doc['id'], org_id: doc['org_id'], name: doc['user_name'], is_editable: true }))
             return doc;
           }))
       }))
@@ -305,7 +301,6 @@ export class VideoToVitalsService {
   addUserAndDirectRegister(userDTO: UserDTO) {
     Logger.debug(`addUserAndDirectRegister() addUserDTO:${JSON.stringify(userDTO)} `, APP);
 
-    let product_user_list = userDTO.product_id.toString().split(",")
     return this.usersService.fetchUserByCondition(userDTO).pipe(
       map(user_doc => user_doc),
       switchMap(user_doc => {
@@ -314,11 +309,8 @@ export class VideoToVitalsService {
           switchMap(org_doc => {
             userDTO.application_id = userDTO.mobile.slice(3, 14);
             userDTO.organization_name = org_doc[0].organization_name;
-            let aws_password = userDTO.password
-            delete userDTO.product_id;
-            delete userDTO.password;
             userDTO.is_register = true;
-            return this.userDb.save(userDTO).pipe(
+            return this.userDb.save(format_user(userDTO)).pipe(
               map(userdoc => {
                 return [userdoc, org_doc]
               }),
@@ -327,15 +319,15 @@ export class VideoToVitalsService {
                   {
                     "email": userDTO.email,
                     "username": userDTO.email,
-                    "password": aws_password 
+                    "password": userDTO.password 
                   }
                 ))
                 return doc[0][0]
               }))
           }),
           map(async doc => {            
-            product_user_list.map(async res1 =>
-             await lastValueFrom(this.userProductJunctionService.createUserProductJunction({ user_id: doc["id"], org_id: userDTO["org_id"], product_id: Number(res1), total_tests: 0 }))
+            userDTO.product_id.map(async (res1, index) =>
+             await lastValueFrom(this.userProductJunctionService.createUserProductJunction({ user_id: doc["id"], org_id: userDTO["org_id"],  product_id: Number(userDTO.product_id[index]), total_tests: 0 , role : userDTO.role[index]  }))
              );
             await lastValueFrom(this.userProfileDb.save({ application_id: doc['application_id'], user_id: doc['id'], org_id: doc['org_id'], name: doc['user_name'], is_editable: true }))
             return doc;
@@ -345,73 +337,6 @@ export class VideoToVitalsService {
 
 
 
-  // addUser(userDTO: UserDTO) {
-  //   Logger.debug(`addUser() addUserDTO:${JSON.stringify(userDTO)} `, APP);
-
-  //   return this.fetchUserByCondition(userDTO).pipe(
-  //     map(user_doc=>user_doc),
-  //     switchMap(user_doc=>{
-  //        return  this.fetchOrgByNameForUserCreation(userDTO.organization_name).pipe(
-  //         map(org_doc => {
-  //           return org_doc
-  //         }),
-  //         switchMap(org_doc => {
-  //           userDTO["org_id"] = org_doc[0].id
-  //           return this.productService.fetchProductByNewName(userDTO.product_name).pipe(
-  //             map(product_doc => {
-  //               delete userDTO.product_name
-  //               userDTO.application_id = userDTO.mobile.slice(3, 14);
-  //               return [product_doc[0].id, org_doc]
-  //             }),
-  //             switchMap(doc => {
-  //               console.log("deszfsd");
-
-  //               userDTO.product_id = Number(doc[0])
-  //               return this.userDb.save(userDTO).pipe(
-  //                 map(userdoc => {
-  //                   return [userdoc, doc]
-  //                 }),
-
-  //                 switchMap(doc => {
-  //                   var encryption={user_id: doc[0][0]['id']};
-
-  //                   this.sendEmailService.sendEmailOnCreateOrgUser(
-
-  //                     {
-  //                       "email": userDTO.email,
-  //                       "organisation_admin_name": doc[1][1][0].admin_name,
-  //                       "fedo_app": "FEDO VITALS",
-  //                       "url": doc[1][1][0].url+"?"+encodeURIComponent(this.encryptPassword(JSON.stringify(encryption))),
-  //                       "name": userDTO.user_name,
-  //                       "pilot_duration": doc[1][1][0].pilot_duration,
-  //                       "organisation_admin_email": doc[1][1][0].organization_email,
-  //                       "application_id":userDTO.application_id
-  //                     }
-  //                   )
-  //                   return doc[0]
-  //                 }),
-
-  //               )
-
-
-  //             }),
-  //             map(doc => {
-  //               doc["id"]
-  //               this.userProductJunctionService.createUserProductJunction({ user_id: doc["id"], org_id: userDTO["org_id"], product_id: userDTO.product_id, total_tests: 1 });
-  //               this.userProfileDb.save({ application_id: doc['application_id'], user_id: doc['id'], org_id: doc['org_id'], name: doc['user_name'], is_editable: true })
-  //               return doc;
-  //             })
-
-  //           )
-  //         }),
-
-  //       )
-  //     })
-  //   )
-
-
-
-  // }
 
   fetchUsersCountByOrgId(org_id: number) {
     Logger.debug(`fetchUsersCountByOrgId() org_id:${org_id}} `, APP);
@@ -496,32 +421,25 @@ export class VideoToVitalsService {
 
   updateUser(id: string, updateUserDTO: UpdateUserDTO) {
     Logger.debug(`updateUser() id:${id} updateUserDTO:${JSON.stringify(updateUserDTO)} `, APP);
-    let productlist = updateUserDTO.product_id?.split(",")
-    let product_junctionlist = updateUserDTO.product_junction_id?.split(",")
 
     return this.userDb.find({ id: id }).pipe(
       map(res => {
-        delete updateUserDTO.product_id
-        delete updateUserDTO.product_junction_id
         if (res.length == 0) throw new NotFoundException('User not found')
-        lastValueFrom(this.userDb.findByIdandUpdate({ id: id.toString(), quries: updateUserDTO }))
+        lastValueFrom(this.userDb.findByIdandUpdate({ id: id.toString(), quries: format_user_update(updateUserDTO,res[0]) }))
         return res
       }),
       switchMap(async res => {
-        if(productlist != undefined){
-        for (let index = 0; index < productlist.length; index++) {
-          await lastValueFrom(this.userProductJunctionDb.find({ id: product_junctionlist[index] }).pipe(
+        for (let index = 0; index < updateUserDTO.product_id.length; index++) {
+          await lastValueFrom(this.userProductJunctionDb.find({ id: updateUserDTO.product_junction_id[index] }).pipe(
             map(async doc => {
-               if (doc.length == 0) await lastValueFrom(this.userProductJunctionDb.save({ user_id: id,  product_id: productlist[index], org_id : res[0].org_id, total_tests : 0}))
-               else return doc
+               if (doc.length != 0) await lastValueFrom(this.userProductJunctionDb.findByIdandUpdate({ id : updateUserDTO.product_junction_id[index],  quries:{role : updateUserDTO.role[index]} }))
+               else await lastValueFrom(this.userProductJunctionDb.save({ user_id: id,  product_id: updateUserDTO.product_id[index], org_id : res[0].org_id, total_tests : 0 , role : updateUserDTO.role[index]})) 
             })
           )
           )
-        }}
-        else return []
+        }
       })
       )
-
   }
 
   updateUserByApplicationId(user_id: string, product_id: number) {
