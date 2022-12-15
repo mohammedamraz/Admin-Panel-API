@@ -360,9 +360,11 @@ export class VideoToVitalsService {
     return this.userDb.find({ id: id }).pipe(
       switchMap((userData:UserDTO[]) => {        
         let user_data = userData[0]        
+        console.log("new")
         return this.userProductJunctionService.fetchUserProductJunctionDataByUserId(userData[0].id)
             .pipe(switchMap(async doc => {
-              for (let index=0;index<=doc.length-1;index++) {
+        console.log("new")
+        for (let index=0;index<=doc.length-1;index++) {
                 await lastValueFrom(this.productService.fetchProductById(doc[index].product_id).pipe(
                   map(productDoc => {
                       doc[index]['product']=productDoc
@@ -371,7 +373,8 @@ export class VideoToVitalsService {
                   }
                   )))
                 }
-                return [user_data]               
+        console.log("new")
+        return [user_data]               
             }))
             // .catch(err => { throw new UnprocessableEntityException(err.message) })
       })
