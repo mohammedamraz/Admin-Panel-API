@@ -45,6 +45,8 @@ export class CreateOrganizationDto {
     event_mode?:Array<string>;
     password? : any;
     is_register? : boolean ;
+    enable_kiosc? : boolean;
+    kiosc_user? : any
     // org_details? : any;
 }
 
@@ -424,6 +426,8 @@ export const format_org_product_juction=(res,index,id)=>{
         fedoscore: res.fedo_score[index], 
         web_access: res.productaccess_web ? res.productaccess_web[index] : false ,  
         ios_access: res.ios_access ? res.ios_access[index] : false, 
+        enable_kiosk: res.enable_kiosk ? res.enable_kiosk[index] : false, 
+        kiosk_user: res.kiosk_user ? res.kiosk_user[index] : null, 
         mobile_access: res.productaccess_mobile ? res.productaccess_mobile[index] : false, 
         status: "Active"
     }
