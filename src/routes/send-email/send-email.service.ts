@@ -137,5 +137,19 @@ export class SendEmailService {
     return this.templateService.sendFinalEmailWhenDaysLeftToPilotExpire(body)
   }
 
+  sendEmailToFedoOnceOrgCreatedInWeb(body: sendEmailOnCreationOfOrgAndUser) {
+    Logger.debug(`sendEmailToFedoOnceOrgCreatedInWeb() body: [${JSON.stringify(body)}]`, APP);
+
+    // body.fedo_app = "Fedo Vitals";
+    return this.templateService.sendEmailToFedoOnceOrgCreatedInWeb(body)
+  }
+
+  sendInstructionEmailOnOrgCreationOnWeb(body: sendEmailOnCreationOfOrgAndUser) {
+    Logger.debug(`sendInstructionEmailOnOrgCreationOnWeb() body: [${JSON.stringify(body)}]`, APP);
+
+    // body.url = "https://www.fedo.ai/products/" + body.url.replace('_', '/') +'?'+ encodeURIComponent(encryptPassword(JSON.stringify({ org_junction_id: body.org_junction_id })))
+    return this.templateService.sendInstructionEmailOnOrgCreationOnWeb(body)
+  }
+
 
 }

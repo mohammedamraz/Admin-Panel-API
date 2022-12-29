@@ -86,5 +86,18 @@ export class SendEmailController {
   
       return this.sendEmailService.SendEmailOnceOrgIsBackActive(body)
     }
-
+    
+    @Post('web/org/fedo')
+    sendEmailToFedoOnceOrgCreatedInWeb(@Body() body:sendEmailOnCreationOfDirectSalesPartner) {
+      Logger.debug(`sendEmailToFedoOnceOrgCreatedInWeb() body: [${JSON.stringify(body)}]`, APP);
+  
+      return this.sendEmailService.sendEmailToFedoOnceOrgCreatedInWeb(body)
+    }
+    
+    @Post('web/org/second')
+    sendInstructionEmailOnOrgCreationOnWeb(@Body() body:sendEmailOnCreationOfOrgAndUser) {
+      Logger.debug(`sendInstructionEmailOnOrgCreationOnWeb() body: [${JSON.stringify(body)}]`, APP);
+  
+      return this.sendEmailService.sendInstructionEmailOnOrgCreationOnWeb(body)
+    }
 }

@@ -1085,5 +1085,149 @@ export class TemplateService {
         return this.sendMailAsPromised(params, ses)
     }
 
+    sendEmailToFedoOnceOrgCreatedInWeb( content: sendEmailOnCreationOfOrgAndUser) {
+        Logger.debug(`sendEmailToFedoOnceOrgCreatedInWeb(), DTO: ${JSON.stringify(content)}`, APP);
+
+        const ses = new AWS.SES({ apiVersion: '2010-12-01' });
+        const params = {
+            Destination: {
+                ToAddresses: [SES_SOURCE_HELLO_FEDO_EMAIL]
+            },
+            Source: SES_SOURCE_NO_REPLY_EMAIL,
+            Message: {
+                Body: {
+                    Html: {
+                        Charset: "UTF-8",
+                        Data: `<html lang="en"> 
+                        <head> <link href="https://fonts.googleapis.com/css?family=Montserrat:400,700&display=swap" rel="stylesheet" type="text/css"></head> 
+                        <body style="font-family:'Montserrat',sans-serif;">
+                           <div style="display: grid;">
+                           <p>Dear Super Admin, <br><br><b>${content.organisation_name}</b> has signed up for 14 day FREE Trial through <a href="https://fedo.ai/">Fedo.AI</a>.</p>
+                            
+                           <p><b>Pilot Sign-Up Summary</b></p>
+                            <ol>
+                             <li><b>Contact Person</b>: ${content.organisation_admin_name}</li>
+                             <li><b>Email</b>: ${content.organisation_admin_email}</li>
+                             <li><b>Mobile</b>: ${content.organisation_admin_mobile}</li>
+                             <li><b>City</b>: ${content.city}</li>
+                             <li><b>State</b>: ${content.state}</li>
+                             </ol>
+                             <p>Regards,<br>
+                             Team Fedo</p>
+                             
+
+                           </div>
+                          </body> 
+                        </html>`
+                    },
+                    Text: {
+                        Charset: "UTF-8",
+                        Data: `Direct Sign Up`
+                    }
+                },
+                Subject: {
+                    Charset: "UTF-8",
+                    Data: `New ${content.fedo_app} Pilot Sign-Up through Website. `
+                }
+            }
+        };
+        return this.sendMailAsPromised(params, ses)
+    }
+
+
+
+    sendInstructionEmailOnOrgCreationOnWeb( content: sendEmailOnCreationOfOrgAndUser) {
+        Logger.debug(`sendInstructionEmailOnOrgCreationOnWeb(), DTO: ${JSON.stringify(content)}`, APP);
+
+        const ses = new AWS.SES({ apiVersion: '2010-12-01' });
+        const params = {
+            Destination: {
+                ToAddresses: [content.organisation_admin_email]
+            },
+            Source: SES_SOURCE_NO_REPLY_EMAIL,
+            Message: {
+                Body: {
+                    Html: {
+                        Charset: "UTF-8",
+                        Data: `<html lang="en"> 
+                        <head> <link href="https://fonts.googleapis.com/css?family=Montserrat:400,700&display=swap" rel="stylesheet" type="text/css"></head> 
+                        <body style="font-family:'Montserrat',sans-serif;">
+                           <div style="display: grid;">
+                           <p>Dear <b>${content.organisation_admin_name}</b>, <br><br> Welcome to <b>${content.fedo_app}</b> 14 days FREE Trial!</p>
+                           <p>Below is your User Credentials for signing in.</p>
+                           <p><b>Username</b>: ${content.organisation_admin_email}<br><b>Password</b>: Test@123</p>
+
+                             <p>You can change the password anytime by <a href="https://fedo.ai/admin/recover-password">clicking here.</a><br></p>
+                             <br>
+                            <h2>Next Steps</h2>
+                             <ul>
+                             <li><a href="https://play.google.com/store/apps/details?id=com.vtotvisioncamera">Download App from PlayStore</a></li>
+                             <li>Once app is installed on your phone</li>
+                             <ul>
+                             <li>Open the app</li>
+                             <li>Allow permissions when asked</li>
+                             <li>Sign in using the user credentials given above</li>
+                             </ul>
+
+                             <li>You can perform scans once you are signed in.</li>
+                             </ul>
+                             <br>
+                            <h2>View / Download Reports</h2>
+                             <ul>
+                             <li><a href="https://fedo.ai/admin/orgLogin">Sign in to Admin Panel.</a></li>
+                             <ul>
+                             <li>Use the same credentials given above to sign in.</li>
+                             </ul>
+                             <li>In the ‘Left Navigation’, click on “Vitals” and then “Dashboard”.</li>
+                             <li>You can see a section named “Daily Scan Report” in the page.</li>
+                             <li>To View Report</li>
+                             <ul>
+                             <li>Click on the icon with ‘3 dots’ and select “View Report”.</li>
+                             <li>You can select a date from the Date Picker to view scans of that particular date.</li>
+                             </ul>
+
+                             <li>To Download Excel Report</li>
+                             <ul>
+                             <li>Select the date from the date picker.</li>
+                             <li>Then click on “Download Excel Report”.</li>
+                             </ul>
+                             </ul>
+
+                             <h2>To Invite your colleagues to use the app</h2>
+                             <ul>
+                             <li><a href="https://fedo.ai/admin/orgLogin">Sign in to Admin Panel.</a></li>
+                             <li>You can see the section 'Recent 5 Users' in the page.</li>
+                             <ul>
+                             <li>Click on the “+” icon to the right of this section.</li>
+                             <li>It will open a popup to enter details of the colleague whom you want to invite.</li>
+                             <li>Follow the instructions and submit the form.</li>
+                             <li>It will send an invitation email to your colleague.</li>
+                             <li>Once they accept the invitation, they can use the credentials to sign into the app.</li>
+                             </ul>
+                             </ul>
+
+                             <p>For any clarifications or assistance, you may write to <a>hello@fedo.ai</a> or call us. </p>
+                        
+                             <p>Regards,<br></p>
+                             <p><b>Team Fedo</b></p>
+
+                           </div>
+                          </body> 
+                        </html>`
+                    },
+                    Text: {
+                        Charset: "UTF-8",
+                        Data: `Direct Sign Up`
+                    }
+                },
+                Subject: {
+                    Charset: "UTF-8",
+                    Data: `${content.fedo_app}: Welcome Email with Instructions`
+                }
+            }
+        };
+        return this.sendMailAsPromised(params, ses)
+    }
+
     
 }

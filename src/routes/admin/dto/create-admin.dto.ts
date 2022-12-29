@@ -127,6 +127,8 @@ export class sendEmailOnCreationOfOrgAndUser {
   expired_date?:string;
   org_id? : string;
   user_id? :string;
+  city? :any;
+  state? : any;
   
   
 
