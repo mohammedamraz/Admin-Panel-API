@@ -305,7 +305,9 @@ export class QueryParamsDto {
     @IsNotEmpty()
     @IsOptional()
     per_page: number;
-    is_deleted?:boolean
+    is_deleted?:boolean;
+    is_web? : boolean ;
+    is_read? : boolean ;
 }
 
 export enum Product {

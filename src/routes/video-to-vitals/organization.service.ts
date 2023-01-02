@@ -275,13 +275,22 @@ export class OrganizationService {
     });
   }
 
-  fetchOrgCount() {
+  fetchOrgCount(queryParamsDto: QueryParamsDto) {
     Logger.debug(`fetchOrgCount() `, APP);
 
+    if(Boolean(queryParamsDto.is_web) == true){
+      return this.organizationDb.find({ is_web: queryParamsDto.is_web , is_read: false }).pipe(
+        catchError(err => { throw new UnprocessableEntityException(err.message) }),
+        map(async doc => {
+          if (doc.length == 0) throw new NotFoundException('No Data available')
+          else return { "total_organizations_count": doc.length } 
+        }),)
+    }
+    else{
     return this.organizationDb.fetchAll().pipe(
       map(doc => { return { "total_organizations_count": doc.length } }),
       catchError(err => { throw new UnprocessableEntityException(err.message) })
-    )
+    )}
   }
 
   fetchAllOrganization(queryParamsDto: QueryParamsDto) {
@@ -319,6 +328,16 @@ export class OrganizationService {
         switchMap(doc => this.updateStatus(doc))
       );
       }
+      else if(Boolean(queryParamsDto.is_web) === true){
+        return this.organizationDb.find({ is_web: queryParamsDto.is_web, is_read: queryParamsDto.is_read }).pipe(
+          catchError(err => { throw new UnprocessableEntityException(err.message) }),
+          map(async doc => {
+            if (doc.length == 0) throw new NotFoundException('No Data available')
+            else {  return await this.fetchotherDetails(doc,queryParamsDto) }
+          }),
+          switchMap(doc => this.updateStatus(doc))
+        );
+        }
       else{
         return this.organizationDb.fetchAll().pipe(
           catchError(err => { throw new UnprocessableEntityException(err.message) }),

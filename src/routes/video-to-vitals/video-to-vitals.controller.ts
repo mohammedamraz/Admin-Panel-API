@@ -40,10 +40,10 @@ export class VideoToVitalsController {
   }
 
   @Get('org/count')
-  fetchOrgCount() {
+  fetchOrgCount(@Query() queryParamsDto: QueryParamsDto) {
     Logger.debug(`fetchOrgByCount()`, APP);
 
-    return this.organizationService.fetchOrgCount()
+    return this.organizationService.fetchOrgCount(queryParamsDto)
   }
 
   //this should be checked if this is working properly with other controllers 
