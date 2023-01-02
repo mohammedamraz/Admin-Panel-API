@@ -51,7 +51,9 @@ export class OrganizationService {
     }
     else delete createOrganizationDto.logo
 
-      return this.fetchOrgByUrlBoth(createOrganizationDto).pipe(
+    if(Boolean(createOrganizationDto.is_web) == true) createOrganizationDto.url = createOrganizationDto.organization_name.split(' ')[0];
+    else createOrganizationDto.url = createOrganizationDto.url;
+    return this.fetchOrgByUrlBoth(createOrganizationDto).pipe(
         map(doc => {
             return this.fetchOrgByCondition(createOrganizationDto).pipe(
               map(doc => { return doc }),
@@ -60,6 +62,8 @@ export class OrganizationService {
                 createOrganizationDto.application_id = createOrganizationDto.organization_mobile.slice(3, 14);
                 return this.organizationDb.save(format_organisation(createOrganizationDto)).pipe(
                   map(res => {
+                    if(Boolean(createOrganizationDto.is_web) == true)  return res
+                    else{
                     var encryption = { org_id: res[0].id };
                     this.sendEmailService.sendEmailOnCreateOrg(
                       {
@@ -71,6 +75,7 @@ export class OrganizationService {
                         "application_id": (res[0].application_id)
                       })
                     return res
+                  }
                   }))
               }))
         }),

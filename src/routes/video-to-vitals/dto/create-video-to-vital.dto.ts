@@ -19,8 +19,8 @@ export class CreateOrganizationDto {
     @IsString()
     @IsPhoneNumber()
     organization_mobile: String;
-    @IsNotEmpty()
-    @IsString()
+    // @IsNotEmpty()
+    // @IsString()
     url: string;
     start_date: Date;
     end_date: Date;
@@ -46,7 +46,9 @@ export class CreateOrganizationDto {
     password? : any;
     is_register? : boolean ;
     enable_kiosc? : boolean;
-    kiosc_user? : any
+    kiosc_user? : any;
+    is_read : boolean;
+    is_web : boolean;
     // org_details? : any;
 }
 
@@ -418,7 +420,9 @@ export const format_organisation=(res)=>{
     state:res?.state || null,
     zip:res?.zip || null,
     city:res?.city || null,
-    address:res?.address || null
+    address:res?.address || null,
+    is_web : res.is_web ? res.is_web : false, 
+    is_read : res.is_read ? res.is_read : false, 
 }
 
     return data
@@ -465,7 +469,7 @@ export const format_org_product_juction=(res,index,id)=>{
         enable_kiosk: res.enable_kiosk ? res.enable_kiosk[index] : false, 
         kiosk_user: res.kiosk_user ? res.kiosk_user[index] : null, 
         mobile_access: res.productaccess_mobile ? res.productaccess_mobile[index] : false, 
-        status: "Active"
+        status: "Active",
     }
     return data
 }
