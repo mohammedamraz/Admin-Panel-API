@@ -227,9 +227,23 @@ export class VideoToVitalsService {
 
 
 
-  changeRegisterStatusOnceConfirmed(id: number) {
+  changeRegisterStatusOnceConfirmed(id: number, queryParamsDto: QueryParamsDto) {
     Logger.debug(`changeRegisterStatusOnceConfirmed() id:${id} `, APP);
 
+    if(Boolean(queryParamsDto.is_web) == true){
+      return this.organizationDb.find({ id: id }).pipe(
+        map(doc => {
+          if (doc.length == 0) {
+            throw new NotFoundException('organization not found')
+          }
+          else {
+            return this.organizationDb.findByIdandUpdate({ id: id.toString(), quries: { is_read: true } })
+          }
+        }),
+  
+      )
+    }
+    else{
     return this.organizationDb.find({ id: id, is_deleted: false }).pipe(
       map(doc => {
         if (doc.length == 0) {
@@ -241,6 +255,7 @@ export class VideoToVitalsService {
       }),
 
     )
+    }
   }
 
   fetchAllVitalsTestCount(id: number) {

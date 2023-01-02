@@ -130,10 +130,10 @@ export class VideoToVitalsController {
 
 
   @Patch('org/register/status/:id')
-  changeRegisterStatusOnceConfirmed(@Param('id') id: number) {
+  changeRegisterStatusOnceConfirmed(@Param('id') id: number, @Query() queryParamsDto: QueryParamsDto) {
     Logger.debug(`updateOrganization() id:${id}  `, APP);
 
-    return this.videoToVitalsService.changeRegisterStatusOnceConfirmed(id);
+    return this.videoToVitalsService.changeRegisterStatusOnceConfirmed(id, queryParamsDto);
   }
 
   @Patch('user/register/status/:id')
