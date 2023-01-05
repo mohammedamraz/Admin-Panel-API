@@ -693,13 +693,26 @@ export class VideoToVitalsService {
       catchError(err => { console.log('err', err); return this.onAWSErrorResponse(err) }))
 
   }
+  
+
+  registerWebSiteUserbyEmail(RegisterUserdto: RegisterUserDTO) {
+    Logger.debug(`registerUserbyEmail(), RegisterUserdto:[${JSON.stringify(RegisterUserdto,)}] `);
+
+    RegisterUserdto.fedoApp = FEDO_USER_ADMIN_PANEL_POOL_NAME
+    return this.http.post(`${AWS_COGNITO_USER_CREATION_URL_SIT}/`, { passcode: this.encryptPassword(RegisterUserdto) }).pipe(
+      map(doc => {
+        console.log('doc', doc)
+      }),
+      catchError(err => { console.log('err', err); return this.onAWSErrorResponse(err) }))
+
+  }
 
   confirmSignupUserByEmail(RegisterUserdto: RegisterUserDTO) {
     Logger.debug(`confirmSignupUserByEmail(), RegisterUserdto: keys ${[JSON.stringify(Object.keys(RegisterUserdto))]} values ${JSON.stringify(Object.values(RegisterUserdto).length)} `, APP);
 
     RegisterUserdto.fedoApp = FEDO_USER_ADMIN_PANEL_POOL_NAME
-    const passcode = this.encryptPassword(RegisterUserdto)
-    return this.http.post(`${AWS_COGNITO_USER_CREATION_URL_SIT}/signupcode`, { passcode: passcode }).pipe(map(res => []), catchError(err => {
+    return this.http.post(`${AWS_COGNITO_USER_CREATION_URL_SIT}/signupcode`, { passcode: this.encryptPassword(RegisterUserdto) }).pipe(map(res => []), catchError(err => {
+      console.log("err",err);
       return this.onAWSErrorResponse(err)
     }))
   }

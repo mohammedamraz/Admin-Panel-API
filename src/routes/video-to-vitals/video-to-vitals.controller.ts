@@ -258,6 +258,14 @@ export class VideoToVitalsController {
     return this.videoToVitalsService.registerUserbyEmail(RegisterUserdto)
   }
 
+  @Post('signup/web')
+  // @UseInterceptors(LoggingInterceptor)
+  registerWebSiteUserbyEmail(@Body() RegisterUserdto: RegisterUserDTO) {
+    Logger.debug(`registerWebSiteUserbyEmail()  loginUserDTO:${JSON.stringify(RegisterUserdto)} `, APP);
+
+    return this.videoToVitalsService.registerWebSiteUserbyEmail(RegisterUserdto)
+  }
+
   @Post('confirm/signup')
   // @UseInterceptors(LoggingInterceptor)
   confirmSignupUserByEmail(@Body() registerUserdto: RegisterUserDTO) {
