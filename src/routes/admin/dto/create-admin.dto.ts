@@ -129,6 +129,7 @@ export class sendEmailOnCreationOfOrgAndUser {
   user_id? :string;
   city? :any;
   state? : any;
+  product_name? : any;
   
   
 

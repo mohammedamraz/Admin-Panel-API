@@ -879,11 +879,12 @@ export class OrganizationService {
     var date= (d => new Date(d.setDate(d.getDate()+Number(dateParams[i]))).toISOString().split("T")[0])(new Date());
     this.params.date=date
     await lastValueFrom(this.orgProductJunctionService.fetchOrgDetailsByExpiryDateForDays(this.params).pipe(
-      map(doc=>{
-      doc.forEach(doc=>{
-        return this.fetchOrganizationDetailsById(doc.org_id).subscribe({
+      map(res=>{
+      res.forEach(doc1=>{
+        return this.fetchOrganizationDetailsById(doc1.org_id).subscribe({
           next: async doc=>{
            return await this.sendEmailService.sendFinalEmailWhenDaysLeftToPilotExpire({
+            product_name : Number(doc1.product_id) === 1 ? 'HSA' : (Number(doc1.product_id) === 2 ? 'Vitals':'RUW'),
             email:doc[0].organization_email,
             organisation_name : doc[0].organization_name,
             organisation_admin_name : doc[0].admin_name.split(' ')[0],
@@ -901,11 +902,12 @@ export class OrganizationService {
       var date= (d => new Date(d.setDate(d.getDate()-1)).toISOString().split("T")[0])(new Date());
       this.params.date=date
       await lastValueFrom(this.orgProductJunctionService.fetchOrgDetailsByExpiryDateForDays(this.params).pipe(
-        map(doc=>{
-        doc.forEach(doc=>{
-          return this.fetchOrganizationDetailsById(doc.org_id).subscribe({
+        map(res=>{
+        res.forEach(doc1=>{
+          return this.fetchOrganizationDetailsById(doc1.org_id).subscribe({
             next: async doc=>{
             return await this.sendEmailService.sendFinalEmailOncePilotIsExpired({
+              product_name : Number(doc1.product_id) === 1 ? 'HSA' : (Number(doc1.product_id) === 2 ? 'Vitals':'RUW'),
               email:doc[0].organization_email,
               organisation_name : doc[0].organization_name,
               organisation_admin_name : doc[0].admin_name.split(' ')[0],

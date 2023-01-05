@@ -1015,7 +1015,7 @@ export class TemplateService {
                         <head> <link href="https://fonts.googleapis.com/css?family=Montserrat:400,700&display=swap" rel="stylesheet" type="text/css"></head> 
                         <body style="font-family:'Montserrat',sans-serif;">
                            <div style="display: grid;">
-                           <p>Dear <b>${content.organisation_admin_name}</b>, <br><br>Your pilot has expired on ${content.expired_date}. You will not be able to access the Vitals App or Admin Panel. <br> <br></p>
+                           <p>Dear <b>${content.organisation_admin_name}</b>, <br><br>Your pilot has expired on ${content.expired_date}. You will not be able to access the ${content.product_name} App or Admin Panel. <br> <br></p>
                              <p>You may get in touch with Fedo at <a>hello@fedo.ai</a> or call us at +91 8904494455 to discuss if you would like to continue using <b>Vitals</b>.<br></p>
                              
                              <p>Good Day!<br></p>
@@ -1034,7 +1034,7 @@ export class TemplateService {
                 },
                 Subject: {
                     Charset: "UTF-8",
-                    Data: `${content.organisation_name} Pilot Expired`
+                    Data: `${content.organisation_name}'s ${content.product_name} Pilot Expired`
                 }
             }
         };
@@ -1059,7 +1059,7 @@ export class TemplateService {
                         <head> <link href="https://fonts.googleapis.com/css?family=Montserrat:400,700&display=swap" rel="stylesheet" type="text/css"></head> 
                         <body style="font-family:'Montserrat',sans-serif;">
                            <div style="display: grid;">
-                           <p>Dear <b>${content.organisation_admin_name}</b>, <br><br>Your pilot will be expiring in the next ${content.expired_date} days. Once expired, you will not be able to access the Vitals App or Admin Panel. <br> <br></p>
+                           <p>Dear <b>${content.organisation_admin_name}</b>, <br><br>Your pilot will be expiring in the next ${content.expired_date} days. Once expired, you will not be able to access the ${content.product_name} App or Admin Panel. <br> <br></p>
                              <p>You may get in touch with Fedo at <a>hello@fedo.ai</a> or call us at +91 8904494455 to discuss if you would like to continue using <b>Vitals</b>.<br></p>
                              
                              <p>Good Day!<br></p>
@@ -1078,7 +1078,7 @@ export class TemplateService {
                 },
                 Subject: {
                     Charset: "UTF-8",
-                    Data: `${content.organisation_name} Pilot Expiring in ${content.expired_date} days`
+                    Data: `${content.organisation_name}'s ${content.product_name} Pilot Expiring in ${content.expired_date} days`
                 }
             }
         };
