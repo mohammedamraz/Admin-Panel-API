@@ -305,7 +305,7 @@ export class VideoToVitalsService {
           }),
           map(async doc => {
             userDTO.product_id.map(async (res1,index) =>{
-              await lastValueFrom(this.userProductJunctionService.createUserProductJunction({ user_id: doc["id"], org_id: userDTO["org_id"], product_id: Number(userDTO.product_id[index]), total_tests: 0 , role : userDTO.role[index] }))})
+              await lastValueFrom(this.userProductJunctionService.createUserProductJunction({ user_id: doc["id"], org_id: userDTO["org_id"], product_id: Number(userDTO.product_id[index]), total_tests: 0 , role : userDTO?.role[index] }))});
             // doc["id"]
             await lastValueFrom(this.userProfileDb.save({ application_id: doc['application_id'], user_id: doc['id'], org_id: doc['org_id'], name: doc['user_name'], is_editable: true }))
             return doc;
@@ -440,6 +440,7 @@ export class VideoToVitalsService {
   updateUser(id: string, updateUserDTO: UpdateUserDTO) {
     Logger.debug(`updateUser() id:${id} updateUserDTO:${JSON.stringify(updateUserDTO)} `, APP);
 
+    updateUserDTO.role = ''
     return this.userDb.find({ id: id }).pipe(
       map(res => {
         if (res.length == 0) throw new NotFoundException('User not found')
@@ -447,15 +448,17 @@ export class VideoToVitalsService {
         return res
       }),
       switchMap(async res => {
+        if(updateUserDTO.product_id != undefined){
         for (let index = 0; index < updateUserDTO.product_id.length; index++) {
           await lastValueFrom(this.userProductJunctionDb.find({ id: updateUserDTO.product_junction_id[index] }).pipe(
             map(async doc => {
                if (doc.length != 0) await lastValueFrom(this.userProductJunctionDb.findByIdandUpdate({ id : updateUserDTO.product_junction_id[index],  quries:{role : updateUserDTO.role[index]} }))
-               else await lastValueFrom(this.userProductJunctionDb.save({ user_id: id,  product_id: updateUserDTO.product_id[index], org_id : res[0].org_id, total_tests : 0 , role : updateUserDTO.role[index]})) 
+               else await lastValueFrom(this.userProductJunctionDb.save({ user_id: id,  product_id: updateUserDTO.product_id[index], org_id : res[0].org_id, total_tests : 0 , })) 
             })
           )
           )
-        }
+        }}
+        else return []
       })
       )
   }

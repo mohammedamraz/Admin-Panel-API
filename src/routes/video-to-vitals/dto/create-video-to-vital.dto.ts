@@ -398,6 +398,7 @@ export const format_user_update =(res,doc)=>{
     designation:res.designation ? res.designation : doc.designation,
     application_id:res.application_id ? res.application_id : doc.application_id,
     is_register:res?.is_register ? res?.is_register : doc?.is_register,
+    is_deleted:res?.is_deleted ? res?.is_deleted : doc?.is_deleted,
 }
 
     return data
@@ -417,7 +418,7 @@ export const format_organisation=(res)=>{
     stage:res?.stage || null,
     application_id:res.application_id,
     is_register:res?.is_register|| false,
-    type:res?.type || 'OrgAdmin',
+    type:res?.type || 'orgAdmin',
     country:res?.country || null,
     state:res?.state || null,
     zip:res?.zip || null,
