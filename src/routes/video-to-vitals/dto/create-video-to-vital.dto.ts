@@ -398,7 +398,7 @@ export const format_user_update =(res,doc)=>{
     designation:res.designation ? res.designation : doc.designation,
     application_id:res.application_id ? res.application_id : doc.application_id,
     is_register:res?.is_register ? res?.is_register : doc?.is_register,
-    is_deleted:res?.is_deleted ? res?.is_deleted : doc?.is_deleted,
+    is_deleted:res.is_deleted?.toString() ? res?.is_deleted : doc?.is_deleted,
 }
 
     return data
@@ -453,6 +453,7 @@ export const format_organisation_update=(res,doc)=>{
     address:res?.address?res?.address:doc?.address,
     updated_date:res.updated_date
 }
+console.log("dtaaa",data)
 return data
     
 }
