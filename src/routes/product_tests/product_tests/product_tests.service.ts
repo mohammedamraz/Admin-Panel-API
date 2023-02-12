@@ -1,5 +1,7 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { ConflictException, Injectable, Logger, NotFoundException } from '@nestjs/common';
+import { S3 } from 'aws-sdk';
 import { lastValueFrom, map } from 'rxjs';
+import { AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY } from 'src/constants';
 import { DatabaseTable } from 'src/lib/database/database.decorator';
 import { DatabaseService } from 'src/lib/database/database.service';
 import { UsersService } from 'src/routes/video-to-vitals/users.service';
@@ -557,5 +559,56 @@ mainData.push({variance : variance})
 return mainData
 
 }
+
+async upload(file) {
+  const { originalname } = file;
+  const bucketS3 = 'fedo-vitals';
+  await this.uploadS3(file.buffer, bucketS3, originalname);
+}
+
+async uploadS3(file, bucket, name) {
+  const s3 = this.getS3();
+
+  const params = {
+    Bucket: bucket,
+    Key: String(name),
+    Body: file,
+    acl: 'public',
+
+
+  };
+
+
+  return new Promise((resolve, reject) => {
+  s3.upload(params, (err, data) => {
+      if (err) {
+        Logger.error(err);
+        reject(err.message);
+      }
+      else{
+      const url = s3.getSignedUrl('getObject', {
+        Bucket: 'fedo-vitals',
+        Key: String(name)
+      })
+
+      resolve(url);
+    }
+    });
+  }).then((next) => {
+   throw new ConflictException({url:next})
+  },
+  (error) => {
+   throw new NotFoundException(error)
+  });
+}
+
+getS3() {
+  return new S3({
+    accessKeyId: AWS_ACCESS_KEY_ID,
+
+    secretAccessKey: AWS_SECRET_ACCESS_KEY,
+  });
+}
+
 
 }
