@@ -390,7 +390,7 @@ export const format_user=(res)=>{
 export const format_user_update =(res,doc)=>{
     let data=
     {user_name:res.user_name? res.user_name : doc.user_name,
-    tpa_name:res.tpa_name ? res.tpa_name :doc.tpa_name,
+    tpa_name:res.tpa_name ? res.tpa_name :null,
     email:res.email ? res.email :doc.email,
     mobile:res.mobile ? res.mobile : doc.mobile,
     org_id:res?.org_id ? res?.org_id :doc?.org_id,
