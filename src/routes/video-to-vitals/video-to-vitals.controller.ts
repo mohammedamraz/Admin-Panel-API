@@ -259,6 +259,7 @@ export class VideoToVitalsController {
   }
 
   @Post('signup/web')
+  @UseInterceptors(FileInterceptor('file'))
   // @UseInterceptors(LoggingInterceptor)
   registerWebSiteUserbyEmail(@Body() RegisterUserdto: RegisterUserDTO) {
     Logger.debug(`registerWebSiteUserbyEmail()  loginUserDTO:${JSON.stringify(RegisterUserdto)} `, APP);
@@ -268,6 +269,7 @@ export class VideoToVitalsController {
 
   @Post('confirm/signup')
   // @UseInterceptors(LoggingInterceptor)
+  @UseInterceptors(FileInterceptor('file'))
   confirmSignupUserByEmail(@Body() registerUserdto: RegisterUserDTO) {
     Logger.debug(`confirmSignupUserByEmail() [${JSON.stringify(Object.keys(registerUserdto))} values ${JSON.stringify(Object.values(registerUserdto).length)}]`, APP);
 

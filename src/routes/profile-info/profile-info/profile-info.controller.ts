@@ -57,6 +57,14 @@ export class ProfileInfoController {
     return this.profileInfoService.updateTotalTestsInProfileInfo( createProfileInfoDTO);
   }
 
+  // This API is for the iframe thing happening in the web app and mobile url
+  @Post('iframe_url/tests/:org_id/:product_id')
+  updateTotalTestsInProfileInfoUsigIframeUrl( @Param() createProfileInfoDTO: CreateProfileInfoDTO, @Body() createProfileInfoBody: CreateProfileInfoDTO) {
+    Logger.debug(`updateTotalTestsInProfileInfoUsigIframeUrl()  updateUserDTO:${JSON.stringify(createProfileInfoDTO)} `, APP);
+
+    return this.profileInfoService.updateTotalTestsInProfileInfoUsigIframeUrl( createProfileInfoDTO,createProfileInfoBody);
+  }
+
   @Get('user/tests/:app_id')
   fetchProfileInfoByApplicationId( @Param('app_id') app_id: string) {
     Logger.debug(`fetchProfileInfoByApplicationId()  app_id:${app_id} `, APP);

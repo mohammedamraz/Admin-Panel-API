@@ -14,8 +14,8 @@ import { IsOptional } from "class-validator";
 
 export class ProductTestsDto {
     id?:number;
-    product_id?: string;
-    org_id?:string;
+    product_id?: any;
+    org_id?:any;
     user_id?:string;
     tests?:number;
     test_date?:string;

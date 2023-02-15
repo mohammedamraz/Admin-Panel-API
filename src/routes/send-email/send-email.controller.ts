@@ -1,4 +1,5 @@
-import { Body, Controller, Logger, Post } from '@nestjs/common';
+import { Body, Controller, Logger, Post, UseInterceptors } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
 import { sendEmailOnCreationOfDirectSalesPartner, sendEmailOnCreationOfOrgAndUser } from '../admin/dto/create-admin.dto';
 import { SendEmailService } from './send-email.service';
 
@@ -88,14 +89,16 @@ export class SendEmailController {
     }
     
     @Post('web/org/fedo')
-    sendEmailToFedoOnceOrgCreatedInWeb(@Body() body:sendEmailOnCreationOfDirectSalesPartner) {
+  @UseInterceptors(FileInterceptor('file'))
+  sendEmailToFedoOnceOrgCreatedInWeb(@Body() body:sendEmailOnCreationOfDirectSalesPartner) {
       Logger.debug(`sendEmailToFedoOnceOrgCreatedInWeb() body: [${JSON.stringify(body)}]`, APP);
   
       return this.sendEmailService.sendEmailToFedoOnceOrgCreatedInWeb(body)
     }
     
     @Post('web/org/second')
-    sendInstructionEmailOnOrgCreationOnWeb(@Body() body:sendEmailOnCreationOfOrgAndUser) {
+  @UseInterceptors(FileInterceptor('file'))
+  sendInstructionEmailOnOrgCreationOnWeb(@Body() body:sendEmailOnCreationOfOrgAndUser) {
       Logger.debug(`sendInstructionEmailOnOrgCreationOnWeb() body: [${JSON.stringify(body)}]`, APP);
   
       return this.sendEmailService.sendInstructionEmailOnOrgCreationOnWeb(body)

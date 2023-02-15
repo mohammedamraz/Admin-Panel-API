@@ -131,6 +131,24 @@ export class ProfileInfoService {
 
     }
 
+    // This service file is for the iframe thing happening in the web app and mobile app
+    updateTotalTestsInProfileInfoUsigIframeUrl(createProfileInfoDTO: CreateProfileInfoDTO, createProfileInfoBody: CreateProfileInfoDTO) {
+        Logger.debug(`updateTotalTestsInProfileInfoUsigIframeUrl() updateUserDTO:${JSON.stringify(createProfileInfoDTO)} `, APP);
+
+        // application_id and product_id is mandatory fields
+        console.log("user profile info",createProfileInfoDTO)
+        return this.userProfileDb.find({ org_id: createProfileInfoDTO.org_id }).pipe(
+            switchMap(async res => {
+                if (res.length == 0) throw new NotFoundException('profile info not found')
+                else {
+                    await lastValueFrom(this.userProfileDb.findandUpdate({ columnName: 'id', columnvalue: res[0].id.toString(), quries: { total_tests: Number(res[0].total_tests) + 1 } }));
+                    var product_test_details = await lastValueFrom(this.productTestsService.saveTestsToProductTests(createProfileInfoBody))
+                    return await lastValueFrom(this.videoToVitalsService.updateUserByApplicationId(res[0].user_id, createProfileInfoDTO.product_id)),product_test_details
+                }
+            }))
+
+    }
+
 
     fetchProfileByOrgIdByQueryParams(createProfileInfoDTO: CreateProfileInfoDTO) {
         Logger.debug(`fetchProfileByOrgId()  `, APP);

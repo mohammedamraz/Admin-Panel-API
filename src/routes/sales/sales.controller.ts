@@ -67,7 +67,7 @@ export class SalesController {
   @Patch(':id/image')
   @UseInterceptors(FileInterceptor('file', {
     storage: diskStorage({
-      _destination: STATIC_IMAGES_PROFILE,
+      // _destination: STATIC_IMAGES_PROFILE,
       get destination() {
         return this._destination;
       },
