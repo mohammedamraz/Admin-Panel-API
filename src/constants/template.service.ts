@@ -716,9 +716,10 @@ export class TemplateService {
                               <img src="https://fedo-file-server.s3.ap-south-1.amazonaws.com/images/logo.png"" width="25%" style="width:2%,max-width: 2%;" /> 
                            </div>
                            <div style="display: grid;">
-                           <p>Hello, OTP for ${emailAndOtp.email} : <b>${emailAndOtp.otp}</b> <br><br></p>
+                           <p>Hello,<br><br> OTP for ${emailAndOtp.name} is <b>${emailAndOtp.otp}</b>. <br><br></p>
 
-                             <p>If the otp request attempt is not made by you, immediately report to hello@fedo.ai.</p>
+                             <p>You need to enter this OTP in the email verification screen of the Fedo Vitals app.</p>
+                             <p>If this request attempt was not made by you, immediately report to hello@fedo.ai.</p>
                              
                              <p>Great Day!<br></p>
                              <p><b>Team Fedo</b><br></p>
