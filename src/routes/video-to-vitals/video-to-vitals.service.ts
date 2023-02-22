@@ -445,6 +445,7 @@ export class VideoToVitalsService {
       map(res => {
         if (res.length == 0) throw new NotFoundException('User not found')
         lastValueFrom(this.userDb.findByIdandUpdate({ id: id.toString(), quries: format_user_update(updateUserDTO,res[0]) }))
+        lastValueFrom(this.userProfileDb.findandUpdate({ columnName : 'application_id',columnvalue:res[0].application_id, quries: {name : updateUserDTO.user_name? updateUserDTO.user_name : res[0].user_name} }))
         return res
       }),
       switchMap(async res => {
