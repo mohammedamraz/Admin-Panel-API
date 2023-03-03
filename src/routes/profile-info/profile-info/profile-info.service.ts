@@ -115,6 +115,18 @@ export class ProfileInfoService {
 
     }
 
+    fetchProfileByMobileNumber(mobile: any) {
+        Logger.debug(`fetchProfileByMobileNumber()  `, APP);
+
+        return this.userProfileDb.find({ mobile: mobile }).pipe(
+            map(doc => {
+                if (doc.length == 0) throw new NotFoundException('user not found');
+                return doc
+            })
+        )
+
+    }
+
     updateTotalTestsInProfileInfo(createProfileInfoDTO: CreateProfileInfoDTO) {
         Logger.debug(`updateTotalTestsInProfileInfo() updateUserDTO:${JSON.stringify(createProfileInfoDTO)} `, APP);
 

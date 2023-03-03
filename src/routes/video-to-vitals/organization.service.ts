@@ -91,7 +91,7 @@ export class OrganizationService {
           return this.usersService.saveUsersToUserDb({ user_name: createOrganizationDto.admin_name, org_id: Number(res[0].id), designation: createOrganizationDto.designation, email: createOrganizationDto.organization_email, application_id: res[0].application_id, organization_name: createOrganizationDto.organization_name, mobile: createOrganizationDto.organization_mobile , type : 'OrgAdmin'}, createOrganizationDto.product_id, Number(res[0].id))
         }),
         switchMap(res => {
-          this.userProfileDb.save({ application_id: res.application_id, user_id: res.id, org_id: res.org_id });
+          this.userProfileDb.save({ application_id: res.application_id, user_id: res.id, org_id: res.org_id , name : createOrganizationDto.admin_name , mobile : createOrganizationDto.organization_mobile.slice(3,14) , is_editable: true , country_code : '+91'});
           return [this.create_organization_response]
         })
       )
@@ -145,7 +145,7 @@ export class OrganizationService {
           return this.usersService.saveUsersToUserDb({ user_name: createOrganizationDto.admin_name, org_id: Number(res[0].id), designation: createOrganizationDto.designation, email: createOrganizationDto.organization_email, application_id: res[0].application_id, organization_name: createOrganizationDto.organization_name, mobile: createOrganizationDto.organization_mobile , type : 'OrgAdmin'}, createOrganizationDto.product_id, Number(res[0].id))
         }),
         switchMap(res => {
-          this.userProfileDb.save({ application_id: res.application_id, user_id: res.id, org_id: res.org_id });
+          this.userProfileDb.save({ application_id: res.application_id, user_id: res.id, org_id: res.org_id , name : createOrganizationDto.admin_name , mobile : createOrganizationDto.organization_mobile.slice(3,14) , is_editable: true , country_code : '+91'});
           return [this.create_organization_response]
         })
       )
@@ -775,7 +775,7 @@ export class OrganizationService {
         if (res.length == 0) throw new NotFoundException('organization not found')
         else{ lastValueFrom(this.usersService.patchUserByApplicationId(res[0].application_id,updateOrganizationDto))
            lastValueFrom(this.organizationDb.findByIdandUpdate({ id: id.toString(), quries: updateOrganizationDto }))
-           lastValueFrom(this.userProfileDb.findandUpdate({ columnName : 'application_id', columnvalue : res[0].application_id , quries: {name : updateOrganizationDto.admin_name} }))
+           lastValueFrom(this.userProfileDb.findandUpdate({ columnName : 'application_id', columnvalue : res[0].application_id , quries: {name : updateOrganizationDto.admin_name? updateOrganizationDto.admin_name : res[0].admin_name , mobile : updateOrganizationDto.organization_mobile? updateOrganizationDto.organization_mobile.slice(3,14) : res[0].organization_mobile.slice(3,14) } }))
         }
       
       }))

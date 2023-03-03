@@ -50,6 +50,8 @@ export class CreateProfileInfoDTO {
     bp_status?: string;
     rbs?: string;
     ecg_url?: string;
+    country_code? : any;
+    mobile? : any;
 }
 
 

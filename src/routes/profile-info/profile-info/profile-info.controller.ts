@@ -43,6 +43,13 @@ export class ProfileInfoController {
     return this.profileInfoService.fetchProfileByOrgId(org_id)
   }
 
+  @Get('mobile/:mobile')
+  fetchProfileByMobileNumber(@Param('mobile') mobile: any) {
+    Logger.debug(`fetchProfileByMobileNumber()`, APP);
+
+    return this.profileInfoService.fetchProfileByMobileNumber(mobile)
+  }
+
   @Get('profile/info/list/:application_id/:org_id')
   fetchProfileByOrgIdByQueryParams( @Param() createProfileInfoDTO: CreateProfileInfoDTO) {
     Logger.debug(`fetchProfileByOrgId() params:${JSON.stringify(createProfileInfoDTO)}`, APP);

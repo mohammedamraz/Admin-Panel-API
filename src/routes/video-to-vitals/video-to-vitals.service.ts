@@ -307,7 +307,7 @@ export class VideoToVitalsService {
             userDTO.product_id.map(async (res1,index) =>{
               await lastValueFrom(this.userProductJunctionService.createUserProductJunction({ user_id: doc["id"], org_id: userDTO["org_id"], product_id: Number(userDTO.product_id[index]), total_tests: 0 , role : userDTO?.role[index] }))});
             // doc["id"]
-            await lastValueFrom(this.userProfileDb.save({ application_id: doc['application_id'], user_id: doc['id'], org_id: doc['org_id'], name: doc['user_name'], is_editable: true }))
+            await lastValueFrom(this.userProfileDb.save({ application_id: doc['application_id'], user_id: doc['id'], org_id: doc['org_id'], name : userDTO.user_name , mobile : userDTO.mobile.slice(3,14) ,  is_editable: true , country_code : '+91' }))
             return doc;
           }))
       }))
@@ -344,7 +344,7 @@ export class VideoToVitalsService {
             userDTO.product_id.map(async (res1, index) =>
              await lastValueFrom(this.userProductJunctionService.createUserProductJunction({ user_id: doc["id"], org_id: userDTO["org_id"],  product_id: Number(userDTO.product_id[index]), total_tests: 0 , role : userDTO.role[index]  }))
              );
-            await lastValueFrom(this.userProfileDb.save({ application_id: doc['application_id'], user_id: doc['id'], org_id: doc['org_id'], name: doc['user_name'], is_editable: true }))
+            await lastValueFrom(this.userProfileDb.save({ application_id: doc['application_id'], user_id: doc['id'], org_id: doc['org_id'], name : userDTO.user_name , mobile : userDTO.mobile.slice(3,14) , is_editable: true , country_code : '+91' }))
             return doc;
           }))
       }))
@@ -445,7 +445,7 @@ export class VideoToVitalsService {
       map(res => {
         if (res.length == 0) throw new NotFoundException('User not found')
         lastValueFrom(this.userDb.findByIdandUpdate({ id: id.toString(), quries: format_user_update(updateUserDTO,res[0]) }))
-        lastValueFrom(this.userProfileDb.findandUpdate({ columnName : 'application_id',columnvalue:res[0].application_id, quries: {name : updateUserDTO.user_name? updateUserDTO.user_name : res[0].user_name} }))
+        lastValueFrom(this.userProfileDb.findandUpdate({ columnName : 'application_id',columnvalue:res[0].application_id, quries: {name : updateUserDTO.user_name? updateUserDTO.user_name : res[0].user_name , mobile : updateUserDTO.mobile? updateUserDTO.mobile.slice(3,14) : res[0].mobile.slice(3,14)} }))
         return res
       }),
       switchMap(async res => {
