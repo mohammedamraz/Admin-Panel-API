@@ -115,10 +115,10 @@ export class ProfileInfoService {
 
     }
 
-    fetchProfileByMobileNumber(mobile: any) {
+    fetchProfileByMobileNumber(createProfileInfoDTO: CreateProfileInfoDTO) {
         Logger.debug(`fetchProfileByMobileNumber()  `, APP);
 
-        return this.userProfileDb.find({ mobile: mobile }).pipe(
+        return this.userProfileDb.find({ mobile: createProfileInfoDTO.mobile, org_id : createProfileInfoDTO.org_id }).pipe(
             map(doc => {
                 if (doc.length == 0) throw new NotFoundException('user not found');
                 return doc
