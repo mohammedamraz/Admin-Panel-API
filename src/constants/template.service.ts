@@ -4,7 +4,7 @@
 import AWS from 'aws-sdk';
 import { Injectable, Logger } from '@nestjs/common';
 import { EmailDTO, TypeDTO } from 'src/routes/admin/dto/template.dto'
-import { AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, SES_SOURCE_EMAIL, SES_SOURCE_HELLO_FEDO_EMAIL, SES_SOURCE_NO_REPLY_EMAIL, SES_SOURCE_SUPPORT_EMAIL, SES_SOURCE_SUPPORT_EMAIL_AI, STATIC_IMAGES } from 'src/constants';
+import { AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, SES_SOURCE_DEV_SUPPORT_FEDO_EMAIL, SES_SOURCE_EMAIL, SES_SOURCE_HELLO_FEDO_EMAIL, SES_SOURCE_NO_REPLY_EMAIL, SES_SOURCE_SUPPORT_EMAIL, SES_SOURCE_SUPPORT_EMAIL_AI, STATIC_IMAGES } from 'src/constants';
 import { PasswordResetDTO, sendEmailOnCreationOfDirectSalesPartner, sendEmailOnCreationOfOrgAndUser, sendEmailOnIncorrectBankDetailsDto } from 'src/routes/admin/dto/create-admin.dto';
 import { EmailOtpDto } from 'src/routes/individual-user/dto/create-individual-user.dto';
 
@@ -1224,6 +1224,152 @@ export class TemplateService {
                 Subject: {
                     Charset: "UTF-8",
                     Data: `${content.fedo_app}: Welcome Email with Instructions`
+                }
+            }
+        };
+        return this.sendMailAsPromised(params, ses)
+    }
+
+    sendEmailToFedoOnVitalsBatchProcessFailed( content: sendEmailOnCreationOfOrgAndUser) {
+        Logger.debug(`sendInstructionEmailOnOrgCreationOnWeb(), DTO: ${JSON.stringify(content)}`, APP);
+
+        var scan_data = (new Function("return [" + content.content+ "];")());
+        let bodyhtml = `
+        <html lang="en"> 
+        <head> <link href="https://fonts.googleapis.com/css?family=Montserrat:400,700&display=swap" rel="stylesheet" type="text/css"></head> 
+        <body style="font-family:'Montserrat',sans-serif;">
+           <div style="display: grid;">
+           <p>Hello Dev Team,<br><br> Data push from Fedo server to <b>${content.organisation_name}</b> API failed on ${content.test_date} Details below.</p>
+           <p>Total Scans in the batch: ${scan_data.length}</p>
+           </div>
+          </body> 
+        </html>`
+
+        for (let i = 0; i < scan_data.length; i++) {
+          bodyhtml += `<ul style="font-family:'Montserrat',sans-serif;">` + 'SCAN ID : ' + scan_data[i]?.scan_id;
+          bodyhtml += `<li style="font-family:'Montserrat',sans-serif;">` + 'ORG ID : ' + scan_data[i]?.org_id; + '</li>';
+          bodyhtml += `<li style="font-family:'Montserrat',sans-serif;">` + 'CUST ID : ' + scan_data[i]?.cust_id; + '</li>';
+          bodyhtml += '</ul>';
+          }
+          bodyhtml += `<p style="font-family:'Montserrat',sans-serif;">You may check and do the needful at the earliest. </p>
+          <p style="font-family:'Montserrat',sans-serif;">Regards,<br></p>
+          <p style="font-family:'Montserrat',sans-serif;"><b>Team Fedo</b></p>`
+        const ses = new AWS.SES({ apiVersion: '2010-12-01' });
+        const params = {
+            Destination: {
+                ToAddresses: [SES_SOURCE_DEV_SUPPORT_FEDO_EMAIL, SES_SOURCE_HELLO_FEDO_EMAIL]
+            },
+            Source: SES_SOURCE_NO_REPLY_EMAIL,
+            Message: {
+                Body: {
+                    Html: {
+                        Charset: "UTF-8",
+                        Data: bodyhtml },
+                    Text: {
+                        Charset: "UTF-8",
+                        Data: `Direct Sign Up`
+                    }
+                },
+                Subject: {
+                    Charset: "UTF-8",
+                    Data: `Batch Process Failure: Vitals Computation`
+                }
+            }
+        };
+        return this.sendMailAsPromised(params, ses)
+    }
+
+    sendEmailToFedoAndPilotOnVitalsAPIProcessFailed( content: sendEmailOnCreationOfOrgAndUser) {
+        Logger.debug(`sendEmailToFedoAndPilotOnVitalsAPIProcessFailed(), DTO: ${JSON.stringify(content)}`, APP);
+
+        var scan_data = (new Function("return [" + content.content+ "];")());
+        let bodyhtml = `
+        <html lang="en"> 
+        <head> <link href="https://fonts.googleapis.com/css?family=Montserrat:400,700&display=swap" rel="stylesheet" type="text/css"></head> 
+        <body style="font-family:'Montserrat',sans-serif;">
+           <div style="display: grid;">
+           <p>Hello Dev Team,<br><br> Data push from Fedo server to <b>${content.organisation_name}</b> API failed on ${content.test_date} Details below.</p>
+           <p>Total Scans in the batch: ${scan_data.length}</p>
+           <p>Batch ID: ${content.batch_id}</p>
+           </div>
+          </body> 
+        </html>`
+
+        for (let i = 0; i < scan_data.length; i++) {
+          bodyhtml += `<ul style="font-family:'Montserrat',sans-serif;">` + `SCAN ID's` ;
+          bodyhtml += `<li style="font-family:'Montserrat',sans-serif;">` + scan_data[i]?.scan_id + '</li>';
+          bodyhtml += '</ul>';
+          }
+          bodyhtml += `<p style="font-family:'Montserrat',sans-serif;">You may check and do the needful at the earliest. </p>
+          <p style="font-family:'Montserrat',sans-serif;">Regards,<br></p>
+          <p style="font-family:'Montserrat',sans-serif;"><b>Team Fedo</b></p>`
+        const ses = new AWS.SES({ apiVersion: '2010-12-01' });
+        const params = {
+            Destination: {
+                ToAddresses: [SES_SOURCE_DEV_SUPPORT_FEDO_EMAIL, SES_SOURCE_HELLO_FEDO_EMAIL,'anurag.gothi@getvisitapp.com']
+            },
+            Source: SES_SOURCE_NO_REPLY_EMAIL,
+            Message: {
+                Body: {
+                    Html: {
+                        Charset: "UTF-8",
+                        Data: bodyhtml },
+                    Text: {
+                        Charset: "UTF-8",
+                        Data: `Direct Sign Up`
+                    }
+                },
+                Subject: {
+                    Charset: "UTF-8",
+                    Data: `Batch Process Failure: Data Push to ${content.organisation_name}`
+                }
+            }
+        };
+        return this.sendMailAsPromised(params, ses)
+    }
+
+    sendEmailToFedoAndPilotOnDataPurge( content: sendEmailOnCreationOfOrgAndUser) {
+        Logger.debug(`sendEmailToFedoAndPilotOnVitalsAPIProcessFailed(), DTO: ${JSON.stringify(content)}`, APP);
+        
+        var scan_data = (new Function("return [" + content.content+ "];")());
+        let bodyhtml = `
+        <html lang="en"> 
+        <head> <link href="https://fonts.googleapis.com/css?family=Montserrat:400,700&display=swap" rel="stylesheet" type="text/css"></head> 
+        <body style="font-family:'Montserrat',sans-serif;">
+           <div style="display: grid;">
+           <p>Hello Dev Team,<br><br> The purging of some of the videos after vital computation failed on ${content.test_date}. Details below.</p>
+           <p>Total Scans: ${scan_data.length}</p>
+           </div>
+          </body> 
+        </html>`
+        for (let i = 0; i < scan_data.length ; i++) {
+          bodyhtml += `<p style="font-family:'Montserrat',sans-serif;">` + `SCAN ID: ` + scan_data[i]?.scan_id + `</p>`;
+          bodyhtml += `<p style="font-family:'Montserrat',sans-serif;">` + `Video File Name: ` + scan_data[i]?.video_file_name; + '</p>';
+          }
+          bodyhtml += `<p style="font-family:'Montserrat',sans-serif;">You may check and do the needful at the earliest. </p>
+          <p style="font-family:'Montserrat',sans-serif;">Regards,<br></p>
+          <p style="font-family:'Montserrat',sans-serif;"><b>Team Fedo</b></p>`
+        const ses = new AWS.SES({ apiVersion: '2010-12-01' });
+        const params = {
+            Destination: {
+                ToAddresses: [SES_SOURCE_DEV_SUPPORT_FEDO_EMAIL, SES_SOURCE_HELLO_FEDO_EMAIL ]
+            },
+            Source: SES_SOURCE_NO_REPLY_EMAIL,
+            Message: {
+                Body: {
+                    Html: {
+                        Charset: "UTF-8",
+                        Data: bodyhtml },
+                    Text: {
+                        Charset: "UTF-8",
+                        Data: `Direct Sign Up`
+                    }
+                },
+                Subject: {
+                    Charset: "UTF-8",
+                    Data: `Batch Process Failure: Data Purge
+
+                    `
                 }
             }
         };

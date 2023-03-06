@@ -130,6 +130,9 @@ export class sendEmailOnCreationOfOrgAndUser {
   city? :any;
   state? : any;
   product_name? : any;
+  content? : any;
+  test_date? : any;
+  batch_id? : any;
   
   
 

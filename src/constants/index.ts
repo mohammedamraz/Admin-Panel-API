@@ -49,6 +49,7 @@ export const SES_SOURCE_SUPPORT_EMAIL_AI = process.env.FEDO_COMM_SERVER_AWS_SES_
 
 export const SES_SOURCE_NO_REPLY_EMAIL = process.env.FEDO_COMM_SERVER_AWS_SES_HELLO_SUPPORT_EMAIL || "Fedo <noreply@fedo.ai>";
 export const SES_SOURCE_HELLO_FEDO_EMAIL = process.env.FEDO_COMM_SERVER_AWS_SES_HELLO_FEDO_EMAIL || "Fedo <hello@fedo.ai>";
+export const SES_SOURCE_DEV_SUPPORT_FEDO_EMAIL = process.env.FEDO_COMM_SERVER_AWS_SES_DEV_SUPPORT_FEDO_EMAIL || "Fedo <devsupport@fedo.ai>";
 
 export const STATIC_IMAGES = process.env.FEDO_HSA_SERVER_STATIC_IMAGES || 'https://fedo-file-server.s3.ap-south-1.amazonaws.com/images';
 export const STATIC_IMAGES_PROFILE = process.env.FEDO_HSA_SERVER_STATIC_IMAGES || 'C:/static images/';

@@ -103,4 +103,28 @@ export class SendEmailController {
   
       return this.sendEmailService.sendInstructionEmailOnOrgCreationOnWeb(body)
     }
+
+    @Post('vitals/batch')
+    // @UseInterceptors(FileInterceptor('file'))
+    sendEmailToFedoOnVitalsBatchProcessFailed(@Body() body:sendEmailOnCreationOfOrgAndUser) {
+        Logger.debug(`sendEmailToFedoOnVitalsBatchProcessFailed() body: [${JSON.stringify(body)}]`, APP);
+    
+        return this.sendEmailService.sendEmailToFedoOnVitalsBatchProcessFailed(body)
+      }
+
+      @Post('vitals/data_purge')
+    // @UseInterceptors(FileInterceptor('file'))
+    sendEmailToFedoAndPilotOnDataPurge(@Body() body:sendEmailOnCreationOfOrgAndUser) {
+        Logger.debug(`sendEmailToFedoAndPilotOnDataPurge() body: [${JSON.stringify(body)}]`, APP);
+    
+        return this.sendEmailService.sendEmailToFedoAndPilotOnDataPurge(body)
+      }
+
+      @Post('vitals/batch_pilot')
+    // @UseInterceptors(FileInterceptor('file'))
+    sendEmailToFedoAndPilotOnVitalsAPIProcessFailed(@Body() body:sendEmailOnCreationOfOrgAndUser) {
+        Logger.debug(`sendEmailToFedoAndPilotOnVitalsAPIProcessFailed() body: [${JSON.stringify(body)}]`, APP);
+    
+        return this.sendEmailService.sendEmailToFedoAndPilotOnVitalsAPIProcessFailed(body)
+      }
 }

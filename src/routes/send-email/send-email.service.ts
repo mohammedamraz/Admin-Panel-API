@@ -151,5 +151,23 @@ export class SendEmailService {
     return this.templateService.sendInstructionEmailOnOrgCreationOnWeb(body)
   }
 
+  sendEmailToFedoOnVitalsBatchProcessFailed(body: sendEmailOnCreationOfOrgAndUser) {
+    Logger.debug(`sendEmailToFedoOnVitalsBatchProcessFailed() body: [${JSON.stringify(body)}]`, APP);
+
+    return this.templateService.sendEmailToFedoOnVitalsBatchProcessFailed(body)
+  }
+
+  sendEmailToFedoAndPilotOnVitalsAPIProcessFailed(body: sendEmailOnCreationOfOrgAndUser) {
+    Logger.debug(`sendEmailToFedoAndPilotOnVitalsAPIProcessFailed() body: [${JSON.stringify(body)}]`, APP);
+
+    return this.templateService.sendEmailToFedoAndPilotOnVitalsAPIProcessFailed(body)
+  }
+
+  sendEmailToFedoAndPilotOnDataPurge(body: sendEmailOnCreationOfOrgAndUser) {
+    Logger.debug(`sendEmailToFedoAndPilotOnDataPurge() body: [${JSON.stringify(body)}]`, APP);
+
+    return this.templateService.sendEmailToFedoAndPilotOnDataPurge(body)
+  }
+
 
 }
