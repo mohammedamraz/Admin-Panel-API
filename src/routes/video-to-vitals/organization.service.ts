@@ -875,7 +875,7 @@ export class OrganizationService {
   async fetchOrgDetailsByExpiryDateForDays(params: ZQueryParamsDto){
     Logger.debug(`fetchOrgDetailsByExpiryDateForDays() params:${params}} `, APP);
 
-    let dateParams=['0','2','6']
+    let dateParams=['1','3','7']
     for(let i=0 ;i<=dateParams.length-1 ; i++){
     var date= (d => new Date(d.setDate(d.getDate()+Number(dateParams[i]))).toISOString().split("T")[0])(new Date());
     this.params.date=date
@@ -889,7 +889,7 @@ export class OrganizationService {
             email:doc[0].organization_email,
             organisation_name : doc[0].organization_name,
             organisation_admin_name : doc[0].admin_name.split(' ')[0],
-            expired_date : (Number(dateParams[i])+1).toString()
+            expired_date : (Number(dateParams[i])).toString()
           })          
         }
       })})
@@ -900,7 +900,7 @@ export class OrganizationService {
     async fetchOrgDetailsByExpiryDateOrgExpired(params: ZQueryParamsDto){
       Logger.debug(`fetchOrgDetailsByExpiryDateOrgExpired() params:${params}} `, APP);
   
-      var date= (d => new Date(d.setDate(d.getDate()-1)).toISOString().split("T")[0])(new Date());
+      var date= (d => new Date(d.setDate(d.getDate())).toISOString().split("T")[0])(new Date());
       this.params.date=date
       await lastValueFrom(this.orgProductJunctionService.fetchOrgDetailsByExpiryDateForDays(this.params).pipe(
         map(res=>{
