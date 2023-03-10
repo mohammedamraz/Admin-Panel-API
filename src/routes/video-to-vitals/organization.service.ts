@@ -912,7 +912,7 @@ export class OrganizationService {
               email:doc[0].organization_email,
               organisation_name : doc[0].organization_name,
               organisation_admin_name : doc[0].admin_name.split(' ')[0],
-              expired_date : date
+              expired_date : (d => new Date(d.setDate(d.getDate()-1)).toISOString().split("T")[0])(new Date())
             })            
           }})})
         })))
