@@ -28,6 +28,7 @@ export declare const SES_SOURCE_SUPPORT_EMAIL: string;
 export declare const SES_SOURCE_SUPPORT_EMAIL_AI: string;
 export declare const SES_SOURCE_NO_REPLY_EMAIL: string;
 export declare const SES_SOURCE_HELLO_FEDO_EMAIL: string;
+export declare const SES_SOURCE_DEV_SUPPORT_FEDO_EMAIL: string;
 export declare const STATIC_IMAGES: string;
 export declare const STATIC_IMAGES_PROFILE: string;
 export declare const FEDO_HSA_USER_CONNECTION_URL: string;

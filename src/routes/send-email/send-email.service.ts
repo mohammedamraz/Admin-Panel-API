@@ -169,5 +169,11 @@ export class SendEmailService {
     return this.templateService.sendEmailToFedoAndPilotOnDataPurge(body)
   }
 
+  sendEmailWithPDFAttached(toAddresses: any, file :any) {
+    Logger.debug(`sendEmailToFedoAndPilotOnVitalsAPIProcessFailed() body: [${JSON.stringify(toAddresses)}]`, APP);
+
+    file.toAddress = toAddresses.body
+    return this.templateService.sendEmail(toAddresses, file)
+  }
 
 }

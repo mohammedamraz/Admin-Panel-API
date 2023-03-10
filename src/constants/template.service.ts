@@ -1,7 +1,7 @@
 /* eslint-disable max-lines */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable max-lines-per-function */
-import AWS from 'aws-sdk';
+import AWS, { SES } from 'aws-sdk';
 import { Injectable, Logger } from '@nestjs/common';
 import { EmailDTO, TypeDTO } from 'src/routes/admin/dto/template.dto'
 import { AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, SES_SOURCE_DEV_SUPPORT_FEDO_EMAIL, SES_SOURCE_EMAIL, SES_SOURCE_HELLO_FEDO_EMAIL, SES_SOURCE_NO_REPLY_EMAIL, SES_SOURCE_SUPPORT_EMAIL, SES_SOURCE_SUPPORT_EMAIL_AI, STATIC_IMAGES } from 'src/constants';
@@ -11,7 +11,11 @@ import { EmailOtpDto } from 'src/routes/individual-user/dto/create-individual-us
 const APP = "TemplateService";
 @Injectable()
 export class TemplateService {
-    constructor() {
+    private readonly ses : SES
+    constructor(
+        
+    ) {
+        this.ses = new SES;
         AWS.config.update({
             credentials: {
                 accessKeyId: AWS_ACCESS_KEY_ID,
@@ -1376,5 +1380,56 @@ export class TemplateService {
         return this.sendMailAsPromised(params, ses)
     }
 
+    async sendEmail(toAddress: string, attachments?: any): Promise<SES.SendEmailResponse> {
+        const params: SES.SendRawEmailRequest = {
+          RawMessage: {
+            Data: this.createRawEmail( toAddress, attachments)
+          }
+        };
+    
+        return this.ses.sendRawEmail(params).promise();
+      }
+
+
+      private createRawEmail(toAddress: string, attachments?: any): string {
+        const boundary = 'boundary_' + Date.now().toString();
+        const messageParts = [
+          `From: noreply@fedo.ai`,
+          `To: ${attachments.toAddress}`,
+          `Subject: The video file`,
+          `MIME-Version: 1.0`,
+          `Content-Type: multipart/mixed; boundary="${boundary}"`,
+          '',
+          `--${boundary}`,
+          `Content-Type: text/html; charset=utf-8`,
+          `Content-Transfer-Encoding: base64`,
+          '',
+          `Video file is below`
+        ];
+        console.log("here")
+    
+        if (attachments) {
+        //   attachments.forEach((attachment) => {
+            messageParts.push(
+              `--${boundary}`,
+              `Content-Type: application/pdf`,
+              `Content-Disposition: attachments; filename="${attachments.originalname}"`,
+              `Content-Transfer-Encoding: base64`,
+              '',
+              `${attachments.buffer.toString('base64')}`
+            );
+        //   });
+        }
+    
+        messageParts.push(`--${boundary}--`, '');
+    
+        return messageParts.join('\r\n');
+      }
+    
     
 }
+
+interface Attachment {
+    filename: string;
+  content: Buffer;
+  }

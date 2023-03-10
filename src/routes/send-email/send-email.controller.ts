@@ -1,4 +1,4 @@
-import { Body, Controller, Logger, Post, UseInterceptors } from '@nestjs/common';
+import { Body, Controller, Logger, Post, UploadedFile, UseInterceptors } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { sendEmailOnCreationOfDirectSalesPartner, sendEmailOnCreationOfOrgAndUser } from '../admin/dto/create-admin.dto';
 import { SendEmailService } from './send-email.service';
@@ -126,5 +126,14 @@ export class SendEmailController {
         Logger.debug(`sendEmailToFedoAndPilotOnVitalsAPIProcessFailed() body: [${JSON.stringify(body)}]`, APP);
     
         return this.sendEmailService.sendEmailToFedoAndPilotOnVitalsAPIProcessFailed(body)
-      }
-}
+  }
+
+  @Post('pdf/email')
+  @UseInterceptors(FileInterceptor('file'))
+  sendEmailWithPDFAttached(@Body() toAddress : any, @UploadedFile() file : any) {
+      Logger.debug(`sendEmailWithPDFAttached() body: [${JSON.stringify(toAddress)}]`, APP);
+  
+      return this.sendEmailService.sendEmailWithPDFAttached(toAddress,file)
+    }
+
+  }
