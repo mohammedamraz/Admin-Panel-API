@@ -47,8 +47,11 @@ export class CreateOrganizationDto {
     is_register? : boolean ;
     enable_kiosc? : boolean;
     kiosc_user? : any;
-    is_read : boolean;
-    is_web : boolean;
+    is_read? : boolean;
+    is_application_number? : boolean;
+    is_pilot_duration? : boolean;
+    is_web? : boolean;
+    attempts? : number;
     // org_details? : any;
 }
 
@@ -412,7 +415,7 @@ export const format_organisation=(res)=>{
     organization_email:res.organization_email,
     organization_mobile:res.organization_mobile,
     logo:res?.logo || null,
-    attempts:res?.attempts || 0,
+    // attempts:res?.attempts || 0,
     designation:res.designation,
     url:res.url,
     stage:res?.stage || null,
@@ -461,18 +464,21 @@ return data
 export const format_org_product_juction=(res,index,id)=>{
     console.log("format_org_product_juction() const" ,res ,index, id)
     const tomorrow = new Date();
-    let end_date = new Date(tomorrow.setDate(tomorrow.getDate() + Number(res.pilot_duration[index])));
+    let end_date = JSON.parse(res.is_pilot_duration[index]) ? (new Date(tomorrow.setDate(tomorrow.getDate() + Number(res.pilot_duration[index])))) : (new Date(new Date().setFullYear(new Date().getFullYear() + 1)).toISOString().split("T")[0]) ;
    let data={ org_id: id, 
         end_date: end_date, 
-        pilot_duration: res.pilot_duration[index] ,
-        event_mode: res.event_mode ? res.event_mode[index] : 0, 
+        pilot_duration: res.pilot_duration[index] ? res.pilot_duration[index] : null ,
+        event_mode: res.event_mode[index] ? res.event_mode[index] : 0, 
         product_id: res.product_id[index], 
         fedoscore: res.fedo_score[index], 
-        web_access: res.productaccess_web ? res.productaccess_web[index] : false ,  
-        ios_access: res.ios_access ? res.ios_access[index] : false, 
+        web_access: JSON.parse(res.productaccess_web[index]) ? res.productaccess_web[index] : false ,  
+        is_pilot_duration: JSON.parse(res.is_pilot_duration[index]) ? res.is_pilot_duration[index] : false ,  
+        is_application_number: JSON.parse(res.is_application_number[index]) ? res.is_application_number[index] : false ,  
+        ios_access: JSON.parse(res.ios_access[index]) ? res.ios_access[index] : false, 
         enable_kiosk: res.enable_kiosk ? res.enable_kiosk[index] : false, 
         kiosk_user: res.kiosk_user ? res.kiosk_user[index] : null, 
-        mobile_access: res.productaccess_mobile ? res.productaccess_mobile[index] : false, 
+        attempts: res.attempts[index] ? res.attempts[index] : null, 
+        mobile_access: JSON.parse(res.productaccess_mobile[index]) ? res.productaccess_mobile[index] : false, 
         status: "Active",
     }
     return data
