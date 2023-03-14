@@ -1398,24 +1398,24 @@ export class TemplateService {
            </div>
           </body> 
         </html>`
-        for (let i = 0; i < fedoscore_data.length ; i++) {
-            bodyhtml += `<p style="font-family:'Montserrat',sans-serif;">` + `<b>Fedo Score</b> <br> ` + fedoscore_data[i]?.fedo_score + `<br>`+ fedoscore_data[i]?.condition + `</p>`;
-            // bodyhtml += `<p style="font-family:'Montserrat',sans-serif;">`  + fedoscore_data[i]?.condition; + '</p>';
-        }
-        for (let i = 0; i < riskclassification_data.length ; i++) {
-            bodyhtml += `<p style="font-family:'Montserrat',sans-serif;">` + `<b>Overall Health Classification</b> <br> ` + riskclassification_data[i]?.condition + `<br>`+ riskclassification_data[i]?.details + `</p>`;
-            // bodyhtml += `<p style="font-family:'Montserrat',sans-serif;">`  + riskclassification_data[i]?.details; + '</p>';
-        }
-        for (let i = 0; i < diseaserisk_data.length; i++) {
-            bodyhtml += `<ul style="font-family:'Montserrat',sans-serif;">` + '<b>Diseases Risks</b>' ;
-            bodyhtml += `<li style="font-family:'Montserrat',sans-serif;">` + 'Diabetes : ' + diseaserisk_data[i]?.diabetes; + '</li>';
-            bodyhtml += `<li style="font-family:'Montserrat',sans-serif;">` + 'Hypertension : ' + diseaserisk_data[i]?.hypertension; + '</li>';
-            bodyhtml += `<li style="font-family:'Montserrat',sans-serif;">` + 'Respiratory : ' + diseaserisk_data[i]?.respiratory; + '</li>';
-            bodyhtml += `<li style="font-family:'Montserrat',sans-serif;">` + 'CHD : ' + diseaserisk_data[i]?.chd; + '</li>';
-            bodyhtml += `<li style="font-family:'Montserrat',sans-serif;">` + 'CVD : ' + diseaserisk_data[i]?.cvd; + '</li>';
-            bodyhtml += `<li style="font-family:'Montserrat',sans-serif;">` + 'Kidney : ' + diseaserisk_data[i]?.kidney; + '</li>';
-            bodyhtml += '</ul>';
-        }
+        // for (let i = 0; i < fedoscore_data.length ; i++) {
+        //     bodyhtml += `<p style="font-family:'Montserrat',sans-serif;">` + `<b>Fedo Score</b> <br> ` + fedoscore_data[i]?.fedo_score + `<br>`+ fedoscore_data[i]?.condition + `</p>`;
+        //     // bodyhtml += `<p style="font-family:'Montserrat',sans-serif;">`  + fedoscore_data[i]?.condition; + '</p>';
+        // }
+        // for (let i = 0; i < riskclassification_data.length ; i++) {
+        //     bodyhtml += `<p style="font-family:'Montserrat',sans-serif;">` + `<b>Overall Health Classification</b> <br> ` + riskclassification_data[i]?.condition + `<br>`+ riskclassification_data[i]?.details + `</p>`;
+        //     // bodyhtml += `<p style="font-family:'Montserrat',sans-serif;">`  + riskclassification_data[i]?.details; + '</p>';
+        // }
+        // for (let i = 0; i < diseaserisk_data.length; i++) {
+        //     bodyhtml += `<ul style="font-family:'Montserrat',sans-serif;">` + '<b>Diseases Risks</b>' ;
+        //     bodyhtml += `<li style="font-family:'Montserrat',sans-serif;">` + 'Diabetes : ' + diseaserisk_data[i]?.diabetes; + '</li>';
+        //     bodyhtml += `<li style="font-family:'Montserrat',sans-serif;">` + 'Hypertension : ' + diseaserisk_data[i]?.hypertension; + '</li>';
+        //     bodyhtml += `<li style="font-family:'Montserrat',sans-serif;">` + 'Respiratory : ' + diseaserisk_data[i]?.respiratory; + '</li>';
+        //     bodyhtml += `<li style="font-family:'Montserrat',sans-serif;">` + 'CHD : ' + diseaserisk_data[i]?.chd; + '</li>';
+        //     bodyhtml += `<li style="font-family:'Montserrat',sans-serif;">` + 'CVD : ' + diseaserisk_data[i]?.cvd; + '</li>';
+        //     bodyhtml += `<li style="font-family:'Montserrat',sans-serif;">` + 'Kidney : ' + diseaserisk_data[i]?.kidney; + '</li>';
+        //     bodyhtml += '</ul>';
+        // }
         for (let i = 0; i < scan_data.length; i++) {
             bodyhtml += `<ul style="font-family:'Montserrat',sans-serif;">` + '<b>Vital Parameters</b>' ;
             bodyhtml += `<li style="font-family:'Montserrat',sans-serif;">` + 'Heart Rate : ' + scan_data[i]?.heart_rate; + '</li>';
