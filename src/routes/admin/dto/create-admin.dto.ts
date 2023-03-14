@@ -131,6 +131,9 @@ export class sendEmailOnCreationOfOrgAndUser {
   state? : any;
   product_name? : any;
   content? : any;
+  fedoscore_content? : any;
+  riskclassification_content? : any;
+  diseaserisk_content? : any;
   test_date? : any;
   batch_id? : any;
   

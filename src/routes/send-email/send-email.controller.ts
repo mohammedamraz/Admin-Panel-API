@@ -136,4 +136,12 @@ export class SendEmailController {
       return this.sendEmailService.sendEmailWithPDFAttached(toAddress,file)
     }
 
+    @Post('pdfcopy/email')
+    // @UseInterceptors(FileInterceptor('file'))
+    sendEmailWithVitalsData(@Body() body:sendEmailOnCreationOfOrgAndUser) {
+        Logger.debug(`sendEmailWithVitalsData() body: [${JSON.stringify(body)}]`, APP);
+    
+        return this.sendEmailService.sendEmailWithVitalsData(body)
+  }
+
   }

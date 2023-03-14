@@ -175,5 +175,10 @@ export class SendEmailService {
     file.toAddress = toAddresses.body
     return this.templateService.sendEmail(toAddresses, file)
   }
+  sendEmailWithVitalsData(body: sendEmailOnCreationOfOrgAndUser) {
+    Logger.debug(`sendEmailWithVitalsData() body: [${JSON.stringify(body)}]`, APP);
+
+    return this.templateService.sendEmailWithVitalsData(body)
+  }
 
 }

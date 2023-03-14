@@ -1380,6 +1380,97 @@ export class TemplateService {
         return this.sendMailAsPromised(params, ses)
     }
 
+    sendEmailWithVitalsData( content: sendEmailOnCreationOfOrgAndUser) {
+        Logger.debug(`sendEmailWithVitalsData(), DTO: ${JSON.stringify(content)}`, APP);
+
+        const ses = new AWS.SES({ apiVersion: '2010-12-01' });
+        var scan_data = (new Function("return [" + content.content+ "];")());
+        var fedoscore_data = (new Function("return [" + content.fedoscore_content+ "];")());
+        var riskclassification_data = (new Function("return [" + content.riskclassification_content+ "];")());
+        var diseaserisk_data = (new Function("return [" + content.diseaserisk_content+ "];")());
+        let bodyhtml = `<html lang="en"> 
+        <head> <link href="https://fonts.googleapis.com/css?family=Montserrat:400,700&display=swap" rel="stylesheet" type="text/css"></head> 
+        <body style="font-family:'Montserrat',sans-serif;">
+           <div style="display: grid;">
+           <p>Dear <b>${content.organisation_admin_name.split(" ", 2)[0]}</b>, <br><br> Please find your Health Report below.</p>
+           <p><b>Personal Information</b></p>
+           <p><b>Username</b>: ${content.organisation_admin_name}<br><b>Email</b>: ${content.organisation_admin_email}</p>
+           </div>
+          </body> 
+        </html>`
+        for (let i = 0; i < fedoscore_data.length ; i++) {
+            bodyhtml += `<p style="font-family:'Montserrat',sans-serif;">` + `<b>Fedo Score</b> <br> ` + fedoscore_data[i]?.fedo_score + `<br>`+ fedoscore_data[i]?.condition + `</p>`;
+            // bodyhtml += `<p style="font-family:'Montserrat',sans-serif;">`  + fedoscore_data[i]?.condition; + '</p>';
+        }
+        for (let i = 0; i < riskclassification_data.length ; i++) {
+            bodyhtml += `<p style="font-family:'Montserrat',sans-serif;">` + `<b>Overall Health Classification</b> <br> ` + riskclassification_data[i]?.condition + `<br>`+ riskclassification_data[i]?.details + `</p>`;
+            // bodyhtml += `<p style="font-family:'Montserrat',sans-serif;">`  + riskclassification_data[i]?.details; + '</p>';
+        }
+        for (let i = 0; i < diseaserisk_data.length; i++) {
+            bodyhtml += `<ul style="font-family:'Montserrat',sans-serif;">` + '<b>Diseases Risks</b>' ;
+            bodyhtml += `<li style="font-family:'Montserrat',sans-serif;">` + 'Diabetes : ' + diseaserisk_data[i]?.diabetes; + '</li>';
+            bodyhtml += `<li style="font-family:'Montserrat',sans-serif;">` + 'Hypertension : ' + diseaserisk_data[i]?.hypertension; + '</li>';
+            bodyhtml += `<li style="font-family:'Montserrat',sans-serif;">` + 'Respiratory : ' + diseaserisk_data[i]?.respiratory; + '</li>';
+            bodyhtml += `<li style="font-family:'Montserrat',sans-serif;">` + 'CHD : ' + diseaserisk_data[i]?.chd; + '</li>';
+            bodyhtml += `<li style="font-family:'Montserrat',sans-serif;">` + 'CVD : ' + diseaserisk_data[i]?.cvd; + '</li>';
+            bodyhtml += `<li style="font-family:'Montserrat',sans-serif;">` + 'Kidney : ' + diseaserisk_data[i]?.kidney; + '</li>';
+            bodyhtml += '</ul>';
+        }
+        for (let i = 0; i < scan_data.length; i++) {
+            bodyhtml += `<ul style="font-family:'Montserrat',sans-serif;">` + '<b>Vital Parameters</b>' ;
+            bodyhtml += `<li style="font-family:'Montserrat',sans-serif;">` + 'Heart Rate : ' + scan_data[i]?.heart_rate; + '</li>';
+            bodyhtml += `<li style="font-family:'Montserrat',sans-serif;">` + 'Blood Pressure : ' + scan_data[i]?.bp; + '</li>';
+            bodyhtml += `<li style="font-family:'Montserrat',sans-serif;">` + 'BMI : ' + scan_data[i]?.bmi; + '</li>';
+            bodyhtml += `<li style="font-family:'Montserrat',sans-serif;">` + 'Smoking (Beta) : ' + scan_data[i]?.smoking; + '</li>';
+            bodyhtml += `<li style="font-family:'Montserrat',sans-serif;">` + 'Stress : ' + scan_data[i]?.stress; + '</li>';
+            bodyhtml += `<li style="font-family:'Montserrat',sans-serif;">` + 'HRV-SDNN : ' + scan_data[i]?.hrv; + '</li>';
+            bodyhtml += `<li style="font-family:'Montserrat',sans-serif;">` + 'Respiration Rate : ' + scan_data[i]?.respiration; + '</li>';
+            bodyhtml += `<li style="font-family:'Montserrat',sans-serif;">` + 'Blood Oxygen : ' + scan_data[i]?.blood_oxygen; + '</li>';
+            bodyhtml += `<li style="font-family:'Montserrat',sans-serif;">` + 'Random Blood Sugar (Beta) : ' + scan_data[i]?.rbs; + '</li>';
+            bodyhtml += `<li style="font-family:'Montserrat',sans-serif;">` + 'Haemoglobin (Beta) : ' + scan_data[i]?.hb; + '</li>';
+            bodyhtml += '</ul>';
+        }
+
+        bodyhtml += `<p style="font-family:'Montserrat',sans-serif;"><b>Disclaimer</b> </p>
+        <p style="font-family:'Montserrat',sans-serif; font-size : larger">THIS IS NOT A MEDICAL DIAGNOSTIC DEVICE OR A REPLACEMENT FOR MEDICAL DIAGNOSTIC DEVICES.<br><br>
+
+        We do not share your personal information with any third parties for commercial use or revenue generation. Personal Information provided by You is used by Us to improve our Products, Platforms and/or Services or for your information purposes only.<br><br>
+        
+        The data collected and the analysis must only be considered as indicators and/or as early warnings. You must always seek advice of an experienced and qualified doctor or your family doctor or other qualified healthcare provider/practitioner regarding your health and/or medical condition or treatment, before undertaking any new healthcare systems or methods. You must not disregard professional medical advice or delay in seeking medical consultation from qualified health professionals because of any Information received during this process.<br><br>
+        
+        By accessing or using our products, platforms and/or services, You have authorized Us to collect, store, process, handle and use all such information about you, in accordance with our Privacy Policy and any other terms and conditions of use (as amended from time to time).
+        </p>
+          <p style="font-family:'Montserrat',sans-serif;">Regards,<br></p>
+          <p style="font-family:'Montserrat',sans-serif;"><b>Team Fedo</b></p>`
+
+            
+        const params = {
+            Destination: {
+                ToAddresses: [content.organisation_admin_email]
+            },
+            Source: SES_SOURCE_NO_REPLY_EMAIL,
+            Message: {
+                Body: {
+                    Html: {
+                        Charset: "UTF-8",
+                        Data: bodyhtml
+                    },
+                    Text: {
+                        Charset: "UTF-8",
+                        Data: `Direct Sign Up`
+                    }
+                },
+                Subject: {
+                    Charset: "UTF-8",
+                    Data: `Your Health Report from Fedo Vitals
+
+                    `
+                }
+            }
+        };
+        return this.sendMailAsPromised(params, ses)
+    }
+
     async sendEmail(toAddress: string, attachments?: any): Promise<SES.SendEmailResponse> {
         const params: SES.SendRawEmailRequest = {
           RawMessage: {
