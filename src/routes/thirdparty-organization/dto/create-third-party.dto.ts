@@ -5,8 +5,30 @@ export class CreateThirdPartyOrganizationDto {
     @IsNotEmpty()
     tpa_name: string;
     id?: string;
-    org_id: string;
+    org_id?: string;
+    api_url? : any;
 }
+
+export class ParamsDto {
+    // id:number;
+    // @IsNotEmpty()
+    // tpa_name: string;
+    id?: string;
+    org_id?: string;
+    // api_url? : any;
+}
+
+export class RequestToAPIDto {
+    clientId?:any;
+    // @IsNotEmpty()
+    customerID?: any;
+    scanID?: any;
+    status?: any;
+    message? : any;
+}
+
+
+
 
 
 export class UpdateThirdPartyOrganizationJunctionDto {
@@ -14,6 +36,7 @@ export class UpdateThirdPartyOrganizationJunctionDto {
     tpa_id: string;
     org_id: string;
     tpa_name:string;
+    api_url? : any;
 }
 
 // export class CreateThirdPartyOrganizationDto {

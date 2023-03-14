@@ -6,7 +6,7 @@ import { DatabaseTable } from 'src/lib/database/database.decorator';
 import { DatabaseService } from 'src/lib/database/database.service';
 import { ZQueryParamsDto } from '../sales/dto/create-sale.dto';
 import { OrganizationService } from '../video-to-vitals/organization.service';
-import { CreateThirdPartyOrganizationDto, UpdateThirdPartyOrganizationJunctionDto } from './dto/create-third-party.dto';
+import { CreateThirdPartyOrganizationDto, ParamsDto, RequestToAPIDto, UpdateThirdPartyOrganizationJunctionDto } from './dto/create-third-party.dto';
 
 const APP = 'ThirdpartyOrganizationService'
 
@@ -59,6 +59,20 @@ export class ThirdpartyOrganizationService {
     )
 
 
+  }
+
+  fetchAPIUrlByThirdPartyOrganization(params: ParamsDto, body: RequestToAPIDto) {
+    Logger.debug(`fetchAPIUrlByThirdPartyOrganization() createProductDto:${params} }`, APP);
+
+    return this.tpaJunctionDB.find({ org_id: params.org_id , id : params.id }).pipe(
+          switchMap(doc => {
+            return this.http.post(`${doc[0].api_url}`,body)
+          .pipe(map(doc=>{
+            return {status : doc.data.message}
+          }))
+        }),
+          catchError(err => { throw new BadRequestException() })
+        )
   }
 
 
