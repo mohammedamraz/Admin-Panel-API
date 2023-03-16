@@ -1392,9 +1392,7 @@ export class TemplateService {
         <head> <link href="https://fonts.googleapis.com/css?family=Montserrat:400,700&display=swap" rel="stylesheet" type="text/css"></head> 
         <body style="font-family:'Montserrat',sans-serif;">
            <div style="display: grid;">
-           <p>Dear <b>${content.organisation_admin_name.split(" ", 2)[0]}</b>, <br><br> Please find your Health Report below.</p>
-           <p><b>Personal Information</b></p>
-           <p><b>Username</b>: ${content.organisation_admin_name}<br><b>Email</b>: ${content.organisation_admin_email}</p>
+           <p>Dear <b>${content.organisation_admin_name.split(" ", 2)[0]}</b>,<br><br> Please find your Health Report below.<br><br><b>Personal Information</b><br>${content.organisation_admin_name}<br>${content.organisation_admin_email}</p>
            </div>
           </body> 
         </html>`
@@ -1416,8 +1414,9 @@ export class TemplateService {
         //     bodyhtml += `<li style="font-family:'Montserrat',sans-serif;">` + 'Kidney : ' + diseaserisk_data[i]?.kidney; + '</li>';
         //     bodyhtml += '</ul>';
         // }
+        bodyhtml +=  `<p style="font-family:'Montserrat',sans-serif;margin-bottom : 0;"><b>Vital Parameters</b></p>`
         for (let i = 0; i < scan_data.length; i++) {
-            bodyhtml += `<ul style="font-family:'Montserrat',sans-serif;">` + '<b>Vital Parameters</b>' ;
+            bodyhtml += `<ul style="font-family:'Montserrat',sans-serif;">` ;
             bodyhtml += `<li style="font-family:'Montserrat',sans-serif;">` + 'Heart Rate : ' + scan_data[i]?.heart_rate; + '</li>';
             bodyhtml += `<li style="font-family:'Montserrat',sans-serif;">` + 'Blood Pressure : ' + scan_data[i]?.bp; + '</li>';
             bodyhtml += `<li style="font-family:'Montserrat',sans-serif;">` + 'BMI : ' + scan_data[i]?.bmi; + '</li>';
@@ -1431,8 +1430,8 @@ export class TemplateService {
             bodyhtml += '</ul>';
         }
 
-        bodyhtml += `<p style="font-family:'Montserrat',sans-serif;"><b>Disclaimer</b> </p>
-        <p style="font-family:'Montserrat',sans-serif; font-size : larger">THIS IS NOT A MEDICAL DIAGNOSTIC DEVICE OR A REPLACEMENT FOR MEDICAL DIAGNOSTIC DEVICES.<br><br>
+        bodyhtml += `<br><p style="font-family:'Montserrat',sans-serif;"><b>Disclaimer</b> </p>
+        <p style="font-family:'Montserrat',sans-serif;">THIS IS NOT A MEDICAL DIAGNOSTIC DEVICE OR A REPLACEMENT FOR MEDICAL DIAGNOSTIC DEVICES.<br><br>
 
         We do not share your personal information with any third parties for commercial use or revenue generation. Personal Information provided by You is used by Us to improve our Products, Platforms and/or Services or for your information purposes only.<br><br>
         
@@ -1440,8 +1439,7 @@ export class TemplateService {
         
         By accessing or using our products, platforms and/or services, You have authorized Us to collect, store, process, handle and use all such information about you, in accordance with our Privacy Policy and any other terms and conditions of use (as amended from time to time).
         </p>
-          <p style="font-family:'Montserrat',sans-serif;">Regards,<br></p>
-          <p style="font-family:'Montserrat',sans-serif;"><b>Team Fedo</b></p>`
+          <p style="font-family:'Montserrat',sans-serif;">Regards,<br><b>Team Fedo</b></p>`
 
             
         const params = {
