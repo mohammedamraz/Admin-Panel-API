@@ -33,4 +33,11 @@ export class ThirdpartyOrganizationController {
         return this.thirdpartyOrganizationService.fetchAPIUrlByThirdPartyOrganization(params,body);
     }
 
+    @Post('api_vitals_url/:org_id/:id')
+    fetchAPIUrlByThirdPartyOrganizationId(@Param() params : ParamsDto , @Body() body : RequestToAPIDto ) {
+        Logger.debug(`fetchAPIUrlByThirdPartyOrganizationId() createProductDto:${body }`, APP);
+
+        return this.thirdpartyOrganizationService.fetchAPIUrlByThirdPartyOrganizationId(params,body);
+    }
+
 }

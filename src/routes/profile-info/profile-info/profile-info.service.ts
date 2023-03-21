@@ -154,6 +154,8 @@ export class ProfileInfoService {
                 if (res.length == 0) throw new NotFoundException('profile info not found')
                 else {
                     await lastValueFrom(this.userProfileDb.findandUpdate({ columnName: 'id', columnvalue: res[0].id.toString(), quries: { total_tests: Number(res[0].total_tests) + 1 } }));
+                    createProfileInfoBody.user_id = res[0].user_id;
+                    createProfileInfoBody.org_id = res[0].org_id;
                     var product_test_details = await lastValueFrom(this.productTestsService.saveTestsToProductTests(createProfileInfoBody))
                     return await lastValueFrom(this.videoToVitalsService.updateUserByApplicationId(res[0].user_id, createProfileInfoDTO.product_id)),product_test_details
                 }

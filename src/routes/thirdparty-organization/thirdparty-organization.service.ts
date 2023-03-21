@@ -66,9 +66,23 @@ export class ThirdpartyOrganizationService {
 
     return this.tpaJunctionDB.find({ org_id: params.org_id , id : params.id }).pipe(
           switchMap(doc => {
-            return this.http.post(`${doc[0].api_url}`,body)
-          .pipe(map(doc=>{
-            return {status : doc.data.message}
+            return this.http.post(`${doc[0].api_url_status}`,body)
+          .pipe(map(res=>{
+            return {status : res.data,doc}
+          }))
+        }),
+          catchError(err => { throw new BadRequestException() })
+        )
+  }
+
+  fetchAPIUrlByThirdPartyOrganizationId(params: ParamsDto, body: any) {
+    Logger.debug(`fetchAPIUrlByThirdPartyOrganizationId() createProductDto:${params} }`, APP);
+
+    return this.tpaJunctionDB.find({ org_id: params.org_id , id : params.id }).pipe(
+          switchMap(doc => {
+            return this.http.post(`${doc[0].api_url_vitals}`,[body])
+          .pipe(map(res=>{
+            return {status : res.data,doc}
           }))
         }),
           catchError(err => { throw new BadRequestException() })
