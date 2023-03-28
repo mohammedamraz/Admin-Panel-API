@@ -1557,14 +1557,13 @@ export class TemplateService {
                             
                             <ol>
                              <li><b>Organisation Name</b>: ${content.organisation_name}</li>
-                             <li><b>Customer ID</b>: ${content.customer_id}</li>
-                             <li><b>Scan ID</b>: ${content.scan_id}</li>
+                             <li><b>CUSTOMER ID</b>: ${content.customer_id}</li>
+                             <li><b>SCAN ID</b>: ${content.scan_id}</li>
+                             <li><b>CLIENT ID</b>: ${content.client_id}</li>
                              <li><b>Timestamp</b>: ${datetime}</li>
                              </ol>
                              
                              <p>System generated email<br>
-                             <p>Regards,<br>
-                             Team Fedo</p>
                              
 
                            </div>

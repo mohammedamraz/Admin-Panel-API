@@ -138,6 +138,7 @@ export class sendEmailOnCreationOfOrgAndUser {
   batch_id? : any;
   customer_id? :any;
   scan_id?: any;
+  client_id?: any;
   
   
 
