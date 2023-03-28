@@ -35,6 +35,8 @@
     "class-validator": "^0.13.2",
     "compression": "^1.7.4",
     "firebase-admin": "^11.0.1",
+    "handlebars": "^4.7.7",
+    "html-pdf": "^3.0.1",
     "node-rsa": "^1.1.1",
     "pg": "^8.7.3",
     "reflect-metadata": "^0.1.13",

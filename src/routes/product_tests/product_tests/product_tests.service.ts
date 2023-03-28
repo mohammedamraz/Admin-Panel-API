@@ -106,7 +106,7 @@ updateTestReportInProductTest(params :ProductTestsDto ,data:ProductTestsDto){
   fetchProductTestUsingApplicationId(application_id:any,product_id :any){
     Logger.debug(`updateTestReportInProductTest() addUserDTO:${JSON.stringify(application_id)} `, APP);
 
-    return this.productTestDB.find({vitals_id : application_id, product_id : product_id}).pipe(
+    return this.productTestDB.find({viu_user : application_id, product_id : product_id}).pipe(
       map(doc=>doc)
     )
   }

@@ -181,4 +181,11 @@ export class SendEmailService {
     return this.templateService.sendEmailWithVitalsData(body)
   }
 
+  sendEmailOnWebSocketFailure(body: sendEmailOnCreationOfOrgAndUser) {
+    Logger.debug(`sendEmailOnWebSocketFailure() body: [${JSON.stringify(body)}]`, APP);
+
+    // body.fedo_app = "Fedo Vitals";
+    return this.templateService.sendEmailOnWebSocketFailure(body)
+  }
+
 }

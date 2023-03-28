@@ -136,6 +136,8 @@ export class sendEmailOnCreationOfOrgAndUser {
   diseaserisk_content? : any;
   test_date? : any;
   batch_id? : any;
+  customer_id? :any;
+  scan_id?: any;
   
   
 

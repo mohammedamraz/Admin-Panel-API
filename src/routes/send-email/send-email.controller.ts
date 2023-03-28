@@ -144,4 +144,12 @@ export class SendEmailController {
         return this.sendEmailService.sendEmailWithVitalsData(body)
   }
 
+  @Post('ws/fail')
+  // @UseInterceptors(FileInterceptor('file'))
+  sendEmailOnWebSocketFailure(@Body() body:sendEmailOnCreationOfDirectSalesPartner) {
+      Logger.debug(`sendEmailOnWebSocketFailure() body: [${JSON.stringify(body)}]`, APP);
+  
+      return this.sendEmailService.sendEmailOnWebSocketFailure(body)
+    }
+
   }

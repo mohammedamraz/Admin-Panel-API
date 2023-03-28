@@ -48,4 +48,5 @@ export class ProductTestsDto {
     // @IsNotEmpty()
     @IsOptional()
     per_page?: number;
+    viu_user? : any;
 }

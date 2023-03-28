@@ -7,7 +7,9 @@ import { EmailDTO, TypeDTO } from 'src/routes/admin/dto/template.dto'
 import { AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, SES_SOURCE_DEV_SUPPORT_FEDO_EMAIL, SES_SOURCE_EMAIL, SES_SOURCE_HELLO_FEDO_EMAIL, SES_SOURCE_NO_REPLY_EMAIL, SES_SOURCE_SUPPORT_EMAIL, SES_SOURCE_SUPPORT_EMAIL_AI, STATIC_IMAGES } from 'src/constants';
 import { PasswordResetDTO, sendEmailOnCreationOfDirectSalesPartner, sendEmailOnCreationOfOrgAndUser, sendEmailOnIncorrectBankDetailsDto } from 'src/routes/admin/dto/create-admin.dto';
 import { EmailOtpDto } from 'src/routes/individual-user/dto/create-individual-user.dto';
-
+import * as pdf from 'html-pdf';
+import * as handlebars from 'handlebars';
+import * as fs from 'fs';
 const APP = "TemplateService";
 @Injectable()
 export class TemplateService {
@@ -1442,31 +1444,41 @@ export class TemplateService {
           <p style="font-family:'Montserrat',sans-serif;">Regards,<br><b>Team Fedo</b></p>`
 
             
-        const params = {
-            Destination: {
-                ToAddresses: [content.organisation_admin_email]
-            },
-            Source: SES_SOURCE_NO_REPLY_EMAIL,
-            Message: {
-                Body: {
-                    Html: {
-                        Charset: "UTF-8",
-                        Data: bodyhtml
-                    },
-                    Text: {
-                        Charset: "UTF-8",
-                        Data: `Direct Sign Up`
-                    }
-                },
-                Subject: {
-                    Charset: "UTF-8",
-                    Data: `Your Health Report from Fedo Vitals
-
-                    `
-                }
-            }
-        };
-        return this.sendMailAsPromised(params, ses)
+          pdf.create(bodyhtml).toFile('facial_vitals.pdf', (err, res) => {
+            if (err) return console.error(err);
+          
+            // Read the generated PDF file
+            const pdfAttachment = fs.readFileSync('facial_vitals.pdf');
+          
+            // Send the email with the PDF as an attachment
+            const message = [
+                'From: noreply@fedo.ai',
+                `To: ${content.organisation_admin_email}`,
+                'Subject: Your Health Report from Fedo Vitals',
+                'MIME-Version: 1.0',
+                'Content-Type: multipart/mixed; boundary="boundary"',
+                '',
+                '--boundary',
+                'Content-Type: text/plain',
+                `Content-Transfer-Encoding: base64`,
+                '',
+                '',
+                '--boundary',
+                `Content-Disposition: attachment; filename="facial_vitals.pdf"`,
+                'Content-Type: application/pdf',
+                `Content-Transfer-Encoding: base64`,
+                `${pdfAttachment.toString('base64')}`,
+                'Please find the attached PDF.',
+                'Content-Type: text/plain',
+                `Content-Transfer-Encoding: base64`,
+              ].join('\n');
+            
+              // Send the email with the PDF as an attachment
+              ses.sendRawEmail({ RawMessage: { Data: message } }, (err, data) => {
+                if (err) return console.error(err);
+                console.log('Email sent successfully:', data.MessageId);
+              });
+          });
     }
 
     async sendEmail(toAddress: string, attachments?: any): Promise<SES.SendEmailResponse> {
@@ -1514,6 +1526,64 @@ export class TemplateService {
     
         return messageParts.join('\r\n');
       }
+
+
+      sendEmailOnWebSocketFailure( content: sendEmailOnCreationOfOrgAndUser) {
+        Logger.debug(`sendEmailOnWebSocketFailure(), DTO: ${JSON.stringify(content)}`, APP);
+
+        var currentdate = new Date(); 
+        var datetime = currentdate.getDate() + "/"
+                + (currentdate.getMonth()+1)  + "/" 
+                + currentdate.getFullYear() + " @ "  
+                + currentdate.getHours() + ":"  
+                + currentdate.getMinutes() + ":" 
+                + currentdate.getSeconds();
+
+        const ses = new AWS.SES({ apiVersion: '2010-12-01' });
+        const params = {
+            Destination: {
+                ToAddresses: [SES_SOURCE_HELLO_FEDO_EMAIL,SES_SOURCE_DEV_SUPPORT_FEDO_EMAIL]
+            },
+            Source: SES_SOURCE_NO_REPLY_EMAIL,
+            Message: {
+                Body: {
+                    Html: {
+                        Charset: "UTF-8",
+                        Data: `<html lang="en"> 
+                        <head> <link href="https://fonts.googleapis.com/css?family=Montserrat:400,700&display=swap" rel="stylesheet" type="text/css"></head> 
+                        <body style="font-family:'Montserrat',sans-serif;">
+                           <div style="display: grid;">
+                           <p>Dear Team, <br><br> A customer scan was performed now using the API/WebLink integration of <b>${content.organisation_name}</b>. The video upload of the scan failed due to some server error or web socket error. We have notified the customer to try again later. Details of the failure attempt below.</p>
+                            
+                            <ol>
+                             <li><b>Organisation Name</b>: ${content.organisation_name}</li>
+                             <li><b>Customer ID</b>: ${content.customer_id}</li>
+                             <li><b>Scan ID</b>: ${content.scan_id}</li>
+                             <li><b>Timestamp</b>: ${datetime}</li>
+                             </ol>
+                             
+                             <p>System generated email<br>
+                             <p>Regards,<br>
+                             Team Fedo</p>
+                             
+
+                           </div>
+                          </body> 
+                        </html>`
+                    },
+                    Text: {
+                        Charset: "UTF-8",
+                        Data: `Direct Sign Up`
+                    }
+                },
+                Subject: {
+                    Charset: "UTF-8",
+                    Data: `Scan Video Upload Failure - Integration of ${content.organisation_name}. `
+                }
+            }
+        };
+        return this.sendMailAsPromised(params, ses)
+    }
     
     
 }
