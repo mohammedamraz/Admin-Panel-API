@@ -1,7 +1,7 @@
 import { HttpService } from '@nestjs/axios';
 import { BadRequestException, ConflictException, Injectable, Logger, NotFoundException, UnauthorizedException, UnprocessableEntityException } from '@nestjs/common';
 import { DatabaseTable } from 'src/lib/database/database.decorator';
-import { CreateOrganizationDto, format_organisation, format_organisation_update, format_org_product_juction, OrgDTO, QueryParamsDto, RegisterUserDTO, UpdateOrganizationDto, UpdateWholeOrganizationDto, UserProfileDTO } from './dto/create-video-to-vital.dto';
+import { CreateOrganizationDto, format_organisation, format_organisation_update, format_org_product_juction, format_org_product_juction_update, OrgDTO, QueryParamsDto, RegisterUserDTO, UpdateOrganizationDto, UpdateWholeOrganizationDto, UserProfileDTO } from './dto/create-video-to-vital.dto';
 import { DatabaseService } from 'src/lib/database/database.service';
 import { catchError, concatMap, from, lastValueFrom, map, switchMap, throwError } from 'rxjs';
 import { AWS_ACCESS_KEY_ID, AWS_COGNITO_USER_CREATION_URL_SIT_ADMIN_PANEL, AWS_SECRET_ACCESS_KEY, FEDO_USER_ADMIN_PANEL_POOL_NAME, PUBLIC_KEY } from 'src/constants';
@@ -88,7 +88,7 @@ export class OrganizationService {
         }),
         switchMap(res => {
           this.create_organization_response = res
-          return this.usersService.saveUsersToUserDb({ user_name: createOrganizationDto.admin_name, org_id: Number(res[0].id), designation: createOrganizationDto.designation, email: createOrganizationDto.organization_email, application_id: res[0].application_id, organization_name: createOrganizationDto.organization_name, mobile: createOrganizationDto.organization_mobile , type : 'OrgAdmin'}, createOrganizationDto.product_id, Number(res[0].id))
+          return this.usersService.saveUsersToUserDb({ user_name: createOrganizationDto.admin_name, org_id: Number(res[0].id), designation: createOrganizationDto.designation, email: createOrganizationDto.organization_email, application_id: res[0].application_id, organization_name: createOrganizationDto.organization_name, mobile: createOrganizationDto.organization_mobile , type : 'OrgAdmin'}, {product_id : createOrganizationDto.product_id, is_pilot_duration : createOrganizationDto.is_pilot_duration, attempts : createOrganizationDto.attempts}, Number(res[0].id))
         }),
         switchMap(res => {
           this.userProfileDb.save({ application_id: res.application_id, user_id: res.id, org_id: res.org_id , name : createOrganizationDto.admin_name , mobile : createOrganizationDto.organization_mobile.slice(3,14) , is_editable: true , country_code : '+91'});
@@ -142,7 +142,7 @@ export class OrganizationService {
         }),
         switchMap(res => {
           this.create_organization_response = res
-          return this.usersService.saveUsersToUserDb({ user_name: createOrganizationDto.admin_name, org_id: Number(res[0].id), designation: createOrganizationDto.designation, email: createOrganizationDto.organization_email, application_id: res[0].application_id, organization_name: createOrganizationDto.organization_name, mobile: createOrganizationDto.organization_mobile , type : 'OrgAdmin'}, createOrganizationDto.product_id, Number(res[0].id))
+          return this.usersService.saveUsersToUserDb({ user_name: createOrganizationDto.admin_name, org_id: Number(res[0].id), designation: createOrganizationDto.designation, email: createOrganizationDto.organization_email, application_id: res[0].application_id, organization_name: createOrganizationDto.organization_name, mobile: createOrganizationDto.organization_mobile , type : 'OrgAdmin'}, {product_id : createOrganizationDto.product_id, is_pilot_duration : createOrganizationDto.is_pilot_duration, attempts : createOrganizationDto.attempts}, Number(res[0].id))
         }),
         switchMap(res => {
           this.userProfileDb.save({ application_id: res.application_id, user_id: res.id, org_id: res.org_id , name : createOrganizationDto.admin_name , mobile : createOrganizationDto.organization_mobile.slice(3,14) , is_editable: true , country_code : '+91'});
@@ -173,10 +173,19 @@ export class OrganizationService {
         for (let index = 0; index < updateWholeOrganizationDto.product_id.length; index++) {
           await lastValueFrom(this.organizationProductJunctionDb.find({ id: updateWholeOrganizationDto.product_junction_id[index] }).pipe(
             map(async doc => {
-              if (doc.length != 0) await lastValueFrom(this.organizationProductJunctionDb.findByIdandUpdate({ id: updateWholeOrganizationDto.product_junction_id[index], quries: format_org_product_juction(updateWholeOrganizationDto,index,id)}))
+              if (doc.length != 0) {
+                if(JSON.parse(updateWholeOrganizationDto.is_change[index]) == true){
+                await lastValueFrom(this.organizationProductJunctionDb.findByIdandUpdate({ id: updateWholeOrganizationDto.product_junction_id[index], quries: format_org_product_juction(updateWholeOrganizationDto,index,id)}))
+                await lastValueFrom(this.userProductJunctionService.fetchByOrgIdAndProductIdAndUpdate(id, updateWholeOrganizationDto.product_id[index], updateWholeOrganizationDto.attempts[index], updateWholeOrganizationDto.is_pilot_duration[index]))
+            }
+            else{
+              await lastValueFrom(this.organizationProductJunctionDb.findByIdandUpdate({ id: updateWholeOrganizationDto.product_junction_id[index], quries: format_org_product_juction_update(updateWholeOrganizationDto,index,id)}))
+                await lastValueFrom(this.userProductJunctionService.fetchByOrgIdAndProductIdAndUpdateWithNoAttempts(id, updateWholeOrganizationDto.product_id[index], updateWholeOrganizationDto.is_pilot_duration[index]))
+            }
+          }
               else {
                 await lastValueFrom(this.organizationProductJunctionDb.save(format_org_product_juction(updateWholeOrganizationDto,index,id)));
-                await lastValueFrom(this.usersService.updateOrgUserByApplicationId(res[0].application_id,Number(updateWholeOrganizationDto.product_id[index])));
+                await lastValueFrom(this.usersService.updateOrgUserByApplicationId(res[0].application_id,Number(updateWholeOrganizationDto.product_id[index]), updateWholeOrganizationDto.attempts[index],updateWholeOrganizationDto.is_pilot_duration[index]));
               }
             })
           )

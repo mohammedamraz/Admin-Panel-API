@@ -51,6 +51,8 @@ export class CreateOrganizationDto {
     is_application_number? : boolean;
     // is_read? : boolean;
     is_web? : boolean;
+    attempts? : number;
+    is_pilot_duration? : boolean;
     // org_details? : any;
 }
 
@@ -103,6 +105,9 @@ export class UpdateWholeOrganizationDto {
     state? : any;
     city? : any;
     address? : any;
+    attempts? : any
+    is_pilot_duration? : boolean
+    is_change? : boolean
 }
 
 export class OrgDTO {
@@ -256,6 +261,7 @@ export class UpdateUserDTO {
     type? :any;
     is_register? : boolean
     role ? : any;
+    attempts? :any;
 
 }
 
@@ -463,18 +469,44 @@ return data
 export const format_org_product_juction=(res,index,id)=>{
     console.log("format_org_product_juction() const" ,res ,index, id)
     const tomorrow = new Date();
-    let end_date = new Date(tomorrow.setDate(tomorrow.getDate() + Number(res.pilot_duration[index])));
+    let end_date = JSON.parse(res.is_pilot_duration[index]) ? (new Date(tomorrow.setDate(tomorrow.getDate() + Number(res.pilot_duration[index])))) : (new Date(new Date().setFullYear(new Date().getFullYear() + 1)).toISOString().split("T")[0]) ;
    let data={ org_id: id, 
         end_date: end_date, 
-        pilot_duration: res.pilot_duration[index] ,
+        pilot_duration: res.pilot_duration[index] ? res.pilot_duration[index] : null ,
         event_mode: res.event_mode ? res.event_mode[index] : 0, 
         product_id: res.product_id[index], 
         fedoscore: res.fedo_score[index], 
         web_access: res.productaccess_web ? res.productaccess_web[index] : false ,  
+        is_pilot_duration: JSON.parse(res.is_pilot_duration[index]) ? res.is_pilot_duration[index] : false ,  
+        is_application_number: JSON.parse(res.is_application_number[index]) ? res.is_application_number[index] : false ,  
         ios_access: res.ios_access ? res.ios_access[index] : false, 
-        is_application_number: res.is_application_number[index] ? res.is_application_number[index] : false ,  
         enable_kiosk: res.enable_kiosk ? res.enable_kiosk[index] : false, 
         kiosk_user: res.kiosk_user ? res.kiosk_user[index] : null, 
+        attempts: res.attempts[index] ? res.attempts[index] : null, 
+        mobile_access: res.productaccess_mobile ? res.productaccess_mobile[index] : false, 
+        status: "Active",
+    }
+    return data
+}
+
+
+export const format_org_product_juction_update=(res,index,id)=>{
+    console.log("format_org_product_juction_update() const" ,res ,index, id)
+    const tomorrow = new Date();
+    let end_date = JSON.parse(res.is_pilot_duration[index]) ? (new Date(tomorrow.setDate(tomorrow.getDate() + Number(res.pilot_duration[index])))) : (new Date(new Date().setFullYear(new Date().getFullYear() + 1)).toISOString().split("T")[0]) ;
+   let data={ org_id: id, 
+        end_date: end_date, 
+        pilot_duration: res.pilot_duration[index] ? res.pilot_duration[index] : null ,
+        event_mode: res.event_mode ? res.event_mode[index] : 0, 
+        product_id: res.product_id[index], 
+        fedoscore: res.fedo_score[index], 
+        web_access: res.productaccess_web ? res.productaccess_web[index] : false ,  
+        is_pilot_duration: JSON.parse(res.is_pilot_duration[index]) ? res.is_pilot_duration[index] : false ,  
+        is_application_number: JSON.parse(res.is_application_number[index]) ? res.is_application_number[index] : false ,  
+        ios_access: res.ios_access ? res.ios_access[index] : false, 
+        enable_kiosk: res.enable_kiosk ? res.enable_kiosk[index] : false, 
+        kiosk_user: res.kiosk_user ? res.kiosk_user[index] : null, 
+        // attempts: res.attempts ? res.attempts[index] : doc.attempts, 
         mobile_access: res.productaccess_mobile ? res.productaccess_mobile[index] : false, 
         status: "Active",
     }

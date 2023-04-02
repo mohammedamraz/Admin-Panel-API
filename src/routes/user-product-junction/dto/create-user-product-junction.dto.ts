@@ -4,5 +4,7 @@ export class CreateUserProductJunctionDto {
     product_id?:number;
     total_tests:number;
     id?:number;
+    attempts? : any;
+    is_pilot_duration? : any;
     role ? : any;
 }

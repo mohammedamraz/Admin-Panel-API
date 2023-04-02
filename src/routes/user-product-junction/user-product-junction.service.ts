@@ -1,5 +1,5 @@
 import { Injectable, Logger, NotFoundException } from '@nestjs/common';
-import { concatMap, map } from 'rxjs';
+import { concatMap, lastValueFrom, map } from 'rxjs';
 import { DatabaseTable } from 'src/lib/database/database.decorator';
 import { DatabaseService } from 'src/lib/database/database.service';
 import { CreateUserProductJunctionDto } from './dto/create-user-product-junction.dto';
@@ -58,11 +58,48 @@ export class UserProductJunctionService {
       )}
   }
 
+
+  fetchByOrgIdAndProductIdAndUpdate(org_id : any , product_id : any, attempts : any , is_pilot_duration : any){
+    Logger.debug(`fetchUserProductJunctionDataByUserIdOrOrgIdAndProductId() userDTO:${JSON.stringify(org_id)} `, APP);
+
+      return this.userProductJunctionDb.find({org_id: org_id,product_id: product_id}).pipe(
+        map(async orgData=>{
+          for(let i =0; i < orgData.length; i++){
+            lastValueFrom(this.userProductJunctionDb.findByIdandUpdate({id : orgData[i].id.toString() , quries : {attempts : attempts , is_pilot_duration : is_pilot_duration}}))
+
+          }
+
+          })
+      )
+  }
+
+  fetchByOrgIdAndProductIdAndUpdateWithNoAttempts(org_id : any , product_id : any , is_pilot_duration : any){
+    Logger.debug(`fetchUserProductJunctionDataByUserIdOrOrgIdAndProductId() userDTO:${JSON.stringify(org_id)} `, APP);
+
+      return this.userProductJunctionDb.find({org_id: org_id,product_id: product_id}).pipe(
+        map(async orgData=>{
+          for(let i =0; i < orgData.length; i++){
+            lastValueFrom(this.userProductJunctionDb.findByIdandUpdate({id : orgData[i].id.toString() , quries : { is_pilot_duration : is_pilot_duration}}))
+
+          }
+
+          })
+      )
+  }
+
   fetchUserProductJunctionDataByUserIdAndProductId(user_id : number, product_id: number){
    
     return this.userProductJunctionDb.find({user_id:user_id,product_id:product_id}).pipe(
       map(doc=>doc)
     )}
+
+    patchUserAttempts(createUserProductJunctionDto:CreateUserProductJunctionDto){
+      return this.fetchUserProductJunctionDataByUserIdAndProductId(createUserProductJunctionDto.user_id , createUserProductJunctionDto.product_id).pipe(map(doc=> {
+
+        return this.userProductJunctionDb.findByIdandUpdate({id : doc[0].id.toString() , quries :{attempts : doc[0].attempts-1}})
+      }))
+
+    }
   
 
 

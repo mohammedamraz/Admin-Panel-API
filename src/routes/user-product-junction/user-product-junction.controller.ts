@@ -16,5 +16,12 @@ export class UserProductJunctionController {
    return this.userProductJunctionService.fetchUserProductJunctionDataByUserIdOrOrgIdAndProductId(createUserProductJunctionDto)
   }
 
+  @Patch('update/:user_id/:product_id')
+  patchUserAttempts(@Param() createUserProductJunctionDto: CreateUserProductJunctionDto){
+    Logger.debug(`patchUserAttempts() id:${createUserProductJunctionDto}} `, APP);
+    
+   return this.userProductJunctionService.patchUserAttempts(createUserProductJunctionDto)
+  }
+
   
 }

@@ -305,7 +305,12 @@ export class VideoToVitalsService {
           }),
           map(async doc => {
             userDTO.product_id.map(async (res1,index) =>{
-              await lastValueFrom(this.userProductJunctionService.createUserProductJunction({ user_id: doc["id"], org_id: userDTO["org_id"], product_id: Number(userDTO.product_id[index]), total_tests: 0 , role : userDTO?.role[index] }))});
+              
+              await lastValueFrom(this.organizationProductJunctionDb.find({org_id : userDTO["org_id"], product_id : Number(userDTO.product_id[index])}).pipe(map(async orgprod=>{
+
+                await lastValueFrom(this.userProductJunctionService.createUserProductJunction({ user_id: doc["id"], org_id: userDTO["org_id"], product_id: Number(userDTO.product_id[index]), total_tests: 0 , role : userDTO?.role[index] , attempts : orgprod[0].attempts , is_pilot_duration : orgprod[0].is_pilot_duration}))
+              })))
+            });
             // doc["id"]
             await lastValueFrom(this.userProfileDb.save({ application_id: doc['application_id'], user_id: doc['id'], org_id: doc['org_id'], name : userDTO.user_name , mobile : userDTO.mobile.slice(3,14) ,  is_editable: true , country_code : '+91' }))
             return doc;
@@ -341,9 +346,12 @@ export class VideoToVitalsService {
               }))
           }),
           map(async doc => {            
-            userDTO.product_id.map(async (res1, index) =>
-             await lastValueFrom(this.userProductJunctionService.createUserProductJunction({ user_id: doc["id"], org_id: userDTO["org_id"],  product_id: Number(userDTO.product_id[index]), total_tests: 0 , role : userDTO.role[index]  }))
-             );
+            userDTO.product_id.map(async (res1, index) =>{
+            await lastValueFrom(this.organizationProductJunctionDb.find({org_id : userDTO["org_id"], product_id : Number(userDTO.product_id[index])}).pipe(map(async orgprod=>{
+
+              await lastValueFrom(this.userProductJunctionService.createUserProductJunction({ user_id: doc["id"], org_id: userDTO["org_id"], product_id: Number(userDTO.product_id[index]), total_tests: 0 , role : userDTO?.role[index] , attempts : orgprod[0].attempts , is_pilot_duration : orgprod[0].is_pilot_duration}))
+            })))
+          });
             await lastValueFrom(this.userProfileDb.save({ application_id: doc['application_id'], user_id: doc['id'], org_id: doc['org_id'], name : userDTO.user_name , mobile : userDTO.mobile.slice(3,14) , is_editable: true , country_code : '+91' }))
             return doc;
           }))
@@ -453,9 +461,12 @@ export class VideoToVitalsService {
         for (let index = 0; index < updateUserDTO.product_id.length; index++) {
           await lastValueFrom(this.userProductJunctionDb.find({ id: updateUserDTO.product_junction_id[index] }).pipe(
             map(async doc => {
-               if (doc.length != 0) await lastValueFrom(this.userProductJunctionDb.findByIdandUpdate({ id : updateUserDTO.product_junction_id[index],  quries:{role : updateUserDTO.role[index]} }))
-               else await lastValueFrom(this.userProductJunctionDb.save({ user_id: id,  product_id: updateUserDTO.product_id[index], org_id : res[0].org_id, total_tests : 0 , })) 
-            })
+               if (doc.length != 0) await lastValueFrom(this.userProductJunctionDb.findByIdandUpdate({ id : updateUserDTO.product_junction_id[index],  quries:{role : updateUserDTO.role[index], attempts : updateUserDTO.attempts[index]} }))
+               else{ 
+            await lastValueFrom(this.organizationProductJunctionDb.find({org_id : res[0].org_id, product_id : Number(updateUserDTO.product_id[index])}).pipe(map(async orgprod=>{
+              await lastValueFrom(this.userProductJunctionDb.save({ user_id: id,  product_id: updateUserDTO.product_id[index], org_id : res[0].org_id, total_tests : 0 , attempts : orgprod[0].attempts , is_pilot_duration : orgprod[0].is_pilot_duration})) })))
+            }
+          })
           )
           )
         }}

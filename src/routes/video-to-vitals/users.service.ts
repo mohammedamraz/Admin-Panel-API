@@ -1,5 +1,6 @@
 import { HttpService } from '@nestjs/axios';
 import { BadRequestException, ConflictException, Injectable, Logger, NotFoundException, UnprocessableEntityException } from '@nestjs/common';
+import { ADDRGETNETWORKPARAMS } from 'dns';
 import { application } from 'express';
 // import { ConflictException, Injectable, Logger, NotFoundException, UnprocessableEntityExcepti on } from '@nestjs/common';
 import { convertMultiFactorInfoToServerFormat } from 'firebase-admin/lib/auth/user-import-builder';
@@ -45,8 +46,9 @@ export class UsersService {
       // map(doc => { return doc}),
       catchError(err=>{throw new BadRequestException(err.message)}),
       switchMap(doc => { 
-        product_user_list.map(res1 =>
-          this.userProductJunctionService.createUserProductJunction({ user_id: doc[0].id, org_id: org_id, product_id: Number(res1), total_tests: 0 }))
+        for (let index = 0; index < product_user_list.product_id.length; index++) {
+          this.userProductJunctionService.createUserProductJunction({ user_id: doc[0].id, org_id: org_id, product_id: Number(product_user_list.product_id[index]), total_tests: 0 , attempts : product_user_list.attempts[index],  is_pilot_duration : product_user_list.is_pilot_duration[index] })
+        }
         return doc;
       })
     )
@@ -316,12 +318,12 @@ export class UsersService {
     };
   }
 
-  updateOrgUserByApplicationId(application_id: string, product_id: number) {
+  updateOrgUserByApplicationId(application_id: string, product_id: number, attempts : any , is_pilot_duration: any) {
     Logger.debug(`updateOrgUserByApplicationId() id:${application_id} product_id:${product_id} updateUserDTO:)} `, APP);
 
     return this.userDb.find({ application_id: application_id }).pipe(
       switchMap(res => {
-        return this.userProductJunctionDb.save({ user_id : res[0].id, org_id : res[0].org_id,product_id : product_id , total_tests : 0})
+        return this.userProductJunctionDb.save({ user_id : res[0].id, org_id : res[0].org_id,product_id : product_id , total_tests : 0 , attempts : attempts , is_pilot_duration : is_pilot_duration})
       }))
 
   }
