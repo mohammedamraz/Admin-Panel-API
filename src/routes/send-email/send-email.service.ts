@@ -84,7 +84,7 @@ export class SendEmailService {
 
     var encryption = { org_id: body.org_id }
     body.organisation_admin_name = body.organisation_admin_name.split(' ')[0]
-    body.url = "https://www.fedo.ai/admin/vital/" + body.url + "?" + encodeURIComponent(encryptPassword(encryption))
+    body.url = "https://fedo.ai/admin/vital/" + body.url + "?" + encodeURIComponent(encryptPassword(encryption))
     body.fedo_app = "Fedo Vitals"
     return this.templateService.sendEmailOnOrgCreation(body)
   }
@@ -94,7 +94,7 @@ export class SendEmailService {
 
     var encryption = { user_id: body.user_id }
     body.name = body.name.split(' ')[0]
-    body.url = "https://www.fedo.ai/admin/vital/" + body.url + "?" + encodeURIComponent(encryptPassword(encryption))
+    body.url = "https://fedo.ai/admin/vital/" + body.url + "?" + encodeURIComponent(encryptPassword(encryption))
     body.fedo_app = "Fedo Vitals"
     // body.organisation_name = "Fedo"
     return this.templateService.sendEmailOnCreateOrgUser(body)
@@ -121,7 +121,7 @@ export class SendEmailService {
   sendEmailOnVitalsWebAppAccess(body: sendEmailOnCreationOfOrgAndUser) {
     Logger.debug(`sendEmailOnVitalsWebAppAccess() body: [${JSON.stringify(body)}]`, APP);
 
-    body.url = "https://www.fedo.ai/products/" + body.url.replace('_', '/') +'?'+ encodeURIComponent(encryptPassword(JSON.stringify({ org_junction_id: body.org_junction_id })))
+    body.url = "https://fedo.ai/products/" + body.url.replace('_', '/') +'?'+ encodeURIComponent(encryptPassword(JSON.stringify({ org_junction_id: body.org_junction_id })))
     return this.templateService.sendEmailOnVitalsWebAppAccess(body)
   }
 
