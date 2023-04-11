@@ -54,6 +54,7 @@ export class CreateOrganizationDto {
     attempts? : number;
     is_pilot_duration? : boolean;
     enable_questionnaire? : boolean;
+    enable_sms? : boolean
     // org_details? : any;
 }
 
@@ -483,6 +484,7 @@ export const format_org_product_juction=(res,index,id)=>{
         is_application_number: JSON.parse(res.is_application_number[index]) ? res.is_application_number[index] : false ,  
         ios_access: res.ios_access ? res.ios_access[index] : false, 
         enable_kiosk: res.enable_kiosk ? res.enable_kiosk[index] : false, 
+        enable_sms: res.enable_sms ? res.enable_sms[index] : false, 
         kiosk_user: res.kiosk_user ? res.kiosk_user[index] : null, 
         attempts: res.attempts[index] ? res.attempts[index] : null, 
         mobile_access: res.productaccess_mobile ? res.productaccess_mobile[index] : false, 
@@ -508,6 +510,7 @@ export const format_org_product_juction_update=(res,index,id)=>{
         is_application_number: JSON.parse(res.is_application_number[index]) ? res.is_application_number[index] : false ,  
         ios_access: res.ios_access ? res.ios_access[index] : false, 
         enable_kiosk: res.enable_kiosk ? res.enable_kiosk[index] : false, 
+        enable_sms: res.enable_sms ? res.enable_sms[index] : false, 
         kiosk_user: res.kiosk_user ? res.kiosk_user[index] : null, 
         // attempts: res.attempts ? res.attempts[index] : doc.attempts, 
         is_questionnaire: res.enable_questionnaire ? res.enable_questionnaire[index] : false, 
