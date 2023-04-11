@@ -21,6 +21,7 @@ import { ThirdpartyOrganizationService } from './thirdparty-organization.service
     DatabaseModule.forFeature({ tableName: 'users' }),
     DatabaseModule.forFeature({ tableName: 'user_profile_info' }),
     DatabaseModule.forFeature({ tableName: 'product' }),
+    DatabaseModule.forFeature({ tableName: 'product_tests' }),
 
 
 

@@ -103,6 +103,12 @@ updateTestReportInProductTest(params :ProductTestsDto ,data:ProductTestsDto){
     else return this.productTestDB.findByIdandUpdate({id:params.id.toString(),quries:data})
   }
 
+  updatePDFInProductTest(params :ProductTestsDto ,data:ProductTestsDto){
+    Logger.debug(`updateTestReportInProductTest() addUserDTO:${JSON.stringify(data)} `, APP);
+
+    return this.productTestDB.findandUpdate({columnName: 'vitals_id', columnvalue : params.vitals_id ,quries:{pdf_location : data.pdf_location}})
+  }
+
   fetchProductTestUsingApplicationId(application_id:any,product_id :any){
     Logger.debug(`updateTestReportInProductTest() addUserDTO:${JSON.stringify(application_id)} `, APP);
 

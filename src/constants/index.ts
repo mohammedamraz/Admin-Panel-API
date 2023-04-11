@@ -59,6 +59,7 @@ export const FEDO_HSA_USER_CONNECTION_URL = process.env.FEDO_HSA_USER_CONNECTION
 
 export const AWS_COGNITO_USER_CREATION_URL_SIT = process.env.FEDO_AWS_COGNITO_USER_CREATION_URL || 'https://dev.fedo.health/hsa/fis/v1/users';
 export const AWS_COGNITO_USER_CREATION_URL_SIT_ADMIN_PANEL = process.env.FEDO_AWS_COGNITO_USER_CREATION_URL_ADMIN_PANEL || 'https://dev.fedo.health/hsa/fis/v1/admin/users';
+export const AWS_COGNITO_SMS_COGNITO_URL_SIT_ADMIN_PANEL = process.env.AWS_COGNITO_SMS_COGNITO_URL_SIT_ADMIN_PANEL || 'https://fedo.ai/communication/api/v1/sms';
 // export const AWS_COGNITO_USER_CREATION_URL_SIT = process.env.FEDO_AWS_COGNITO_USER_CREATION_URL || 'http://0.0.0.0:36000/users';
 export const PUBLIC_KEY =
 	'-----BEGIN PUBLIC KEY-----\n' +

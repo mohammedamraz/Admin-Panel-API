@@ -49,4 +49,5 @@ export class ProductTestsDto {
     @IsOptional()
     per_page?: number;
     viu_user? : any;
+    pdf_location? : any
 }

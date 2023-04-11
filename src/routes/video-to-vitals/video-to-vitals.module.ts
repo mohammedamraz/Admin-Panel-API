@@ -11,6 +11,7 @@ import { OrganizationService } from './organization.service';
 import { OrgProductJunctionService } from '../org-product-junction/org-product-junction.service';
 import { SendEmailService } from '../send-email/send-email.service';
 import { UsersService } from './users.service';
+import { ProductTestsService } from '../product_tests/product_tests/product_tests.service';
 
 @Module({
   imports: [
@@ -22,13 +23,15 @@ import { UsersService } from './users.service';
 
     DatabaseModule.forFeature({ tableName: 'product' }),
     DatabaseModule.forFeature({ tableName: 'user_product_junction' }),
+    DatabaseModule.forFeature({ tableName: 'product_tests' }),
+  
     HttpModule.register({
       timeout: 10000,
       maxRedirects: 5
     })
   ],
   controllers: [VideoToVitalsController],
-  providers: [VideoToVitalsService, ProductService, UserProductJunctionService, SendEmailService, TemplateService, OrganizationService, OrgProductJunctionService, UsersService ],
+  providers: [VideoToVitalsService, ProductService, UserProductJunctionService, SendEmailService, TemplateService, OrganizationService, OrgProductJunctionService, UsersService ,ProductTestsService],
   exports: [OrganizationService]
 })
 export class VideoToVitalsModule { }

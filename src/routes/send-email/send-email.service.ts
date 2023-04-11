@@ -6,13 +6,20 @@ import { UpdateSendEmailDto } from './dto/update-send-email.dto';
 import { sendEmailOnCreationOfOrgAndUser } from 'src/routes/admin/dto/create-admin.dto';
 import { EmailOtpDto } from 'src/routes/individual-user/dto/create-individual-user.dto';
 import { encryptPassword } from 'src/constants/helper';
+import { ProductTestsService } from '../product_tests/product_tests/product_tests.service';
+import { DatabaseTable } from 'src/lib/database/database.decorator';
+import { DatabaseService } from 'src/lib/database/database.service';
+import { ProductTestsDto } from '../product_tests/product_tests/dto/create-product_tests.dto';
 
 const APP = "SendEmailService"
 @Injectable()
 export class SendEmailService {
 
   constructor(
+    @DatabaseTable('product_tests')
+        private readonly productTestDB: DatabaseService<ProductTestsDto>,
     private readonly templateService: TemplateService,
+    // private readonly prod : ProductTestsService
   ) { }
 
   sendEmailOnCreateOrg(body: sendEmailOnCreationOfOrgAndUser) {
@@ -175,10 +182,18 @@ export class SendEmailService {
     file.toAddress = toAddresses.body
     return this.templateService.sendEmail(toAddresses, file)
   }
-  sendEmailWithVitalsData(body: sendEmailOnCreationOfOrgAndUser) {
+  async sendEmailWithVitalsData(body: sendEmailOnCreationOfOrgAndUser) {
     Logger.debug(`sendEmailWithVitalsData() body: [${JSON.stringify(body)}]`, APP);
 
-    return this.templateService.sendEmailWithVitalsData(body)
+    const doc = await this.templateService.sendEmailWithVitalsData(body);
+    return this.productTestDB.findandUpdate({ columnName: 'vitals_id', columnvalue: body.scan_id, quries: { pdf_location: doc } });
+  }
+
+  async sendEmailToKioskUserWithVitalsData(body: sendEmailOnCreationOfOrgAndUser) {
+    Logger.debug(`sendEmailToKioskUserWithVitalsData() body: [${JSON.stringify(body)}]`, APP);
+
+    const doc = await this.templateService.sendEmailToKioskUserWithVitalsData(body);
+    return this.productTestDB.findandUpdate({ columnName: 'vitals_id', columnvalue: body.scan_id, quries: { pdf_location: doc } });
   }
 
   sendEmailOnWebSocketFailure(body: sendEmailOnCreationOfOrgAndUser) {

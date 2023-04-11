@@ -139,6 +139,7 @@ export class sendEmailOnCreationOfOrgAndUser {
   customer_id? :any;
   scan_id?: any;
   client_id?: any;
+  is_questioannire? : any;
   
   
 

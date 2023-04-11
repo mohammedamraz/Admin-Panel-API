@@ -34,6 +34,7 @@ export declare const STATIC_IMAGES_PROFILE: string;
 export declare const FEDO_HSA_USER_CONNECTION_URL: string;
 export declare const AWS_COGNITO_USER_CREATION_URL_SIT: string;
 export declare const AWS_COGNITO_USER_CREATION_URL_SIT_ADMIN_PANEL: string;
+export declare const AWS_COGNITO_SMS_COGNITO_URL_SIT_ADMIN_PANEL: string;
 export declare const PUBLIC_KEY: string;
 export declare const PRIVATE_KEY: string;
 export declare class ZwitchHttpBody {

@@ -144,6 +144,13 @@ export class SendEmailController {
         return this.sendEmailService.sendEmailWithVitalsData(body)
   }
 
+  @Post('pdfcopy/kiosk/email')
+  sendEmailToKioskUserWithVitalsData(@Body() body:sendEmailOnCreationOfOrgAndUser) {
+    Logger.debug(`sendEmailToKioskUserWithVitalsData() body: [${JSON.stringify(body)}]`, APP);
+
+    return this.sendEmailService.sendEmailToKioskUserWithVitalsData(body)
+}
+
   @Post('ws/fail')
   // @UseInterceptors(FileInterceptor('file'))
   sendEmailOnWebSocketFailure(@Body() body:sendEmailOnCreationOfDirectSalesPartner) {
@@ -151,5 +158,6 @@ export class SendEmailController {
   
       return this.sendEmailService.sendEmailOnWebSocketFailure(body)
     }
+    
 
   }
