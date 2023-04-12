@@ -8,11 +8,13 @@ import { AWS_ACCESS_KEY_ID, AWS_COGNITO_SMS_COGNITO_URL_SIT_ADMIN_PANEL, AWS_COG
 import { PasswordResetDTO, sendEmailOnCreationOfDirectSalesPartner, sendEmailOnCreationOfOrgAndUser, sendEmailOnIncorrectBankDetailsDto } from 'src/routes/admin/dto/create-admin.dto';
 import { EmailOtpDto } from 'src/routes/individual-user/dto/create-individual-user.dto';
 import * as pdf from 'html-pdf';
+import * as html_to_pdf from 'html-pdf-node';
 import * as handlebars from 'handlebars';
 import * as fs from 'fs';
 import { ProductTestsService } from 'src/routes/product_tests/product_tests/product_tests.service';
 import { lastValueFrom } from 'rxjs';
 import { HttpService } from '@nestjs/axios';
+// var html_to_pdf = require('html-pdf-node');
 const APP = "TemplateService";
 @Injectable()
 export class TemplateService {
@@ -1390,9 +1392,10 @@ export class TemplateService {
     sendEmailWithVitalsData( content: sendEmailOnCreationOfOrgAndUser) {
         Logger.debug(`sendEmailWithVitalsData(), DTO: ${JSON.stringify(content)}`, APP);
         
-        var html_to_pdf = require('html-pdf-node');
+        // var html_to_pdf = require('html-pdf-node');
         let options = { format: 'A4' };
         var currentdate = new Date(); 
+        currentdate.setMinutes(currentdate.getMinutes() + 330);
         var scanDate = 
         currentdate.getFullYear().toString() 
         + (currentdate.getMonth()+1).toString()  + 
@@ -1518,9 +1521,10 @@ export class TemplateService {
         async sendEmailToKioskUserWithVitalsData( content: sendEmailOnCreationOfOrgAndUser) {
         Logger.debug(`sendEmailWithVitalsData(), DTO: ${JSON.stringify(content)}`, APP);
         
-        var html_to_pdf = require('html-pdf-node');
+        // var html_to_pdf = require('html-pdf-node');
         let options = { format: 'A4' };
         var currentdate = new Date(); 
+        currentdate.setMinutes(currentdate.getMinutes() + 330);
         var scanDate = 
                  currentdate.getFullYear().toString() 
                 + (currentdate.getMonth()+1).toString()  + 
@@ -1712,6 +1716,7 @@ export class TemplateService {
         Logger.debug(`sendEmailOnWebSocketFailure(), DTO: ${JSON.stringify(content)}`, APP);
 
         var currentdate = new Date(); 
+        currentdate.setMinutes(currentdate.getMinutes() + 330);
         var datetime = currentdate.getDate() + "/"
                 + (currentdate.getMonth()+1)  + "/" 
                 + currentdate.getFullYear() + " @ "  
