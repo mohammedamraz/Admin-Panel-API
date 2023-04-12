@@ -1393,6 +1393,7 @@ export class TemplateService {
         var html_to_pdf = require('html-pdf-node');
         let options = { format: 'A4' };
         var currentdate = new Date(); 
+        currentdate.setMinutes(currentdate.getMinutes() + 330);
         var scanDate = 
         currentdate.getFullYear().toString() 
         + (currentdate.getMonth()+1).toString()  + 
@@ -1521,6 +1522,7 @@ export class TemplateService {
         var html_to_pdf = require('html-pdf-node');
         let options = { format: 'A4' };
         var currentdate = new Date(); 
+        currentdate.setMinutes(currentdate.getMinutes() + 330);
         var scanDate = 
                  currentdate.getFullYear().toString() 
                 + (currentdate.getMonth()+1).toString()  + 
@@ -1712,6 +1714,7 @@ export class TemplateService {
         Logger.debug(`sendEmailOnWebSocketFailure(), DTO: ${JSON.stringify(content)}`, APP);
 
         var currentdate = new Date(); 
+        currentdate.setMinutes(currentdate.getMinutes() + 330);
         var datetime = currentdate.getDate() + "/"
                 + (currentdate.getMonth()+1)  + "/" 
                 + currentdate.getFullYear() + " @ "  
