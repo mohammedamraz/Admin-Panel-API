@@ -7,10 +7,7 @@ import { EmailDTO, TypeDTO } from 'src/routes/admin/dto/template.dto'
 import { AWS_ACCESS_KEY_ID, AWS_COGNITO_SMS_COGNITO_URL_SIT_ADMIN_PANEL, AWS_COGNITO_USER_CREATION_URL_SIT_ADMIN_PANEL, AWS_SECRET_ACCESS_KEY, SES_SOURCE_DEV_SUPPORT_FEDO_EMAIL, SES_SOURCE_EMAIL, SES_SOURCE_HELLO_FEDO_EMAIL, SES_SOURCE_NO_REPLY_EMAIL, SES_SOURCE_SUPPORT_EMAIL, SES_SOURCE_SUPPORT_EMAIL_AI, STATIC_IMAGES } from 'src/constants';
 import { PasswordResetDTO, sendEmailOnCreationOfDirectSalesPartner, sendEmailOnCreationOfOrgAndUser, sendEmailOnIncorrectBankDetailsDto } from 'src/routes/admin/dto/create-admin.dto';
 import { EmailOtpDto } from 'src/routes/individual-user/dto/create-individual-user.dto';
-import * as pdf from 'html-pdf';
-import * as html_to_pdf from 'html-pdf-node';
-import * as handlebars from 'handlebars';
-import * as fs from 'fs';
+import * as htmlpdf from 'puppeteer-html-pdf';
 import { ProductTestsService } from 'src/routes/product_tests/product_tests/product_tests.service';
 import { lastValueFrom } from 'rxjs';
 import { HttpService } from '@nestjs/axios';
@@ -1478,8 +1475,8 @@ export class TemplateService {
                 <br>
                 <hr style="border-top: dotted 1px;width : 25%" />`
                 
-                let file = { content: bodyhtml };
-                return new Promise ((accept,reject)=>{html_to_pdf.generatePdf(file, options).then(pdfBuffer => {
+                let file =  bodyhtml ;
+                return new Promise ((accept,reject)=>{htmlpdf.create(file, options).then(pdfBuffer => {
                     // if (err) reject(err);
                     console.log("PDF Buffer:-", pdfBuffer);
                     
@@ -1609,8 +1606,8 @@ export class TemplateService {
           <hr style="border-top: dotted 1px;width : 25%" />`
 
             
-          let file = { content: bodyhtml };
-          return new Promise((resolve1,rejects) =>{html_to_pdf.generatePdf(file, options).then(pdfBuffer => {
+          let file =  bodyhtml ;
+          return new Promise((resolve1,rejects) =>{htmlpdf.create(file, options).then(pdfBuffer => {
             // if (err) rejects(err);
             
             const message = [
