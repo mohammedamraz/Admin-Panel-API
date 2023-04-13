@@ -9,6 +9,7 @@ import { PasswordResetDTO, sendEmailOnCreationOfDirectSalesPartner, sendEmailOnC
 import { EmailOtpDto } from 'src/routes/individual-user/dto/create-individual-user.dto';
 import * as pdf from 'html-pdf';
 import * as html_to_pdf from 'html-pdf-node';
+import * as htmlpdf from 'puppeteer-html-pdf';
 import * as handlebars from 'handlebars';
 import * as fs from 'fs';
 import { ProductTestsService } from 'src/routes/product_tests/product_tests/product_tests.service';
@@ -1478,8 +1479,8 @@ export class TemplateService {
                 <br>
                 <hr style="border-top: dotted 1px;width : 25%" />`
                 
-                let file = { content: bodyhtml };
-                return new Promise ((accept,reject)=>{html_to_pdf.generatePdf(file, options).then(pdfBuffer => {
+                let file =  bodyhtml ;
+                return new Promise ((accept,reject)=>{htmlpdf.create(file, options).then(pdfBuffer => {
                     // if (err) reject(err);
                     console.log("PDF Buffer:-", pdfBuffer);
                     
@@ -1609,8 +1610,8 @@ export class TemplateService {
           <hr style="border-top: dotted 1px;width : 25%" />`
 
             
-          let file = { content: bodyhtml };
-          return new Promise((resolve1,rejects) =>{html_to_pdf.generatePdf(file, options).then(pdfBuffer => {
+          let file =  bodyhtml ;
+          return new Promise((resolve1,rejects) =>{htmlpdf.create(file, options).then(pdfBuffer => {
             // if (err) rejects(err);
             
             const message = [
