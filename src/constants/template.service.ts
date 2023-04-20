@@ -1390,7 +1390,19 @@ export class TemplateService {
         Logger.debug(`sendEmailWithVitalsData(), DTO: ${JSON.stringify(content)}`, APP);
         
         // var html_to_pdf = require('html-pdf-node');
-        let options = { format: 'A4' };
+        let options = { format: 'A4' ,
+        margin: {
+            top: '2cm',
+            right: '2cm',
+            bottom: '2cm',
+            left: '2cm'
+          },
+          displayHeaderFooter: true,
+          footerTemplate: `
+          <div style="font-size: 12px; text-align: center; {{#isLastPage}}position: absolute; bottom: 0; width: 100%;{{/isLastPage}}">
+            Powered by Fedo.Ai
+        </div>
+        `};
         var currentdate = new Date(); 
         currentdate.setMinutes(currentdate.getMinutes() + 330);
         var scanDate = 
@@ -1415,22 +1427,28 @@ export class TemplateService {
         var questionnaire_data = (new Function("return [" + content.is_questioannire+ "];")());
         let bodyhtml = `<html lang="en"> 
         <head> <link href="https://fonts.googleapis.com/css?family=Calibri:400,700&display=swap" rel="stylesheet" type="text/css"></head> 
-        <body style="font-family:'Calibri',sans-serif;margin : 5rem">
+        <body style="font-family:'Calibri',sans-serif;">
            <div style="display: grid;">
-           <p style="font-size:28px">Health Report of <b>${content.organisation_admin_name}</b><br><span style="font-size:14px"><b>Date: </b>${datetime} <br><hr><br><b>Personal Information</b></span><br><span style="font-size:12px"><b>Age</b> : ${content.age}<br><b>Gender</b> : ${content.gender}<br> <b>Application Number</b> : ${content.application_id}</span></p>
+           <div style="display:block"><img style="height: 3rem;" src="https://fedo-vitals.s3.ap-south-1.amazonaws.com/MicrosoftTeams-image.png">`
+           if(content.logo != null){
+           bodyhtml+= `<img style="    width: 3rem;
+           margin-left: 1rem;" src="${content.logo}">`
+}
+           bodyhtml+= `</div>
+           <p style="font-size:28px">Health Report of <b>${content.organisation_admin_name}</b><br><span style="font-size:14px"><b>Date: </b>${datetime} <br><hr style="width : 100%" /><br><b>Personal Information</b></span><span style="font-size:12px"><b>Age</b> : ${content.age}<br><b>Gender</b> : ${content.gender}<br> <b>Application Number</b> : ${content.application_id}</span></p>
            </div>
            </body> 
            </html>`
            if(content.fedoscore_content != null){
                for (let i = 0; i < fedoscore_data.length ; i++) {
-                   bodyhtml += `<p style="font-family:'Calibri',sans-serif; font-size:14px">` + `<b>Fedo Score</b> <br><b><span style="font-size:20px">` +fedoscore_data[i]?.fedo_score + `</span><br><span style="font-size:12px">What does this score mean?</b></span><br><span style="font-size:12px">`+ fedoscore_data[i]?.condition + `</span></p>`;
+                   bodyhtml += `<p style="font-family:'Calibri',sans-serif; font-size:14px;margin-top:1.5rem">` + `<b>Fedo Score</b> <br><b><span style="font-size:20px">` +fedoscore_data[i]?.fedo_score + `</span><br><span style="font-size:12px">What does this score mean?</b></span><br><span style="font-size:12px">`+ fedoscore_data[i]?.condition + `</span></p>`;
                 }}
                 if(content.riskclassification_content != null){
                     for (let i = 0; i < riskclassification_data.length ; i++) {
-                        bodyhtml += `<p style="font-family:'Calibri',sans-serif;font-size:14px">` + `<b>Risk Category</b> <br> <span style="font-size:12px">` + riskclassification_data[i]?.condition + `</span></p>`;
+                        bodyhtml += `<p style="font-family:'Calibri',sans-serif;font-size:14px;margin-top:3rem">` + `<b>Risk Category</b> <br> <span style="font-size:12px">` + riskclassification_data[i]?.condition + `</span></p>`;
                     }}
                     if(content.diseaserisk_content != null){
-                        bodyhtml +=  `<p style="font-family:'Calibri',sans-serif;margin-bottom : 0; font-size:14px"><b>Diseases Risks Prediction</b></p>`
+                        bodyhtml +=  `<p style="font-family:'Calibri',sans-serif;margin-bottom : 0;margin-top:3rem; font-size:14px"><b>Diseases Risks Prediction</b></p>`
                         for (let i = 0; i < diseaserisk_data.length; i++) {
                             bodyhtml += `<ul style="font-family:'Calibri',sans-serif;font-size:12px">` ;
                             bodyhtml += `<li style="font-family:'Calibri',sans-serif;"><b>Diabetes : </b>` + diseaserisk_data[i]?.diabetes; + '</li>';
@@ -1442,13 +1460,15 @@ export class TemplateService {
                             bodyhtml += '</ul>';
                         }}
                         if(content.content != null){
-                            bodyhtml +=  `<p style="font-family:'Calibri',sans-serif;margin-bottom : 0;font-size:14px"><b>Vital Parameters</b></p>`
+                            bodyhtml +=  `<p style="font-family:'Calibri',sans-serif;margin-bottom : 0;margin-top:3rem;font-size:14px"><b>Vital Parameters</b></p>`
             for (let i = 0; i < scan_data.length; i++) {
                 bodyhtml += `<ul style="font-family:'Calibri',sans-serif; font-size:12px">` ;
                 bodyhtml += `<li style="font-family:'Calibri',sans-serif;"><b>Heart Rate : </b>` + scan_data[i]?.heart_rate; + '</li>';
                 bodyhtml += `<li style="font-family:'Calibri',sans-serif;"><b>Blood Pressure : </b>` + scan_data[i]?.bp; + '</li>';
                 bodyhtml += `<li style="font-family:'Calibri',sans-serif;"><b>BMI : </b>` + scan_data[i]?.bmi; + '</li>';
+            if(scan_data[i].smoking != null){
                 bodyhtml += `<li style="font-family:'Calibri',sans-serif;"><b>Smoker (Beta) : </b>` + scan_data[i]?.smoking; + '</li>';
+            }
                 bodyhtml += `<li style="font-family:'Calibri',sans-serif;"><b>Stress (SNS) : </b>` + scan_data[i]?.stress; + '</li>';
                 bodyhtml += `<li style="font-family:'Calibri',sans-serif;"><b>SPO2 : </b>` + scan_data[i]?.blood_oxygen; + '</li>';
                 bodyhtml += `<li style="font-family:'Calibri',sans-serif;"><b>HRV-SDNN : </b>` + scan_data[i]?.hrv; + '</li>';
@@ -1458,12 +1478,12 @@ export class TemplateService {
                 bodyhtml += '</ul>';
             }}
             if(content.is_questioannire != null){
-                bodyhtml +=  `<p style="font-family:'Calibri',sans-serif;margin-bottom : 0;font-size:14px"><b>Additional Questionnaire</b></p>`
+                bodyhtml +=  `<p style="font-family:'Calibri',sans-serif;margin-bottom : 0;margin-top:3rem;font-size:14px"><b>Additional Questionnaire</b></p>`
                 for (let i = 0; i < questionnaire_data.length; i++) {
                     bodyhtml += `<p style="font-family:'Calibri',sans-serif; font-size:12px">` + `<b>[Q${i+1}] ` +questionnaire_data[i]?.question + `</b><br><span style="font-size:12px">[Ans] `+ questionnaire_data[i]?.answer + `</span></p>`;
                 }}
                 
-                bodyhtml += `<br><p style="font-family:'Calibri',sans-serif; font-size:14px"><b>Disclaimer</b> </p>
+                bodyhtml += `<p style="font-family:'Calibri',sans-serif;margin-top:3rem; font-size:14px"><b>Disclaimer</b> </p>
                 <p style="font-family:'Calibri',sans-serif; font-size:10px">THIS IS NOT A MEDICAL DIAGNOSTIC DEVICE OR A REPLACEMENT FOR MEDICAL DIAGNOSTIC DEVICES.<br><br>
                 
                 We do not share your personal information with any third parties for commercial use or revenue generation. Personal Information provided by You is used by Us to improve our Products, Platforms and/or Services or for your information purposes only.<br><br>
@@ -1476,7 +1496,7 @@ export class TemplateService {
                 <hr style="border-top: dotted 1px;width : 25%" />`
                 
                 let file =  bodyhtml ;
-                return new Promise ((accept,reject)=>{htmlpdf.create(file, options).then(pdfBuffer => {
+                return new Promise ((accept,reject)=>{htmlpdf.create(file, options,{handlebars : true}).then(pdfBuffer => {
                     // if (err) reject(err);
                     console.log("PDF Buffer:-", pdfBuffer);
                     
@@ -1503,7 +1523,7 @@ export class TemplateService {
                     ].join('\n');
               accept(new Promise((resolve , rejects)=>{return this.upload(pdfBuffer,name).then(doc =>{
                 
-                  resolve(lastValueFrom(this.http.post(`${AWS_COGNITO_SMS_COGNITO_URL_SIT_ADMIN_PANEL}`, { Message : `Hey ${content.organisation_admin_name.split(" ", 2)[0]}, your Health Report from Fedo ${doc}`, PhoneNumber : content.organisation_admin_mobile , Subject : "String" })).then(res=>res.data));
+                  resolve(lastValueFrom(this.http.post(`${AWS_COGNITO_SMS_COGNITO_URL_SIT_ADMIN_PANEL}`, { Message : `Hey ${content.organisation_admin_name.split(" ", 2)[0]}, your Health Report from Fedo ${doc}`, PhoneNumber : content.organisation_admin_mobile , Subject : "String" })).then(res=>doc));
                   
                 }),
                 (error) => {
@@ -1519,7 +1539,20 @@ export class TemplateService {
         Logger.debug(`sendEmailWithVitalsData(), DTO: ${JSON.stringify(content)}`, APP);
         
         // var html_to_pdf = require('html-pdf-node');
-        let options = { format: 'A4' };
+        let options = { format: 'A4' ,
+        margin: {
+            top: '2cm',
+            right: '2cm',
+            bottom: '2cm',
+            left: '2cm'
+          },
+          displayHeaderFooter: true,
+          footerTemplate: `
+          <div style="font-size: 12px; text-align: center; {{#isLastPage}}position: absolute; bottom: 0; width: 100%;{{/isLastPage}}">
+
+            Powered by Fedo.Ai
+        </div>
+        `};
         var currentdate = new Date(); 
         currentdate.setMinutes(currentdate.getMinutes() + 330);
         var scanDate = 
@@ -1544,70 +1577,77 @@ export class TemplateService {
         var questionnaire_data = (new Function("return [" + content.is_questioannire+ "];")());
         let bodyhtml = `<html lang="en"> 
         <head> <link href="https://fonts.googleapis.com/css?family=Calibri:400,700&display=swap" rel="stylesheet" type="text/css"></head> 
-        <body style="font-family:'Calibri',sans-serif; padding : 5rem">
+        <body style="font-family:'Calibri',sans-serif;">
            <div style="display: grid;">
-           <p style="font-size:28px">Health Report of <b>${content.organisation_admin_name}</b><br><span style="font-size:14px"><b>Date: </b>${datetime} <br><hr><br><b>Personal Information</b></span><br><span style="font-size:12px"><b>Age</b> : ${content.age}<br><b>Gender</b> : ${content.gender}<br> <b>Application Number</b> : ${content.application_id}</span></p>
-           </div>
-          </body> 
-        </html>`
-        if(content.fedoscore_content != null){
-        for (let i = 0; i < fedoscore_data.length ; i++) {
-            bodyhtml += `<p style="font-family:'Calibri',sans-serif; font-size:14px">` + `<b>Fedo Score</b> <br><b><span style="font-size:20px">` +fedoscore_data[i]?.fedo_score + `</span><br><span style="font-size:12px">What does this score mean?</b></span><br><span style="font-size:12px">`+ fedoscore_data[i]?.condition + `</span></p>`;
-        }}
-        if(content.riskclassification_content != null){
-            for (let i = 0; i < riskclassification_data.length ; i++) {
-            bodyhtml += `<p style="font-family:'Calibri',sans-serif;font-size:14px">` + `<b>Risk Category</b> <br> <span style="font-size:12px">` + riskclassification_data[i]?.condition + `</span></p>`;
-        }}
-        if(content.diseaserisk_content != null){
-            bodyhtml +=  `<p style="font-family:'Calibri',sans-serif;margin-bottom : 0; font-size:14px"><b>Diseases Risks Prediction</b></p>`
-        for (let i = 0; i < diseaserisk_data.length; i++) {
-            bodyhtml += `<ul style="font-family:'Calibri',sans-serif;font-size:12px">` ;
-            bodyhtml += `<li style="font-family:'Calibri',sans-serif;"><b>Diabetes : </b>` + diseaserisk_data[i]?.diabetes; + '</li>';
-            bodyhtml += `<li style="font-family:'Calibri',sans-serif;"><b>Hypertension : </b>` + diseaserisk_data[i]?.hypertension; + '</li>';
-            bodyhtml += `<li style="font-family:'Calibri',sans-serif;"><b>Respiratory : </b>` + diseaserisk_data[i]?.respiratory; + '</li>';
-            bodyhtml += `<li style="font-family:'Calibri',sans-serif;"><b>CHD : </b>` + diseaserisk_data[i]?.chd; + '</li>';
-            bodyhtml += `<li style="font-family:'Calibri',sans-serif;"><b>CVD : </b>` + diseaserisk_data[i]?.cvd; + '</li>';
-            bodyhtml += `<li style="font-family:'Calibri',sans-serif;"><b>Kidney : </b>` + diseaserisk_data[i]?.kidney; + '</li>';
-            bodyhtml += '</ul>';
-        }}
-        if(content.content != null){
-            bodyhtml +=  `<p style="font-family:'Calibri',sans-serif;margin-bottom : 0;font-size:14px"><b>Vital Parameters</b></p>`
-        for (let i = 0; i < scan_data.length; i++) {
-            bodyhtml += `<ul style="font-family:'Calibri',sans-serif; font-size:12px">` ;
-            bodyhtml += `<li style="font-family:'Calibri',sans-serif;"><b>Heart Rate : </b>` + scan_data[i]?.heart_rate; + '</li>';
-            bodyhtml += `<li style="font-family:'Calibri',sans-serif;"><b>Blood Pressure : </b>` + scan_data[i]?.bp; + '</li>';
-            bodyhtml += `<li style="font-family:'Calibri',sans-serif;"><b>BMI : </b>` + scan_data[i]?.bmi; + '</li>';
-            bodyhtml += `<li style="font-family:'Calibri',sans-serif;"><b>Smoker (Beta) : </b>` + scan_data[i]?.smoking; + '</li>';
-            bodyhtml += `<li style="font-family:'Calibri',sans-serif;"><b>Stress (SNS) : </b>` + scan_data[i]?.stress; + '</li>';
-            bodyhtml += `<li style="font-family:'Calibri',sans-serif;"><b>SPO2 : </b>` + scan_data[i]?.blood_oxygen; + '</li>';
-            bodyhtml += `<li style="font-family:'Calibri',sans-serif;"><b>HRV-SDNN : </b>` + scan_data[i]?.hrv; + '</li>';
-            bodyhtml += `<li style="font-family:'Calibri',sans-serif;"><b>Respiration Rate : </b>` + scan_data[i]?.respiration; + '</li>';
-            bodyhtml += `<li style="font-family:'Calibri',sans-serif;"><b>Random Blood Sugar (Beta) : </b>` + scan_data[i]?.rbs; + '</li>';
-            bodyhtml += `<li style="font-family:'Calibri',sans-serif;"><b>Haemoglobin (Beta) : </b>` + scan_data[i]?.hb; + '</li>';
-            bodyhtml += '</ul>';
-        }}
+           <div style="display:block"><img style="height: 3rem;" src="https://fedo-vitals.s3.ap-south-1.amazonaws.com/MicrosoftTeams-image.png">`
+           if(content.logo != null){
+           bodyhtml+= `<img style="    width: 3rem;
+           margin-left: 1rem;" src="${content.logo}">`
+}
+bodyhtml+= `</div>
+<p style="font-size:28px">Health Report of <b>${content.organisation_admin_name}</b><br><span style="font-size:14px"><b>Date: </b>${datetime} <br><hr style="width : 100%" /><br><b>Personal Information</b></span><span style="font-size:12px"><b>Age</b> : ${content.age}<br><b>Gender</b> : ${content.gender}<br> <b>Application Number</b> : ${content.application_id}</span></p>
+</div>
+</body> 
+</html>`
+if(content.fedoscore_content != null){
+    for (let i = 0; i < fedoscore_data.length ; i++) {
+        bodyhtml += `<p style="font-family:'Calibri',sans-serif; font-size:14px;margin-top:1.5rem">` + `<b>Fedo Score</b> <br><b><span style="font-size:20px">` +fedoscore_data[i]?.fedo_score + `</span><br><span style="font-size:12px">What does this score mean?</b></span><br><span style="font-size:12px">`+ fedoscore_data[i]?.condition + `</span></p>`;
+     }}
+     if(content.riskclassification_content != null){
+         for (let i = 0; i < riskclassification_data.length ; i++) {
+             bodyhtml += `<p style="font-family:'Calibri',sans-serif;font-size:14px;margin-top:3rem">` + `<b>Risk Category</b> <br> <span style="font-size:12px">` + riskclassification_data[i]?.condition + `</span></p>`;
+         }}
+         if(content.diseaserisk_content != null){
+             bodyhtml +=  `<p style="font-family:'Calibri',sans-serif;margin-bottom : 0;margin-top:3rem; font-size:14px"><b>Diseases Risks Prediction</b></p>`
+             for (let i = 0; i < diseaserisk_data.length; i++) {
+                 bodyhtml += `<ul style="font-family:'Calibri',sans-serif;font-size:12px">` ;
+                 bodyhtml += `<li style="font-family:'Calibri',sans-serif;"><b>Diabetes : </b>` + diseaserisk_data[i]?.diabetes; + '</li>';
+                 bodyhtml += `<li style="font-family:'Calibri',sans-serif;"><b>Hypertension : </b>` + diseaserisk_data[i]?.hypertension; + '</li>';
+                 bodyhtml += `<li style="font-family:'Calibri',sans-serif;"><b>Respiratory : </b>` + diseaserisk_data[i]?.respiratory; + '</li>';
+                 bodyhtml += `<li style="font-family:'Calibri',sans-serif;"><b>CHD : </b>` + diseaserisk_data[i]?.chd; + '</li>';
+                 bodyhtml += `<li style="font-family:'Calibri',sans-serif;"><b>CVD : </b>` + diseaserisk_data[i]?.cvd; + '</li>';
+                 bodyhtml += `<li style="font-family:'Calibri',sans-serif;"><b>Kidney : </b>` + diseaserisk_data[i]?.kidney; + '</li>';
+                 bodyhtml += '</ul>';
+             }}
+             if(content.content != null){
+                 bodyhtml +=  `<p style="font-family:'Calibri',sans-serif;margin-bottom : 0;margin-top:3rem;font-size:14px"><b>Vital Parameters</b></p>`
+ for (let i = 0; i < scan_data.length; i++) {
+     bodyhtml += `<ul style="font-family:'Calibri',sans-serif; font-size:12px">` ;
+     bodyhtml += `<li style="font-family:'Calibri',sans-serif;"><b>Heart Rate : </b>` + scan_data[i]?.heart_rate; + '</li>';
+     bodyhtml += `<li style="font-family:'Calibri',sans-serif;"><b>Blood Pressure : </b>` + scan_data[i]?.bp; + '</li>';
+     bodyhtml += `<li style="font-family:'Calibri',sans-serif;"><b>BMI : </b>` + scan_data[i]?.bmi; + '</li>';
+ if(scan_data[i].smoking != null){
+     bodyhtml += `<li style="font-family:'Calibri',sans-serif;"><b>Smoker (Beta) : </b>` + scan_data[i]?.smoking; + '</li>';
+ }
+     bodyhtml += `<li style="font-family:'Calibri',sans-serif;"><b>Stress (SNS) : </b>` + scan_data[i]?.stress; + '</li>';
+     bodyhtml += `<li style="font-family:'Calibri',sans-serif;"><b>SPO2 : </b>` + scan_data[i]?.blood_oxygen; + '</li>';
+     bodyhtml += `<li style="font-family:'Calibri',sans-serif;"><b>HRV-SDNN : </b>` + scan_data[i]?.hrv; + '</li>';
+     bodyhtml += `<li style="font-family:'Calibri',sans-serif;"><b>Respiration Rate : </b>` + scan_data[i]?.respiration; + '</li>';
+     bodyhtml += `<li style="font-family:'Calibri',sans-serif;"><b>Random Blood Sugar (Beta) : </b>` + scan_data[i]?.rbs; + '</li>';
+     bodyhtml += `<li style="font-family:'Calibri',sans-serif;"><b>Haemoglobin (Beta) : </b>` + scan_data[i]?.hb; + '</li>';
+     bodyhtml += '</ul>';
+ }}
+ if(content.is_questioannire != null){
+     bodyhtml +=  `<p style="font-family:'Calibri',sans-serif;margin-bottom : 0;margin-top:3rem;font-size:14px"><b>Additional Questionnaire</b></p>`
+     for (let i = 0; i < questionnaire_data.length; i++) {
+         bodyhtml += `<p style="font-family:'Calibri',sans-serif; font-size:12px">` + `<b>[Q${i+1}] ` +questionnaire_data[i]?.question + `</b><br><span style="font-size:12px">[Ans] `+ questionnaire_data[i]?.answer + `</span></p>`;
+     }}
+     
+     bodyhtml += `<p style="font-family:'Calibri',sans-serif;margin-top:3rem; font-size:14px"><b>Disclaimer</b> </p>
+     <p style="font-family:'Calibri',sans-serif; font-size:10px">THIS IS NOT A MEDICAL DIAGNOSTIC DEVICE OR A REPLACEMENT FOR MEDICAL DIAGNOSTIC DEVICES.<br><br>
+     
+     We do not share your personal information with any third parties for commercial use or revenue generation. Personal Information provided by You is used by Us to improve our Products, Platforms and/or Services or for your information purposes only.<br><br>
+     
+     The data collected and the analysis must only be considered as indicators and/or as early warnings. You must always seek advice of an experienced and qualified doctor or your family doctor or other qualified healthcare provider/practitioner regarding your health and/or medical condition or treatment, before undertaking any new healthcare systems or methods. You must not disregard professional medical advice or delay in seeking medical consultation from qualified health professionals because of any Information received during this process.<br><br>
 
-        if(content.is_questioannire != null){
-            bodyhtml +=  `<p style="font-family:'Calibri',sans-serif;margin-bottom : 0;font-size:14px"><b>Additional Questionnaire</b></p>`
-        for (let i = 0; i < questionnaire_data.length; i++) {
-            bodyhtml += `<p style="font-family:'Calibri',sans-serif; font-size:12px">` + `<b>[Q${i+1}] ` +questionnaire_data[i]?.question + `</b><br><span style="font-size:12px">[Ans] `+ questionnaire_data[i]?.answer + `</span></p>`;
-        }}
-
-        bodyhtml += `<br><p style="font-family:'Calibri',sans-serif; font-size:14px"><b>Disclaimer</b> </p>
-        <p style="font-family:'Calibri',sans-serif; font-size:10px">THIS IS NOT A MEDICAL DIAGNOSTIC DEVICE OR A REPLACEMENT FOR MEDICAL DIAGNOSTIC DEVICES.<br><br>
-
-        We do not share your personal information with any third parties for commercial use or revenue generation. Personal Information provided by You is used by Us to improve our Products, Platforms and/or Services or for your information purposes only.<br><br>
-        
-        The data collected and the analysis must only be considered as indicators and/or as early warnings. You must always seek advice of an experienced and qualified doctor or your family doctor or other qualified healthcare provider/practitioner regarding your health and/or medical condition or treatment, before undertaking any new healthcare systems or methods. You must not disregard professional medical advice or delay in seeking medical consultation from qualified health professionals because of any Information received during this process.<br><br>
-        
-        By accessing or using our products, platforms and/or services, You have authorized Us to collect, store, process, handle and use all such information about you, in accordance with our Privacy Policy and any other terms and conditions of use (as amended from time to time).
-        </p>
-          <br>
-          <hr style="border-top: dotted 1px;width : 25%" />`
+     By accessing or using our products, platforms and/or services, You have authorized Us to collect, store, process, handle and use all such information about you, in accordance with our Privacy Policy and any other terms and conditions of use (as amended from time to time).
+     </p>
+     <br>
+     <hr style="border-top: dotted 1px;width : 25%" />`
 
             
           let file =  bodyhtml ;
-          return new Promise((resolve1,rejects) =>{htmlpdf.create(file, options).then(pdfBuffer => {
+          return new Promise((resolve1,rejects) =>{htmlpdf.create(file, options,{ handlebars: true }).then(pdfBuffer => {
             // if (err) rejects(err);
             
             const message = [
@@ -1779,6 +1819,8 @@ export class TemplateService {
           Key: String(name),
           Body: file,
           acl: 'public',
+          ContentType : 'application/pdf',
+          ContentDisposition : 'inline'
       
       
         };

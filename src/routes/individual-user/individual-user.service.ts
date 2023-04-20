@@ -162,9 +162,9 @@ export class IndividualUserService {
           }
           if (res[0].is_verified == false) {
             return this.emailService.sendOtpToEmail(emailAndOtp).then(async v => {
-              return await lastValueFrom(this.saveToRandomIdDB());
+              // return await lastValueFrom(this.saveToRandomIdDB());
             }).then(doc => {
-              this.individualUserDb.save({ email: emailAndOtp.email, fedo_score: true, attempts: 3, total_tests : 3 ,  is_verified: false , product_id : 2 , unique_id : doc[0].unique_id  });
+              // this.individualUserDb.save({ email: emailAndOtp.email, fedo_score: true, attempts: 3, total_tests : 3 ,  is_verified: false , product_id : 2 , unique_id : doc[0].unique_id  });
               return emailAndOtp;
             }).catch(err => {
               throw new UnprocessableEntityException('Failed to send OTP. Please try again')
