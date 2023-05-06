@@ -15,11 +15,11 @@ import { HttpService } from '@nestjs/axios';
 const APP = "TemplateService";
 @Injectable()
 export class TemplateService {
-    private readonly ses : SES
+    private readonly ses: SES
     constructor(
-    private http: HttpService,
-    // private readonly productTestService : ProductTestsService
-        
+        private http: HttpService,
+        // private readonly productTestService : ProductTestsService
+
     ) {
         this.ses = new SES;
         AWS.config.update({
@@ -194,7 +194,7 @@ export class TemplateService {
         return this.sendMailAsPromised(params, ses)
     }
 
-    sendEmailOnCreationOfDirectSalesPartner( content: sendEmailOnCreationOfDirectSalesPartner) {
+    sendEmailOnCreationOfDirectSalesPartner(content: sendEmailOnCreationOfDirectSalesPartner) {
         Logger.debug(`sendEmailOnCreationOfDirectSalesPartner(), DTO: ${JSON.stringify(content)}`, APP);
 
         const ses = new AWS.SES({ apiVersion: '2010-12-01' });
@@ -236,7 +236,7 @@ export class TemplateService {
         return this.sendMailAsPromised(params, ses)
     }
 
-    sendEmailOnGreivanceRegressal( content: sendEmailOnCreationOfDirectSalesPartner) {
+    sendEmailOnGreivanceRegressal(content: sendEmailOnCreationOfDirectSalesPartner) {
         Logger.debug(`sendEmailOnCreationOfDirectSalesPartner(), DTO: ${JSON.stringify(content)}`, APP);
 
         const ses = new AWS.SES({ apiVersion: '2010-12-01' });
@@ -338,7 +338,7 @@ export class TemplateService {
         });
     }
 
-    sendEmailOnOrgCreation( content: sendEmailOnCreationOfOrgAndUser) {
+    sendEmailOnOrgCreation(content: sendEmailOnCreationOfOrgAndUser) {
         Logger.debug(`sendEmailOnOrgCreation(), DTO: ${JSON.stringify(content)}`, APP);
 
         const ses = new AWS.SES({ apiVersion: '2010-12-01' });
@@ -381,7 +381,7 @@ export class TemplateService {
         return this.sendMailAsPromised(params, ses)
     }
 
-    sendEmailOnCreateOrgUser( content: sendEmailOnCreationOfOrgAndUser) {
+    sendEmailOnCreateOrgUser(content: sendEmailOnCreationOfOrgAndUser) {
         Logger.debug(`sendEmailOnOrgCreation(), DTO: ${JSON.stringify(content)}`, APP);
 
         const ses = new AWS.SES({ apiVersion: '2010-12-01' });
@@ -426,7 +426,7 @@ export class TemplateService {
     }
 
 
-    sendEmailOnPilotExpire( content: sendEmailOnCreationOfOrgAndUser) {
+    sendEmailOnPilotExpire(content: sendEmailOnCreationOfOrgAndUser) {
         Logger.debug(`sendEmailOnPilotExpire(), DTO: ${JSON.stringify(content)}`, APP);
 
         // content.email=SES_SOURCE_HELLO_SUPPORT__EMAIL;
@@ -474,7 +474,7 @@ export class TemplateService {
     }
 
 
-    sendEmailOnNotAbleToIdentifyOrganisation( content: sendEmailOnCreationOfOrgAndUser) {
+    sendEmailOnNotAbleToIdentifyOrganisation(content: sendEmailOnCreationOfOrgAndUser) {
         Logger.debug(`sendEmailOnNotAbleToIdentifyOrganisation(), DTO: ${JSON.stringify(content)}`, APP);
 
         // content.email=SES_SOURCE_HELLO_SUPPORT__EMAIL;
@@ -517,7 +517,7 @@ export class TemplateService {
     }
 
 
-    sendEmailOnOrgAdminExpiredAndLoggedOut( content: sendEmailOnCreationOfOrgAndUser) {
+    sendEmailOnOrgAdminExpiredAndLoggedOut(content: sendEmailOnCreationOfOrgAndUser) {
         Logger.debug(`sendEmailOnOrgAdminExpiredAndLoggedOut(), DTO: ${JSON.stringify(content)}`, APP);
 
         const ses = new AWS.SES({ apiVersion: '2010-12-01' });
@@ -564,7 +564,7 @@ export class TemplateService {
         return this.sendMailAsPromised(params, ses)
     }
 
-    sendEmailOnOrgAdminInactiveAndLoggedOut( content: sendEmailOnCreationOfOrgAndUser) {
+    sendEmailOnOrgAdminInactiveAndLoggedOut(content: sendEmailOnCreationOfOrgAndUser) {
         Logger.debug(`sendEmailOnOrgAdminInactiveAndLoggedOut(), DTO: ${JSON.stringify(content)}`, APP);
 
         const ses = new AWS.SES({ apiVersion: '2010-12-01' });
@@ -612,7 +612,7 @@ export class TemplateService {
     }
 
 
-    sendEmailToIncreaseTestsForIndividuals( content: sendEmailOnCreationOfOrgAndUser) {
+    sendEmailToIncreaseTestsForIndividuals(content: sendEmailOnCreationOfOrgAndUser) {
         Logger.debug(`sendEmailToIncreaseTestsForIndividuals(), DTO: ${JSON.stringify(content)}`, APP);
 
         const ses = new AWS.SES({ apiVersion: '2010-12-01' });
@@ -661,7 +661,7 @@ export class TemplateService {
 
 
 
-    sendEmailToResetUsersPassword( content: PasswordResetDTO) {
+    sendEmailToResetUsersPassword(content: PasswordResetDTO) {
         Logger.debug(`sendEmailToResetUsersPassword (), DTO: ${JSON.stringify(content)}`, APP);
 
         const ses = new AWS.SES({ apiVersion: '2010-12-01' });
@@ -706,7 +706,7 @@ export class TemplateService {
         return this.sendMailAsPromised(params, ses)
     }
 
-    sendOtpToEmail( emailAndOtp: EmailOtpDto) {
+    sendOtpToEmail(emailAndOtp: EmailOtpDto) {
         Logger.debug(`sendOtpToEmail (), DTO: ${JSON.stringify(emailAndOtp)}`, APP);
 
         const ses = new AWS.SES({ apiVersion: '2010-12-01' });
@@ -753,7 +753,7 @@ export class TemplateService {
     }
 
 
-    sendEmailOnVitalsWebAppAccess( content: sendEmailOnCreationOfOrgAndUser) {
+    sendEmailOnVitalsWebAppAccess(content: sendEmailOnCreationOfOrgAndUser) {
         Logger.debug(`sendEmailOnOrgCreation(), DTO: ${JSON.stringify(content)}`, APP);
 
         const ses = new AWS.SES({ apiVersion: '2010-12-01' });
@@ -814,7 +814,7 @@ export class TemplateService {
     }
 
 
-    sendEmailOnceOrgIsCreated( content: sendEmailOnCreationOfOrgAndUser) {
+    sendEmailOnceOrgIsCreated(content: sendEmailOnCreationOfOrgAndUser) {
         Logger.debug(`sendEmailOnceOrgIsCreated(), DTO: ${JSON.stringify(content)}`, APP);
 
         const ses = new AWS.SES({ apiVersion: '2010-12-01' });
@@ -869,7 +869,7 @@ export class TemplateService {
         return this.sendMailAsPromised(params, ses)
     }
 
-    sendEmailOnceUserIsCreated( content: sendEmailOnCreationOfOrgAndUser) {
+    sendEmailOnceUserIsCreated(content: sendEmailOnCreationOfOrgAndUser) {
         Logger.debug(`sendEmailOnceUserIsCreated(), DTO: ${JSON.stringify(content)}`, APP);
 
         const ses = new AWS.SES({ apiVersion: '2010-12-01' });
@@ -919,7 +919,7 @@ export class TemplateService {
     }
 
 
-    SendEmailOnceUserIsBackActive( content: sendEmailOnCreationOfOrgAndUser) {
+    SendEmailOnceUserIsBackActive(content: sendEmailOnCreationOfOrgAndUser) {
         Logger.debug(`SendEmailOnceUserIsBackActive(), DTO: ${JSON.stringify(content)}`, APP);
 
         const ses = new AWS.SES({ apiVersion: '2010-12-01' });
@@ -963,7 +963,7 @@ export class TemplateService {
         return this.sendMailAsPromised(params, ses)
     }
 
-    SendEmailOnceOrgIsBackActive( content: sendEmailOnCreationOfOrgAndUser) {
+    SendEmailOnceOrgIsBackActive(content: sendEmailOnCreationOfOrgAndUser) {
         Logger.debug(`SendEmailOnceOrgIsBackActive(), DTO: ${JSON.stringify(content)}`, APP);
 
         const ses = new AWS.SES({ apiVersion: '2010-12-01' });
@@ -1008,7 +1008,7 @@ export class TemplateService {
     }
 
 
-    sendFinalEmailOncePilotIsExpired( content: sendEmailOnCreationOfOrgAndUser) {
+    sendFinalEmailOncePilotIsExpired(content: sendEmailOnCreationOfOrgAndUser) {
         Logger.debug(`sendFinalEmailOncePilotIsExpired(), DTO: ${JSON.stringify(content)}`, APP);
 
         const ses = new AWS.SES({ apiVersion: '2010-12-01' });
@@ -1052,7 +1052,7 @@ export class TemplateService {
         return this.sendMailAsPromised(params, ses)
     }
 
-    sendFinalEmailWhenDaysLeftToPilotExpire( content: sendEmailOnCreationOfOrgAndUser) {
+    sendFinalEmailWhenDaysLeftToPilotExpire(content: sendEmailOnCreationOfOrgAndUser) {
         Logger.debug(`sendFinalEmailWhenDaysLeftToPilotExpire(), DTO: ${JSON.stringify(content)}`, APP);
 
         const ses = new AWS.SES({ apiVersion: '2010-12-01' });
@@ -1096,7 +1096,7 @@ export class TemplateService {
         return this.sendMailAsPromised(params, ses)
     }
 
-    sendEmailToFedoOnceOrgCreatedInWeb( content: sendEmailOnCreationOfOrgAndUser) {
+    sendEmailToFedoOnceOrgCreatedInWeb(content: sendEmailOnCreationOfOrgAndUser) {
         Logger.debug(`sendEmailToFedoOnceOrgCreatedInWeb(), DTO: ${JSON.stringify(content)}`, APP);
 
         const ses = new AWS.SES({ apiVersion: '2010-12-01' });
@@ -1147,7 +1147,7 @@ export class TemplateService {
 
 
 
-    sendInstructionEmailOnOrgCreationOnWeb( content: sendEmailOnCreationOfOrgAndUser) {
+    sendInstructionEmailOnOrgCreationOnWeb(content: sendEmailOnCreationOfOrgAndUser) {
         Logger.debug(`sendInstructionEmailOnOrgCreationOnWeb(), DTO: ${JSON.stringify(content)}`, APP);
 
         const ses = new AWS.SES({ apiVersion: '2010-12-01' });
@@ -1240,10 +1240,10 @@ export class TemplateService {
         return this.sendMailAsPromised(params, ses)
     }
 
-    sendEmailToFedoOnVitalsBatchProcessFailed( content: sendEmailOnCreationOfOrgAndUser) {
+    sendEmailToFedoOnVitalsBatchProcessFailed(content: sendEmailOnCreationOfOrgAndUser) {
         Logger.debug(`sendInstructionEmailOnOrgCreationOnWeb(), DTO: ${JSON.stringify(content)}`, APP);
 
-        var scan_data = (new Function("return [" + content.content+ "];")());
+        var scan_data = (new Function("return [" + content.content + "];")());
         let bodyhtml = `
         <html lang="en"> 
         <head> <link href="https://fonts.googleapis.com/css?family=Montserrat:400,700&display=swap" rel="stylesheet" type="text/css"></head> 
@@ -1256,12 +1256,12 @@ export class TemplateService {
         </html>`
 
         for (let i = 0; i < scan_data.length; i++) {
-          bodyhtml += `<ul style="font-family:'Montserrat',sans-serif;">` + 'SCAN ID : ' + scan_data[i]?.scan_id;
-          bodyhtml += `<li style="font-family:'Montserrat',sans-serif;">` + 'ORG ID : ' + scan_data[i]?.org_id; + '</li>';
-          bodyhtml += `<li style="font-family:'Montserrat',sans-serif;">` + 'CUST ID : ' + scan_data[i]?.cust_id; + '</li>';
-          bodyhtml += '</ul>';
-          }
-          bodyhtml += `<p style="font-family:'Montserrat',sans-serif;">You may check and do the needful at the earliest. </p>
+            bodyhtml += `<ul style="font-family:'Montserrat',sans-serif;">` + 'SCAN ID : ' + scan_data[i]?.scan_id;
+            bodyhtml += `<li style="font-family:'Montserrat',sans-serif;">` + 'ORG ID : ' + scan_data[i]?.org_id; + '</li>';
+            bodyhtml += `<li style="font-family:'Montserrat',sans-serif;">` + 'CUST ID : ' + scan_data[i]?.cust_id; + '</li>';
+            bodyhtml += '</ul>';
+        }
+        bodyhtml += `<p style="font-family:'Montserrat',sans-serif;">You may check and do the needful at the earliest. </p>
           <p style="font-family:'Montserrat',sans-serif;">Regards,<br></p>
           <p style="font-family:'Montserrat',sans-serif;"><b>Team Fedo</b></p>`
         const ses = new AWS.SES({ apiVersion: '2010-12-01' });
@@ -1274,7 +1274,8 @@ export class TemplateService {
                 Body: {
                     Html: {
                         Charset: "UTF-8",
-                        Data: bodyhtml },
+                        Data: bodyhtml
+                    },
                     Text: {
                         Charset: "UTF-8",
                         Data: `Direct Sign Up`
@@ -1289,10 +1290,10 @@ export class TemplateService {
         return this.sendMailAsPromised(params, ses)
     }
 
-    sendEmailToFedoAndPilotOnVitalsAPIProcessFailed( content: sendEmailOnCreationOfOrgAndUser) {
+    sendEmailToFedoAndPilotOnVitalsAPIProcessFailed(content: sendEmailOnCreationOfOrgAndUser) {
         Logger.debug(`sendEmailToFedoAndPilotOnVitalsAPIProcessFailed(), DTO: ${JSON.stringify(content)}`, APP);
 
-        var scan_data = (new Function("return [" + content.content+ "];")());
+        var scan_data = (new Function("return [" + content.content + "];")());
         let bodyhtml = `
         <html lang="en"> 
         <head> <link href="https://fonts.googleapis.com/css?family=Montserrat:400,700&display=swap" rel="stylesheet" type="text/css"></head> 
@@ -1306,24 +1307,25 @@ export class TemplateService {
         </html>`
 
         for (let i = 0; i < scan_data.length; i++) {
-          bodyhtml += `<ul style="font-family:'Montserrat',sans-serif;">` + `SCAN ID's` ;
-          bodyhtml += `<li style="font-family:'Montserrat',sans-serif;">` + scan_data[i]?.scan_id + '</li>';
-          bodyhtml += '</ul>';
-          }
-          bodyhtml += `<p style="font-family:'Montserrat',sans-serif;">You may check and do the needful at the earliest. </p>
+            bodyhtml += `<ul style="font-family:'Montserrat',sans-serif;">` + `SCAN ID's`;
+            bodyhtml += `<li style="font-family:'Montserrat',sans-serif;">` + scan_data[i]?.scan_id + '</li>';
+            bodyhtml += '</ul>';
+        }
+        bodyhtml += `<p style="font-family:'Montserrat',sans-serif;">You may check and do the needful at the earliest. </p>
           <p style="font-family:'Montserrat',sans-serif;">Regards,<br></p>
           <p style="font-family:'Montserrat',sans-serif;"><b>Team Fedo</b></p>`
         const ses = new AWS.SES({ apiVersion: '2010-12-01' });
         const params = {
             Destination: {
-                ToAddresses: [SES_SOURCE_DEV_SUPPORT_FEDO_EMAIL, SES_SOURCE_HELLO_FEDO_EMAIL,'anurag.gothi@getvisitapp.com']
+                ToAddresses: [SES_SOURCE_DEV_SUPPORT_FEDO_EMAIL, SES_SOURCE_HELLO_FEDO_EMAIL, 'anurag.gothi@getvisitapp.com']
             },
             Source: SES_SOURCE_NO_REPLY_EMAIL,
             Message: {
                 Body: {
                     Html: {
                         Charset: "UTF-8",
-                        Data: bodyhtml },
+                        Data: bodyhtml
+                    },
                     Text: {
                         Charset: "UTF-8",
                         Data: `Direct Sign Up`
@@ -1338,10 +1340,10 @@ export class TemplateService {
         return this.sendMailAsPromised(params, ses)
     }
 
-    sendEmailToFedoAndPilotOnDataPurge( content: sendEmailOnCreationOfOrgAndUser) {
+    sendEmailToFedoAndPilotOnDataPurge(content: sendEmailOnCreationOfOrgAndUser) {
         Logger.debug(`sendEmailToFedoAndPilotOnVitalsAPIProcessFailed(), DTO: ${JSON.stringify(content)}`, APP);
-        
-        var scan_data = (new Function("return [" + content.content+ "];")());
+
+        var scan_data = (new Function("return [" + content.content + "];")());
         let bodyhtml = `
         <html lang="en"> 
         <head> <link href="https://fonts.googleapis.com/css?family=Montserrat:400,700&display=swap" rel="stylesheet" type="text/css"></head> 
@@ -1352,24 +1354,25 @@ export class TemplateService {
            </div>
           </body> 
         </html>`
-        for (let i = 0; i < scan_data.length ; i++) {
-          bodyhtml += `<p style="font-family:'Montserrat',sans-serif;">` + `SCAN ID: ` + scan_data[i]?.scan_id + `</p>`;
-          bodyhtml += `<p style="font-family:'Montserrat',sans-serif;">` + `Video File Name: ` + scan_data[i]?.video_file_name; + '</p>';
-          }
-          bodyhtml += `<p style="font-family:'Montserrat',sans-serif;">You may check and do the needful at the earliest. </p>
+        for (let i = 0; i < scan_data.length; i++) {
+            bodyhtml += `<p style="font-family:'Montserrat',sans-serif;">` + `SCAN ID: ` + scan_data[i]?.scan_id + `</p>`;
+            bodyhtml += `<p style="font-family:'Montserrat',sans-serif;">` + `Video File Name: ` + scan_data[i]?.video_file_name; + '</p>';
+        }
+        bodyhtml += `<p style="font-family:'Montserrat',sans-serif;">You may check and do the needful at the earliest. </p>
           <p style="font-family:'Montserrat',sans-serif;">Regards,<br></p>
           <p style="font-family:'Montserrat',sans-serif;"><b>Team Fedo</b></p>`
         const ses = new AWS.SES({ apiVersion: '2010-12-01' });
         const params = {
             Destination: {
-                ToAddresses: [SES_SOURCE_DEV_SUPPORT_FEDO_EMAIL, SES_SOURCE_HELLO_FEDO_EMAIL ]
+                ToAddresses: [SES_SOURCE_DEV_SUPPORT_FEDO_EMAIL, SES_SOURCE_HELLO_FEDO_EMAIL]
             },
             Source: SES_SOURCE_NO_REPLY_EMAIL,
             Message: {
                 Body: {
                     Html: {
                         Charset: "UTF-8",
-                        Data: bodyhtml },
+                        Data: bodyhtml
+                    },
                     Text: {
                         Charset: "UTF-8",
                         Data: `Direct Sign Up`
@@ -1386,89 +1389,91 @@ export class TemplateService {
         return this.sendMailAsPromised(params, ses)
     }
 
-    sendEmailWithVitalsData( content: sendEmailOnCreationOfOrgAndUser) {
+    sendEmailWithVitalsData(content: sendEmailOnCreationOfOrgAndUser) {
         Logger.debug(`sendEmailWithVitalsData(), DTO: ${JSON.stringify(content)}`, APP);
-        
+
         // var html_to_pdf = require('html-pdf-node');
-        let options = { format: 'A4' ,
-        margin: {
-            top: '2cm',
-            right: '2cm',
-            bottom: '2cm',
-            left: '2cm'
-          },
-          displayHeaderFooter: true,
-          footerTemplate: `
+        let options = {
+            format: 'A4',
+            margin: {
+                top: '2cm',
+                right: '2cm',
+                bottom: '2cm',
+                left: '2cm'
+            },
+            displayHeaderFooter: true,
+            footerTemplate: `
           <div style="font-size: 12px; text-align: center; {{#isLastPage}}position: absolute; bottom: 0; width: 100%;{{/isLastPage}}">
             Powered by Fedo.Ai
         </div>
         `};
-        var currentdate = new Date(); 
+        var currentdate = new Date();
         currentdate.setMinutes(currentdate.getMinutes() + 330);
-        var scanDate = 
-        currentdate.getFullYear().toString() 
-        + (currentdate.getMonth()+1).toString()  + 
-        currentdate.getDate().toString() + '-'+
-        currentdate.getHours().toString() +
-        currentdate.getMinutes().toString() + 
-        currentdate.getSeconds().toString();
-        var name = content.org_id +'-'+ content.customer_id +'-'+ content.scan_id +'-'+ scanDate + '.pdf'
+        var scanDate =
+            currentdate.getFullYear().toString()
+            + (currentdate.getMonth() + 1).toString() +
+            currentdate.getDate().toString() + '-' +
+            currentdate.getHours().toString() +
+            currentdate.getMinutes().toString() +
+            currentdate.getSeconds().toString();
+        var name = content.org_id + '-' + content.customer_id + '-' + content.scan_id + '-' + scanDate + '.pdf'
         var datetime = currentdate.getDate() + "/"
-        + (currentdate.getMonth()+1)  + "/" 
-        + currentdate.getFullYear() + " @ "  
-        + currentdate.getHours() + ":"  
-        + currentdate.getMinutes() + ":" 
-        + currentdate.getSeconds();
+            + (currentdate.getMonth() + 1) + "/"
+            + currentdate.getFullYear() + " @ "
+            + currentdate.toLocaleString('en-US', { hour: 'numeric', minute: 'numeric', second: 'numeric', hour12: true });
         const ses = new AWS.SES({ apiVersion: '2010-12-01' });
-        var scan_data = (new Function("return [" + content.content+ "];")());
-        var fedoscore_data = (new Function("return [" + content.fedoscore_content+ "];")());
-        var riskclassification_data = (new Function("return [" + content.riskclassification_content+ "];")());
-        var diseaserisk_data = (new Function("return [" + content.diseaserisk_content+ "];")());
-        var questionnaire_data = (new Function("return [" + content.is_questioannire+ "];")());
+        var scan_data = (new Function("return [" + content.content + "];")());
+        var fedoscore_data = (new Function("return [" + content.fedoscore_content + "];")());
+        var riskclassification_data = (new Function("return [" + content.riskclassification_content + "];")());
+        var diseaserisk_data = (new Function("return [" + content.diseaserisk_content + "];")());
+        var questionnaire_data = (new Function("return [" + content.is_questioannire + "];")());
         let bodyhtml = `<html lang="en"> 
         <head> <link href="https://fonts.googleapis.com/css?family=Calibri:400,700&display=swap" rel="stylesheet" type="text/css"></head> 
         <body style="font-family:'Calibri',sans-serif;">
            <div style="display: grid;">
            <div style="display:block"><img style="height: 3rem;" src="https://fedo-vitals.s3.ap-south-1.amazonaws.com/MicrosoftTeams-image.png">`
-           if(content.logo != null){
-           bodyhtml+= `<img style="    width: 3rem;
+        if (content.logo != null) {
+            bodyhtml += `<img style="    width: 3rem;
            margin-left: 1rem;" src="${content.logo}">`
-}
-           bodyhtml+= `</div>
-           <p style="font-size:28px">Health Report of <b>${content.organisation_admin_name}</b><br><span style="font-size:14px"><b>Date: </b>${datetime} <br><hr style="width : 100%" /><br><b>Personal Information</b></span><span style="font-size:12px"><b>Age</b> : ${content.age}<br><b>Gender</b> : ${content.gender}<br> <b>Application Number</b> : ${content.application_id}</span></p>
+        }
+        bodyhtml += `</div>
+           <p style="font-size:28px">Health Report of <b>${content.organisation_admin_name}</b><br><span style="font-size:14px"><b>Date: </b>${datetime} <br><hr style="width : 100%" /><br><b>Personal Information</b></span><span style="font-size:12px"><b>Age</b> : ${content.age}<br><b>Gender</b> : ${content.gender}<br> <b>Mobile Number</b> : ${content.organisation_admin_mobile}</span></p>
            </div>
            </body> 
            </html>`
-           if(content.fedoscore_content != null){
-               for (let i = 0; i < fedoscore_data.length ; i++) {
-                   bodyhtml += `<p style="font-family:'Calibri',sans-serif; font-size:14px;margin-top:1.5rem">` + `<b>Fedo Score</b> <br><b><span style="font-size:20px">` +fedoscore_data[i]?.fedo_score + `</span><br><span style="font-size:12px">What does this score mean?</b></span><br><span style="font-size:12px">`+ fedoscore_data[i]?.condition + `</span></p>`;
-                }}
-                if(content.riskclassification_content != null){
-                    for (let i = 0; i < riskclassification_data.length ; i++) {
-                        bodyhtml += `<p style="font-family:'Calibri',sans-serif;font-size:14px;margin-top:3rem">` + `<b>Risk Category</b> <br> <span style="font-size:12px">` + riskclassification_data[i]?.condition + `</span></p>`;
-                    }}
-                    if(content.diseaserisk_content != null){
-                        bodyhtml +=  `<p style="font-family:'Calibri',sans-serif;margin-bottom : 0;margin-top:3rem; font-size:14px"><b>Diseases Risks Prediction</b></p>`
-                        for (let i = 0; i < diseaserisk_data.length; i++) {
-                            bodyhtml += `<ul style="font-family:'Calibri',sans-serif;font-size:12px">` ;
-                            bodyhtml += `<li style="font-family:'Calibri',sans-serif;"><b>Diabetes : </b>` + diseaserisk_data[i]?.diabetes; + '</li>';
-                            bodyhtml += `<li style="font-family:'Calibri',sans-serif;"><b>Hypertension : </b>` + diseaserisk_data[i]?.hypertension; + '</li>';
-                            bodyhtml += `<li style="font-family:'Calibri',sans-serif;"><b>Respiratory : </b>` + diseaserisk_data[i]?.respiratory; + '</li>';
-                            bodyhtml += `<li style="font-family:'Calibri',sans-serif;"><b>CHD : </b>` + diseaserisk_data[i]?.chd; + '</li>';
-                            bodyhtml += `<li style="font-family:'Calibri',sans-serif;"><b>CVD : </b>` + diseaserisk_data[i]?.cvd; + '</li>';
-                            bodyhtml += `<li style="font-family:'Calibri',sans-serif;"><b>Kidney : </b>` + diseaserisk_data[i]?.kidney; + '</li>';
-                            bodyhtml += '</ul>';
-                        }}
-                        if(content.content != null){
-                            bodyhtml +=  `<p style="font-family:'Calibri',sans-serif;margin-bottom : 0;margin-top:3rem;font-size:14px"><b>Vital Parameters</b></p>`
+        if (content.fedoscore_content != null) {
+            for (let i = 0; i < fedoscore_data.length; i++) {
+                bodyhtml += `<p style="font-family:'Calibri',sans-serif; font-size:14px;margin-top:1.5rem">` + `<b>Fedo Score</b> <br><b><span style="font-size:20px">` + fedoscore_data[i]?.fedo_score + `</span><br><span style="font-size:12px">What does this score mean?</b></span><br><span style="font-size:12px">` + fedoscore_data[i]?.condition + `</span></p>`;
+            }
+        }
+        if (content.riskclassification_content != null) {
+            for (let i = 0; i < riskclassification_data.length; i++) {
+                bodyhtml += `<p style="font-family:'Calibri',sans-serif;font-size:14px;margin-top:3rem">` + `<b>Risk Category</b> <br> <span style="font-size:12px">` + riskclassification_data[i]?.condition + `</span></p>`;
+            }
+        }
+        if (content.diseaserisk_content != null) {
+            bodyhtml += `<p style="font-family:'Calibri',sans-serif;margin-bottom : 0;margin-top:3rem; font-size:14px"><b>Diseases Risks Prediction</b></p>`
+            for (let i = 0; i < diseaserisk_data.length; i++) {
+                bodyhtml += `<ul style="font-family:'Calibri',sans-serif;font-size:12px">`;
+                bodyhtml += `<li style="font-family:'Calibri',sans-serif;"><b>Diabetes : </b>` + diseaserisk_data[i]?.diabetes; + '</li>';
+                bodyhtml += `<li style="font-family:'Calibri',sans-serif;"><b>Hypertension : </b>` + diseaserisk_data[i]?.hypertension; + '</li>';
+                bodyhtml += `<li style="font-family:'Calibri',sans-serif;"><b>Respiratory : </b>` + diseaserisk_data[i]?.respiratory; + '</li>';
+                bodyhtml += `<li style="font-family:'Calibri',sans-serif;"><b>CHD : </b>` + diseaserisk_data[i]?.chd; + '</li>';
+                bodyhtml += `<li style="font-family:'Calibri',sans-serif;"><b>CVD : </b>` + diseaserisk_data[i]?.cvd; + '</li>';
+                bodyhtml += `<li style="font-family:'Calibri',sans-serif;"><b>Kidney : </b>` + diseaserisk_data[i]?.kidney; + '</li>';
+                bodyhtml += '</ul>';
+            }
+        }
+        if (content.content != null) {
+            bodyhtml += `<p style="font-family:'Calibri',sans-serif;margin-bottom : 0;margin-top:3rem;font-size:14px"><b>Vital Parameters</b></p>`
             for (let i = 0; i < scan_data.length; i++) {
-                bodyhtml += `<ul style="font-family:'Calibri',sans-serif; font-size:12px">` ;
+                bodyhtml += `<ul style="font-family:'Calibri',sans-serif; font-size:12px">`;
                 bodyhtml += `<li style="font-family:'Calibri',sans-serif;"><b>Heart Rate : </b>` + scan_data[i]?.heart_rate; + '</li>';
                 bodyhtml += `<li style="font-family:'Calibri',sans-serif;"><b>Blood Pressure : </b>` + scan_data[i]?.bp; + '</li>';
                 bodyhtml += `<li style="font-family:'Calibri',sans-serif;"><b>BMI : </b>` + scan_data[i]?.bmi; + '</li>';
-            if(scan_data[i].smoking != null){
-                bodyhtml += `<li style="font-family:'Calibri',sans-serif;"><b>Smoker (Beta) : </b>` + scan_data[i]?.smoking; + '</li>';
-            }
+                if (scan_data[i].smoking != null) {
+                    bodyhtml += `<li style="font-family:'Calibri',sans-serif;"><b>Smoker (Beta) : </b>` + scan_data[i]?.smoking; + '</li>';
+                }
                 bodyhtml += `<li style="font-family:'Calibri',sans-serif;"><b>Stress (SNS) : </b>` + scan_data[i]?.stress; + '</li>';
                 bodyhtml += `<li style="font-family:'Calibri',sans-serif;"><b>SPO2 : </b>` + scan_data[i]?.blood_oxygen; + '</li>';
                 bodyhtml += `<li style="font-family:'Calibri',sans-serif;"><b>HRV-SDNN : </b>` + scan_data[i]?.hrv; + '</li>';
@@ -1476,14 +1481,16 @@ export class TemplateService {
                 bodyhtml += `<li style="font-family:'Calibri',sans-serif;"><b>Random Blood Sugar (Beta) : </b>` + scan_data[i]?.rbs; + '</li>';
                 bodyhtml += `<li style="font-family:'Calibri',sans-serif;"><b>Haemoglobin (Beta) : </b>` + scan_data[i]?.hb; + '</li>';
                 bodyhtml += '</ul>';
-            }}
-            if(content.is_questioannire != null){
-                bodyhtml +=  `<p style="font-family:'Calibri',sans-serif;margin-bottom : 0;margin-top:3rem;font-size:14px"><b>Additional Questionnaire</b></p>`
-                for (let i = 0; i < questionnaire_data.length; i++) {
-                    bodyhtml += `<p style="font-family:'Calibri',sans-serif; font-size:12px">` + `<b>[Q${i+1}] ` +questionnaire_data[i]?.question + `</b><br><span style="font-size:12px">[Ans] `+ questionnaire_data[i]?.answer + `</span></p>`;
-                }}
-                
-                bodyhtml += `<p style="font-family:'Calibri',sans-serif;margin-top:3rem; font-size:14px"><b>Disclaimer</b> </p>
+            }
+        }
+        if (content.is_questioannire != null) {
+            bodyhtml += `<p style="font-family:'Calibri',sans-serif;margin-bottom : 0;margin-top:3rem;font-size:14px"><b>Additional Questionnaire</b></p>`
+            for (let i = 0; i < questionnaire_data.length; i++) {
+                bodyhtml += `<p style="font-family:'Calibri',sans-serif; font-size:12px">` + `<b>[Q${i + 1}] ` + questionnaire_data[i]?.question + `</b><br><span style="font-size:12px">[Ans] ` + questionnaire_data[i]?.answer + `</span></p>`;
+            }
+        }
+
+        bodyhtml += `<p style="font-family:'Calibri',sans-serif;margin-top:3rem; font-size:14px"><b>Disclaimer</b> </p>
                 <p style="font-family:'Calibri',sans-serif; font-size:10px">THIS IS NOT A MEDICAL DIAGNOSTIC DEVICE OR A REPLACEMENT FOR MEDICAL DIAGNOSTIC DEVICES.<br><br>
                 
                 We do not share your personal information with any third parties for commercial use or revenue generation. Personal Information provided by You is used by Us to improve our Products, Platforms and/or Services or for your information purposes only.<br><br>
@@ -1494,146 +1501,155 @@ export class TemplateService {
                 </p>
                 <br>
                 <hr style="border-top: dotted 1px;width : 25%" />`
-                
-                let file =  bodyhtml ;
-                return new Promise ((accept,reject)=>{htmlpdf.create(file, options,{handlebars : true}).then(pdfBuffer => {
-                    // if (err) reject(err);
-                    console.log("PDF Buffer:-", pdfBuffer);
-                    
-                    const message = [
-                        'From: noreply@fedo.ai',
-                        `To: ${content.organisation_admin_email}`,
-                        'Subject: Your Health Report from Fedo Vitals',
-                        'MIME-Version: 1.0',
-                        'Content-Type: multipart/mixed; boundary="boundary"',
-                        '',
-                        '--boundary',
-                        'Content-Type: text/plain',
-                        `Content-Transfer-Encoding: base64`,
-                        '',
-                        '',
-                        '--boundary',
-                        `Content-Disposition: attachment; filename="${name}"`,
-                        'Content-Type: application/pdf',
-                        `Content-Transfer-Encoding: base64`,
-                        `${pdfBuffer.toString('base64')}`,
-                        'Please find the attached PDF.',
-                        'Content-Type: text/plain',
-                        `Content-Transfer-Encoding: base64`,
-                    ].join('\n');
-              accept(new Promise((resolve , rejects)=>{return this.upload(pdfBuffer,name).then(doc =>{
-                
-                  resolve(lastValueFrom(this.http.post(`${AWS_COGNITO_SMS_COGNITO_URL_SIT_ADMIN_PANEL}`, { Message : `Hey ${content.organisation_admin_name.split(" ", 2)[0]}, your Health Report from Fedo ${doc}`, PhoneNumber : content.organisation_admin_mobile , Subject : "String" })).then(res=>doc));
-                  
-                }),
-                (error) => {
-                    rejects(error)
-                    console.log(`onRejected function called: ${error.message}`);
-                }
-            }).then(res=>res)
-            )
-        });})
+
+        let file = bodyhtml;
+        return new Promise((accept, reject) => {
+            htmlpdf.create(file, options, { handlebars: true }).then(pdfBuffer => {
+                // if (err) reject(err);
+                console.log("PDF Buffer:-", pdfBuffer);
+
+                const message = [
+                    'From: noreply@fedo.ai',
+                    `To: ${content.organisation_admin_email}`,
+                    'Subject: Your Health Report from Fedo Vitals',
+                    'MIME-Version: 1.0',
+                    'Content-Type: multipart/mixed; boundary="boundary"',
+                    '',
+                    '--boundary',
+                    'Content-Type: text/plain',
+                    `Content-Transfer-Encoding: base64`,
+                    '',
+                    '',
+                    '--boundary',
+                    `Content-Disposition: attachment; filename="${name}"`,
+                    'Content-Type: application/pdf',
+                    `Content-Transfer-Encoding: base64`,
+                    `${pdfBuffer.toString('base64')}`,
+                    'Please find the attached PDF.',
+                    'Content-Type: text/plain',
+                    `Content-Transfer-Encoding: base64`,
+                ].join('\n');
+                accept(new Promise((resolve, rejects) => {
+                    return this.upload(pdfBuffer, name).then(doc => {
+
+                        resolve(lastValueFrom(this.http.post(`${AWS_COGNITO_SMS_COGNITO_URL_SIT_ADMIN_PANEL}`, { Message: `Hey ${content.organisation_admin_name.split(" ", 2)[0]}, your Health Report from Fedo ${doc}`, PhoneNumber: content.organisation_admin_mobile, Subject: "String" })).then(res => doc));
+
+                    }),
+                        (error) => {
+                            rejects(error)
+                            console.log(`onRejected function called: ${error.message}`);
+                        }
+                }).then(res => res)
+                )
+            });
+        })
     }
-        
-        async sendEmailToKioskUserWithVitalsData( content: sendEmailOnCreationOfOrgAndUser) {
+
+    async sendEmailToKioskUserWithVitalsData(content: sendEmailOnCreationOfOrgAndUser) {
         Logger.debug(`sendEmailWithVitalsData(), DTO: ${JSON.stringify(content)}`, APP);
-        
+
         // var html_to_pdf = require('html-pdf-node');
-        let options = { format: 'A4' ,
-        margin: {
-            top: '2cm',
-            right: '2cm',
-            bottom: '2cm',
-            left: '2cm'
-          },
-          displayHeaderFooter: true,
-          footerTemplate: `
+        let options = {
+            format: 'A4',
+            margin: {
+                top: '2cm',
+                right: '2cm',
+                bottom: '2cm',
+                left: '2cm'
+            },
+            displayHeaderFooter: true,
+            footerTemplate: `
           <div style="font-size: 12px; text-align: center; {{#isLastPage}}position: absolute; bottom: 0; width: 100%;{{/isLastPage}}">
 
             Powered by Fedo.Ai
         </div>
         `};
-        var currentdate = new Date(); 
+        var currentdate = new Date();
         currentdate.setMinutes(currentdate.getMinutes() + 330);
-        var scanDate = 
-                 currentdate.getFullYear().toString() 
-                + (currentdate.getMonth()+1).toString()  + 
-                currentdate.getDate().toString() + '-'+
-                 currentdate.getHours().toString() +
-                 currentdate.getMinutes().toString() + 
-                 currentdate.getSeconds().toString();
-        var name = content.org_id +'-'+ content.customer_id +'-'+ content.scan_id +'-'+ scanDate + '.pdf'
+        var scanDate =
+            currentdate.getFullYear().toString()
+            + (currentdate.getMonth() + 1).toString() +
+            currentdate.getDate().toString() + '-' +
+            currentdate.getHours().toString() +
+            currentdate.getMinutes().toString() +
+            currentdate.getSeconds().toString();
+        var name = content.org_id + '-' + content.customer_id + '-' + content.scan_id + '-' + scanDate + '.pdf'
         var datetime = currentdate.getDate() + "/"
-                + (currentdate.getMonth()+1)  + "/" 
-                + currentdate.getFullYear() + " @ "  
-                + currentdate.getHours() + ":"  
-                + currentdate.getMinutes() + ":" 
-                + currentdate.getSeconds();
+            + (currentdate.getMonth() + 1) + "/"
+            + currentdate.getFullYear() + " @ "
+            + currentdate.getHours() + ":"
+            + currentdate.getMinutes() + ":"
+            + currentdate.getSeconds();
         const ses = new AWS.SES({ apiVersion: '2010-12-01' });
-        var scan_data = (new Function("return [" + content.content+ "];")());
-        var fedoscore_data = (new Function("return [" + content.fedoscore_content+ "];")());
-        var riskclassification_data = (new Function("return [" + content.riskclassification_content+ "];")());
-        var diseaserisk_data = (new Function("return [" + content.diseaserisk_content+ "];")());
-        var questionnaire_data = (new Function("return [" + content.is_questioannire+ "];")());
+        var scan_data = (new Function("return [" + content.content + "];")());
+        var fedoscore_data = (new Function("return [" + content.fedoscore_content + "];")());
+        var riskclassification_data = (new Function("return [" + content.riskclassification_content + "];")());
+        var diseaserisk_data = (new Function("return [" + content.diseaserisk_content + "];")());
+        var questionnaire_data = (new Function("return [" + content.is_questioannire + "];")());
         let bodyhtml = `<html lang="en"> 
         <head> <link href="https://fonts.googleapis.com/css?family=Calibri:400,700&display=swap" rel="stylesheet" type="text/css"></head> 
         <body style="font-family:'Calibri',sans-serif;">
            <div style="display: grid;">
            <div style="display:block"><img style="height: 3rem;" src="https://fedo-vitals.s3.ap-south-1.amazonaws.com/MicrosoftTeams-image.png">`
-           if(content.logo != null){
-           bodyhtml+= `<img style="    width: 3rem;
+        if (content.logo != null) {
+            bodyhtml += `<img style="    width: 3rem;
            margin-left: 1rem;" src="${content.logo}">`
-}
-bodyhtml+= `</div>
+        }
+        bodyhtml += `</div>
 <p style="font-size:28px">Health Report of <b>${content.organisation_admin_name}</b><br><span style="font-size:14px"><b>Date: </b>${datetime} <br><hr style="width : 100%" /><br><b>Personal Information</b></span><span style="font-size:12px"><b>Age</b> : ${content.age}<br><b>Gender</b> : ${content.gender}<br> <b>Application Number</b> : ${content.application_id}</span></p>
 </div>
 </body> 
 </html>`
-if(content.fedoscore_content != null){
-    for (let i = 0; i < fedoscore_data.length ; i++) {
-        bodyhtml += `<p style="font-family:'Calibri',sans-serif; font-size:14px;margin-top:1.5rem">` + `<b>Fedo Score</b> <br><b><span style="font-size:20px">` +fedoscore_data[i]?.fedo_score + `</span><br><span style="font-size:12px">What does this score mean?</b></span><br><span style="font-size:12px">`+ fedoscore_data[i]?.condition + `</span></p>`;
-     }}
-     if(content.riskclassification_content != null){
-         for (let i = 0; i < riskclassification_data.length ; i++) {
-             bodyhtml += `<p style="font-family:'Calibri',sans-serif;font-size:14px;margin-top:3rem">` + `<b>Risk Category</b> <br> <span style="font-size:12px">` + riskclassification_data[i]?.condition + `</span></p>`;
-         }}
-         if(content.diseaserisk_content != null){
-             bodyhtml +=  `<p style="font-family:'Calibri',sans-serif;margin-bottom : 0;margin-top:3rem; font-size:14px"><b>Diseases Risks Prediction</b></p>`
-             for (let i = 0; i < diseaserisk_data.length; i++) {
-                 bodyhtml += `<ul style="font-family:'Calibri',sans-serif;font-size:12px">` ;
-                 bodyhtml += `<li style="font-family:'Calibri',sans-serif;"><b>Diabetes : </b>` + diseaserisk_data[i]?.diabetes; + '</li>';
-                 bodyhtml += `<li style="font-family:'Calibri',sans-serif;"><b>Hypertension : </b>` + diseaserisk_data[i]?.hypertension; + '</li>';
-                 bodyhtml += `<li style="font-family:'Calibri',sans-serif;"><b>Respiratory : </b>` + diseaserisk_data[i]?.respiratory; + '</li>';
-                 bodyhtml += `<li style="font-family:'Calibri',sans-serif;"><b>CHD : </b>` + diseaserisk_data[i]?.chd; + '</li>';
-                 bodyhtml += `<li style="font-family:'Calibri',sans-serif;"><b>CVD : </b>` + diseaserisk_data[i]?.cvd; + '</li>';
-                 bodyhtml += `<li style="font-family:'Calibri',sans-serif;"><b>Kidney : </b>` + diseaserisk_data[i]?.kidney; + '</li>';
-                 bodyhtml += '</ul>';
-             }}
-             if(content.content != null){
-                 bodyhtml +=  `<p style="font-family:'Calibri',sans-serif;margin-bottom : 0;margin-top:3rem;font-size:14px"><b>Vital Parameters</b></p>`
- for (let i = 0; i < scan_data.length; i++) {
-     bodyhtml += `<ul style="font-family:'Calibri',sans-serif; font-size:12px">` ;
-     bodyhtml += `<li style="font-family:'Calibri',sans-serif;"><b>Heart Rate : </b>` + scan_data[i]?.heart_rate; + '</li>';
-     bodyhtml += `<li style="font-family:'Calibri',sans-serif;"><b>Blood Pressure : </b>` + scan_data[i]?.bp; + '</li>';
-     bodyhtml += `<li style="font-family:'Calibri',sans-serif;"><b>BMI : </b>` + scan_data[i]?.bmi; + '</li>';
- if(scan_data[i].smoking != null){
-     bodyhtml += `<li style="font-family:'Calibri',sans-serif;"><b>Smoker (Beta) : </b>` + scan_data[i]?.smoking; + '</li>';
- }
-     bodyhtml += `<li style="font-family:'Calibri',sans-serif;"><b>Stress (SNS) : </b>` + scan_data[i]?.stress; + '</li>';
-     bodyhtml += `<li style="font-family:'Calibri',sans-serif;"><b>SPO2 : </b>` + scan_data[i]?.blood_oxygen; + '</li>';
-     bodyhtml += `<li style="font-family:'Calibri',sans-serif;"><b>HRV-SDNN : </b>` + scan_data[i]?.hrv; + '</li>';
-     bodyhtml += `<li style="font-family:'Calibri',sans-serif;"><b>Respiration Rate : </b>` + scan_data[i]?.respiration; + '</li>';
-     bodyhtml += `<li style="font-family:'Calibri',sans-serif;"><b>Random Blood Sugar (Beta) : </b>` + scan_data[i]?.rbs; + '</li>';
-     bodyhtml += `<li style="font-family:'Calibri',sans-serif;"><b>Haemoglobin (Beta) : </b>` + scan_data[i]?.hb; + '</li>';
-     bodyhtml += '</ul>';
- }}
- if(content.is_questioannire != null){
-     bodyhtml +=  `<p style="font-family:'Calibri',sans-serif;margin-bottom : 0;margin-top:3rem;font-size:14px"><b>Additional Questionnaire</b></p>`
-     for (let i = 0; i < questionnaire_data.length; i++) {
-         bodyhtml += `<p style="font-family:'Calibri',sans-serif; font-size:12px">` + `<b>[Q${i+1}] ` +questionnaire_data[i]?.question + `</b><br><span style="font-size:12px">[Ans] `+ questionnaire_data[i]?.answer + `</span></p>`;
-     }}
-     
-     bodyhtml += `<p style="font-family:'Calibri',sans-serif;margin-top:3rem; font-size:14px"><b>Disclaimer</b> </p>
+        if (content.fedoscore_content != null) {
+            for (let i = 0; i < fedoscore_data.length; i++) {
+                bodyhtml += `<p style="font-family:'Calibri',sans-serif; font-size:14px;margin-top:1.5rem">` + `<b>Fedo Score</b> <br><b><span style="font-size:20px">` + fedoscore_data[i]?.fedo_score + `</span><br><span style="font-size:12px">What does this score mean?</b></span><br><span style="font-size:12px">` + fedoscore_data[i]?.condition + `</span></p>`;
+            }
+        }
+        if (content.riskclassification_content != null) {
+            for (let i = 0; i < riskclassification_data.length; i++) {
+                bodyhtml += `<p style="font-family:'Calibri',sans-serif;font-size:14px;margin-top:3rem">` + `<b>Risk Category</b> <br> <span style="font-size:12px">` + riskclassification_data[i]?.condition + `</span></p>`;
+            }
+        }
+        if (content.diseaserisk_content != null) {
+            bodyhtml += `<p style="font-family:'Calibri',sans-serif;margin-bottom : 0;margin-top:3rem; font-size:14px"><b>Diseases Risks Prediction</b></p>`
+            for (let i = 0; i < diseaserisk_data.length; i++) {
+                bodyhtml += `<ul style="font-family:'Calibri',sans-serif;font-size:12px">`;
+                bodyhtml += `<li style="font-family:'Calibri',sans-serif;"><b>Diabetes : </b>` + diseaserisk_data[i]?.diabetes; + '</li>';
+                bodyhtml += `<li style="font-family:'Calibri',sans-serif;"><b>Hypertension : </b>` + diseaserisk_data[i]?.hypertension; + '</li>';
+                bodyhtml += `<li style="font-family:'Calibri',sans-serif;"><b>Respiratory : </b>` + diseaserisk_data[i]?.respiratory; + '</li>';
+                bodyhtml += `<li style="font-family:'Calibri',sans-serif;"><b>CHD : </b>` + diseaserisk_data[i]?.chd; + '</li>';
+                bodyhtml += `<li style="font-family:'Calibri',sans-serif;"><b>CVD : </b>` + diseaserisk_data[i]?.cvd; + '</li>';
+                bodyhtml += `<li style="font-family:'Calibri',sans-serif;"><b>Kidney : </b>` + diseaserisk_data[i]?.kidney; + '</li>';
+                bodyhtml += '</ul>';
+            }
+        }
+        if (content.content != null) {
+            bodyhtml += `<p style="font-family:'Calibri',sans-serif;margin-bottom : 0;margin-top:3rem;font-size:14px"><b>Vital Parameters</b></p>`
+            for (let i = 0; i < scan_data.length; i++) {
+                bodyhtml += `<ul style="font-family:'Calibri',sans-serif; font-size:12px">`;
+                bodyhtml += `<li style="font-family:'Calibri',sans-serif;"><b>Heart Rate : </b>` + scan_data[i]?.heart_rate; + '</li>';
+                bodyhtml += `<li style="font-family:'Calibri',sans-serif;"><b>Blood Pressure : </b>` + scan_data[i]?.bp; + '</li>';
+                bodyhtml += `<li style="font-family:'Calibri',sans-serif;"><b>BMI : </b>` + scan_data[i]?.bmi; + '</li>';
+                if (scan_data[i].smoking != null) {
+                    bodyhtml += `<li style="font-family:'Calibri',sans-serif;"><b>Smoker (Beta) : </b>` + scan_data[i]?.smoking; + '</li>';
+                }
+                bodyhtml += `<li style="font-family:'Calibri',sans-serif;"><b>Stress (SNS) : </b>` + scan_data[i]?.stress; + '</li>';
+                bodyhtml += `<li style="font-family:'Calibri',sans-serif;"><b>SPO2 : </b>` + scan_data[i]?.blood_oxygen; + '</li>';
+                bodyhtml += `<li style="font-family:'Calibri',sans-serif;"><b>HRV-SDNN : </b>` + scan_data[i]?.hrv; + '</li>';
+                bodyhtml += `<li style="font-family:'Calibri',sans-serif;"><b>Respiration Rate : </b>` + scan_data[i]?.respiration; + '</li>';
+                bodyhtml += `<li style="font-family:'Calibri',sans-serif;"><b>Random Blood Sugar (Beta) : </b>` + scan_data[i]?.rbs; + '</li>';
+                bodyhtml += `<li style="font-family:'Calibri',sans-serif;"><b>Haemoglobin (Beta) : </b>` + scan_data[i]?.hb; + '</li>';
+                bodyhtml += '</ul>';
+            }
+        }
+        if (content.is_questioannire != null) {
+            bodyhtml += `<p style="font-family:'Calibri',sans-serif;margin-bottom : 0;margin-top:3rem;font-size:14px"><b>Additional Questionnaire</b></p>`
+            for (let i = 0; i < questionnaire_data.length; i++) {
+                bodyhtml += `<p style="font-family:'Calibri',sans-serif; font-size:12px">` + `<b>[Q${i + 1}] ` + questionnaire_data[i]?.question + `</b><br><span style="font-size:12px">[Ans] ` + questionnaire_data[i]?.answer + `</span></p>`;
+            }
+        }
+
+        bodyhtml += `<p style="font-family:'Calibri',sans-serif;margin-top:3rem; font-size:14px"><b>Disclaimer</b> </p>
      <p style="font-family:'Calibri',sans-serif; font-size:10px">THIS IS NOT A MEDICAL DIAGNOSTIC DEVICE OR A REPLACEMENT FOR MEDICAL DIAGNOSTIC DEVICES.<br><br>
      
      We do not share your personal information with any third parties for commercial use or revenue generation. Personal Information provided by You is used by Us to improve our Products, Platforms and/or Services or for your information purposes only.<br><br>
@@ -1645,23 +1661,24 @@ if(content.fedoscore_content != null){
      <br>
      <hr style="border-top: dotted 1px;width : 25%" />`
 
-            
-          let file =  bodyhtml ;
-          return new Promise((resolve1,rejects) =>{htmlpdf.create(file, options,{ handlebars: true }).then(pdfBuffer => {
-            // if (err) rejects(err);
-            
-            const message = [
-                'From: noreply@fedo.ai',
-                `To: ${content.organisation_admin_email}`,
-                'Subject: Health Report from Fedo Vitals',
-                'MIME-Version: 1.0',
-                'Content-Type: multipart/mixed; boundary="boundary"',
-                '',
-                '--boundary',
-                `Content-Type: text/html; charset=UTF-8`,
-                'Content-Transfer-Encoding: quoted-printable',
-                '',
-                `<html lang="en"> 
+
+        let file = bodyhtml;
+        return new Promise((resolve1, rejects) => {
+            htmlpdf.create(file, options, { handlebars: true }).then(pdfBuffer => {
+                // if (err) rejects(err);
+
+                const message = [
+                    'From: noreply@fedo.ai',
+                    `To: ${content.organisation_admin_email}`,
+                    'Subject: Health Report from Fedo Vitals',
+                    'MIME-Version: 1.0',
+                    'Content-Type: multipart/mixed; boundary="boundary"',
+                    '',
+                    '--boundary',
+                    `Content-Type: text/html; charset=UTF-8`,
+                    'Content-Transfer-Encoding: quoted-printable',
+                    '',
+                    `<html lang="en"> 
                 <head> <link href="https://fonts.googleapis.com/css?family=Calibri:400,700&display=swap" rel="stylesheet" type="text/css">
                 <style>
                   body {
@@ -1682,89 +1699,92 @@ if(content.fedoscore_content != null){
                     </div>
                    </body>
                    </html>`,
-                '',
-                '--boundary',
+                    '',
+                    '--boundary',
 
-                `Content-Disposition: attachment; filename="${name}"`,
-                'Content-Type: application/pdf',
-                `Content-Transfer-Encoding: base64`,
-                `${pdfBuffer.toString('base64')}`,
-                '',
-                '--boundary--'
-              ].join('\n');
-              resolve1(
-                 new Promise((resolve,rejects)  =>{ ses.sendRawEmail({ RawMessage: { Data: message } }, async (err, data) => {
-                if (err) rejects(err) 
-                resolve(await this.upload(pdfBuffer,name));
-                
-              });}).then(res=>res))
-          })})
-          
+                    `Content-Disposition: attachment; filename="${name}"`,
+                    'Content-Type: application/pdf',
+                    `Content-Transfer-Encoding: base64`,
+                    `${pdfBuffer.toString('base64')}`,
+                    '',
+                    '--boundary--'
+                ].join('\n');
+                resolve1(
+                    new Promise((resolve, rejects) => {
+                        ses.sendRawEmail({ RawMessage: { Data: message } }, async (err, data) => {
+                            if (err) rejects(err)
+                            resolve(await this.upload(pdfBuffer, name));
+
+                        });
+                    }).then(res => res))
+            })
+        })
+
     }
 
     async sendEmail(toAddress: string, attachments?: any): Promise<SES.SendEmailResponse> {
         const params: SES.SendRawEmailRequest = {
-          RawMessage: {
-            Data: this.createRawEmail( toAddress, attachments)
-          }
+            RawMessage: {
+                Data: this.createRawEmail(toAddress, attachments)
+            }
         };
-    
+
         return this.ses.sendRawEmail(params).promise();
-      }
+    }
 
 
-      private createRawEmail(toAddress: string, attachments?: any): string {
+    private createRawEmail(toAddress: string, attachments?: any): string {
         const boundary = 'boundary_' + Date.now().toString();
         const messageParts = [
-          `From: noreply@fedo.ai`,
-          `To: ${attachments.toAddress}`,
-          `Subject: The video file`,
-          `MIME-Version: 1.0`,
-          `Content-Type: multipart/mixed; boundary="${boundary}"`,
-          '',
-          `--${boundary}`,
-          `Content-Type: text/html; charset=utf-8`,
-          `Content-Transfer-Encoding: base64`,
-          '',
-          `Video file is below`
+            `From: noreply@fedo.ai`,
+            `To: ${attachments.toAddress}`,
+            `Subject: The video file`,
+            `MIME-Version: 1.0`,
+            `Content-Type: multipart/mixed; boundary="${boundary}"`,
+            '',
+            `--${boundary}`,
+            `Content-Type: text/html; charset=utf-8`,
+            `Content-Transfer-Encoding: base64`,
+            '',
+            `Video file is below`
         ];
         console.log("here")
-    
+
         if (attachments) {
-        //   attachments.forEach((attachment) => {
+            //   attachments.forEach((attachment) => {
             messageParts.push(
-              `--${boundary}`,
-              `Content-Type: application/pdf`,
-              `Content-Disposition: attachments; filename="${attachments.originalname}"`,
-              `Content-Transfer-Encoding: base64`,
-              '',
-              `${attachments.buffer.toString('base64')}`
+                `--${boundary}`,
+                `Content-Type: application/pdf`,
+                `Content-Disposition: attachments; filename="${attachments.originalname}"`,
+                `Content-Transfer-Encoding: base64`,
+                '',
+                `${attachments.buffer.toString('base64')}`
             );
-        //   });
+            //   });
         }
-    
+
         messageParts.push(`--${boundary}--`, '');
-    
+
         return messageParts.join('\r\n');
-      }
+    }
 
 
-      sendEmailOnWebSocketFailure( content: sendEmailOnCreationOfOrgAndUser) {
+    sendEmailOnWebSocketFailure(content: sendEmailOnCreationOfOrgAndUser) {
         Logger.debug(`sendEmailOnWebSocketFailure(), DTO: ${JSON.stringify(content)}`, APP);
 
-        var currentdate = new Date(); 
+        var currentdate = new Date();
         currentdate.setMinutes(currentdate.getMinutes() + 330);
         var datetime = currentdate.getDate() + "/"
-                + (currentdate.getMonth()+1)  + "/" 
-                + currentdate.getFullYear() + " @ "  
-                + currentdate.getHours() + ":"  
-                + currentdate.getMinutes() + ":" 
-                + currentdate.getSeconds();
+            + (currentdate.getMonth() + 1) + "/"
+            + currentdate.getFullYear() + " @ "
+            + currentdate.getHours() + ":"
+            + currentdate.getMinutes() + ":"
+            + currentdate.getSeconds();
 
         const ses = new AWS.SES({ apiVersion: '2010-12-01' });
         const params = {
             Destination: {
-                ToAddresses: [SES_SOURCE_HELLO_FEDO_EMAIL,SES_SOURCE_DEV_SUPPORT_FEDO_EMAIL]
+                ToAddresses: [SES_SOURCE_HELLO_FEDO_EMAIL, SES_SOURCE_DEV_SUPPORT_FEDO_EMAIL]
             },
             Source: SES_SOURCE_NO_REPLY_EMAIL,
             Message: {
@@ -1806,63 +1826,63 @@ if(content.fedoscore_content != null){
         return this.sendMailAsPromised(params, ses)
     }
 
-    async upload(file,name) {
+    async upload(file, name) {
         const bucketS3 = 'fedo-vitals';
-        return this.uploadS3(file, bucketS3, name).then(res=>{console.log("resdsdf",res);return res});
-      }
-      
-      async uploadS3(file, bucket, name) {
+        return this.uploadS3(file, bucketS3, name).then(res => { console.log("resdsdf", res); return res });
+    }
+
+    async uploadS3(file, bucket, name) {
         const s3 = this.getS3();
-      
+
         const params = {
-          Bucket: bucket,
-          Key: String(name),
-          Body: file,
-          acl: 'public',
-          ContentType : 'application/pdf',
-          ContentDisposition : 'inline'
-      
-      
+            Bucket: bucket,
+            Key: String(name),
+            Body: file,
+            acl: 'public',
+            ContentType: 'application/pdf',
+            ContentDisposition: 'inline'
+
+
         };
-      
-      
+
+
         return new Promise((resolve, reject) => {
-        s3.upload(params, (err, data) => {
-            if (err) {
-              Logger.error(err);
-              reject(err.message);
-            }
-            else{
-            const url = s3.getSignedUrl('getObject', {
-              Bucket: 'fedo-vitals',
-              Key: String(name)
-            })
-      
-            resolve(data.Location);
-            console.log("essa",data.Location)
-          }
-          });
+            s3.upload(params, (err, data) => {
+                if (err) {
+                    Logger.error(err);
+                    reject(err.message);
+                }
+                else {
+                    const url = s3.getSignedUrl('getObject', {
+                        Bucket: 'fedo-vitals',
+                        Key: String(name)
+                    })
+
+                    resolve(data.Location);
+                    console.log("essa", data.Location)
+                }
+            });
         }).then((next) => {
-      
-        return next;
+
+            return next;
         },
-        (error) => {
-        //  throw new NotFoundException(error)
-        });
-      }
-      
-      getS3() {
+            (error) => {
+                //  throw new NotFoundException(error)
+            });
+    }
+
+    getS3() {
         return new S3({
-          accessKeyId: AWS_ACCESS_KEY_ID,
-      
-          secretAccessKey: AWS_SECRET_ACCESS_KEY,
+            accessKeyId: AWS_ACCESS_KEY_ID,
+
+            secretAccessKey: AWS_SECRET_ACCESS_KEY,
         });
-      }
-    
-    
+    }
+
+
 }
 
 interface Attachment {
     filename: string;
-  content: Buffer;
-  }
+    content: Buffer;
+}
