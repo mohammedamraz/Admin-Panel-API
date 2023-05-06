@@ -1408,7 +1408,7 @@ export class TemplateService {
         </div>
         `};
         var currentdate = new Date();
-        currentdate.setMinutes(currentdate.getMinutes() + 330);
+        
         var scanDate =
             currentdate.getFullYear().toString()
             + (currentdate.getMonth() + 1).toString() +
