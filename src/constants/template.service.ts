@@ -1468,18 +1468,18 @@ export class TemplateService {
             bodyhtml += `<p style="font-family:'Calibri',sans-serif;margin-bottom : 0;margin-top:3rem;font-size:14px"><b>Vital Parameters</b></p>`
             for (let i = 0; i < scan_data.length; i++) {
                 bodyhtml += `<ul style="font-family:'Calibri',sans-serif; font-size:12px">`;
-                bodyhtml += `<li style="font-family:'Calibri',sans-serif;"><b>Heart Rate : </b>` + scan_data[i]?.heart_rate; + '</li>';
-                bodyhtml += `<li style="font-family:'Calibri',sans-serif;"><b>Blood Pressure : </b>` + scan_data[i]?.bp; + '</li>';
-                bodyhtml += `<li style="font-family:'Calibri',sans-serif;"><b>BMI : </b>` + scan_data[i]?.bmi; + '</li>';
+                bodyhtml += `<li style="font-family:'Calibri',sans-serif;"><b>Heart Rates : </b>` + scan_data[i]?.heart_rate + ` [Ref: 60 - 90 bpm]` + '</li>';
+                bodyhtml += `<li style="font-family:'Calibri',sans-serif;"><b>Blood Pressure : </b>` + scan_data[i]?.bp + ' [Ref: systolic: 120 - 139 mm Hg diastolic: 80 - 89 mm Hg]' + '</li>';
+                bodyhtml += `<li style="font-family:'Calibri',sans-serif;"><b>BMI : </b>` + scan_data[i]?.bmi + ' [Ref: 18.5 - 24.9 bpm]' + '</li>';
                 if (scan_data[i].smoking != null) {
                     bodyhtml += `<li style="font-family:'Calibri',sans-serif;"><b>Smoker (Beta) : </b>` + scan_data[i]?.smoking; + '</li>';
                 }
                 bodyhtml += `<li style="font-family:'Calibri',sans-serif;"><b>Stress (SNS) : </b>` + scan_data[i]?.stress; + '</li>';
-                bodyhtml += `<li style="font-family:'Calibri',sans-serif;"><b>SPO2 : </b>` + scan_data[i]?.blood_oxygen; + '</li>';
-                bodyhtml += `<li style="font-family:'Calibri',sans-serif;"><b>HRV-SDNN : </b>` + scan_data[i]?.hrv; + '</li>';
-                bodyhtml += `<li style="font-family:'Calibri',sans-serif;"><b>Respiration Rate : </b>` + scan_data[i]?.respiration; + '</li>';
-                bodyhtml += `<li style="font-family:'Calibri',sans-serif;"><b>Random Blood Sugar (Beta) : </b>` + scan_data[i]?.rbs; + '</li>';
-                bodyhtml += `<li style="font-family:'Calibri',sans-serif;"><b>Haemoglobin (Beta) : </b>` + scan_data[i]?.hb; + '</li>';
+                bodyhtml += `<li style="font-family:'Calibri',sans-serif;"><b>SPO2 : </b>` + scan_data[i]?.blood_oxygen + ' [Ref: 95 - 99 % bpm]' + '</li>';
+                bodyhtml += `<li style="font-family:'Calibri',sans-serif;"><b>HRV-SDNN : </b>` + scan_data[i]?.hrv + ' [Ref: greater than 100]' + '</li>';
+                bodyhtml += `<li style="font-family:'Calibri',sans-serif;"><b>Respiration Rate : </b>` + scan_data[i]?.respiration + ' [Ref:  12 to 18 breaths per minute]' + '</li>';
+                bodyhtml += `<li style="font-family:'Calibri',sans-serif;"><b>Random Blood Sugar (Beta) : </b>` + scan_data[i]?.rbs + ' [Ref: 100 - 170 mg/dL]' + '</li>';
+                bodyhtml += `<li style="font-family:'Calibri',sans-serif;"><b>Haemoglobin (Beta) : </b>` + scan_data[i]?.hb + ' [Ref: 14 to 18 g/dl (Male) 12 to 16 g/dl (Female)]' + '</li>';
                 bodyhtml += '</ul>';
             }
         }
@@ -1488,6 +1488,12 @@ export class TemplateService {
             for (let i = 0; i < questionnaire_data.length; i++) {
                 bodyhtml += `<p style="font-family:'Calibri',sans-serif; font-size:12px">` + `<b>[Q${i + 1}] ` + questionnaire_data[i]?.question + `</b><br><span style="font-size:12px">[Ans] ` + questionnaire_data[i]?.answer + `</span></p>`;
             }
+        }
+        if(content.is_milvik == true){
+            bodyhtml += `<ul style="font-family:'Calibri',sans-serif;margin-top:3rem; font-size:14px">Please be advised that for doctors consultations, contact us at the following channels:
+            <li style="font-family:'Calibri',sans-serif; font-size:12px">Mobile Number: <b>+918069088088</b></li>
+            <li style="font-family:'Calibri',sans-serif; font-size:12px">WhatsApp Number: <b>+916291075616</b></li>
+            </ul>`
         }
 
         bodyhtml += `<p style="font-family:'Calibri',sans-serif;margin-top:3rem; font-size:14px"><b>Disclaimer</b> </p>
@@ -1532,7 +1538,7 @@ export class TemplateService {
                 accept(new Promise((resolve, rejects) => {
                     return this.upload(pdfBuffer, name).then(doc => {
 
-                        resolve(lastValueFrom(this.http.post(`${AWS_COGNITO_SMS_COGNITO_URL_SIT_ADMIN_PANEL}`, { Message: `Hey ${content.organisation_admin_name.split(" ", 2)[0]}, your Health Report from Fedo ${doc}`, PhoneNumber: content.organisation_admin_mobile, Subject: "String" })).then(res => doc));
+                        resolve(lastValueFrom(this.http.post(`${AWS_COGNITO_SMS_COGNITO_URL_SIT_ADMIN_PANEL}`, { Message: `Hey ${content.organisation_admin_name.split(" ", 2)[0]}, your Health Report from Fedo ${doc} For doctor consultations, contact us at: Mobile: +918069088088 WhatsApp: +916291075616 `, PhoneNumber: content.organisation_admin_mobile, Subject: "String" })).then(res => doc));
 
                     }),
                         (error) => {
@@ -1627,18 +1633,18 @@ export class TemplateService {
             bodyhtml += `<p style="font-family:'Calibri',sans-serif;margin-bottom : 0;margin-top:3rem;font-size:14px"><b>Vital Parameters</b></p>`
             for (let i = 0; i < scan_data.length; i++) {
                 bodyhtml += `<ul style="font-family:'Calibri',sans-serif; font-size:12px">`;
-                bodyhtml += `<li style="font-family:'Calibri',sans-serif;"><b>Heart Rate : </b>` + scan_data[i]?.heart_rate; + '</li>';
-                bodyhtml += `<li style="font-family:'Calibri',sans-serif;"><b>Blood Pressure : </b>` + scan_data[i]?.bp; + '</li>';
-                bodyhtml += `<li style="font-family:'Calibri',sans-serif;"><b>BMI : </b>` + scan_data[i]?.bmi; + '</li>';
+                bodyhtml += `<li style="font-family:'Calibri',sans-serif;"><b>Heart Rates : </b>` + scan_data[i]?.heart_rate + ` [Ref: 60 - 90 bpm]` + '</li>';
+                bodyhtml += `<li style="font-family:'Calibri',sans-serif;"><b>Blood Pressure : </b>` + scan_data[i]?.bp + ' [Ref: systolic: 120 - 139 mm Hg diastolic: 80 - 89 mm Hg]' + '</li>';
+                bodyhtml += `<li style="font-family:'Calibri',sans-serif;"><b>BMI : </b>` + scan_data[i]?.bmi + ' [Ref: 18.5 - 24.9 bpm]' + '</li>';
                 if (scan_data[i].smoking != null) {
                     bodyhtml += `<li style="font-family:'Calibri',sans-serif;"><b>Smoker (Beta) : </b>` + scan_data[i]?.smoking; + '</li>';
                 }
                 bodyhtml += `<li style="font-family:'Calibri',sans-serif;"><b>Stress (SNS) : </b>` + scan_data[i]?.stress; + '</li>';
-                bodyhtml += `<li style="font-family:'Calibri',sans-serif;"><b>SPO2 : </b>` + scan_data[i]?.blood_oxygen; + '</li>';
-                bodyhtml += `<li style="font-family:'Calibri',sans-serif;"><b>HRV-SDNN : </b>` + scan_data[i]?.hrv; + '</li>';
-                bodyhtml += `<li style="font-family:'Calibri',sans-serif;"><b>Respiration Rate : </b>` + scan_data[i]?.respiration; + '</li>';
-                bodyhtml += `<li style="font-family:'Calibri',sans-serif;"><b>Random Blood Sugar (Beta) : </b>` + scan_data[i]?.rbs; + '</li>';
-                bodyhtml += `<li style="font-family:'Calibri',sans-serif;"><b>Haemoglobin (Beta) : </b>` + scan_data[i]?.hb; + '</li>';
+                bodyhtml += `<li style="font-family:'Calibri',sans-serif;"><b>SPO2 : </b>` + scan_data[i]?.blood_oxygen + ' [Ref: 95 - 99 % bpm]' + '</li>';
+                bodyhtml += `<li style="font-family:'Calibri',sans-serif;"><b>HRV-SDNN : </b>` + scan_data[i]?.hrv + ' [Ref: greater than 100]' + '</li>';
+                bodyhtml += `<li style="font-family:'Calibri',sans-serif;"><b>Respiration Rate : </b>` + scan_data[i]?.respiration + ' [Ref:  12 to 18 breaths per minute]' + '</li>';
+                bodyhtml += `<li style="font-family:'Calibri',sans-serif;"><b>Random Blood Sugar (Beta) : </b>` + scan_data[i]?.rbs + ' [Ref: 100 - 170 mg/dL]' + '</li>';
+                bodyhtml += `<li style="font-family:'Calibri',sans-serif;"><b>Haemoglobin (Beta) : </b>` + scan_data[i]?.hb + ' [Ref: 14 to 18 g/dl (Male) 12 to 16 g/dl (Female)]' + '</li>';
                 bodyhtml += '</ul>';
             }
         }
@@ -1647,6 +1653,13 @@ export class TemplateService {
             for (let i = 0; i < questionnaire_data.length; i++) {
                 bodyhtml += `<p style="font-family:'Calibri',sans-serif; font-size:12px">` + `<b>[Q${i + 1}] ` + questionnaire_data[i]?.question + `</b><br><span style="font-size:12px">[Ans] ` + questionnaire_data[i]?.answer + `</span></p>`;
             }
+        }
+
+        if(content.is_milvik == true){
+            bodyhtml += `<ul style="font-family:'Calibri',sans-serif;margin-top:3rem; font-size:14px">Please be advised that for doctors consultations, contact us at the following channels:
+            <li style="font-family:'Calibri',sans-serif; font-size:12px">Mobile Number: <b>+918069088088</b></li>
+            <li style="font-family:'Calibri',sans-serif; font-size:12px">WhatsApp Number: <b>+916291075616</b></li>
+            </ul>`
         }
 
         bodyhtml += `<p style="font-family:'Calibri',sans-serif;margin-top:3rem; font-size:14px"><b>Disclaimer</b> </p>
