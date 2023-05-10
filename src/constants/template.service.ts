@@ -1490,7 +1490,7 @@ export class TemplateService {
             }
         }
         if(content.is_milvik == true){
-            bodyhtml += `<ul style="font-family:'Calibri',sans-serif;margin-top:3rem; font-size:14px">Please be advised that for doctors consultations, contact us at the following channels:
+            bodyhtml += `<ul style="font-family:'Calibri',sans-serif;margin-top:3rem; font-size:14px">Please be advised that for doctor consultations, contact us at the following channels:
             <li style="font-family:'Calibri',sans-serif; font-size:12px">Mobile Number: <b>+918069088088</b></li>
             <li style="font-family:'Calibri',sans-serif; font-size:12px">WhatsApp Number: <b>+916291075616</b></li>
             </ul>`
@@ -1656,7 +1656,7 @@ export class TemplateService {
         }
 
         if(content.is_milvik == true){
-            bodyhtml += `<ul style="font-family:'Calibri',sans-serif;margin-top:3rem; font-size:14px">Please be advised that for doctors consultations, contact us at the following channels:
+            bodyhtml += `<ul style="font-family:'Calibri',sans-serif;margin-top:3rem; font-size:14px">Please be advised that for doctor consultations, contact us at the following channels:
             <li style="font-family:'Calibri',sans-serif; font-size:12px">Mobile Number: <b>+918069088088</b></li>
             <li style="font-family:'Calibri',sans-serif; font-size:12px">WhatsApp Number: <b>+916291075616</b></li>
             </ul>`
