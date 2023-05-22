@@ -347,6 +347,16 @@ export class OrganizationService {
           switchMap(doc => this.updateStatus(doc))
         );
         }
+        else if(queryParamsDto.name !=  null){
+          return this.organizationDb.findByAlphabet({ name : queryParamsDto.name }).pipe(
+            catchError(err => { throw new UnprocessableEntityException(err.message) }),
+            map(async doc => {
+              if (doc.length == 0) return new NotFoundException('No Data available')
+              else {  return await this.fetchotherDetails(doc,queryParamsDto) }
+            }),
+            switchMap(doc => this.updateStatus(doc))
+          );
+          }
       else{
         return this.organizationDb.fetchAll().pipe(
           catchError(err => { throw new UnprocessableEntityException(err.message) }),

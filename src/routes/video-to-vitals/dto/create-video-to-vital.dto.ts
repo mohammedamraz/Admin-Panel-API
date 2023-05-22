@@ -320,6 +320,7 @@ export class QueryParamsDto {
     is_deleted?:boolean;
     is_web? : boolean ;
     is_read? : boolean ;
+    name? : string;
 }
 
 export enum Product {
@@ -379,6 +380,7 @@ export class UserParamDto {
     per_page: number;
     product_id?:number;
     is_deleted?:boolean
+    name? : string;
 
 }
 

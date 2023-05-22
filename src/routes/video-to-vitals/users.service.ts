@@ -79,6 +79,17 @@ export class UsersService {
           }
         })
       )}
+      else if(userParamDto.name !=  null){
+        return this.userDb.findUserByAlphabet({ name : userParamDto.name }, org_id).pipe(
+          catchError(err => { throw new UnprocessableEntityException(err.message) }),
+          map(doc => {
+            if (doc.length == 0) { throw new NotFoundException(`user Not available for organization id ${org_id}`) }
+            else {
+              return this.fetchUsersTestDetails(doc,userParamDto)
+            }
+          })
+        )
+        }
       else{        
         return this.userDb.find({ org_id: org_id}).pipe(
           catchError(err => { throw new UnprocessableEntityException(err.message) }),

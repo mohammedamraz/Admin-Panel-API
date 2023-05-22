@@ -218,7 +218,19 @@ export class DatabaseService<T> implements DatabaseInterface<T> {
     let values = []
     let params = findbyConditionParams
     Object.values(params).map((params, index) => { variables.push(params), values.push((`$${index + 1}`)) })
-    const query = `SELECT * FROM ${this.tableName} WHERE name like '${params.name}%' `;
+    const query = `SELECT * FROM ${this.tableName} WHERE organization_name ILIKE '${params.name}%' `;
+    return this.runQuery(query);
+  }
+
+  findUserByAlphabet(findbyConditionParams: findByDateParams, org_id : any): Observable<T[]> {
+    Logger.debug(`find_by_alphabet(): params ${[JSON.stringify(findbyConditionParams)]}`, APP);
+
+
+    let variables = [];
+    let values = []
+    let params = findbyConditionParams
+    Object.values(params).map((params, index) => { variables.push(params), values.push((`$${index + 1}`)) })
+    const query = `SELECT * FROM ${this.tableName} WHERE org_id = ${org_id} and user_name ILIKE '${params.name}%' `;
     return this.runQuery(query);
   }
 

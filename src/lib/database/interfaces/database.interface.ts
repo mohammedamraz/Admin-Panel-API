@@ -83,7 +83,7 @@ export class findByDateParams {
 
   number_of_rows?: number;
 
-  is_active: string;
+  is_active?: string;
 }
 
 export class findByDateParamsStatistics {
