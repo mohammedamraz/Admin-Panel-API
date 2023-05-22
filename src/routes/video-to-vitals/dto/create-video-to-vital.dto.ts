@@ -56,6 +56,19 @@ export class CreateOrganizationDto {
     enable_questionnaire? : boolean;
     enable_sms? : boolean
     enable_beta? : boolean
+    is_heart_rate? : boolean
+    is_stress? : boolean
+    is_bmi? : boolean
+    is_smoker? : boolean
+    is_hrv? : boolean
+    is_respiration? : boolean
+    is_bp? : boolean
+    is_spo2? : boolean
+    is_ecg? : boolean
+    is_cholesterol? : boolean
+    is_dashboard? : boolean
+    is_rbs? : boolean
+    is_haemoglobin? : boolean
     // org_details? : any;
 }
 
@@ -491,6 +504,19 @@ export const format_org_product_juction=(res,index,id)=>{
         enable_kiosk: res.enable_kiosk ? res.enable_kiosk[index] : false, 
         enable_sms: res.enable_sms ? res.enable_sms[index] : false, 
         enable_beta: res.enable_beta ? res.enable_beta[index] : false, 
+        is_heart_rate: res.is_heart_rate ? res.is_heart_rate[index] : true, 
+        is_stress: res.is_stress ? res.is_stress[index] : true, 
+        is_bmi: res.is_bmi ? res.is_bmi[index] : true, 
+        is_smoker: res.is_smoker ? res.is_smoker[index] : true, 
+        is_hrv: res.is_hrv ? res.is_hrv[index] : true, 
+        is_respiration: res.is_respiration ? res.is_respiration[index] : true, 
+        is_bp: res.is_bp ? res.is_bp[index] : true, 
+        is_spo2: res.is_spo2 ? res.is_spo2[index] : true, 
+        is_ecg: res.is_ecg ? res.is_ecg[index] : true, 
+        is_cholesterol: res.is_cholesterol ? res.is_cholesterol[index] : true, 
+        is_dashboard: res.is_dashboard ? res.is_dashboard[index] : true, 
+        is_rbs: res.is_rbs ? res.is_rbs[index] : true, 
+        is_haemoglobin: res.is_haemoglobin ? res.is_haemoglobin[index] : true, 
         kiosk_user: res.kiosk_user ? res.kiosk_user[index] : null, 
         attempts: res.attempts[index] ? res.attempts[index] : null, 
         mobile_access: res.productaccess_mobile ? res.productaccess_mobile[index] : false, 
@@ -520,6 +546,19 @@ export const format_org_product_juction_update=(res,index,id)=>{
         enable_kiosk: res.enable_kiosk ? res.enable_kiosk[index] : false, 
         enable_sms: res.enable_sms ? res.enable_sms[index] : false, 
         enable_beta: res.enable_beta ? res.enable_beta[index] : false, 
+        is_heart_rate: res.is_heart_rate ? res.is_heart_rate[index] : true, 
+        is_stress: res.is_stress ? res.is_stress[index] : true, 
+        is_bmi: res.is_bmi ? res.is_bmi[index] : true, 
+        is_smoker: res.is_smoker ? res.is_smoker[index] : true, 
+        is_hrv: res.is_hrv ? res.is_hrv[index] : true, 
+        is_respiration: res.is_respiration ? res.is_respiration[index] : true, 
+        is_bp: res.is_bp ? res.is_bp[index] : true, 
+        is_spo2: res.is_spo2 ? res.is_spo2[index] : true, 
+        is_ecg: res.is_ecg ? res.is_ecg[index] : true, 
+        is_cholesterol: res.is_cholesterol ? res.is_cholesterol[index] : true, 
+        is_dashboard: res.is_dashboard ? res.is_dashboard[index] : true, 
+        is_rbs: res.is_rbs ? res.is_rbs[index] : true, 
+        is_haemoglobin: res.is_haemoglobin ? res.is_haemoglobin[index] : true, 
         kiosk_user: res.kiosk_user ? res.kiosk_user[index] : null, 
         // attempts: res.attempts ? res.attempts[index] : doc.attempts, 
         is_questionnaire: res.enable_questionnaire ? res.enable_questionnaire[index] : false, 
