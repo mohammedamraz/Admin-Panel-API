@@ -59,4 +59,20 @@ export class ProductTestsController {
     return this.ProductTestsService.upload( file);
   }
 
+
+  @Get('range/org')
+  fetchTotalTestsOfOrgDateRange(@Query() params :ProductTestsDto) {
+    Logger.debug(`fetchTotalTestsOfOrgByDateRange()`, APP);
+
+    return this.ProductTestsService.fetchTotalTestsOfOrgDateRange(params)
+  }
+
+  @Get('range/user')
+  fetchTotalTestsOfUserDateRange(@Query() params :ProductTestsDto) {
+    Logger.debug(`fetchTotalTestsOfUserDateRange()`, APP);
+
+    return this.ProductTestsService.fetchTotalTestsOfUserDateRange(params)
+  }
+
+  
 }

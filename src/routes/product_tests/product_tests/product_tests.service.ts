@@ -617,4 +617,85 @@ getS3() {
 }
 
 
+
+
+async fetchTotalTestsOfOrgDateRange(params:ProductTestsDto){
+  Logger.debug(`fetchTotalTestsOfOrgDateRange() params:${params}} `, APP);
+  let mainData= [];
+
+  const params_data = {
+    org_id : params.org_id,
+    product_id : params.product_id,
+    test_date : params.test_date,
+    test_end_date : params.test_end_date
+  }
+  const doc = await lastValueFrom(this.productTestDB.findOrgDataForThePerformanceChart(params_data));
+  if (doc.length==0) {
+        const org_id = params.org_id
+        const total_org_tests = doc.reduce((pre, acc) => pre + acc['tests'], 0); 
+        mainData.push({org_id, total_org_tests})
+      }
+      else{
+        var holder = []
+        doc.forEach( object => {
+
+          const data = holder.find( doc => doc.user_id=== object.user_id)
+          if(!data){
+            holder.push({user_id:object.user_id,total_tests:object.tests})
+          }
+          else{
+           data.total_tests = (data.total_tests) + (object.tests)
+          }
+        });
+         const org_id = params.org_id
+         const total_org_tests = doc.reduce((pre, acc) => pre + acc['tests'], 0);
+         mainData.push({org_id, total_org_tests})      
+      }
+      doc.sort((a: { id?: number; },b: { id?: number; })=> b.id-a.id);   
+        const filteredDoc =  doc.filter((doc:any)=>doc.policy_number!==null);
+        mainData[0]['data'] = this.Paginator(filteredDoc,params.page,params.per_page) ;
+        return mainData
+
+}
+
+async fetchTotalTestsOfUserDateRange(params:ProductTestsDto){
+  Logger.debug(`fetchTotalTestsOfUserDateRange() params:${params}} `, APP);
+  let mainData= [];
+
+  const params_data = {
+    user_id : params.user_id,
+    product_id : params.product_id,
+    test_date : params.test_date,
+    test_end_date : params.test_end_date
+  }
+  const doc = await lastValueFrom(this.productTestDB.findUserDataForThePerformanceChart(params_data));
+  if (doc.length==0) {
+        const user_id = params.user_id
+        const total_user_tests = doc.reduce((pre, acc) => pre + acc['tests'], 0); 
+        mainData.push({user_id, total_user_tests})
+      }
+      else{
+        var holder = []
+        doc.forEach( object => {
+
+          const data = holder.find( doc => doc.user_id=== object.user_id)
+          if(!data){
+            holder.push({user_id:object.user_id,total_tests:object.tests})
+          }
+          else{
+           data.total_tests = (data.total_tests) + (object.tests)
+          }
+        });
+         const user_id = params.user_id
+         const total_user_tests = doc.reduce((pre, acc) => pre + acc['tests'], 0);
+         mainData.push({user_id, total_user_tests})      
+      }
+      doc.sort((a: { id?: number; },b: { id?: number; })=> b.id-a.id);   
+        const filteredDoc =  doc.filter((doc:any)=>doc.policy_number!==null);
+        mainData[0]['data'] = this.Paginator(filteredDoc,params.page,params.per_page) ;
+        return mainData
+
+}
+
+
 }

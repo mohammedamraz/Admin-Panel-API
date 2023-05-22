@@ -19,6 +19,7 @@ export class ProductTestsDto {
     user_id?:string;
     tests?:number;
     test_date?:string;
+    test_end_date? : string;
     event_mode?:boolean;
     period? :string;
     name?: string;
