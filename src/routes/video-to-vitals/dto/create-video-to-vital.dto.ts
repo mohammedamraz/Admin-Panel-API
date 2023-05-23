@@ -69,6 +69,8 @@ export class CreateOrganizationDto {
     is_dashboard? : boolean
     is_rbs? : boolean
     is_haemoglobin? : boolean
+    auth_url? : any 
+    
     // org_details? : any;
 }
 

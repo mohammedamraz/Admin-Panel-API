@@ -29,6 +29,11 @@ export class RequestToAPIDto {
     message? : any;
 }
 
+export class AuthAPIDto {
+    fullName?: any;
+    policy_number? : any;
+}
+
 
 
 

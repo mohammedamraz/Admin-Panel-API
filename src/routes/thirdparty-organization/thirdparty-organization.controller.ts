@@ -1,6 +1,6 @@
 import { Body, Controller, Get, Logger, Param, Patch, Post, Query } from '@nestjs/common';
 import { ZQueryParamsDto } from '../sales/dto/create-sale.dto';
-import { CreateThirdPartyOrganizationDto, ParamsDto, RequestToAPIDto, UpdateThirdPartyOrganizationJunctionDto } from './dto/create-third-party.dto';
+import { AuthAPIDto, CreateThirdPartyOrganizationDto, ParamsDto, RequestToAPIDto, UpdateThirdPartyOrganizationJunctionDto } from './dto/create-third-party.dto';
 import { ThirdpartyOrganizationService } from './thirdparty-organization.service';
 
 const APP = "ThirdpartyOrganizationController"
@@ -39,5 +39,14 @@ export class ThirdpartyOrganizationController {
 
         return this.thirdpartyOrganizationService.fetchAPIUrlByThirdPartyOrganizationId(params,body);
     }
+
+
+    @Post('auth_url/:org_id')
+    authUrlEncryption(@Param('org_id')  org_id : number , @Body() body :  AuthAPIDto) {
+        Logger.debug(`authUrlEncryption() createProductDto: ${body}}`, APP);
+
+        return this.thirdpartyOrganizationService.authUrlEncryption(org_id,body);
+    }
+
 
 }

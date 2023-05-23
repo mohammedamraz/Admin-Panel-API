@@ -6,8 +6,9 @@ import { DatabaseTable } from 'src/lib/database/database.decorator';
 import { DatabaseService } from 'src/lib/database/database.service';
 import { ZQueryParamsDto } from '../sales/dto/create-sale.dto';
 import { OrganizationService } from '../video-to-vitals/organization.service';
-import { CreateThirdPartyOrganizationDto, ParamsDto, RequestToAPIDto, UpdateThirdPartyOrganizationJunctionDto } from './dto/create-third-party.dto';
-
+import { AuthAPIDto, CreateThirdPartyOrganizationDto, ParamsDto, RequestToAPIDto, UpdateThirdPartyOrganizationJunctionDto } from './dto/create-third-party.dto';
+import axios from 'axios';
+import { URLSearchParams } from 'url';
 const APP = 'ThirdpartyOrganizationService'
 
 @Injectable()
@@ -90,5 +91,47 @@ export class ThirdpartyOrganizationService {
   }
 
 
+  authUrlEncryption(org_id : number , body : AuthAPIDto){
+    Logger.debug(`authUrlEncryption() createProductDto: ${body}}`, APP);
+  
+  return this.organizationService.fetchOrganizationByIdDetails(org_id).pipe(
+    switchMap(async doc => { 
+      const url = doc[0].auth_url.token_url;
+      const secondUrl = doc[0].auth_url.callback_url;
+      const username = doc[0].auth_url.username;
+      const password = doc[0].auth_url.password;
+      const grantType = 'client_credentials';
+      const fullName = body.fullName;
+      try {
+  const params = new URLSearchParams();
+  params.append('grant_type', grantType);
+
+  const firstResponse = await axios.post(url, params.toString(), {
+    headers: {
+      Authorization: `Basic ${Buffer.from(`${username}:${password}`).toString('base64')}`,
+      'Content-Type': 'application/x-www-form-urlencoded',
+    },
+  });
+
+  const accessToken = firstResponse.data.access_token;
+  const secondParams = {
+    fullName: fullName,
+  };
+  const secondResponse = await axios.post(secondUrl, secondParams, {
+    headers: {
+      'x-api-key': 'GeaXDlRmIz54zwXzEbs9VaPYCfCfMRPs4MuJsc6l',
+      Authorization: `Bearer ${accessToken}`,
+      'X-Aegon-Policy-Number': body.policy_number,
+    },
+  });
+
+  return secondResponse.data;
+
+} catch (error) {
+  throw new BadRequestException({status : error.response.status, message : error.response.statusText})
+} })
+)
+
+}
 
 }
