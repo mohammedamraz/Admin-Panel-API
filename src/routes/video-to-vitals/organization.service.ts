@@ -344,7 +344,7 @@ export class OrganizationService {
             if (doc.length == 0) throw new NotFoundException('No Data available')
             else {  return await this.fetchotherDetails(doc,queryParamsDto) }
           }),
-          switchMap(doc => this.updateStatus(doc))
+          // switchMap(doc => this.updateStatus(doc))
         );
         }
         else if(queryParamsDto.name !=  null){
@@ -354,7 +354,7 @@ export class OrganizationService {
               if (doc.length == 0) return new NotFoundException('No Data available')
               else {  return await this.fetchotherDetails(doc,queryParamsDto) }
             }),
-            switchMap(doc => this.updateStatus(doc))
+            // switchMap(doc => this.updateStatus(doc))
           );
           }
       else{
