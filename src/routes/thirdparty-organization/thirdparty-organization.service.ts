@@ -65,73 +65,72 @@ export class ThirdpartyOrganizationService {
   fetchAPIUrlByThirdPartyOrganization(params: ParamsDto, body: RequestToAPIDto) {
     Logger.debug(`fetchAPIUrlByThirdPartyOrganization() createProductDto:${params} }`, APP);
 
-    return this.tpaJunctionDB.find({ org_id: params.org_id , id : params.id }).pipe(
-          switchMap(doc => {
-            return this.http.post(`${doc[0].api_url_status}`,body)
-          .pipe(map(res=>{
-            return {status : res.data,doc}
+    return this.tpaJunctionDB.find({ org_id: params.org_id, id: params.id }).pipe(
+      switchMap(doc => {
+        return this.http.post(`${doc[0].api_url_status}`, body)
+          .pipe(map(res => {
+            return { status: res.data, doc }
           }))
-        }),
-          catchError(err => { throw new BadRequestException() })
-        )
+      }),
+      catchError(err => { throw new BadRequestException() })
+    )
   }
 
   fetchAPIUrlByThirdPartyOrganizationId(params: ParamsDto, body: any) {
     Logger.debug(`fetchAPIUrlByThirdPartyOrganizationId() createProductDto:${params} }`, APP);
 
-    return this.tpaJunctionDB.find({ org_id: params.org_id , id : params.id }).pipe(
-          switchMap(doc => {
-            return this.http.post(`${doc[0].api_url_vitals}`,[body])
-          .pipe(map(res=>{
-            return {status : res.data,doc}
+    return this.tpaJunctionDB.find({ org_id: params.org_id, id: params.id }).pipe(
+      switchMap(doc => {
+        return this.http.post(`${doc[0].api_url_vitals}`, [body])
+          .pipe(map(res => {
+            return { status: res.data, doc }
           }))
-        }),
-          catchError(err => { throw new BadRequestException() })
-        )
+      }),
+      catchError(err => { throw new BadRequestException() })
+    )
   }
 
 
-  authUrlEncryption(org_id : number , body : AuthAPIDto){
+  authUrlEncryption(org_id: number, body: AuthAPIDto) {
     Logger.debug(`authUrlEncryption() createProductDto: ${body}}`, APP);
-  
-  return this.organizationService.fetchOrganizationByIdDetails(org_id).pipe(
-    switchMap(async doc => { 
-      const url = doc[0].auth_url.token_url;
-      const secondUrl = doc[0].auth_url.callback_url;
-      const username = doc[0].auth_url.username;
-      const password = doc[0].auth_url.password;
-      const grantType = 'client_credentials';
-      const fullName = body.fullName;
-      try {
-  const params = new URLSearchParams();
-  params.append('grant_type', grantType);
 
-  const firstResponse = await axios.post(url, params.toString(), {
-    headers: {
-      Authorization: `Basic ${Buffer.from(`${username}:${password}`).toString('base64')}`,
-      'Content-Type': 'application/x-www-form-urlencoded',
-    },
-  });
+    return this.organizationService.fetchOrganizationByIdDetails(org_id).pipe(
+      switchMap(async doc => {
+        const url = doc[0].auth_url.token_url;
+        const secondUrl = doc[0].auth_url.callback_url;
+        const username = doc[0].auth_url.username;
+        const password = doc[0].auth_url.password;
+        const grantType = 'client_credentials';
+        const policy_number = body.policy_number;
+        try {
+          const params = new URLSearchParams();
+          params.append('grant_type', grantType);
 
-  const accessToken = firstResponse.data.access_token;
-  const secondParams = {
-    fullName: fullName,
-  };
-  const secondResponse = await axios.post(secondUrl, secondParams, {
-    headers: {
-      'x-api-key': 'GeaXDlRmIz54zwXzEbs9VaPYCfCfMRPs4MuJsc6l',
-      Authorization: `Bearer ${accessToken}`,
-      'X-Aegon-Policy-Number': body.policy_number,
-    },
-  });
+          const firstResponse = await axios.post(url, params.toString(), {
+            headers: {
+              Authorization: `Basic ${Buffer.from(`${username}:${password}`).toString('base64')}`,
+              'Content-Type': 'application/x-www-form-urlencoded',
+            },
+          });
 
-  return secondResponse.data;
+          delete body.policy_number;
+          const accessToken = firstResponse.data.access_token;
+          const secondResponse = await axios.post(secondUrl, body, {
+            headers: {
+              'x-api-key': 'GeaXDlRmIz54zwXzEbs9VaPYCfCfMRPs4MuJsc6l',
+              Authorization: `Bearer ${accessToken}`,
+              'X-Aegon-Policy-Number': policy_number,
+            },
+          });
 
-} catch (error) {
-  throw new BadRequestException({status : error.response.status, message : error.response.statusText})
-} })
-)
+          return secondResponse.data;
 
-}
+        } catch (error) {
+          throw new BadRequestException({ status: error.response.status, message: error.response.statusText })
+        }
+      })
+    )
+
+  }
 
 }
