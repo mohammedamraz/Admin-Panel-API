@@ -440,7 +440,7 @@ export const format_organisation=(res)=>{
     admin_name:res.admin_name,
     organization_email:res.organization_email,
     organization_mobile:res.organization_mobile,
-    logo:res?.logo || null,
+    logo:res.logo ? res.logo : 'https://fedo-vitals.s3.ap-south-1.amazonaws.com/fedo%20logo%20white.png',
     // attempts:res?.attempts || 0,
     designation:res.designation,
     url:res.url,
@@ -490,8 +490,8 @@ return data
 export const format_org_product_juction=(res,index,id)=>{
     console.log("format_org_product_juction() const" ,res ,index, id)
     const tomorrow = new Date();
-    // res.kiosk_user[index] =  res.kiosk_user[index] ? res.kiosk_user[index].toString().replace('[','') : null
-    // res.kiosk_user[index] =  res.kiosk_user[index] ? res.kiosk_user[index].toString().replace(']','') : null
+    res.kiosk_user[index] =  res.kiosk_user[index] ? res.kiosk_user[index].toString().replace('[','') : null
+    res.kiosk_user[index] =  res.kiosk_user[index] ? res.kiosk_user[index].toString().replace(']','') : null
     let end_date = JSON.parse(res.is_pilot_duration[index]) ? (new Date(tomorrow.setDate(tomorrow.getDate() + Number(res.pilot_duration[index])))) : (new Date(new Date().setFullYear(new Date().getFullYear() + 1)).toISOString().split("T")[0]) ;
    let data={ org_id: id, 
         end_date: end_date, 
@@ -532,8 +532,8 @@ export const format_org_product_juction=(res,index,id)=>{
 export const format_org_product_juction_update=(res,index,id)=>{
     console.log("format_org_product_juction_update() const" ,res ,index, id)
     const tomorrow = new Date();
-    // res.kiosk_user[index] =  res.kiosk_user[index] ? res.kiosk_user[index].toString().replace('[','') : null
-    // res.kiosk_user[index] =  res.kiosk_user[index] ? res.kiosk_user[index].toString().replace(']','') : null
+    res.kiosk_user[index] =  res.kiosk_user[index] ? res.kiosk_user[index].toString().replace('[','') : null
+    res.kiosk_user[index] =  res.kiosk_user[index] ? res.kiosk_user[index].toString().replace(']','') : null
     let end_date = JSON.parse(res.is_pilot_duration[index]) ? (new Date(tomorrow.setDate(tomorrow.getDate() + Number(res.pilot_duration[index])))) : (new Date(new Date().setFullYear(new Date().getFullYear() + 1)).toISOString().split("T")[0]) ;
    let data={ org_id: id, 
         end_date: end_date, 
