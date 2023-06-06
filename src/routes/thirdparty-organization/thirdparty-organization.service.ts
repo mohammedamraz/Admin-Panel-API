@@ -117,7 +117,7 @@ export class ThirdpartyOrganizationService {
           const accessToken = firstResponse.data.access_token;
           const secondResponse = await axios.post(secondUrl, body, {
             headers: {
-              'x-api-key': 'GeaXDlRmIz54zwXzEbs9VaPYCfCfMRPs4MuJsc6l',
+              'x-api-key': doc[0].auth_url.x_api_key,
               Authorization: `Bearer ${accessToken}`,
               'X-Aegon-Policy-Number': policy_number,
             },
