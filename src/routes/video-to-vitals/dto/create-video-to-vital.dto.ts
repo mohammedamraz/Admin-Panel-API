@@ -490,8 +490,11 @@ return data
 export const format_org_product_juction=(res,index,id)=>{
     console.log("format_org_product_juction() const" ,res ,index, id)
     const tomorrow = new Date();
+    if(res.kiosk_user != null){
+        console.log("coming inside")
     res.kiosk_user[index] =  res.kiosk_user[index] ? res.kiosk_user[index].toString().replace('[','') : null
     res.kiosk_user[index] =  res.kiosk_user[index] ? res.kiosk_user[index].toString().replace(']','') : null
+    }
     let end_date = JSON.parse(res.is_pilot_duration[index]) ? (new Date(tomorrow.setDate(tomorrow.getDate() + Number(res.pilot_duration[index])))) : (new Date(new Date().setFullYear(new Date().getFullYear() + 1)).toISOString().split("T")[0]) ;
    let data={ org_id: id, 
         end_date: end_date, 
@@ -532,8 +535,11 @@ export const format_org_product_juction=(res,index,id)=>{
 export const format_org_product_juction_update=(res,index,id)=>{
     console.log("format_org_product_juction_update() const" ,res ,index, id)
     const tomorrow = new Date();
+    if(res.kiosk_user != null){
+        console.log("coming inside")
     res.kiosk_user[index] =  res.kiosk_user[index] ? res.kiosk_user[index].toString().replace('[','') : null
     res.kiosk_user[index] =  res.kiosk_user[index] ? res.kiosk_user[index].toString().replace(']','') : null
+    }
     let end_date = JSON.parse(res.is_pilot_duration[index]) ? (new Date(tomorrow.setDate(tomorrow.getDate() + Number(res.pilot_duration[index])))) : (new Date(new Date().setFullYear(new Date().getFullYear() + 1)).toISOString().split("T")[0]) ;
    let data={ org_id: id, 
         end_date: end_date, 
