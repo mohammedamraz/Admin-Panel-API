@@ -44,6 +44,12 @@ export class ThirdpartyOrganizationService {
 
   }
 
+  patchThirdPartyOrganizationById(id : number , createThirdPartyOrganizationDto : CreateThirdPartyOrganizationDto){
+    Logger.debug(`patchThirdPartyOrganizationById() createProductDto:${JSON.stringify(createThirdPartyOrganizationDto)} }`, APP);
+
+    return this.tpaJunctionDB.findByIdandUpdate({id : id.toString() , quries : createThirdPartyOrganizationDto}).pipe(map(doc => doc),
+    catchError(err => { throw new BadRequestException(err.message)}))
+  }
 
   fetchThirdPartyOrganizationOfSpecificOrg(org_id: string, params: ZQueryParamsDto) {
     Logger.debug(`fetchThirdPartyOrganizationOfSpecificOrg() createProductDto:${org_id} }`, APP);

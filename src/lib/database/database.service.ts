@@ -197,6 +197,14 @@ export class DatabaseService<T> implements DatabaseInterface<T> {
     return this.runQuery(query)
   }
 
+  deleteLastRow(): Observable<T[]> {
+    Logger.debug(`deleteLastRow()}`, APP);
+
+    const query = `DELETE FROM ${this.tableName} WHERE id = (SELECT max(id) FROM ${this.tableName})`;
+    return this.runQuery(query)
+  }
+  
+
   findByCondition(id: number, findbyConditionParams: findByConditionParams) {
     Logger.debug(`findByCondition(): params ${[JSON.stringify(findbyConditionParams)]}`, APP);
 

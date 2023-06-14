@@ -937,4 +937,11 @@ export class OrganizationService {
         })))
       }
 
+      deleteLastOrgRow(){
+      Logger.debug(`deleteLastOrgRow()} `, APP);
+
+      return this.organizationDb.deleteLastRow().pipe(map(doc => doc),
+      catchError(err => {throw new BadRequestException(err.message)}))
+      
+    }
 }

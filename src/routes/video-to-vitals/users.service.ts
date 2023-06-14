@@ -338,4 +338,13 @@ export class UsersService {
       }))
 
   }
+
+  deleteLastUserRow(){
+    Logger.debug(`deleteLastUserRow()} `, APP);
+
+    return this.userDb.deleteLastRow().pipe(map(doc => doc),
+    catchError(err => {throw new BadRequestException(err.message)}))
+    
+  }
+
 }
