@@ -139,4 +139,10 @@ export class ThirdpartyOrganizationService {
 
   }
 
+  sampleUrlForAuth(body : RequestToAPIDto){
+    Logger.debug('sampleUrlForAuth',APP);
+
+    return {status : 'Success'}
+  }
+
 }

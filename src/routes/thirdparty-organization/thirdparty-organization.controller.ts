@@ -55,5 +55,12 @@ export class ThirdpartyOrganizationController {
         return this.thirdpartyOrganizationService.authUrlEncryption(org_id,body);
     }
 
+    @Post('auth_sample_url')
+    sampleUrlForAuth(@Body() body : RequestToAPIDto) {
+        Logger.debug(`sampleUrlForAuth() }`, APP);
+
+        return this.thirdpartyOrganizationService.sampleUrlForAuth(body);
+    }
+
 
 }
