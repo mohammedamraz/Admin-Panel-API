@@ -351,6 +351,20 @@ export class VideoToVitalsController {
    return this.organizationService.fetchOrgDetailsByExpiryDateOrgExpired(params)
   }
 
+  @Post('delete/last_org_row')
+  deleteLastOrgRow() {
+    Logger.debug(`deleteLastOrgRow() []`, APP);
+
+    return this.organizationService.deleteLastOrgRow();
+  }
+
+  @Post('delete/last_user_row')
+  deleteLastUserRow() {
+    Logger.debug(`deleteLastUserRow() []`, APP);
+
+    return this.usersService.deleteLastUserRow();
+  }
+
 }
 
 
