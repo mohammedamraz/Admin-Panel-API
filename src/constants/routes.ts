@@ -10,6 +10,8 @@ import { VideoToVitalsModule } from 'src/routes/video-to-vitals/video-to-vitals.
 import { OrgProductJunctionModule } from 'src/routes/org-product-junction/org-product-junction.module';
 import { GenericUrlModule } from 'src/routes/generic/generic-url.module';
 import { ProductTestsModule } from 'src/routes/product_tests/product_tests/product_tests.module';
+import { CustomerInsightsModule } from 'src/routes/customer-insights/customer-insights.module';
+import { ScanLevelModule } from 'src/routes/scan-level/scan-level.module';
 /**
  * NOTE: Routes are picked on 'first-match'
  *       So the order is important
@@ -62,5 +64,13 @@ export const APP_ROUTES = [
   {
     path: 'product_tests',
     module: ProductTestsModule,
+  },
+  {
+    path: 'customer_insights',
+    module: CustomerInsightsModule,
+  },
+  {
+    path: 'scan_level',
+    module: ScanLevelModule,
   },
 ];

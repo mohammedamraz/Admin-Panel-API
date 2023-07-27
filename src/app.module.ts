@@ -20,6 +20,8 @@ import { SendEmailModule } from './routes/send-email/send-email.module';
 import { GenericUrlModule } from './routes/generic/generic-url.module';
 import { ScheduleModule } from '@nestjs/schedule';
 import { ProductTestsModule } from './routes/product_tests/product_tests/product_tests.module';
+import { CustomerInsightsModule } from './routes/customer-insights/customer-insights.module';
+import { ScanLevelModule } from './routes/scan-level/scan-level.module';
 
 @Module({
   imports: [
@@ -43,7 +45,9 @@ import { ProductTestsModule } from './routes/product_tests/product_tests/product
     ThirdpartyOrganizationModule,
     GenericUrlModule,
     ProductTestsModule,
-    ScheduleModule.forRoot()
+    ScheduleModule.forRoot(),
+    CustomerInsightsModule,
+    ScanLevelModule
     
   ],
   controllers: [AppController],
