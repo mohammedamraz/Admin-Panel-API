@@ -51,7 +51,6 @@ export class CustomerInsightsService {
             return this.insights_db.findandUpdate({ columnName: 'customer_id', columnvalue: customer_id, quries: UpdateCustomerInsightsDTO })
         }
         else {
-            console.log("doc",QueryParamsDto)
             if (QueryParamsDto.type == 'attempts') {
                 return this.FetchCustomerInsightById(customer_id).pipe(map(doc => {
                     return this.insights_db.findandUpdate({ columnName: 'customer_id', columnvalue: doc[0].customer_id, quries: { total_attempts: doc[0].total_attempts + 1 } })
@@ -59,8 +58,7 @@ export class CustomerInsightsService {
                     catchError(err => { throw new BadRequestException(err.message) }))
             }
             else if (QueryParamsDto.type == 'clicks') {
-            console.log("clicks")
-            return this.FetchCustomerInsightById(customer_id).pipe(map(doc => {
+                return this.FetchCustomerInsightById(customer_id).pipe(map(doc => {
                     return this.insights_db.findandUpdate({ columnName: 'customer_id', columnvalue: doc[0].customer_id, quries: { total_clicks: doc[0].total_clicks + 1 } })
                 }),
                     catchError(err => { throw new BadRequestException(err.message) }))
