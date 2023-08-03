@@ -191,6 +191,15 @@ export class SendEmailService {
     return this.productTestDB.findandUpdate({ columnName: 'vitals_id', columnvalue: body.scan_id, quries: format_mobilesave(doc,body.organisation_admin_mobile,datetime) });
   }
 
+  async savePdfWithVitalsData(body: sendEmailOnCreationOfOrgAndUser) {
+    Logger.debug(`savePdfWithVitalsData() body: [${JSON.stringify(body)}]`, APP);
+
+    var currentdate = new Date();
+    var datetime = currentdate.toLocaleString('en-US', { hour: 'numeric', minute: 'numeric', second: 'numeric', hour12: true });
+    const doc = await this.templateService.savePdfWithVitalsData(body);
+    return this.productTestDB.findandUpdate({ columnName: 'vitals_id', columnvalue: body.scan_id, quries: format_mobilesave(doc,body.organisation_admin_mobile,datetime) });
+  }
+
   async sendEmailToKioskUserWithVitalsData(body: sendEmailOnCreationOfOrgAndUser) {
     Logger.debug(`sendEmailToKioskUserWithVitalsData() body: [${JSON.stringify(body)}]`, APP);
 

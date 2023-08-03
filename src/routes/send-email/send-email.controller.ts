@@ -144,6 +144,14 @@ export class SendEmailController {
         return this.sendEmailService.sendEmailWithVitalsData(body)
   }
 
+  @Post('pdfsave/aws')
+    // @UseInterceptors(FileInterceptor('file'))
+    savePdfWithVitalsData(@Body() body:sendEmailOnCreationOfOrgAndUser) {
+        Logger.debug(`savePdfWithVitalsData() body: [${JSON.stringify(body)}]`, APP);
+    
+        return this.sendEmailService.savePdfWithVitalsData(body)
+  }
+
   @Post('pdfcopy/kiosk/email')
   sendEmailToKioskUserWithVitalsData(@Body() body:sendEmailOnCreationOfOrgAndUser) {
     Logger.debug(`sendEmailToKioskUserWithVitalsData() body: [${JSON.stringify(body)}]`, APP);
