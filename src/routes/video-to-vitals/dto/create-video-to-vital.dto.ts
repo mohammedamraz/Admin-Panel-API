@@ -22,6 +22,7 @@ export class CreateOrganizationDto {
     // @IsNotEmpty()
     // @IsString()
     url: string;
+    industry_id? : any;
     start_date: Date;
     end_date: Date;
     @IsOptional()
@@ -43,6 +44,8 @@ export class CreateOrganizationDto {
     web_url?: Array<string>;
     type?: string;
     event_mode?:Array<string>;
+    save_data?:Array<boolean>;
+    enable_sdk?:Array<boolean>;
     password? : any;
     is_register? : boolean ;
     enable_kiosc? : boolean;
@@ -101,6 +104,7 @@ export class UpdateWholeOrganizationDto {
     fedo_score: boolean;
     @IsOptional()
     logo: string;
+    industry_id? : any;
     pilot_duration: number;
     product_name: string;
     product_id: string;
@@ -455,6 +459,7 @@ export const format_organisation=(res)=>{
     address:res?.address || null,
     is_web : res.is_web ? res.is_web : false, 
     is_read : res.is_read ? res.is_read : false, 
+    industry_id : res.industry_id ? res.industry_id : 1, 
 }
 
     return data
@@ -526,6 +531,8 @@ export const format_org_product_juction=(res,index,id)=>{
         attempts: res.attempts[index] ? res.attempts[index] : null, 
         mobile_access: res.productaccess_mobile ? res.productaccess_mobile[index] : false, 
         is_questionnaire: res.enable_questionnaire ? res.enable_questionnaire[index] : false, 
+        save_data: res.save_data ? res.save_data[index] : true, 
+        enable_sdk: res.enable_sdk ? res.enable_sdk[index] : false, 
         status: "Active",
     }
     return data
@@ -571,6 +578,8 @@ export const format_org_product_juction_update=(res,index,id)=>{
         // attempts: res.attempts ? res.attempts[index] : doc.attempts, 
         is_questionnaire: res.enable_questionnaire ? res.enable_questionnaire[index] : false, 
         mobile_access: res.productaccess_mobile ? res.productaccess_mobile[index] : false, 
+        save_data: res.save_data ? res.save_data[index] : true, 
+        enable_sdk: res.enable_sdk ? res.enable_sdk[index] : false, 
         status: "Active",
     }
     return data

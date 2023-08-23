@@ -12,6 +12,8 @@ import { GenericUrlModule } from 'src/routes/generic/generic-url.module';
 import { ProductTestsModule } from 'src/routes/product_tests/product_tests/product_tests.module';
 import { CustomerInsightsModule } from 'src/routes/customer-insights/customer-insights.module';
 import { ScanLevelModule } from 'src/routes/scan-level/scan-level.module';
+import { IndustryTypeModule } from 'src/routes/industry-type/industry-type.module';
+import { AppVersionModule } from 'src/routes/app-version/app-version.module';
 /**
  * NOTE: Routes are picked on 'first-match'
  *       So the order is important
@@ -72,5 +74,13 @@ export const APP_ROUTES = [
   {
     path: 'scan_level',
     module: ScanLevelModule,
+  },
+  {
+    path: 'industry_type',
+    module: IndustryTypeModule,
+  },
+  {
+    path: 'app_version',
+    module: AppVersionModule,
   },
 ];

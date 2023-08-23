@@ -22,6 +22,8 @@ import { ScheduleModule } from '@nestjs/schedule';
 import { ProductTestsModule } from './routes/product_tests/product_tests/product_tests.module';
 import { CustomerInsightsModule } from './routes/customer-insights/customer-insights.module';
 import { ScanLevelModule } from './routes/scan-level/scan-level.module';
+import { IndustryTypeModule } from './routes/industry-type/industry-type.module';
+import { AppVersionModule } from './routes/app-version/app-version.module';
 
 @Module({
   imports: [
@@ -47,7 +49,9 @@ import { ScanLevelModule } from './routes/scan-level/scan-level.module';
     ProductTestsModule,
     ScheduleModule.forRoot(),
     CustomerInsightsModule,
-    ScanLevelModule
+    ScanLevelModule,
+    IndustryTypeModule,
+    AppVersionModule
     
   ],
   controllers: [AppController],

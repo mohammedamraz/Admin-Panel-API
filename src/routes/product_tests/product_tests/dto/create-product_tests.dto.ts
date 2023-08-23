@@ -51,4 +51,5 @@ export class ProductTestsDto {
     per_page?: number;
     viu_user? : any;
     pdf_location? : any
+    version_id? : any;
 }
