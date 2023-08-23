@@ -1877,7 +1877,7 @@ export class TemplateService {
 
 
     private createRawEmail(toAddress: string, attachments?: any): string {
-        const boundary = 'boundary_' + Date.now().toString();
+        const boundary = 'boundary_' + new Date().toISOString().split("T")[0];
         const messageParts = [
             `From: noreply@fedo.ai`,
             `To: ${attachments.toAddress}`,
