@@ -141,7 +141,8 @@ export class sendEmailOnCreationOfOrgAndUser {
   client_id?: any;
   is_questioannire? : any;
   logo? :any
-  is_milvik? : boolean
+  is_milvik? : boolean;
+  policy_number? : any;
   
   
 

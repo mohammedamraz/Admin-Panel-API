@@ -2,7 +2,7 @@ import { Controller, Get, Post, Body, Patch, Param, Delete, Logger, ParseIntPipe
 import { VideoToVitalsService } from './video-to-vitals.service';
 import { CreateOrganizationDto, LoginUserDTO, LoginUserPasswordCheckDTO, OrgDTO, ProductDto, QueryParamsDto, RegisterUserDTO, UpdateOrganizationDto, UpdateUserDTO, UpdateWholeOrganizationDto, UserDTO, UserParamDto, VitalUserDTO } from './dto/create-video-to-vital.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { EncryptUrlDTO, PasswordResetDTO } from '../admin/dto/create-admin.dto';
+import { EncryptUrlDTO, PasswordResetDTO, sendEmailOnCreationOfOrgAndUser } from '../admin/dto/create-admin.dto';
 import { ConfirmForgotPasswordDTO, ForgotPasswordDTO } from '../admin/dto/login.dto';
 import { OrganizationService } from './organization.service';
 import { UsersService } from './users.service';
@@ -10,6 +10,7 @@ import { LoggingInterceptor } from 'src/interceptors/interceptor';
 import { ZQueryParamsDto } from '../org-product-junction/dto/create-org-product-junction.dto';
 import { Cron } from '@nestjs/schedule';
 import { JoiValidationPipe } from 'src/constants/pipes';
+import { url } from 'inspector';
 
 
 const APP = "VideoToVitalsController"
@@ -379,13 +380,20 @@ export class VideoToVitalsController {
     return this.organizationService.generateEncryptedUrlForHealthIndia(EncryptUrlDTO)
   }
 
-  // @Post('pre_signed/save')
-  // @UseInterceptors(FileInterceptor('file'))
-  // uploadTOPresignedUrl(@UploadedFile() file, @Query('type') type : any) {
-  //   Logger.debug(`uploadTOPresignedUrl()`, APP);
+  @Post('pre_signed/video/save')
+  @UseInterceptors(FileInterceptor('file'))
+  uploadVideoTOPresignedUrl(@UploadedFile() file, @Query('policy_number') policy_number : any) {
+    Logger.debug(`uploadVideoTOPresignedUrl()`, APP);
 
-  //   return this.organizationService.uploadTOPresignedUrl( file , type);
-  // }
+    return this.organizationService.uploadVideoTOPresignedUrl( file , policy_number);
+  }
+
+  @Post('pre_signed/pdf/save')
+  uploadPDFTOPresignedUrl(@Body() body:sendEmailOnCreationOfOrgAndUser) {
+    Logger.debug(`uploadPDFTOPresignedUrl()`, APP);
+
+    return this.organizationService.uploadPDFTOPresignedUrl(body);
+  }
 }
 
 
