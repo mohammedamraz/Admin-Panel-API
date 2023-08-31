@@ -340,8 +340,68 @@ export class DatabaseService<T> implements DatabaseInterface<T> {
     let values = []
     let params = findbyConditionParams
     delete params.period;
+    if(findbyConditionParams.policy_number){
+      Object.values(params).map((params, index) => { variables.push(params), values.push((`$${index + 1}`)) })        
+      const query = `SELECT * FROM ${this.tableName} WHERE org_id = ${values[0]} AND product_id = ${values[1]} AND policy_number = ${values[2]} AND test_date BETWEEN ${values[3]} and ${values[4]}`
+      return this.runQuery(query, variables);
+    }
+    else{
+      delete findbyConditionParams.policy_number;
+      Object.values(params).map((params, index) => { variables.push(params), values.push((`$${index + 1}`)) })        
+      const query = `SELECT * FROM ${this.tableName} WHERE org_id = ${values[0]} AND product_id = ${values[1]} AND test_date BETWEEN ${values[2]} and ${values[3]}`
+      return this.runQuery(query, variables);
+    }
+
+  }
+
+  findOrgDataForThePerformanceChartAllOrg(findbyConditionParams: findByDateParamsStatisticsPerformanceChart): Observable<T[]> {
+    Logger.debug(`find_by_date(): params ${[JSON.stringify(findbyConditionParams)]}`, APP);
+
+    let variables = [];
+    let values = []
+    let params = findbyConditionParams
+    delete params.period;
     Object.values(params).map((params, index) => { variables.push(params), values.push((`$${index + 1}`)) })        
-    const query = `SELECT * FROM ${this.tableName} WHERE org_id = ${values[0]} AND product_id = ${values[1]} AND test_date BETWEEN ${values[2]} and ${values[3]}`
+    const query = `SELECT * FROM ${this.tableName} WHERE product_id = ${values[0]} AND test_date BETWEEN ${values[1]} and ${values[2]}`
+    return this.runQuery(query, variables);
+
+  }
+
+  findOrgDataForThePerformanceChartAllOrgByVersionId(findbyConditionParams: findByDateParamsStatisticsPerformanceChart): Observable<T[]> {
+    Logger.debug(`find_by_date(): params ${[JSON.stringify(findbyConditionParams)]}`, APP);
+
+    let variables = [];
+    let values = []
+    let params = findbyConditionParams
+    delete params.period;
+    Object.values(params).map((params, index) => { variables.push(params), values.push((`$${index + 1}`)) }) 
+    const query = `SELECT * FROM ${this.tableName} WHERE product_id = ${values[0]} AND version_id = ${values[1]} AND test_date BETWEEN ${values[2]} and ${values[3]}`
+    return this.runQuery(query, variables);
+
+  }
+
+  findOrgDataForThePerformanceChartAllOrgByVersionIdAndOrgId(findbyConditionParams: findByDateParamsStatisticsPerformanceChart): Observable<T[]> {
+    Logger.debug(`find_by_date(): params ${[JSON.stringify(findbyConditionParams)]}`, APP);
+
+    let variables = [];
+    let values = []
+    let params = findbyConditionParams
+    delete params.period;
+    Object.values(params).map((params, index) => { variables.push(params), values.push((`$${index + 1}`)) }) 
+    const query = `SELECT * FROM ${this.tableName} WHERE org_id = ${values[0]} AND product_id = ${values[1]} AND version_id = ${values[2]} AND test_date BETWEEN ${values[3]} and ${values[4]}`
+    return this.runQuery(query, variables);
+
+  }
+
+  findUserDataForThePerformanceChartAllUserByVersionIdAndOrgId(findbyConditionParams: findByDateParamsStatisticsPerformanceChart): Observable<T[]> {
+    Logger.debug(`find_by_date(): params ${[JSON.stringify(findbyConditionParams)]}`, APP);
+
+    let variables = [];
+    let values = []
+    let params = findbyConditionParams
+    delete params.period;
+    Object.values(params).map((params, index) => { variables.push(params), values.push((`$${index + 1}`)) }) 
+    const query = `SELECT * FROM ${this.tableName} WHERE user_id = ${values[0]} AND product_id = ${values[1]} AND version_id = ${values[2]} AND test_date BETWEEN ${values[3]} and ${values[4]}`
     return this.runQuery(query, variables);
 
   }
@@ -354,9 +414,16 @@ export class DatabaseService<T> implements DatabaseInterface<T> {
     let values = []
     let params = findbyConditionParams
     delete params.period;
-    Object.values(params).map((params, index) => { variables.push(params), values.push((`$${index + 1}`)) })        
-    const query = `SELECT * FROM ${this.tableName} WHERE user_id = ${values[0]} AND product_id = ${values[1]} AND test_date BETWEEN ${values[2]} and ${values[3]}`
-    return this.runQuery(query, variables);
+    if(findbyConditionParams.policy_number){
+      Object.values(params).map((params, index) => { variables.push(params), values.push((`$${index + 1}`)) })        
+      const query = `SELECT * FROM ${this.tableName} WHERE user_id = ${values[0]} AND product_id = ${values[1]} AND policy_number = ${values[2]} AND test_date BETWEEN ${values[3]} and ${values[4]}`
+      return this.runQuery(query, variables);
+    }
+    else{
+      Object.values(params).map((params, index) => { variables.push(params), values.push((`$${index + 1}`)) })        
+      const query = `SELECT * FROM ${this.tableName} WHERE user_id = ${values[0]} AND product_id = ${values[1]} AND test_date BETWEEN ${values[2]} and ${values[3]}`
+      return this.runQuery(query, variables);
+    }
 
   }
 

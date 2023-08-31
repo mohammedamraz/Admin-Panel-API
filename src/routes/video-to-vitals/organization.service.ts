@@ -5,7 +5,7 @@ import { CreateOrganizationDto, format_organisation, format_organisation_update,
 import { DatabaseService } from 'src/lib/database/database.service';
 import { catchError, concatMap, from, lastValueFrom, map, switchMap, throwError } from 'rxjs';
 import { AWS_ACCESS_KEY_ID, AWS_COGNITO_USER_CREATION_URL_SIT_ADMIN_PANEL, AWS_SECRET_ACCESS_KEY, FEDO_USER_ADMIN_PANEL_POOL_NAME, PUBLIC_KEY } from 'src/constants';
-import { S3 } from 'aws-sdk';
+import AWS, { S3 } from 'aws-sdk';
 import { v4 as uuidv4 } from 'uuid';
 import { OrgProductJunctionService } from '../org-product-junction/org-product-junction.service';
 import { CreateOrgProductJunctionDto, ZQueryParamsDto } from '../org-product-junction/dto/create-org-product-junction.dto';
@@ -13,6 +13,12 @@ import { UserProductJunctionService } from '../user-product-junction/user-produc
 import { SendEmailService } from '../send-email/send-email.service';
 import { ProductService } from '../product/product.service';
 import { UsersService } from './users.service';
+import { EncryptUrlDTO, sendEmailOnCreationOfOrgAndUser } from '../admin/dto/create-admin.dto';
+import { decryptPassword } from 'src/constants/helper';
+import axios from 'axios';
+import * as htmlpdf from 'puppeteer-html-pdf';
+
+
 
 const APP = 'OrganizationService'
 @Injectable()
@@ -944,4 +950,245 @@ export class OrganizationService {
       catchError(err => {throw new BadRequestException(err.message)}))
       
     }
-}
+
+    private createQueryString(params: Record<string, any>): string {
+      return Object.keys(params)
+        .map(key => `${key}=${encodeURIComponent(params[key])}`)
+        .join('&');
+    }
+
+    generateEncryptedUrlForCanara(EncryptUrlDTO : EncryptUrlDTO){
+      Logger.debug(`generateEncryptedUrl,APP`,APP);
+
+      EncryptUrlDTO.orgId = '88';
+      EncryptUrlDTO.userId = '689';
+      EncryptUrlDTO.tenantId = '88';
+        const str = this.createQueryString(EncryptUrlDTO);
+        const url = 'https://fedo.ai/products/vitals/webapp/vitals?' + str;
+        return url;
+    }
+
+    generateEncryptedUrlForHealthIndia(EncryptUrlDTO : EncryptUrlDTO){
+      Logger.debug(`generateEncryptedUrlForHealthIndia,APP`,APP);
+
+      EncryptUrlDTO.orgId = '88';
+      EncryptUrlDTO.userId = '689';
+      EncryptUrlDTO.tenantId = '88';
+        const str = this.createQueryString(EncryptUrlDTO);
+        const url = 'https://fedo.ai/products/vitals/webapp/vitals?' + 'secureparam=' + this.encryptPassword(str);
+        return url;
+    }
+
+    // This part of section is not fully done but the mechanism is whole done, just have to apply the logic and it will work automatically
+    // For the new req of kushbu also we can use this same controller because it will save in thier aws but the url we can store in the db and it can be viewed
+    // If we do this almost everything is done from my way
+    // async uploadTOPresignedUrl(file : any, type : any){
+    //   Logger.debug(`uploadTOPresignedUrl`,APP);
+
+    //   console.log("file",file)
+    //   if(type == 'pdf'){
+    //     const data = await this.createPdfByVitalsData();
+    //     console.log("data",data)
+    //     file = {
+    //       fieldname : 'file',
+    //       originalname : 'test.pdf',
+    //       mimetype : 'application/pdf',
+    //       buffer : data,
+    //       size : 198930
+    //     };
+    //   }
+    //   else {
+
+    //   }
+    //   const s3 = this.getS3();
+    //  const bucket = 'fedo-vitals'; 
+    //   const params = {
+    //     Bucket: bucket,
+    //     Key: 'canaras3test/' + String(file.originalname),
+    //     Expires: 3600,
+    //     ContentType: 'application/octet-stream',
+    //     ACL: 'private',
+    //   };
+
+    //   const preSignedUrl = s3.getSignedUrl('putObject', params)
+    //   try {
+    //     const response = await axios.put(preSignedUrl, file, {
+    //       headers: {
+    //         'Content-Type': 'application/octet-stream',
+    //       },
+    //     });
+  
+    //     if (response.status === 200) {
+    //       const questionMarkIndex = response.config.url.indexOf("?");
+    //       const filteredUrl = response.config.url.slice(0, questionMarkIndex);
+    //       return {url : filteredUrl};
+    //     } else {
+    //       throw new Error('File upload failed');
+    //     }
+    //   } catch (error) {
+    //     throw new Error('An error occurred while uploading the file');
+    //   }
+    // }
+
+    // createPdfByVitalsData(){
+    //   Logger.debug(`createPdfByVitalsData`,APP)
+
+    //   const content = {
+
+    //     "org_id": "1",
+    
+    //     "fedo_app": "Fedo Vitals",
+    
+    //     "customer_id": 20,
+    
+    //     "scan_id": "4c659",
+    
+    //     "organisation_admin_name": "Mohammed Amraz",
+    
+    //     "organisation_admin_mobile": "+919847814527",
+    
+    //     "organisation_admin_email": "mohd.amraz0@gmail.com",
+    
+    //     "age": "25",
+    
+    //     "gender": "Male",
+    
+    //     "application_id": "9847814527",
+    
+    //     "logo": "https://fedo-vitals.s3.ap-south-1.amazonaws.com/Logo-Milvik.png",
+    
+    //     "content": "{heart_rate: 'fhc133b',bp: 25,bmi: 'alice@example.com' ,stress: 30,hrv: 'bob@example.com' ,respiration: 'Charlie',blood_oxygen: 35,rbs: '@example.com', hb : 48 } ",
+    
+    //     "fedoscore_content": "{fedo_score: 'fhc133b',condition:'erhfdgv rtdfxgfcrtdfxfgv rtdfxcfc rdfxfc'} ",
+    
+    //     "riskclassification_content": "{condition: 'hbfesdxcbvrhsdvxfjhcbrsjdv',details:'wesfdgchgwvsdhdgchwgesdzdhxgvcwhegsdv'} ",
+    
+    //     "diseaserisk_content": "{diabetes: 'fhc133b',hypertension: 25,respiratory: 'alice@example.com' , chd: 'Bob',cvd: 30,kidney: 'bob@example.com' }",
+    
+    //     "is_questioannire": "{question: 'fhc133b',answer: 25 },{question: 'sdx',answer: 25 },{question: 'resgdfcerd',answer: 25 }"
+    
+    // }
+    //   let options = {
+    //     format: 'A4',
+    //     margin: {
+    //         top: '2cm',
+    //         right: '2cm',
+    //         bottom: '2cm',
+    //         left: '2cm'
+    //     },
+    //     displayHeaderFooter: true,
+    //     footerTemplate: `
+    //   <div style="font-size: 12px; text-align: center; {{#isLastPage}}position: absolute; bottom: 0; width: 100%;{{/isLastPage}}">
+    //     Powered by Fedo.Ai
+    // </div>
+    // `};
+    // var currentdate = new Date();
+    
+    // var scanDate =
+    //     currentdate.getFullYear().toString()
+    //     + (currentdate.getMonth() + 1).toString() +
+    //     currentdate.getDate().toString() + '-' +
+    //     currentdate.getHours().toString() +
+    //     currentdate.getMinutes().toString() +
+    //     currentdate.getSeconds().toString();
+    // var name = content.org_id + '-' + content.customer_id + '-' + content.scan_id + '-' + scanDate + '.pdf'
+    // var datetime = currentdate.getDate() + "/"
+    //     + (currentdate.getMonth() + 1) + "/"
+    //     + currentdate.getFullYear() + " @ "
+    //     + currentdate.toLocaleString('en-US', { hour: 'numeric', minute: 'numeric', second: 'numeric', hour12: true });
+    // const ses = new AWS.SES({ apiVersion: '2010-12-01' });
+    // var scan_data = (new Function("return [" + content.content + "];")());
+    // var fedoscore_data = (new Function("return [" + content.fedoscore_content + "];")());
+    // var riskclassification_data = (new Function("return [" + content.riskclassification_content + "];")());
+    // var diseaserisk_data = (new Function("return [" + content.diseaserisk_content + "];")());
+    // var questionnaire_data = (new Function("return [" + content.is_questioannire + "];")());
+    // let bodyhtml = `<html lang="en"> 
+    // <head> <link href="https://fonts.googleapis.com/css?family=Calibri:400,700&display=swap" rel="stylesheet" type="text/css"></head> 
+    // <body style="font-family:'Calibri',sans-serif;">
+    //    <div style="display: grid;">
+    //    <div style="display:block"><img style="height: 1rem; width : 3rem" src="https://fedo-vitals.s3.ap-south-1.amazonaws.com/MicrosoftTeams-image.png">`
+    // if (content.logo != null) {
+    //     bodyhtml += `<img style="    width: 3rem;
+    //    margin-left: 1rem;" src="${content.logo}">`
+    // }
+    // bodyhtml += `</div>
+    //    <p style="font-size:28px">Health Report of <b>${content.organisation_admin_name}</b><br><span style="font-size:14px"><b>Date: </b>${datetime} <br><hr style="width : 100%" /><br><b>Personal Information</b></span><span style="font-size:12px"><b>Age</b> : ${content.age}<br><b>Gender</b> : ${content.gender}<br> <b>Mobile Number</b> : ${content.organisation_admin_mobile}</span></p>
+    //    </div>
+    //    </body> 
+    //    </html>`
+    // if (content.fedoscore_content != null) {
+    //     for (let i = 0; i < fedoscore_data.length; i++) {
+    //         bodyhtml += `<p style="font-family:'Calibri',sans-serif; font-size:20px;margin-top:1.5rem">` + `<b>Fedo Score</b> <br><b><span style="font-size:26px">` + fedoscore_data[i]?.fedo_score + `</span><br><span style="font-size:12px">What does this score mean?</b></span><br><span style="font-size:12px">` + fedoscore_data[i]?.condition + `</span></p>`;
+    //     }
+    // }
+    // if (content.riskclassification_content != null) {
+    //     for (let i = 0; i < riskclassification_data.length; i++) {
+    //         bodyhtml += `<p style="font-family:'Calibri',sans-serif;font-size:14px;margin-top:3rem">` + `<b>Risk Category</b> <br> <span style="font-size:12px">` + riskclassification_data[i]?.condition + `</span></p>`;
+    //     }
+    // }
+    // if (content.diseaserisk_content != null) {
+    //     bodyhtml += `<p style="font-family:'Calibri',sans-serif;margin-bottom : 0;margin-top:3rem; font-size:14px"><b>Diseases Risks Prediction</b></p>`
+    //     for (let i = 0; i < diseaserisk_data.length; i++) {
+    //         bodyhtml += `<ul style="font-family:'Calibri',sans-serif;font-size:12px">`;
+    //         bodyhtml += `<li style="font-family:'Calibri',sans-serif;"><b>Diabetes : </b>` + diseaserisk_data[i]?.diabetes; + '</li>';
+    //         bodyhtml += `<li style="font-family:'Calibri',sans-serif;"><b>Hypertension : </b>` + diseaserisk_data[i]?.hypertension; + '</li>';
+    //         bodyhtml += `<li style="font-family:'Calibri',sans-serif;"><b>Respiratory : </b>` + diseaserisk_data[i]?.respiratory; + '</li>';
+    //         bodyhtml += `<li style="font-family:'Calibri',sans-serif;"><b>CHD : </b>` + diseaserisk_data[i]?.chd; + '</li>';
+    //         bodyhtml += `<li style="font-family:'Calibri',sans-serif;"><b>CVD : </b>` + diseaserisk_data[i]?.cvd; + '</li>';
+    //         bodyhtml += `<li style="font-family:'Calibri',sans-serif;"><b>Kidney : </b>` + diseaserisk_data[i]?.kidney; + '</li>';
+    //         bodyhtml += '</ul>';
+    //     }
+    // }
+    // if (content.content != null) {
+    //     bodyhtml += `<p style="font-family:'Calibri',sans-serif;margin-bottom : 0;margin-top:3rem;font-size:14px"><b>Vital Parameters</b></p>`
+    //     for (let i = 0; i < scan_data.length; i++) {
+    //         bodyhtml += `<ul style="font-family:'Calibri',sans-serif; font-size:12px">`;
+    //         bodyhtml += `<li style="font-family:'Calibri',sans-serif;"><b>Heart Rates : </b>` + scan_data[i]?.heart_rate + ` [Ref: 60 - 90 bpm]` + '</li>';
+    //         bodyhtml += `<li style="font-family:'Calibri',sans-serif;"><b>Blood Pressure : </b>` + scan_data[i]?.bp + ' [Ref: systolic: 120 - 139 mm Hg diastolic: 80 - 89 mm Hg]' + '</li>';
+    //         bodyhtml += `<li style="font-family:'Calibri',sans-serif;"><b>BMI : </b>` + scan_data[i]?.bmi + ' [Ref: 18.5 - 24.9 bpm]' + '</li>';
+    //         if (scan_data[i].smoking != null) {
+    //             bodyhtml += `<li style="font-family:'Calibri',sans-serif;"><b>Smoker (Beta) : </b>` + scan_data[i]?.smoking; + '</li>';
+    //         }
+    //         bodyhtml += `<li style="font-family:'Calibri',sans-serif;"><b>Stress (SNS) : </b>` + scan_data[i]?.stress; + '</li>';
+    //         bodyhtml += `<li style="font-family:'Calibri',sans-serif;"><b>SPO2 : </b>` + scan_data[i]?.blood_oxygen + ' [Ref: 95 - 99 % bpm]' + '</li>';
+    //         bodyhtml += `<li style="font-family:'Calibri',sans-serif;"><b>HRV-SDNN : </b>` + scan_data[i]?.hrv + ' [Ref: greater than 100]' + '</li>';
+    //         bodyhtml += `<li style="font-family:'Calibri',sans-serif;"><b>Respiration Rate : </b>` + scan_data[i]?.respiration + ' [Ref:  12 to 18 breaths per minute]' + '</li>';
+    //         bodyhtml += `<li style="font-family:'Calibri',sans-serif;"><b>Random Blood Sugar (Beta) : </b>` + scan_data[i]?.rbs + ' [Ref: 100 - 170 mg/dL]' + '</li>';
+    //         bodyhtml += `<li style="font-family:'Calibri',sans-serif;"><b>Haemoglobin (Beta) : </b>` + scan_data[i]?.hb + ' [Ref: 14 to 18 g/dl (Male) 12 to 16 g/dl (Female)]' + '</li>';
+    //         bodyhtml += '</ul>';
+    //     }
+    // }
+    // if (content.is_questioannire != null) {
+    //     bodyhtml += `<p style="font-family:'Calibri',sans-serif;margin-bottom : 0;margin-top:3rem;font-size:14px"><b>Additional Questionnaire</b></p>`
+    //     for (let i = 0; i < questionnaire_data.length; i++) {
+    //         bodyhtml += `<p style="font-family:'Calibri',sans-serif; font-size:12px">` + `<b>[Q${i + 1}] ` + questionnaire_data[i]?.question + `</b><br><span style="font-size:12px">[Ans] ` + questionnaire_data[i]?.answer + `</span></p>`;
+    //     }
+    // }
+    // if(content.org_id == "63"){
+    //     bodyhtml += `<ul style="font-family:'Calibri',sans-serif;margin-top:3rem; font-size:14px">Please be advised that for doctor consultations, contact us at the following channels:
+    //     <li style="font-family:'Calibri',sans-serif; font-size:12px">Mobile Number: <b>+918069088088</b></li>
+    //     <li style="font-family:'Calibri',sans-serif; font-size:12px">WhatsApp Number: <b>+916291075616</b></li>
+    //     </ul>`
+    // }
+
+    // bodyhtml += `<p style="font-family:'Calibri',sans-serif;margin-top:3rem; font-size:14px"><b>Disclaimer</b> </p>
+    //         <p style="font-family:'Calibri',sans-serif; font-size:10px">THIS IS NOT A MEDICAL DIAGNOSTIC DEVICE OR A REPLACEMENT FOR MEDICAL DIAGNOSTIC DEVICES.<br><br>
+            
+    //         We do not share your personal information with any third parties for commercial use or revenue generation. Personal Information provided by You is used by Us to improve our Products, Platforms and/or Services or for your information purposes only.<br><br>
+            
+    //         The data collected and the analysis must only be considered as indicators and/or as early warnings. You must always seek advice of an experienced and qualified doctor or your family doctor or other qualified healthcare provider/practitioner regarding your health and/or medical condition or treatment, before undertaking any new healthcare systems or methods. You must not disregard professional medical advice or delay in seeking medical consultation from qualified health professionals because of any Information received during this process.<br><br>
+    
+    //         By accessing or using our products, platforms and/or services, You have authorized Us to collect, store, process, handle and use all such information about you, in accordance with our Privacy Policy and any other terms and conditions of use (as amended from time to time).
+    //         </p>
+    //         <br>
+    //         <hr style="border-top: dotted 1px;width : 25%" />`
+
+    // let file = bodyhtml;
+    // return htmlpdf.create(file, options, { handlebars: true })
+
+
+    // }
+
+
+    }
+// }

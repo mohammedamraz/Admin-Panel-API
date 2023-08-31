@@ -82,5 +82,34 @@ export class ProductTestsController {
   //   return this.ProductTestsService.SendAutomatedExcelReportToTheClient(params)
   // }
 
+
+  @Get('tests/admin/board')
+  fetchTotalTestsForAdminDashboard(@Query() params :ProductTestsDto) {
+    Logger.debug(`fetchTotalTestsForAdminDashboard()`, APP);
+
+    return this.ProductTestsService.fetchTotalTestsForAdminDashboard(params)
+  }
+
+  @Get('tests/admin/board/year')
+  fetchTotalTestsForAdminDashboardByYear(@Query() params :ProductTestsDto) {
+    Logger.debug(`fetchTotalTestsForAdminDashboardByYear()`, APP);
+
+    return this.ProductTestsService.fetchTotalTestsForAdminDashboardByYear(params)
+  }
+
+  @Get('tests/admin/board/filterperiod/org')
+  fetchTotalTestsForAdminDashboardByOrgAndIndustry(@Query() params :ProductTestsDto) {
+    Logger.debug(`fetchTotalTestsForAdminDashboardByOrgAndIndustry()`, APP);
+
+    return this.ProductTestsService.fetchTotalTestsForAdminDashboardByOrgAndIndustry(params)
+  }
+
+  @Get('tests/admin/board/filterperiod/user')
+  fetchTotalTestsForAdminDashboardByUser(@Query() params :ProductTestsDto) {
+    Logger.debug(`fetchTotalTestsForAdminDashboardByUser()`, APP);
+
+    return this.ProductTestsService.fetchTotalTestsForAdminDashboardByUser(params)
+  }
+
   
 }

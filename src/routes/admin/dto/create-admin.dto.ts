@@ -154,6 +154,22 @@ export class PasswordResetDTO {
   url? : string;
   
 }
+
+export class EncryptUrlDTO {
+  
+  @IsNotEmpty()
+  clientId: string;
+  @IsNotEmpty()
+  custId?:string;
+  @IsNotEmpty()
+  scanId? : string;
+  expiryDateTime? : string;
+  orgId? : string;
+  userId? : string;
+  tenantId? : string;
+  org_name? : string;
+  
+}
 export class createAccount {
 
   id: string;

@@ -2,7 +2,7 @@ import { Controller, Get, Post, Body, Patch, Param, Delete, Logger, ParseIntPipe
 import { VideoToVitalsService } from './video-to-vitals.service';
 import { CreateOrganizationDto, LoginUserDTO, LoginUserPasswordCheckDTO, OrgDTO, ProductDto, QueryParamsDto, RegisterUserDTO, UpdateOrganizationDto, UpdateUserDTO, UpdateWholeOrganizationDto, UserDTO, UserParamDto, VitalUserDTO } from './dto/create-video-to-vital.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { PasswordResetDTO } from '../admin/dto/create-admin.dto';
+import { EncryptUrlDTO, PasswordResetDTO } from '../admin/dto/create-admin.dto';
 import { ConfirmForgotPasswordDTO, ForgotPasswordDTO } from '../admin/dto/login.dto';
 import { OrganizationService } from './organization.service';
 import { UsersService } from './users.service';
@@ -365,6 +365,27 @@ export class VideoToVitalsController {
     return this.usersService.deleteLastUserRow();
   }
 
+  @Post('webApp/url/canara')
+  generateEncryptedUrlForCanara(@Body() EncryptUrlDTO: EncryptUrlDTO) {
+    Logger.debug(`generateEncryptedUrlForCanara()  EncryptUrlDTO:${JSON.stringify(EncryptUrlDTO)} `, APP);
+
+    return this.organizationService.generateEncryptedUrlForCanara(EncryptUrlDTO)
+  }
+
+  @Post('webApp/url/healthIndia')
+  generateEncryptedUrlForHealthIndia(@Body() EncryptUrlDTO: EncryptUrlDTO) {
+    Logger.debug(`generateEncryptedUrlForHealthIndia()  EncryptUrlDTO:${JSON.stringify(EncryptUrlDTO)} `, APP);
+
+    return this.organizationService.generateEncryptedUrlForHealthIndia(EncryptUrlDTO)
+  }
+
+  // @Post('pre_signed/save')
+  // @UseInterceptors(FileInterceptor('file'))
+  // uploadTOPresignedUrl(@UploadedFile() file, @Query('type') type : any) {
+  //   Logger.debug(`uploadTOPresignedUrl()`, APP);
+
+  //   return this.organizationService.uploadTOPresignedUrl( file , type);
+  // }
 }
 
 

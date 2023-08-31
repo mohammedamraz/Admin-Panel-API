@@ -101,6 +101,8 @@ export class findByDateParamsStatisticsPerformanceChart {
   product_id?:string;
   test_date? : string;
   test_end_date? : string;
+  version_id? : string;
+  policy_number? : any;
 
 }
 

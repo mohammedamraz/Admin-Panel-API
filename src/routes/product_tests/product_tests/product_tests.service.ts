@@ -9,6 +9,7 @@ import { ProductTestsDto } from './dto/create-product_tests.dto';
 // import { DatabaseService } from 'firebase-admin/lib/database/database';
 import * as XLSX from 'xlsx-js-style'; 
 import { SendEmailService } from 'src/routes/send-email/send-email.service';
+import { CreateOrganizationDto, UserDTO } from 'src/routes/video-to-vitals/dto/create-video-to-vital.dto';
 const APP = "ProductTestsService"
 
 @Injectable()
@@ -16,6 +17,10 @@ export class ProductTestsService {
     constructor(
         @DatabaseTable('product_tests')
         private readonly productTestDB: DatabaseService<ProductTestsDto>,
+        @DatabaseTable('organization')
+        private readonly org_db: DatabaseService<CreateOrganizationDto>,
+        @DatabaseTable('users')
+        private readonly user_db: DatabaseService<UserDTO>,
         private readonly SendEmailServices : SendEmailService,
         private readonly UsersService : UsersService)
 {}
@@ -621,7 +626,6 @@ getS3() {
 
 
 
-
 async fetchTotalTestsOfOrgDateRange(params:ProductTestsDto){
   Logger.debug(`fetchTotalTestsOfOrgDateRange() params:${params}} `, APP);
   let mainData= [];
@@ -629,9 +633,11 @@ async fetchTotalTestsOfOrgDateRange(params:ProductTestsDto){
   const params_data = {
     org_id : params.org_id,
     product_id : params.product_id,
+    policy_number : params.policy_number,
     test_date : params.test_date,
-    test_end_date : params.test_end_date
+    test_end_date : params.test_end_date,
   }
+  if(!params.policy_number) delete params_data.policy_number;
   const doc = await lastValueFrom(this.productTestDB.findOrgDataForThePerformanceChart(params_data));
   if (doc.length==0) {
         const org_id = params.org_id
@@ -668,9 +674,11 @@ async fetchTotalTestsOfUserDateRange(params:ProductTestsDto){
   const params_data = {
     user_id : params.user_id,
     product_id : params.product_id,
+    policy_number : params.policy_number,
     test_date : params.test_date,
     test_end_date : params.test_end_date
   }
+  if(!params.policy_number) delete params_data.policy_number;
   const doc = await lastValueFrom(this.productTestDB.findUserDataForThePerformanceChart(params_data));
   if (doc.length==0) {
         const user_id = params.user_id
@@ -862,6 +870,348 @@ async fetchTotalTestsOfUserDateRange(params:ProductTestsDto){
       }
 
 }
+
+
+  async fetchTotalTestsForAdminDashboard(params:ProductTestsDto){
+  Logger.debug(`fetchTotalTestsOfUsersByTime() params:${params}} `, APP);
+
+  const today = new Date();
+    const firstDayOfMonth = new Date(today.getFullYear(), today.getMonth(), 2).toISOString().split("T")[0];
+    const lastDayOfMonth = new Date(today.getFullYear(), today.getMonth() + 1, 1).toISOString().split("T")[0];
+  if(!params.org_id){
+    if(params.version_id){
+      const total_tests_till_now = await lastValueFrom(this.productTestDB.find({version_id : params.version_id, product_id : params.product_id}));
+      const params_data = {
+        product_id : params.product_id,
+        version_id : params.version_id,
+        test_date : firstDayOfMonth,
+        test_end_date : lastDayOfMonth
+      }
+      const total_tests_this_month = await lastValueFrom(this.productTestDB.findOrgDataForThePerformanceChartAllOrgByVersionId(params_data));
+      const param_data = {
+        product_id : params.product_id,
+        version_id : params.version_id,
+        test_date : new Date().toISOString().split("T")[0],
+        test_end_date : new Date().toISOString().split("T")[0]
+      }
+      const total_tests_today = await lastValueFrom(this.productTestDB.findOrgDataForThePerformanceChartAllOrgByVersionId(param_data));
+      return {total_tests_today : total_tests_today.length,total_tests_this_month : total_tests_this_month.length,total_tests_till_now : total_tests_till_now.length}
+    }
+    else if(!params.version_id){
+      const total_tests_till_now = await lastValueFrom(this.productTestDB.find({product_id : params.product_id}));
+      const params_data = {
+        product_id : params.product_id,
+        test_date : firstDayOfMonth,
+        test_end_date : lastDayOfMonth
+      }
+      const total_tests_this_month = await lastValueFrom(this.productTestDB.findOrgDataForThePerformanceChartAllOrg(params_data));
+      const param_data = {
+        product_id : params.product_id,
+        test_date : new Date().toISOString().split("T")[0],
+        test_end_date : new Date().toISOString().split("T")[0]
+      }
+      const total_tests_today = await lastValueFrom(this.productTestDB.findOrgDataForThePerformanceChartAllOrg(param_data));
+      return {total_tests_today : total_tests_today.length,total_tests_this_month : total_tests_this_month.length,total_tests_till_now : total_tests_till_now.length}
+
+    }
+
+  }
+  else if (params.org_id){
+    if(params.version_id){
+      const total_tests_till_now = await lastValueFrom(this.productTestDB.find({version_id : params.version_id, product_id : params.product_id, org_id : params.org_id}));
+      const params_data = {
+        org_id : params.org_id,
+        product_id : params.product_id,
+        version_id : params.version_id,
+        test_date : firstDayOfMonth,
+        test_end_date : lastDayOfMonth
+      }
+      const total_tests_this_month = await lastValueFrom(this.productTestDB.findOrgDataForThePerformanceChartAllOrgByVersionIdAndOrgId(params_data));
+      const param_data = {
+        org_id : params.org_id,
+        product_id : params.product_id,
+        version_id : params.version_id,
+        test_date : new Date().toISOString().split("T")[0],
+        test_end_date : new Date().toISOString().split("T")[0]
+      }
+      const total_tests_today = await lastValueFrom(this.productTestDB.findOrgDataForThePerformanceChartAllOrgByVersionIdAndOrgId(param_data));
+      return {total_tests_today : total_tests_today.length,total_tests_this_month : total_tests_this_month.length,total_tests_till_now : total_tests_till_now.length}
+    }
+    else if(!params.version_id){
+
+      const total_tests_till_now = await lastValueFrom(this.productTestDB.find({ product_id : params.product_id, org_id : params.org_id}));
+      const params_data = {
+        org_id : params.org_id,
+        product_id : params.product_id,
+        test_date : firstDayOfMonth,
+        test_end_date : lastDayOfMonth
+      }
+      const total_tests_this_month = await lastValueFrom(this.productTestDB.findOrgDataForThePerformanceChart(params_data));
+      const param_data = {
+        org_id : params.org_id,
+        product_id : params.product_id,
+        test_date : new Date().toISOString().split("T")[0],
+        test_end_date : new Date().toISOString().split("T")[0]
+      }
+      const total_tests_today = await lastValueFrom(this.productTestDB.findOrgDataForThePerformanceChart(param_data));
+      return {total_tests_today : total_tests_today.length,total_tests_this_month : total_tests_this_month.length,total_tests_till_now : total_tests_till_now.length}      
+    }
+
+  }
+
+}
+
+
+date_arraay : any = [];
+async fetchTotalTestsForAdminDashboardByYear(params:ProductTestsDto){
+  Logger.debug(`fetchTotalTestsForAdminDashboardByYear() params:${params}} `, APP);
+
+  const date = new Date(params.test_date);
+  console.log("date",date)
+      this.date_arraay_org = [
+      new Date(date.setMonth(0,1)).toISOString().split("T")[0],
+      new Date(date.setMonth(0,31)).toISOString().split("T")[0],
+      new Date(date.setMonth(1,1)).toISOString().split("T")[0],
+      new Date(date.setMonth(1,28)).toISOString().split("T")[0],
+      new Date(date.setMonth(2,1)).toISOString().split("T")[0],
+      new Date(date.setMonth(2,31)).toISOString().split("T")[0],
+      new Date(date.setMonth(3,1)).toISOString().split("T")[0],
+      new Date(date.setMonth(3,30)).toISOString().split("T")[0],
+      new Date(date.setMonth(4,1)).toISOString().split("T")[0],
+      new Date(date.setMonth(4,31)).toISOString().split("T")[0],
+      new Date(date.setMonth(5,1)).toISOString().split("T")[0],
+      new Date(date.setMonth(5,30)).toISOString().split("T")[0],
+      new Date(date.setMonth(6,1)).toISOString().split("T")[0],
+      new Date(date.setMonth(6,31)).toISOString().split("T")[0],
+      new Date(date.setMonth(7,1)).toISOString().split("T")[0],
+      new Date(date.setMonth(7,31)).toISOString().split("T")[0],
+      new Date(date.setMonth(8,1)).toISOString().split("T")[0],
+      new Date(date.setMonth(8,30)).toISOString().split("T")[0],
+      new Date(date.setMonth(9,1)).toISOString().split("T")[0],
+      new Date(date.setMonth(9,31)).toISOString().split("T")[0],
+      new Date(date.setMonth(10,1)).toISOString().split("T")[0],
+      new Date(date.setMonth(10,30)).toISOString().split("T")[0],
+      new Date(date.setMonth(11,1)).toISOString().split("T")[0],
+      new Date(date.setMonth(11,31)).toISOString().split("T")[0]
+      ]
+      this.date_arraay.length = 12;
+    let quarter_data = [];
+    if(!params.org_id){
+    if(params.version_id){
+      for (let j=0 ; j <= this.date_arraay.length-1; j++){
+      const params_data = {
+        product_id : params.product_id,
+        version_id : params.version_id,
+        test_date : this.date_arraay_org[j*2],
+        test_end_date : this.date_arraay_org[j*2+1]
+      }
+      const total_tests_this_month = await lastValueFrom(this.productTestDB.findOrgDataForThePerformanceChartAllOrgByVersionId(params_data));
+      quarter_data.push(total_tests_this_month.length)
+    }
+  }
+    else if(!params.version_id){
+      for (let j=0 ; j <= this.date_arraay.length-1; j++){
+        const params_data = {
+        product_id : params.product_id,
+        test_date : this.date_arraay_org[j*2],
+        test_end_date : this.date_arraay_org[j*2+1]
+      }
+      const total_tests_this_month = await lastValueFrom(this.productTestDB.findOrgDataForThePerformanceChartAllOrg(params_data));
+      quarter_data.push(total_tests_this_month.length)
+    }
+
+  }
+}
+  else if (params.org_id){
+    if(params.version_id){
+      for (let j=0 ; j <= this.date_arraay.length-1; j++){
+        const params_data = {
+        org_id : params.org_id,
+        product_id : params.product_id,
+        version_id : params.version_id,
+        test_date : this.date_arraay_org[j*2],
+        test_end_date : this.date_arraay_org[j*2+1]
+      }
+      const total_tests_this_month = await lastValueFrom(this.productTestDB.findOrgDataForThePerformanceChartAllOrgByVersionIdAndOrgId(params_data));
+      quarter_data.push(total_tests_this_month.length)
+    }
+  }
+    else if(!params.version_id){
+      for (let j=0 ; j <= this.date_arraay.length-1; j++){
+        const params_data = {
+        org_id : params.org_id,
+        product_id : params.product_id,
+        test_date : this.date_arraay_org[j*2],
+        test_end_date : this.date_arraay_org[j*2+1]
+      }
+      const total_tests_this_month = await lastValueFrom(this.productTestDB.findOrgDataForThePerformanceChart(params_data));
+      quarter_data.push(total_tests_this_month.length)
+    }
+  }  
+}
+return {total_tests_this_month : quarter_data}
+
+}
+
+// so for this the data is pending and then filter by the version id is also pending, this is not whole done, check what it is
+// So only thing pending is to implement the industry fetch and also by version id, other org and user is done.
+async fetchDataForCategory(ids: number[]): Promise<any[]> {
+  // Example: Fetch additional data for each ID in the list
+  const additionalDataPromises = ids.map(async id => {
+    // Replace this with your actual data fetching mechanism
+    const param_data = {
+      org_id : id.toString(),
+      product_id : '2',
+      test_date : '22-01-2012',
+      test_end_date : '22-01-2023'
+    }
+    const additionalItem = await lastValueFrom(this.productTestDB.findOrgDataForThePerformanceChart(param_data));;
+    return additionalItem;
+  });
+
+  // Wait for all promises to resolve
+  const additionalData = await Promise.all(additionalDataPromises);
+  return additionalData;
+}
+
+
+
+
+async fetchTotalTestsForAdminDashboardByUser(params: ProductTestsDto){
+  Logger.debug(`fetchTotalTestsForAdminDashboardByUser`,APP);
+
+  const user_data = await lastValueFrom(this.user_db.find({org_id : params.org_id}));
+    const data_with_product_tests = await Promise.all(
+      user_data.map(async (item) => {
+        if(!params.version_id){
+          const param_data = {
+            user_id : item.id.toString(),
+            product_id : params.product_id,
+            test_date : params.test_date,
+            test_end_date : params.test_end_date
+          }
+    const test_data = await lastValueFrom(this.productTestDB.findUserDataForThePerformanceChart(param_data));
+    return { 
+      user_name: item.user_name,
+      user_id: item.id,
+      tests: test_data.length,
+     };
+        }
+        else { 
+          const param_data = {
+            user_id : item.id.toString(),
+            product_id : params.product_id,
+            version_id : params.version_id,
+            test_date : params.test_date,
+            test_end_date : params.test_end_date
+          }
+    const test_data = await lastValueFrom(this.productTestDB.findUserDataForThePerformanceChartAllUserByVersionIdAndOrgId(param_data));
+    return { 
+      user_name: item.user_name,
+      user_id: item.id,
+      tests: test_data.length,
+     };
+        }
+      }),
+    );
+    return data_with_product_tests;
+}
+
+
+  async fetchTotalTestsForAdminDashboardByOrgAndIndustry(params: ProductTestsDto){
+  Logger.debug(`fetchTotalTestsForAdminDashboardByOrgAndIndustry`,APP);
+
+  const org_data = await lastValueFrom(this.org_db.fetchAll());
+
+    const data_with_product_tests = await Promise.all(
+      org_data.map(async (item) => {
+        // console.log("the whole org data",org_data)
+        console.log("the  org data",item)
+        if(!params.version_id){
+          const param_data = {
+            org_id : item.id.toString(),
+            product_id : params.product_id,
+            test_date : params.test_date,
+            test_end_date : params.test_end_date
+          }
+    const test_data = await lastValueFrom(this.productTestDB.findOrgDataForThePerformanceChart(param_data));
+    return { 
+      org_name: item.organization_name,
+      org_id: item.id,
+      tests: test_data.length,
+     };
+        }
+        else { 
+          const param_data = {
+            org_id : item.id.toString(),
+            product_id : params.product_id,
+            version_id : params.version_id,
+            test_date : params.test_date,
+            test_end_date : params.test_end_date
+          }
+    const test_data = await lastValueFrom(this.productTestDB.findOrgDataForThePerformanceChartAllOrgByVersionIdAndOrgId(param_data));
+    return { 
+      org_name: item.organization_name,
+      org_id: item.id,
+      tests: test_data.length,
+     };
+        }
+      }),
+    );
+    return data_with_product_tests;
+
+
+    // From here the fetch by industry starts
+
+  //   const categorizedData = {};
+
+  // // Categorize the initial data based on industry_id
+  // org_data.forEach(item => {
+  //   const industryId = item.industry_id;
+  //   if (!categorizedData[industryId]) {
+  //     categorizedData[industryId] = [];
+  //   }
+  //   categorizedData[industryId].push(item);
+  // });
+  // const categorizedDataWithAdditional = await Promise.all(
+  //   Object.entries(categorizedData).map(async ([industryId, items]: [string, any[]]) => {
+  //     // console.log("the itens abd und",industryId, items)
+  //     const ids = items.map(item => item.id);
+  //     // console.log("ids in the ind",ids)
+  //     // const param_data = {
+  //     //               org_id : '1',
+  //     //               product_id : params.product_id,
+  //     //               test_date : params.test_date,
+  //     //               test_end_date : params.test_end_date
+  //     //             }
+  //     const additionalData = await this.fetchDataForCategory(ids);
+  //     console.log("additional datq",additionalData)
+  //      const totalTests = additionalData.reduce((accumulator, data) => {
+  //       console.log("daya",data,accumulator)
+  //       return accumulator + (data.length || 0);
+  //     }, 0);
+
+  //     const categoryTests = additionalData.reduce((accumulator, data) => {
+  //       console.log("daya lengjht",data.length)
+  //       return  (data.length || 0);
+  //     }, 0);
+  //     const percentage = totalTests === 0 ? 0 : (categoryTests / totalTests) * 100;
+
+      
+
+  //     return { industryId, tests: percentage };
+  //   }),
+  // );
+
+  // return categorizedDataWithAdditional;
+
+       }
+
+    // return {data_from_org : data_with_product_tests};
+
+
+
+// }
 
 
 }
