@@ -366,7 +366,7 @@ export class VideoToVitalsController {
     return this.usersService.deleteLastUserRow();
   }
 
-  @Post('webApp/url/canara')
+  @Post('generate/scanLink')
   generateEncryptedUrlForCanara(@Body() EncryptUrlDTO: EncryptUrlDTO) {
     Logger.debug(`generateEncryptedUrlForCanara()  EncryptUrlDTO:${JSON.stringify(EncryptUrlDTO)} `, APP);
 
