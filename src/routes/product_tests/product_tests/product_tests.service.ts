@@ -1053,12 +1053,8 @@ return {total_tests_this_month : quarter_data}
 
 }
 
-// so for this the data is pending and then filter by the version id is also pending, this is not whole done, check what it is
-// So only thing pending is to implement the industry fetch and also by version id, other org and user is done.
 async fetchDataForCategory(ids: number[]): Promise<any[]> {
-  // Example: Fetch additional data for each ID in the list
   const additionalDataPromises = ids.map(async id => {
-    // Replace this with your actual data fetching mechanism
     const param_data = {
       org_id : id.toString(),
       product_id : '2',
@@ -1118,8 +1114,8 @@ async fetchTotalTestsForAdminDashboardByUser(params: ProductTestsDto){
 }
 
 
-  async fetchTotalTestsForAdminDashboardByOrgAndIndustry(params: ProductTestsDto){
-  Logger.debug(`fetchTotalTestsForAdminDashboardByOrgAndIndustry`,APP);
+async fetchTotalTestsForAdminDashboardByOrg(params: ProductTestsDto){
+  Logger.debug(`fetchTotalTestsForAdminDashboardByOrg`,APP);
 
   const org_data = await lastValueFrom(this.org_db.fetchAll());
 
@@ -1159,59 +1155,84 @@ async fetchTotalTestsForAdminDashboardByUser(params: ProductTestsDto){
       }),
     );
     return data_with_product_tests;
+}
 
+  async fetchTotalTestsForAdminDashboardByOrgAndIndustry(params: ProductTestsDto){
+  Logger.debug(`fetchTotalTestsForAdminDashboardByOrgAndIndustry`,APP);
 
-    // From here the fetch by industry starts
+  const org_data = await lastValueFrom(this.org_db.fetchAll());
 
-  //   const categorizedData = {};
+const industryGroups = {};
 
-  // // Categorize the initial data based on industry_id
-  // org_data.forEach(item => {
-  //   const industryId = item.industry_id;
-  //   if (!categorizedData[industryId]) {
-  //     categorizedData[industryId] = [];
-  //   }
-  //   categorizedData[industryId].push(item);
-  // });
-  // const categorizedDataWithAdditional = await Promise.all(
-  //   Object.entries(categorizedData).map(async ([industryId, items]: [string, any[]]) => {
-  //     // console.log("the itens abd und",industryId, items)
-  //     const ids = items.map(item => item.id);
-  //     // console.log("ids in the ind",ids)
-  //     // const param_data = {
-  //     //               org_id : '1',
-  //     //               product_id : params.product_id,
-  //     //               test_date : params.test_date,
-  //     //               test_end_date : params.test_end_date
-  //     //             }
-  //     const additionalData = await this.fetchDataForCategory(ids);
-  //     console.log("additional datq",additionalData)
-  //      const totalTests = additionalData.reduce((accumulator, data) => {
-  //       console.log("daya",data,accumulator)
-  //       return accumulator + (data.length || 0);
-  //     }, 0);
+  org_data.forEach((org) => {
+    const industryId = org.industry_id;
 
-  //     const categoryTests = additionalData.reduce((accumulator, data) => {
-  //       console.log("daya lengjht",data.length)
-  //       return  (data.length || 0);
-  //     }, 0);
-  //     const percentage = totalTests === 0 ? 0 : (categoryTests / totalTests) * 100;
+    if (!industryGroups[industryId]) {
+      industryGroups[industryId] = [];
+    }
 
+    industryGroups[industryId].push(org.id); 
+  });
+
+  const responses = [];
+  let totalResponseLength = 0;
+
+  for (const industryId in industryGroups) {
+    if (Object.hasOwnProperty.call(industryGroups, industryId)) {
+      const orgIds = industryGroups[industryId];
       
+      const response = await this.yourFunctionToProcessOrgData(industryId, orgIds, params);
+      const responseLength = response.reduce((total, currentArray) => total + currentArray.length, 0);
 
-  //     return { industryId, tests: percentage };
-  //   }),
-  // );
+      totalResponseLength += responseLength;
+    }
+  }
 
-  // return categorizedDataWithAdditional;
+  for (const industryId in industryGroups) {
+    if (Object.hasOwnProperty.call(industryGroups, industryId)) {
+      const orgDataList = industryGroups[industryId];
+      
+      const response = await this.yourFunctionToProcessOrgData(industryId, orgDataList, params);
 
-       }
+      const responsePercentage = (response.reduce((total, currentArray) => total + currentArray.length, 0) / totalResponseLength) * 100;
 
-    // return {data_from_org : data_with_product_tests};
+      responses.push({ industry_id: industryId, response_percentage: Math.round(responsePercentage * (10**2)) / (10**2) });
+    }
+  }
+  return responses;
+}
 
 
+async yourFunctionToProcessOrgData(industryId, orgDataList, params) {
+  const results =[];
+  for (const orgData of orgDataList) {
+  if(params.version_id){
+    const param_data = {
+      org_id : orgData.toString(),
+      product_id : params.product_id,
+      version_id : params.version_id,
+      test_date : params.test_date,
+      test_end_date : params.test_end_date
+    }
+    const result = await lastValueFrom(this.productTestDB.findOrgDataForThePerformanceChartAllOrgByVersionIdAndOrgId(param_data));
+    results.push(result)
 
-// }
+  }
+  else{
+    const param_data = {
+      org_id : orgData.toString(),
+      product_id : params.product_id,
+      test_date : params.test_date,
+      test_end_date : params.test_end_date
+    }
+    const result = await lastValueFrom(this.productTestDB.findOrgDataForThePerformanceChart(param_data));
+    results.push(result)
+    
+  }
+}
+return results;
+}
+
 
 
 }

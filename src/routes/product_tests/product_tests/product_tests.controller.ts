@@ -98,6 +98,13 @@ export class ProductTestsController {
   }
 
   @Get('tests/admin/board/filterperiod/org')
+  fetchTotalTestsForAdminDashboardByOrg(@Query() params :ProductTestsDto) {
+    Logger.debug(`fetchTotalTestsForAdminDashboardByOrg()`, APP);
+
+    return this.ProductTestsService.fetchTotalTestsForAdminDashboardByOrg(params)
+  }
+
+  @Get('tests/admin/board/filterperiod/industry')
   fetchTotalTestsForAdminDashboardByOrgAndIndustry(@Query() params :ProductTestsDto) {
     Logger.debug(`fetchTotalTestsForAdminDashboardByOrgAndIndustry()`, APP);
 
