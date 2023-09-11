@@ -373,7 +373,7 @@ export class VideoToVitalsController {
     return this.organizationService.generateEncryptedUrlForCanara(EncryptUrlDTO)
   }
 
-  @Post('webApp/url/healthIndia')
+  @Post('generateEncryptedScanLink')
   generateEncryptedUrlForHealthIndia(@Body() EncryptUrlDTO: EncryptUrlDTO) {
     Logger.debug(`generateEncryptedUrlForHealthIndia()  EncryptUrlDTO:${JSON.stringify(EncryptUrlDTO)} `, APP);
 

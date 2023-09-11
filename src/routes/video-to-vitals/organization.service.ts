@@ -974,10 +974,11 @@ export class OrganizationService {
     generateEncryptedUrlForHealthIndia(EncryptUrlDTO : EncryptUrlDTO){
       Logger.debug(`generateEncryptedUrlForHealthIndia,APP`,APP);
 
-      EncryptUrlDTO.orgId = '88';
-      EncryptUrlDTO.userId = '689';
-      EncryptUrlDTO.tenantId = '88';
+      EncryptUrlDTO.orgId = '124';
+      EncryptUrlDTO.userId = '678';
+      EncryptUrlDTO.tenantId = '124';
         const str = this.createQueryString(EncryptUrlDTO);
+        console.log("the str",str)
         const url = 'https://fedo.ai/products/vitals/webapp/vitals?' + 'secureparam=' + this.encryptPassword(str);
         return url;
     }
