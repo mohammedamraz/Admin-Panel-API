@@ -71,26 +71,42 @@ export class ThirdpartyOrganizationService {
   fetchAPIUrlByThirdPartyOrganization(params: ParamsDto, body: RequestToAPIDto) {
     Logger.debug(`fetchAPIUrlByThirdPartyOrganization() createProductDto:${params} }`, APP);
 
+    let api_response : any;
     return this.tpaJunctionDB.find({ org_id: params.org_id, id: params.id }).pipe(
-      switchMap(doc => {
-        return this.http.post(`${doc[0].api_url_status}`, body)
-          .pipe(map(res => {
-            return { status: res.data, doc }
-          }))
+      switchMap(async doc => {
+        if(doc[0].x_api_key){
+        api_response = await axios.post(doc[0].api_url_status, body, {
+          headers: {
+            'x-api-key': doc[0].x_api_key
+          },
+        });
+      }
+      else {
+        api_response = await axios.post(doc[0].api_url_status, body);
+      }
+        return  { status: api_response.data, doc };
       }),
-      catchError(err => { throw new BadRequestException() })
+      catchError(err => {console.log("err",err); throw new BadRequestException() })
     )
   }
 
   fetchAPIUrlByThirdPartyOrganizationId(params: ParamsDto, body: any) {
     Logger.debug(`fetchAPIUrlByThirdPartyOrganizationId() createProductDto:${params} }`, APP);
+    let api_response : any;
 
     return this.tpaJunctionDB.find({ org_id: params.org_id, id: params.id }).pipe(
-      switchMap(doc => {
-        return this.http.post(`${doc[0].api_url_vitals}`, [body])
-          .pipe(map(res => {
-            return { status: res.data, doc }
-          }))
+      switchMap(async doc => {
+        if(doc[0].x_api_key){
+        api_response = await axios.post(doc[0].api_url_vitals, body, {
+          headers: {
+            'x-api-key': doc[0].x_api_key
+          },
+        });
+      }
+      else {
+        api_response = await axios.post(doc[0].api_url_status, body);
+      }
+        return  { status: api_response.data, doc };
       }),
       catchError(err => { throw new BadRequestException() })
     )
