@@ -74,11 +74,9 @@ export class ThirdpartyOrganizationService {
     let api_response : any;
     return this.tpaJunctionDB.find({ org_id: params.org_id, id: params.id }).pipe(
       switchMap(async doc => {
-        if(doc[0].x_api_key){
+        if(doc[0].header){
         api_response = await axios.post(doc[0].api_url_status, body, {
-          headers: {
-            'x-api-key': doc[0].x_api_key
-          },
+          headers: doc[0].header
         });
       }
       else {
@@ -96,11 +94,9 @@ export class ThirdpartyOrganizationService {
 
     return this.tpaJunctionDB.find({ org_id: params.org_id, id: params.id }).pipe(
       switchMap(async doc => {
-        if(doc[0].x_api_key){
+        if(doc[0].header){
         api_response = await axios.post(doc[0].api_url_vitals, body, {
-          headers: {
-            'x-api-key': doc[0].x_api_key
-          },
+          headers: doc[0].header
         });
       }
       else {
