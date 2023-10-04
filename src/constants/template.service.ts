@@ -1027,7 +1027,7 @@ export class TemplateService {
                         <body style="font-family:'Montserrat',sans-serif;">
                            <div style="display: grid;">
                            <p>Dear <b>${content.organisation_admin_name}</b>, <br><br>Your pilot has expired on ${content.expired_date}. You will not be able to access the ${content.product_name} App or Admin Panel. <br> <br></p>
-                             <p>You may get in touch with Fedo at <a>hello@fedo.ai</a> or call us at +91 8904494455 to discuss if you would like to continue using <b>Vitals</b>.<br></p>
+                             <p>You may get in touch with Fedo at <a>hello@fedo.ai</a> to discuss if you would like to continue using <b>Vitals</b>.<br></p>
                              
                              <p>Good Day!<br></p>
                              <p>Regards</p>

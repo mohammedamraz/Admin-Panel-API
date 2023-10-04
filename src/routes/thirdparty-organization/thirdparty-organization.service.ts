@@ -100,7 +100,7 @@ export class ThirdpartyOrganizationService {
         });
       }
       else {
-        api_response = await axios.post(doc[0].api_url_status, body);
+        api_response = await axios.post(doc[0].api_url_vitals, body);
       }
         return  { status: api_response.data, doc };
       }),

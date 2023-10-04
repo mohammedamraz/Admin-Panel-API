@@ -18,7 +18,7 @@ export class CustomerInsightsService {
     CreateCustomerInsight(customer_id: any, CreateCustomerInsightDTO: CreateCustomerInsightDTO) {
         Logger.debug(`CreateCustomerInsight id: ${customer_id}`, APP)
 
-        CreateCustomerInsightDTO.created_time = new Date().toLocaleTimeString();
+        CreateCustomerInsightDTO.created_time = new Date().getTime();
         return this.FetchCustomerInsightById(customer_id).pipe(map(doc => {
             if (doc.length == 0) {
                 CreateCustomerInsightDTO.customer_id = customer_id;
@@ -45,7 +45,7 @@ export class CustomerInsightsService {
     UpdateCustomerInsight(customer_id: any, QueryParamsDto: QueryParamsDto, UpdateCustomerInsightsDTO: UpdateCustomerInsightsDTO) {
         Logger.debug(`UpdateCustomerInsight id : ${customer_id}`, APP)
 
-        UpdateCustomerInsightsDTO.updated_time = new Date().toLocaleTimeString();
+        UpdateCustomerInsightsDTO.updated_time = new Date().getTime();
         UpdateCustomerInsightsDTO.updated_date = new Date();
         if (!QueryParamsDto.type) {
             return this.insights_db.findandUpdate({ columnName: 'customer_id', columnvalue: customer_id, quries: UpdateCustomerInsightsDTO })
