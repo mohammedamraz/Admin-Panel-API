@@ -337,12 +337,12 @@ export class VideoToVitalsController {
   //   return this.organizationService.updateOrganization(id, updateOrganizationDto);
   // }
 
-  @Cron('30 6 0 * * *', { timeZone: 'Asia/Kolkata', })
-  fetchOrgDetailsByExpiryDateForDays(@Query() params: ZQueryParamsDto){
-    Logger.debug(`fetchOrgDetailsByExpiryDateForDays() params:${params}} `, APP);
+  // @Cron('30 6 0 * * *', { timeZone: 'Asia/Kolkata', })
+  // fetchOrgDetailsByExpiryDateForDays(@Query() params: ZQueryParamsDto){
+  //   Logger.debug(`fetchOrgDetailsByExpiryDateForDays() params:${params}} `, APP);
 
-   return this.organizationService.fetchOrgDetailsByExpiryDateForDays(params)
-  }
+  //  return this.organizationService.fetchOrgDetailsByExpiryDateForDays(params)
+  // }
 
 
   @Cron('30 6 0 * * *', { timeZone: 'Asia/Kolkata', })

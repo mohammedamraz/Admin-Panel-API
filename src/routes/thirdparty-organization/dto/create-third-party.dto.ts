@@ -8,7 +8,9 @@ export class CreateThirdPartyOrganizationDto {
     org_id?: string;
     api_url_status? : any;
     api_url_vitals? : any;
+    x_api_key? : any;
     is_batchprocess? : boolean;
+    header? : any;
 }
 
 export class ParamsDto {
@@ -46,6 +48,8 @@ export class UpdateThirdPartyOrganizationJunctionDto {
     api_url_status? : any;
     api_url_vitals? : any;
     is_batchprocess? : boolean;
+    x_api_key? : any;
+    header? : any;
 }
 
 // export class CreateThirdPartyOrganizationDto {
