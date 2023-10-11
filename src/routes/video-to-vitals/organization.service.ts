@@ -977,6 +977,18 @@ export class OrganizationService {
       EncryptUrlDTO.orgId = '124';
       EncryptUrlDTO.userId = '678';
       EncryptUrlDTO.tenantId = '124';
+      // This to do in a dynamic way, we can call by tpa_name rather than calling as org_name and that will work
+      // return this.organizationDb.findByAlphabet(EncryptUrlQueryDTO).pipe(map(doc => {
+      //   console.log("doc",doc);
+      //   EncryptUrlDTO.orgId = doc[0].id.toString();
+      // })),
+      // map(_res  => {
+      //   return this.usersService.fetchUserByOrgId(_res[0].id);
+
+      // }),
+      // map(_doc =>{
+      //   console.log("doc",_doc)
+      // })
         const str = this.createQueryString(EncryptUrlDTO);
         console.log("the str",str)
         const url = 'https://fedo.ai/products/vitals/webapp/vitals?' + 'secureparam=' + this.encryptPassword(str);

@@ -198,6 +198,12 @@ export class UsersService {
     return this.userDb.find({id:user_id}).pipe(map(doc=>doc))
   }
 
+  fetchUserByOrgId(org_id:any){
+    Logger.debug(`fetchUserById() addUserDTO:${JSON.stringify(org_id)} `, APP);
+
+    return this.userDb.find({org_id:org_id}).pipe(map(doc=>doc))
+  }
+
   fetchAllUsersByMobile(userDTO: UserDTO) {
     Logger.debug(`fetchAllUsertByMobile() addUserDTO:${JSON.stringify(userDTO)} `, APP);
 

@@ -483,6 +483,7 @@ export const format_organisation_update=(res,doc)=>{
     country:res?.country?res?.country:doc?.country,
     state:res?.state?res?.state:doc?.state,
     zip:res?.zip?res?.zip:doc?.zip,
+    industry_id:res?.industry_id?res?.industry_id:doc?.industry_id,
     city:res?.city?res?.city:doc?.city,
     address:res?.address?res?.address:doc?.address,
     updated_date:res.updated_date
