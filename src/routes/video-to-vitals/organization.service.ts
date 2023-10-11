@@ -977,6 +977,7 @@ export class OrganizationService {
       EncryptUrlDTO.orgId = '124';
       EncryptUrlDTO.userId = '678';
       EncryptUrlDTO.tenantId = '124';
+      EncryptUrlDTO.expiryDateTime = new Date().getTime().toString();
       // This to do in a dynamic way, we can call by tpa_name rather than calling as org_name and that will work
       // return this.organizationDb.findByAlphabet(EncryptUrlQueryDTO).pipe(map(doc => {
       //   console.log("doc",doc);
