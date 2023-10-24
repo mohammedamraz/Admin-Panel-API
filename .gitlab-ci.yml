@@ -69,10 +69,10 @@ Deploy:
     -     npm install -g nexe
     -     nexe dist/src/main.js -o $TAGGED_APP_VERSION -t x64-14.15.3
     -     tar -czf $TAGGED_APP_VERSION.tar $TAGGED_APP_VERSION
-    -     chmod 400 $SSH_PRIVATE_KEY_ABSLI_PROD
+    -     chmod 400 $FEDO_AI_NEW_HEALTH_WEBSITE
     -     echo "Deploying to PROD"
-    -     scp -i $SSH_PRIVATE_KEY_ABSLI_PROD -o StrictHostKeyChecking=no $TAGGED_APP_VERSION.tar ubuntu@canarahsbc.fedo.ai:~
-    -     ssh -i $SSH_PRIVATE_KEY_ABSLI_PROD -o StrictHostKeyChecking=no ubuntu@canarahsbc.fedo.ai "sudo systemctl stop $SERVICE_NAME;$AS_FEDO_PROD bash -c \"cp $TAGGED_APP_VERSION.tar $RELEASE_LOCATION_PROD; cd $DEPLOY_LOCATION_PROD; pwd; unlink $SERVICE_NAME; rm -rf *; tar -xzf $RELEASE_LOCATION_PROD/$TAGGED_APP_VERSION.tar;ln -s $DEPLOY_LOCATION_PROD/$TAGGED_APP_VERSION $DEPLOY_LOCATION_PROD/$SERVICE_NAME\"; cd; rm -f $TAGGED_APP_VERSION.tar; sudo systemctl start $SERVICE_NAME;"
+    -     scp -i $FEDO_AI_NEW_HEALTH_WEBSITE -o StrictHostKeyChecking=no $TAGGED_APP_VERSION.tar ubuntu@fedo.ai:~
+    -     ssh -i $FEDO_AI_NEW_HEALTH_WEBSITE -o StrictHostKeyChecking=no ubuntu@fedo.ai "sudo systemctl stop $SERVICE_NAME;$AS_FEDO_PROD bash -c \"cp $TAGGED_APP_VERSION.tar $RELEASE_LOCATION_PROD; cd $DEPLOY_LOCATION_PROD; pwd; unlink $SERVICE_NAME; rm -rf *; tar -xzf $RELEASE_LOCATION_PROD/$TAGGED_APP_VERSION.tar;ln -s $DEPLOY_LOCATION_PROD/$TAGGED_APP_VERSION $DEPLOY_LOCATION_PROD/$SERVICE_NAME\"; cd; rm -f $TAGGED_APP_VERSION.tar; sudo systemctl start $SERVICE_NAME;"
     - fi
     - cd
     - rm -f $TAGGED_APP_VERSION.tar
