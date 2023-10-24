@@ -463,7 +463,6 @@ export const format_organisation=(res)=>{
     address:res?.address || null,
     is_web : res.is_web ? res.is_web : false, 
     is_read : res.is_read ? res.is_read : false, 
-    user_level_access : res.user_level_access ? res.user_level_access : false, 
     industry_id : res.industry_id ? res.industry_id : 1, 
 }
 
@@ -489,7 +488,6 @@ export const format_organisation_update=(res,doc)=>{
     state:res?.state?res?.state:doc?.state,
     zip:res?.zip?res?.zip:doc?.zip,
     industry_id:res?.industry_id?res?.industry_id:doc?.industry_id,
-    user_level_access:res?.user_level_access?res?.user_level_access:doc?.user_level_access,
     city:res?.city?res?.city:doc?.city,
     address:res?.address?res?.address:doc?.address,
     updated_date:res.updated_date
@@ -540,7 +538,8 @@ export const format_org_product_juction=(res,index,id)=>{
         is_questionnaire: res.enable_questionnaire ? res.enable_questionnaire[index] : false, 
         save_data: res.save_data ? res.save_data[index] : true, 
         enable_sdk: res.enable_sdk ? res.enable_sdk[index] : false, 
-        status: "Active",
+    user_level_access : res.user_level_access ? res.user_level_access : false, 
+    status: "Active",
     }
     return data
 }
@@ -587,7 +586,8 @@ export const format_org_product_juction_update=(res,index,id)=>{
         mobile_access: res.productaccess_mobile ? res.productaccess_mobile[index] : false, 
         save_data: res.save_data ? res.save_data[index] : true, 
         enable_sdk: res.enable_sdk ? res.enable_sdk[index] : false, 
-        status: "Active",
+    user_level_access:res?.user_level_access?res?.user_level_access:false,
+    status: "Active",
     }
     return data
 }
