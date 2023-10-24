@@ -7,4 +7,5 @@ export class CreateUserProductJunctionDto {
     attempts? : any;
     is_pilot_duration? : any;
     role ? : any;
+    is_dashboard? : boolean
 }

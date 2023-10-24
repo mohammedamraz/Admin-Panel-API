@@ -23,6 +23,7 @@ export class CreateOrganizationDto {
     // @IsString()
     url: string;
     industry_id? : any;
+    user_level_access? : Array<boolean>;
     start_date: Date;
     end_date: Date;
     @IsOptional()
@@ -105,6 +106,7 @@ export class UpdateWholeOrganizationDto {
     @IsOptional()
     logo: string;
     industry_id? : any;
+    user_level_access? : boolean;
     pilot_duration: number;
     product_name: string;
     product_id: string;
@@ -227,6 +229,7 @@ export class UserDTO {
     is_register? : boolean;
     total_test? : any;
     role? : Array<string>;
+    is_dashboard? : Array<boolean>;
 }
 
 
@@ -283,8 +286,9 @@ export class UpdateUserDTO {
     tests?:any;
     type? :any;
     is_register? : boolean
-    role ? : any;
+    role? : any;
     attempts? :any;
+    is_dashboard? : boolean;
 
 }
 
@@ -459,6 +463,7 @@ export const format_organisation=(res)=>{
     address:res?.address || null,
     is_web : res.is_web ? res.is_web : false, 
     is_read : res.is_read ? res.is_read : false, 
+    user_level_access : res.user_level_access ? res.user_level_access : false, 
     industry_id : res.industry_id ? res.industry_id : 1, 
 }
 
@@ -484,6 +489,7 @@ export const format_organisation_update=(res,doc)=>{
     state:res?.state?res?.state:doc?.state,
     zip:res?.zip?res?.zip:doc?.zip,
     industry_id:res?.industry_id?res?.industry_id:doc?.industry_id,
+    user_level_access:res?.user_level_access?res?.user_level_access:doc?.user_level_access,
     city:res?.city?res?.city:doc?.city,
     address:res?.address?res?.address:doc?.address,
     updated_date:res.updated_date
