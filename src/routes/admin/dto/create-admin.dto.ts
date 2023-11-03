@@ -169,6 +169,7 @@ export class EncryptUrlDTO {
   userId? : string;
   tenantId? : string;
   org_name? : string;
+  time_stamp? : boolean;
   
 }
 export class createAccount {

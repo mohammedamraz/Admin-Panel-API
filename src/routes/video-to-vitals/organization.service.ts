@@ -974,10 +974,19 @@ export class OrganizationService {
     generateEncryptedUrlForHealthIndia(EncryptUrlDTO : EncryptUrlDTO){
       Logger.debug(`generateEncryptedUrlForHealthIndia,APP`,APP);
 
-      EncryptUrlDTO.orgId = '124';
-      EncryptUrlDTO.userId = '678';
+      EncryptUrlDTO.orgId = '19';
+      EncryptUrlDTO.userId = '702';
       EncryptUrlDTO.tenantId = '124';
-      EncryptUrlDTO.expiryDateTime = new Date().getTime().toString();
+      if(EncryptUrlDTO.time_stamp == true){
+
+       EncryptUrlDTO.expiryDateTime = new Date().getTime().toString();
+       delete EncryptUrlDTO.time_stamp;
+      }
+      else{
+
+       delete EncryptUrlDTO.time_stamp;
+       delete EncryptUrlDTO.expiryDateTime;
+      }
       // This to do in a dynamic way, we can call by tpa_name rather than calling as org_name and that will work
       // return this.organizationDb.findByAlphabet(EncryptUrlQueryDTO).pipe(map(doc => {
       //   console.log("doc",doc);
@@ -992,7 +1001,7 @@ export class OrganizationService {
       // })
         const str = this.createQueryString(EncryptUrlDTO);
         console.log("the str",str)
-        const url = 'https://fedo.ai/products/vitals/webapp/vitals?' + 'secureparam=' + this.encryptPassword(str);
+        const url = 'https://fedo.ai/products/vitals/webapp/vitals?'+ str;
         return url;
     }
 
