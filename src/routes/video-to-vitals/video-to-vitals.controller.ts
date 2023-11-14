@@ -11,6 +11,7 @@ import { ZQueryParamsDto } from '../org-product-junction/dto/create-org-product-
 import { Cron } from '@nestjs/schedule';
 import { JoiValidationPipe } from 'src/constants/pipes';
 import { url } from 'inspector';
+import { StatusDTO, VitalsDTO } from './dto/vitals-dto';
 
 
 const APP = "VideoToVitalsController"
@@ -394,6 +395,45 @@ export class VideoToVitalsController {
 
     return this.organizationService.uploadPDFTOPresignedUrl(body);
   }
+
+  @Get('vitals/vitals-details')
+  
+  findAllVitalsDetails(@Body() vitalsDTO: VitalsDTO) {
+    Logger.debug(`findAllVitalsDetails() VitalsDTO:${JSON.stringify(vitalsDTO)} `);
+
+    return this.videoToVitalsService.findAllVitalsDetails(vitalsDTO);
+  }
+  @Get('status/fetch')
+  fetchCustomerIdAndScanId(@Query('cust_id') cust_id: StatusDTO,@Query('scan_id') scan_id: StatusDTO) {
+    Logger.debug(`fetchCustomerId() customer_id:${cust_id}`, APP);
+    Logger.debug(`fetchScanId() scan_id:${scan_id}`, APP);
+    
+    return this.videoToVitalsService.fetchCustomerIdAndScanId(cust_id,scan_id);
+  }
+
+  @Get('vitals/fetch')
+  fetchRowDetails(@Query('cust_id') cust_id: VitalsDTO,@Query('scan_id') scan_id: VitalsDTO){
+    Logger.debug(`fetchCustomerById() customer_id:${cust_id}`, APP);
+    Logger.debug(`fetchScanById() scan_id:${scan_id}`, APP);
+
+    return this.videoToVitalsService.fetchRowDetails(cust_id,scan_id);
+  }
+
+  @Post('status')
+  
+  saveToStatusDb(@Body() statusDTO: StatusDTO) {
+    Logger.debug(`saveToStatusDb() StatusDTO:${JSON.stringify(statusDTO)} `);
+
+    return this.videoToVitalsService.saveToStatusDb(statusDTO);
+  }
+
+  @Patch('vitals/update-info/:id')
+  updateVitalsData(@Param('id') id: number, @Body() vitalsDTO: VitalsDTO){
+    Logger.debug(`updateVitalsData() id:${id} vitalsDTO: ${JSON.stringify(vitalsDTO)} `, APP);
+    return this.videoToVitalsService.updateVitalsData(id, vitalsDTO);
+  }
+
+
 }
 
 

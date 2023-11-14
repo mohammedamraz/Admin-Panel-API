@@ -16,12 +16,14 @@ import { OrganizationService } from './organization.service';
 import { CreateProductDto } from '../product/dto/create-product.dto';
 import { SendEmailService } from '../send-email/send-email.service';
 import { UsersService } from './users.service';
+import { StatusDTO, VitalsDTO } from './dto/vitals-dto';
 
 const APP = 'VideoToVitalsService'
 
 @Injectable()
 export class VideoToVitalsService {
   bucket: any;
+  res = [];
   constructor(
     @DatabaseTable('organization')
     private readonly organizationDb: DatabaseService<CreateOrganizationDto>,
@@ -40,6 +42,8 @@ export class VideoToVitalsService {
     private readonly usersService: UsersService,
     private http: HttpService,
     private readonly productService: ProductService,
+    @DatabaseTable('vitals_table') private readonly statusDb: DatabaseService<StatusDTO>,
+    @DatabaseTable('vitals_table') private readonly vitalsDb: DatabaseService<VitalsDTO>,
 
 
   ) { }
@@ -736,6 +740,10 @@ export class VideoToVitalsService {
     }))
   }
 
+
+
+  
+
   // confirmEmail(confirmEmailDTO: EmailConfirmationDTO) {
   //   Logger.debug(`confirmEmail() confirmEmailDTO:[${JSON.stringify(confirmEmailDTO,)}]`);
 
@@ -794,6 +802,71 @@ export class VideoToVitalsService {
     console.log(`${filename} uploaded.`);
 
   }
+
+
+
+      findAllVitalsDetails(vitalsDto: VitalsDTO) {
+      Logger.debug(`findAllVitalsDetails() data:${vitalsDto}}`);
+      return this.vitalsDb.fetchAll().pipe(
+         catchError(err => { throw new UnprocessableEntityException(err.message) }),
+         map(doc => {
+            if (doc.length == 0) {
+               throw new NotFoundException('No user Found')
+            }
+            else {
+               return doc
+            }
+         }),
+      );;
+   }
+
+   saveToStatusDb(statusDTO: StatusDTO) {
+      Logger.debug(`saveToStatusDb() data:${statusDTO}}`);
+      return this.statusDb.save(statusDTO);
+   }
+
+   fetchCustomerIdAndScanId(customer_id: StatusDTO, scan_id: StatusDTO) {
+      Logger.debug(`fetchCustomerIdAndScanId() cust_id:${customer_id},scan_id:${scan_id} }`, APP);
+
+      return this.statusDb.find({ customer_id: customer_id, scan_id: scan_id }).pipe(
+         switchMap((doc) => {
+            return doc
+         }),
+         map(doc => {
+            let data = new StatusDTO();
+            data.customer_id = doc.customer_id;
+            data.scan_id = doc.scan_id;
+            data.tenant_id = doc.tenant_id;
+            data.message = doc.message;
+            data.status = doc.status;
+            this.res.push(data);
+            return this.res;
+         })
+      )
+   }
+
+   fetchRowDetails(customer_id: VitalsDTO, scan_id: VitalsDTO) {
+      Logger.debug(`fetchRowDetails() cust_id:${customer_id},scan_id:${scan_id} }`, APP);
+
+      return this.vitalsDb.find({ customer_id: customer_id, scan_id: scan_id }).pipe(
+         map((doc) => {
+            return doc
+         }),)
+   }
+
+
+   updateVitalsData(id: number, vitalsDTO: VitalsDTO) {
+      Logger.debug(`updateVitalsData() id:${id} vitalsDTO: ${JSON.stringify(vitalsDTO)} `, APP);
+      return this.vitalsDb.find({ id: id }).pipe(map(res => {
+         if (res.length == 0) throw new NotFoundException('user not found')
+         else {
+            lastValueFrom(this.vitalsDb.findByIdandUpdate({ id: id.toString(), quries: vitalsDTO }))
+            
+         }
+
+      }))
+   }
+
 
 
 }
