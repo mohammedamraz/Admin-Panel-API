@@ -42,8 +42,10 @@ export class VideoToVitalsService {
     private readonly usersService: UsersService,
     private http: HttpService,
     private readonly productService: ProductService,
-    @DatabaseTable('vitals_table') private readonly statusDb: DatabaseService<StatusDTO>,
-    @DatabaseTable('vitals_table') private readonly vitalsDb: DatabaseService<VitalsDTO>,
+    @DatabaseTable('vitals_table') 
+    private readonly statusDb: DatabaseService<StatusDTO>,
+    @DatabaseTable('vitals_table') 
+    private readonly vitalsDb: DatabaseService<VitalsDTO>,
 
 
   ) { }

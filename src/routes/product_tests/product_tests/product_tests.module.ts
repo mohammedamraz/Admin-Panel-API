@@ -21,6 +21,7 @@ import { ProductTestsService } from './product_tests.service';
     DatabaseModule.forFeature({ tableName: 'users' }),
     DatabaseModule.forFeature({ tableName: 'user_profile_info' }),
     DatabaseModule.forFeature({ tableName: 'product' }),
+    DatabaseModule.forFeature({ tableName: 'vitals_table' }),
     HttpModule.register({
       timeout: 10000,
       maxRedirects: 5

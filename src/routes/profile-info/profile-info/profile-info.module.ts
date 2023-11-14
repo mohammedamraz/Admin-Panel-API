@@ -22,6 +22,8 @@ import { ProfileInfoService } from './profile-info.service';
     DatabaseModule.forFeature({ tableName: 'organization_product_junction' }),
     DatabaseModule.forFeature({ tableName: 'product' }),
     DatabaseModule.forFeature({ tableName: 'user_product_junction' }),
+  DatabaseModule.forFeature({ tableName: 'vitals_table' }),
+
     HttpModule.register({
       timeout: 10000,
       maxRedirects: 5

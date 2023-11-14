@@ -23,7 +23,9 @@ import { ProductTestsService } from '../product_tests/product_tests/product_test
 
     DatabaseModule.forFeature({ tableName: 'product' }),
     DatabaseModule.forFeature({ tableName: 'user_product_junction' }),
+    DatabaseModule.forFeature({ tableName: 'vitals_table' }),
     DatabaseModule.forFeature({ tableName: 'product_tests' }),
+    
   
     HttpModule.register({
       timeout: 10000,
