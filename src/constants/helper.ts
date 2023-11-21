@@ -80,3 +80,21 @@ export const decryptPassword = (encryptedPassword) => {
     return JSON.parse(decryptedString)
   
   }
+
+  export const encryptXAPIKey=(APIKey) =>{
+    const NodeRSA = require('node-rsa');
+    // const apiKey = "custid=1&orgid=10";
+    let key_public = new NodeRSA(PUBLIC_KEY)
+    var encryptedString = key_public.encrypt(APIKey, 'base64')
+    console.log(encryptedString);
+    return encryptedString
+   }
+
+   export const decryptXAPIKey=(encryptXAPIKey)=>{
+    const NodeRSA = require('node-rsa');
+	var private_key = PRIVATE_KEY
+	let key_private = new NodeRSA(private_key)
+    var decryptedString = key_private.decrypt(encryptXAPIKey, 'utf8')
+    return JSON.parse(decryptedString)
+   }
+  

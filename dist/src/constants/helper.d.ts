@@ -8,3 +8,5 @@ export declare const editFileName: (req: any, file: any, callback: any) => void;
 export declare const imageFileFilter: (req: any, file: any, callback: any) => any;
 export declare const encryptPassword: (password: any) => any;
 export declare const decryptPassword: (encryptedPassword: any) => any;
+export declare const encryptXAPIKey: (APIKey: any) => any;
+export declare const decryptXAPIKey: (encryptXAPIKey: any) => any;

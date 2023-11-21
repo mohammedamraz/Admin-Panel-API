@@ -1,3 +1,5 @@
+import { Optional } from "@nestjs/common";
+import { IsNotEmpty } from "class-validator";
 
 
 
@@ -5,10 +7,14 @@
 
 export class StatusDTO{
     id:number;
+    // @IsNotEmpty()
     customer_id:string;
+    // @IsNotEmpty()
     tenant_id:number;
+    // @IsNotEmpty()
     scan_id:string;
     message:string;
+    // @Optional()
     status:number;
    
 
@@ -22,10 +28,19 @@ export class StatusDTO{
     }
 }
 
+
+export class OrganisationDTO{
+    organisation_id:number;
+    user_id:number;
+    tenant_id:number;
+}
+
 export class VitalsDTO{
+// @IsNotEmpty()
 id:number;
 status:number;
 message:string;
+// @Optional()
 heart_rate:number;
 rbs:number;
 hemoglobin:number;

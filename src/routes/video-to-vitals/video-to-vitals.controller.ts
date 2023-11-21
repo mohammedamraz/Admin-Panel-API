@@ -11,7 +11,8 @@ import { ZQueryParamsDto } from '../org-product-junction/dto/create-org-product-
 import { Cron } from '@nestjs/schedule';
 import { JoiValidationPipe } from 'src/constants/pipes';
 import { url } from 'inspector';
-import { StatusDTO, VitalsDTO } from './dto/vitals-dto';
+import { OrganisationDTO, StatusDTO, VitalsDTO } from './dto/vitals-dto';
+import { Headers } from '@nestjs/common';
 
 
 const APP = "VideoToVitalsController"
@@ -396,7 +397,7 @@ export class VideoToVitalsController {
     return this.organizationService.uploadPDFTOPresignedUrl(body);
   }
 
-  @Get('vitals/vitals-details')
+  @Get('fetchAll/vitals-details')
   
   findAllVitalsDetails(@Body() vitalsDTO: VitalsDTO) {
     Logger.debug(`findAllVitalsDetails() VitalsDTO:${JSON.stringify(vitalsDTO)} `);
@@ -404,22 +405,24 @@ export class VideoToVitalsController {
     return this.videoToVitalsService.findAllVitalsDetails(vitalsDTO);
   }
   @Get('status/fetch')
-  fetchCustomerIdAndScanId(@Query('cust_id') cust_id: StatusDTO,@Query('scan_id') scan_id: StatusDTO) {
+  fetchCustomerIdAndScanId(@Headers('x-api-key') apiKey:string,@Query('cust_id') cust_id: StatusDTO,@Query('scan_id') scan_id: StatusDTO) {
     Logger.debug(`fetchCustomerId() customer_id:${cust_id}`, APP);
     Logger.debug(`fetchScanId() scan_id:${scan_id}`, APP);
-    
-    return this.videoToVitalsService.fetchCustomerIdAndScanId(cust_id,scan_id);
+    console.log("APIKey",apiKey)
+    return this.videoToVitalsService.fetchCustomerIdAndScanId(cust_id,scan_id,apiKey);
   }
 
-  @Get('vitals/fetch')
-  fetchRowDetails(@Query('cust_id') cust_id: VitalsDTO,@Query('scan_id') scan_id: VitalsDTO){
-    Logger.debug(`fetchCustomerById() customer_id:${cust_id}`, APP);
+  @Get('header/fetch')
+  fetchRowDetails(@Headers('x-api-key') apiKey:string,@Query('cust_id') cust_id: VitalsDTO,@Query('scan_id') scan_id: VitalsDTO){
+    Logger.debug(`fetchCustomerById() customer_id:${cust_id}`,`APIKey`,apiKey, APP);
     Logger.debug(`fetchScanById() scan_id:${scan_id}`, APP);
 
-    return this.videoToVitalsService.fetchRowDetails(cust_id,scan_id);
+    console.log("APIKey",apiKey)
+    return this.videoToVitalsService.fetchRowDetails(cust_id,scan_id, apiKey);
+    // return 'API Key:${api-key}';
   }
 
-  @Post('status')
+  @Post('statusDTO/status')
   
   saveToStatusDb(@Body() statusDTO: StatusDTO) {
     Logger.debug(`saveToStatusDb() StatusDTO:${JSON.stringify(statusDTO)} `);
@@ -427,10 +430,18 @@ export class VideoToVitalsController {
     return this.videoToVitalsService.saveToStatusDb(statusDTO);
   }
 
-  @Patch('vitals/update-info/:id')
+  @Patch('update-info/:id')
   updateVitalsData(@Param('id') id: number, @Body() vitalsDTO: VitalsDTO){
     Logger.debug(`updateVitalsData() id:${id} vitalsDTO: ${JSON.stringify(vitalsDTO)} `, APP);
     return this.videoToVitalsService.updateVitalsData(id, vitalsDTO);
+  }
+
+  @Post('org/enc')
+  encryptApiKey(@Body() organizationDTO: OrganisationDTO){
+    console.log(organizationDTO['data']);
+    // Logger.debug(`orgDTO org_id:${org_id} vitalsDTO: ${JSON.stringify(OrgDTO)} `, APP);
+    //return this.videoToVitalsService.saveToOrgDb(orgDTO);
+    return this.videoToVitalsService.encryptXAPIKey(organizationDTO['data']);
   }
 
 

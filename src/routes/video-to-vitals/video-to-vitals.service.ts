@@ -5,7 +5,7 @@ import { DatabaseService } from 'src/lib/database/database.service';
 import { PasswordResetDTO } from '../admin/dto/create-admin.dto';
 import { ProductService } from '../product/product.service';
 import { UserProductJunctionService } from '../user-product-junction/user-product-junction.service';
-import { AWS_COGNITO_USER_CREATION_URL_SIT, AWS_COGNITO_USER_CREATION_URL_SIT_ADMIN_PANEL, FEDO_APP, FEDO_USER_ADMIN_PANEL_POOL_NAME, PUBLIC_KEY } from 'src/constants';
+import { AWS_COGNITO_USER_CREATION_URL_SIT, AWS_COGNITO_USER_CREATION_URL_SIT_ADMIN_PANEL, FEDO_APP, FEDO_USER_ADMIN_PANEL_POOL_NAME, PRIVATE_KEY, PUBLIC_KEY } from 'src/constants';
 import { HttpService } from '@nestjs/axios';
 import { AxiosResponse } from 'axios';
 import { ConfirmForgotPasswordDTO, ForgotPasswordDTO } from '../admin/dto/login.dto';
@@ -16,7 +16,9 @@ import { OrganizationService } from './organization.service';
 import { CreateProductDto } from '../product/dto/create-product.dto';
 import { SendEmailService } from '../send-email/send-email.service';
 import { UsersService } from './users.service';
-import { StatusDTO, VitalsDTO } from './dto/vitals-dto';
+import { OrganisationDTO, StatusDTO, VitalsDTO } from './dto/vitals-dto';
+import { ConfigService } from 'src/lib/config/config.service';
+import { decryptXAPIKey, encryptXAPIKey } from 'src/constants/helper';
 
 const APP = 'VideoToVitalsService'
 
@@ -42,21 +44,22 @@ export class VideoToVitalsService {
     private readonly usersService: UsersService,
     private http: HttpService,
     private readonly productService: ProductService,
-    @DatabaseTable('vitals_table') 
+    @DatabaseTable('vitals_table')
     private readonly statusDb: DatabaseService<StatusDTO>,
-    @DatabaseTable('vitals_table') 
+    @DatabaseTable('vitals_table')
     private readonly vitalsDb: DatabaseService<VitalsDTO>,
-
+    @DatabaseTable('vitals_table')
+    private readonly con: DatabaseService<VitalsDTO>,
 
   ) { }
 
-  fetchAllVitalsPilot(id:number,queryParamsDto: QueryParamsDto) {
+  fetchAllVitalsPilot(id: number, queryParamsDto: QueryParamsDto) {
     Logger.debug(`fetchAllVitalsPilot() product_id:${id} queryParamsDto:${JSON.stringify(queryParamsDto)}`, APP);
 
     if (queryParamsDto.type == "latest") {
       return this.organizationProductJunctionDb.fetchLatestFiveByProductId(id).pipe(
-        catchError(err => {throw new UnprocessableEntityException(err.message)}),
-        map(doc => this.fetchotherDetails(doc,queryParamsDto)),
+        catchError(err => { throw new UnprocessableEntityException(err.message) }),
+        map(doc => this.fetchotherDetails(doc, queryParamsDto)),
         switchMap(doc => this.organizationService.updateStatus(doc))
       );
     }
@@ -68,7 +71,8 @@ export class VideoToVitalsService {
             throw new NotFoundException('No Data available')
           }
           else {
-            return this.fetchotherDetails(doc,queryParamsDto)
+
+            return this.fetchotherDetails(doc, queryParamsDto)
           }
         }),
         switchMap(doc => this.organizationService.updateStatus(doc))
@@ -82,7 +86,7 @@ export class VideoToVitalsService {
             throw new NotFoundException('No Data available')
           }
           else {
-            return this.fetchotherDetails(doc,queryParamsDto)
+            return this.fetchotherDetails(doc, queryParamsDto)
           }
         }),
         switchMap(doc => this.organizationService.updateStatus(doc))
@@ -90,7 +94,7 @@ export class VideoToVitalsService {
     }
   }
 
-  fetchotherDetails(createOrganizationDto: CreateOrganizationDto[],queryParamsDto: QueryParamsDto) {
+  fetchotherDetails(createOrganizationDto: CreateOrganizationDto[], queryParamsDto: QueryParamsDto) {
     Logger.debug(`fetchotherDetails() createOrganizationDto: ${JSON.stringify(createOrganizationDto)} queryParamsDto:${JSON.stringify(queryParamsDto)}`, APP);
 
     let userProfileData: CreateOrganizationDto[] = [];
@@ -104,10 +108,10 @@ export class VideoToVitalsService {
             return orgData
           })
       }),
-    )).then(_doc => this.fetchotherMoreDetails(userProfileData,queryParamsDto)).catch(err => { throw new UnprocessableEntityException(err.message) })
+    )).then(_doc => this.fetchotherMoreDetails(userProfileData, queryParamsDto)).catch(err => { throw new UnprocessableEntityException(err.message) })
   }
 
-  fetchotherMoreDetails(createOrganizationDto: CreateOrganizationDto[],queryParamsDto:QueryParamsDto) {
+  fetchotherMoreDetails(createOrganizationDto: CreateOrganizationDto[], queryParamsDto: QueryParamsDto) {
     Logger.debug(`fetchotherMoreDetails() createOrganizationDto: ${JSON.stringify(createOrganizationDto)} queryParamsDto:${JSON.stringify(queryParamsDto)}`, APP);
 
     let orgData: CreateOrganizationDto[] = [];
@@ -119,14 +123,14 @@ export class VideoToVitalsService {
             orgJunData['organization_name'] = doc[0].organization_name
             // orgJunData['org_details'] = doc[0];
             orgData.push(orgJunData);
-            orgData.sort((a: { id?: number; },b: { id?: number; })=> b.id-a.id);
-            
+            orgData.sort((a: { id?: number; }, b: { id?: number; }) => b.id - a.id);
+
             return orgJunData
 
           })
       }),
     ))
-    .then(_doc => this.organizationService.Paginator(orgData,queryParamsDto.page,queryParamsDto.per_page) ).catch(err => { throw new UnprocessableEntityException(err.message) })
+      .then(_doc => this.organizationService.Paginator(orgData, queryParamsDto.page, queryParamsDto.per_page)).catch(err => { throw new UnprocessableEntityException(err.message) })
   }
 
   fetchDate(createOrganizationDto: CreateOrganizationDto) {
@@ -236,7 +240,7 @@ export class VideoToVitalsService {
   changeRegisterStatusOnceConfirmed(id: number, queryParamsDto: QueryParamsDto) {
     Logger.debug(`changeRegisterStatusOnceConfirmed() id:${id} `, APP);
 
-    if(Boolean(queryParamsDto.is_web) == true){
+    if (Boolean(queryParamsDto.is_web) == true) {
       return this.organizationDb.find({ id: id }).pipe(
         map(doc => {
           if (doc.length == 0) {
@@ -246,21 +250,21 @@ export class VideoToVitalsService {
             return this.organizationDb.findByIdandUpdate({ id: id.toString(), quries: { is_read: true } })
           }
         }),
-  
+
       )
     }
-    else{
-    return this.organizationDb.find({ id: id, is_deleted: false }).pipe(
-      map(doc => {
-        if (doc.length == 0) {
-          throw new NotFoundException('organization not found')
-        }
-        else {
-          return this.organizationDb.findByIdandUpdate({ id: id.toString(), quries: { is_register: true } })
-        }
-      }),
+    else {
+      return this.organizationDb.find({ id: id, is_deleted: false }).pipe(
+        map(doc => {
+          if (doc.length == 0) {
+            throw new NotFoundException('organization not found')
+          }
+          else {
+            return this.organizationDb.findByIdandUpdate({ id: id.toString(), quries: { is_register: true } })
+          }
+        }),
 
-    )
+      )
     }
   }
 
@@ -310,17 +314,17 @@ export class VideoToVitalsService {
               }))
           }),
           map(async doc => {
-            userDTO.product_id.map(async (res1,index) =>{
-              
-              await lastValueFrom(this.organizationProductJunctionDb.find({org_id : userDTO["org_id"], product_id : Number(userDTO.product_id[index])}).pipe(map(async orgprod=>{
+            userDTO.product_id.map(async (res1, index) => {
 
-                await lastValueFrom(this.userProductJunctionService.createUserProductJunction({ 
-                    user_id: doc["id"], org_id: userDTO["org_id"], product_id: Number(userDTO.product_id[index]), total_tests: 0 , role : userDTO?.role[index] , attempts : orgprod[0].attempts , is_pilot_duration : orgprod[0].is_pilot_duration , is_dashboard : false
-                  }))
+              await lastValueFrom(this.organizationProductJunctionDb.find({ org_id: userDTO["org_id"], product_id: Number(userDTO.product_id[index]) }).pipe(map(async orgprod => {
+
+                await lastValueFrom(this.userProductJunctionService.createUserProductJunction({
+                  user_id: doc["id"], org_id: userDTO["org_id"], product_id: Number(userDTO.product_id[index]), total_tests: 0, role: userDTO?.role[index], attempts: orgprod[0].attempts, is_pilot_duration: orgprod[0].is_pilot_duration, is_dashboard: false
+                }))
               })))
             });
             // doc["id"]
-            await lastValueFrom(this.userProfileDb.save({ application_id: doc['application_id'], user_id: doc['id'], org_id: doc['org_id'], name : userDTO.user_name , mobile : userDTO.mobile.slice(3,14) ,  is_editable: true , country_code : '+91' }))
+            await lastValueFrom(this.userProfileDb.save({ application_id: doc['application_id'], user_id: doc['id'], org_id: doc['org_id'], name: userDTO.user_name, mobile: userDTO.mobile.slice(3, 14), is_editable: true, country_code: '+91' }))
             return doc;
           }))
       }))
@@ -347,22 +351,22 @@ export class VideoToVitalsService {
                   {
                     "email": userDTO.email,
                     "username": userDTO.email,
-                    "password": userDTO.password 
+                    "password": userDTO.password
                   }
                 ))
                 return doc[0][0]
               }))
           }),
-          map(async doc => {            
-            userDTO.product_id.map(async (res1, index) =>{
-            await lastValueFrom(this.organizationProductJunctionDb.find({org_id : userDTO["org_id"], product_id : Number(userDTO.product_id[index])}).pipe(map(async orgprod=>{
+          map(async doc => {
+            userDTO.product_id.map(async (res1, index) => {
+              await lastValueFrom(this.organizationProductJunctionDb.find({ org_id: userDTO["org_id"], product_id: Number(userDTO.product_id[index]) }).pipe(map(async orgprod => {
 
-              await lastValueFrom(this.userProductJunctionService.createUserProductJunction({
-                 user_id: doc["id"], org_id: userDTO["org_id"], product_id: Number(userDTO.product_id[index]), total_tests: 0 , role : userDTO?.role[index] , attempts : orgprod[0].attempts , is_pilot_duration : orgprod[0].is_pilot_duration, is_dashboard : false
-            }))
-            })))
-          });
-            await lastValueFrom(this.userProfileDb.save({ application_id: doc['application_id'], user_id: doc['id'], org_id: doc['org_id'], name : userDTO.user_name , mobile : userDTO.mobile.slice(3,14) , is_editable: true , country_code : '+91' }))
+                await lastValueFrom(this.userProductJunctionService.createUserProductJunction({
+                  user_id: doc["id"], org_id: userDTO["org_id"], product_id: Number(userDTO.product_id[index]), total_tests: 0, role: userDTO?.role[index], attempts: orgprod[0].attempts, is_pilot_duration: orgprod[0].is_pilot_duration, is_dashboard: false
+                }))
+              })))
+            });
+            await lastValueFrom(this.userProfileDb.save({ application_id: doc['application_id'], user_id: doc['id'], org_id: doc['org_id'], name: userDTO.user_name, mobile: userDTO.mobile.slice(3, 14), is_editable: true, country_code: '+91' }))
             return doc;
           }))
       }))
@@ -391,25 +395,25 @@ export class VideoToVitalsService {
     Logger.debug(`fetchUserDetailsById() id:${id}} `, APP);
 
     return this.userDb.find({ id: id }).pipe(
-      switchMap((userData:UserDTO[]) => {        
-        let user_data = userData[0]        
+      switchMap((userData: UserDTO[]) => {
+        let user_data = userData[0]
         console.log("new")
         return this.userProductJunctionService.fetchUserProductJunctionDataByUserId(userData[0].id)
-            .pipe(switchMap(async doc => {
-        console.log("new")
-        for (let index=0;index<=doc.length-1;index++) {
-                await lastValueFrom(this.productService.fetchProductById(doc[index].product_id).pipe(
-                  map(productDoc => {
-                      doc[index]['product']=productDoc
-                      user_data['tests'] = doc
-                      user_data['total_test'] = doc.reduce((pre, acc) => pre + acc['total_tests'], 0);
-                  }
-                  )))
+          .pipe(switchMap(async doc => {
+            console.log("new")
+            for (let index = 0; index <= doc.length - 1; index++) {
+              await lastValueFrom(this.productService.fetchProductById(doc[index].product_id).pipe(
+                map(productDoc => {
+                  doc[index]['product'] = productDoc
+                  user_data['tests'] = doc
+                  user_data['total_test'] = doc.reduce((pre, acc) => pre + acc['total_tests'], 0);
                 }
-        console.log("new")
-        return [user_data]               
-            }))
-            // .catch(err => { throw new UnprocessableEntityException(err.message) })
+                )))
+            }
+            console.log("new")
+            return [user_data]
+          }))
+        // .catch(err => { throw new UnprocessableEntityException(err.message) })
       })
     )
   }
@@ -418,20 +422,21 @@ export class VideoToVitalsService {
     Logger.debug(`fetchUserById() id:${id}} `, APP);
 
     return this.userDb.find({ id: id }).pipe(
-          concatMap((userData:any)=>{
+      concatMap((userData: any) => {
         return lastValueFrom(this.userProductJunctionService.fetchUserProductJunctionDataByUserId(userData[0].id))
-       }),
-            switchMap(async doc=>{
-              for (let index=0;index<=doc.length-1;index++) {
-                await lastValueFrom(this.productService.fetchProductById(doc[index].product_id)).then(
-                  (productDoc:any) => {
-                    Object.keys(productDoc).map((doc1,indexn)=>{
-                      doc[index][doc1]=productDoc[doc1]
-                    })
-                  } )}
-                return doc
-              }))
-            
+      }),
+      switchMap(async doc => {
+        for (let index = 0; index <= doc.length - 1; index++) {
+          await lastValueFrom(this.productService.fetchProductById(doc[index].product_id)).then(
+            (productDoc: any) => {
+              Object.keys(productDoc).map((doc1, indexn) => {
+                doc[index][doc1] = productDoc[doc1]
+              })
+            })
+        }
+        return doc
+      }))
+
   }
 
 
@@ -462,27 +467,29 @@ export class VideoToVitalsService {
     return this.userDb.find({ id: id }).pipe(
       map(res => {
         if (res.length == 0) throw new NotFoundException('User not found')
-        lastValueFrom(this.userDb.findByIdandUpdate({ id: id.toString(), quries: format_user_update(updateUserDTO,res[0]) }))
-        lastValueFrom(this.userProfileDb.findandUpdate({ columnName : 'application_id',columnvalue:res[0].application_id, quries: {name : updateUserDTO.user_name? updateUserDTO.user_name : res[0].user_name , mobile : updateUserDTO.mobile? updateUserDTO.mobile.slice(3,14) : res[0].mobile.slice(3,14)} }))
+        lastValueFrom(this.userDb.findByIdandUpdate({ id: id.toString(), quries: format_user_update(updateUserDTO, res[0]) }))
+        lastValueFrom(this.userProfileDb.findandUpdate({ columnName: 'application_id', columnvalue: res[0].application_id, quries: { name: updateUserDTO.user_name ? updateUserDTO.user_name : res[0].user_name, mobile: updateUserDTO.mobile ? updateUserDTO.mobile.slice(3, 14) : res[0].mobile.slice(3, 14) } }))
         return res
       }),
       switchMap(async res => {
-        if(updateUserDTO.product_id != undefined){
-        for (let index = 0; index < updateUserDTO.product_id.length; index++) {
-          await lastValueFrom(this.userProductJunctionDb.find({ id: updateUserDTO.product_junction_id[index] }).pipe(
-            map(async doc => {
-               if (doc.length != 0) await lastValueFrom(this.userProductJunctionDb.findByIdandUpdate({ id : updateUserDTO.product_junction_id[index],  quries:{role : updateUserDTO.role[index], attempts : updateUserDTO.attempts[index], is_dashboard : updateUserDTO.is_dashboard[index]} }))
-               else{ 
-            await lastValueFrom(this.organizationProductJunctionDb.find({org_id : res[0].org_id, product_id : Number(updateUserDTO.product_id[index])}).pipe(map(async orgprod=>{
-              await lastValueFrom(this.userProductJunctionDb.save({ user_id: id,  product_id: updateUserDTO.product_id[index], org_id : res[0].org_id, total_tests : 0 , attempts : orgprod[0].attempts , is_pilot_duration : orgprod[0].is_pilot_duration, is_dashboard : false})) })))
-            }
-          })
-          )
-          )
-        }}
+        if (updateUserDTO.product_id != undefined) {
+          for (let index = 0; index < updateUserDTO.product_id.length; index++) {
+            await lastValueFrom(this.userProductJunctionDb.find({ id: updateUserDTO.product_junction_id[index] }).pipe(
+              map(async doc => {
+                if (doc.length != 0) await lastValueFrom(this.userProductJunctionDb.findByIdandUpdate({ id: updateUserDTO.product_junction_id[index], quries: { role: updateUserDTO.role[index], attempts: updateUserDTO.attempts[index], is_dashboard: updateUserDTO.is_dashboard[index] } }))
+                else {
+                  await lastValueFrom(this.organizationProductJunctionDb.find({ org_id: res[0].org_id, product_id: Number(updateUserDTO.product_id[index]) }).pipe(map(async orgprod => {
+                    await lastValueFrom(this.userProductJunctionDb.save({ user_id: id, product_id: updateUserDTO.product_id[index], org_id: res[0].org_id, total_tests: 0, attempts: orgprod[0].attempts, is_pilot_duration: orgprod[0].is_pilot_duration, is_dashboard: false }))
+                  })))
+                }
+              })
+            )
+            )
+          }
+        }
         else return []
       })
-      )
+    )
   }
 
   updateUserByApplicationId(user_id: string, product_id: number) {
@@ -518,7 +525,7 @@ export class VideoToVitalsService {
             })
           )
         }
-        else return this.usersService.fetchAllUsersByApplicationId(doc[0].application_id,doc)
+        else return this.usersService.fetchAllUsersByApplicationId(doc[0].application_id, doc)
       }),
     )
   }
@@ -718,7 +725,7 @@ export class VideoToVitalsService {
       catchError(err => { console.log('err', err); return this.onAWSErrorResponse(err) }))
 
   }
-  
+
 
   registerWebSiteUserbyEmail(RegisterUserdto: RegisterUserDTO) {
     Logger.debug(`registerUserbyEmail(), RegisterUserdto:[${JSON.stringify(RegisterUserdto,)}] `);
@@ -737,14 +744,14 @@ export class VideoToVitalsService {
 
     RegisterUserdto.fedoApp = FEDO_USER_ADMIN_PANEL_POOL_NAME
     return this.http.post(`${AWS_COGNITO_USER_CREATION_URL_SIT}/signupcode`, { passcode: this.encryptPassword(JSON.stringify(RegisterUserdto)) }).pipe(map(res => []), catchError(err => {
-      console.log("err",err);
+      console.log("err", err);
       return this.onAWSErrorResponse(err)
     }))
   }
 
 
 
-  
+
 
   // confirmEmail(confirmEmailDTO: EmailConfirmationDTO) {
   //   Logger.debug(`confirmEmail() confirmEmailDTO:[${JSON.stringify(confirmEmailDTO,)}]`);
@@ -807,68 +814,147 @@ export class VideoToVitalsService {
 
 
 
-      findAllVitalsDetails(vitalsDto: VitalsDTO) {
-      Logger.debug(`findAllVitalsDetails() data:${vitalsDto}}`);
-      return this.vitalsDb.fetchAll().pipe(
-         catchError(err => { throw new UnprocessableEntityException(err.message) }),
-         map(doc => {
-            if (doc.length == 0) {
-               throw new NotFoundException('No user Found')
-            }
-            else {
-               return doc
-            }
-         }),
-      );;
-   }
+  findAllVitalsDetails(vitalsDto: VitalsDTO) {
+    Logger.debug(`findAllVitalsDetails() data:${vitalsDto}}`);
+    return this.vitalsDb.fetchAll().pipe(
+      catchError(err => { throw new UnprocessableEntityException(err.message) }),
+      map(doc => {
+        if (doc.length == 0) {
+          throw new NotFoundException('No user Found')
+        }
+        else {
+          return doc
+        }
+      }),
+    );;
+  }
 
-   saveToStatusDb(statusDTO: StatusDTO) {
-      Logger.debug(`saveToStatusDb() data:${statusDTO}}`);
-      return this.statusDb.save(statusDTO);
-   }
+  saveToStatusDb(statusDTO: StatusDTO) {
+    Logger.debug(`saveToStatusDb() data:${statusDTO}}`);
+    return this.statusDb.save(statusDTO);
+  }
 
-   fetchCustomerIdAndScanId(customer_id: StatusDTO, scan_id: StatusDTO) {
-      Logger.debug(`fetchCustomerIdAndScanId() cust_id:${customer_id},scan_id:${scan_id} }`, APP);
+  //  saveToOrgDb(orgDTO:OrganisationDTO){
+  //   Logger.debug(`saveToStatusDb() data:${orgDTO}}`);
+  //   return this.statusDb.save(orgDTO);
+  //  }
 
-      return this.statusDb.find({ customer_id: customer_id, scan_id: scan_id }).pipe(
-         switchMap((doc) => {
-            return doc
-         }),
-         map(doc => {
-            let data = new StatusDTO();
-            data.customer_id = doc.customer_id;
-            data.scan_id = doc.scan_id;
-            data.tenant_id = doc.tenant_id;
-            data.message = doc.message;
-            data.status = doc.status;
-            this.res.push(data);
-            return this.res;
-         })
-      )
-   }
+  fetchCustomerIdAndScanId(customer_id: StatusDTO, scan_id: StatusDTO,apiKey) {
+    Logger.debug(`fetchCustomerIdAndScanId() cust_id:${customer_id},scan_id:${scan_id} }`, APP);
+    var decryptedId:any = this.decryptXAPIKey(apiKey)
+    console.log('d', decryptedId);
+    return this.organizationService.fetchOrganizationDetailsById(decryptedId.orgId)
+    .pipe(catchError(err => { throw new UnprocessableEntityException(err.message) }),
+      map(doc => {
+        
+        
+          // console.log(doc);
+          //  return doc
+          return this.statusDb.find({ customer_id: customer_id, scan_id: scan_id }).pipe(
+              map((doc) => {
+                console.log(doc);
+                return doc
+              }))
 
-   fetchRowDetails(customer_id: VitalsDTO, scan_id: VitalsDTO) {
-      Logger.debug(`fetchRowDetails() cust_id:${customer_id},scan_id:${scan_id} }`, APP);
-
-      return this.vitalsDb.find({ customer_id: customer_id, scan_id: scan_id }).pipe(
-         map((doc) => {
-            return doc
-         }),)
-   }
-
-
-   updateVitalsData(id: number, vitalsDTO: VitalsDTO) {
-      Logger.debug(`updateVitalsData() id:${id} vitalsDTO: ${JSON.stringify(vitalsDTO)} `, APP);
-      return this.vitalsDb.find({ id: id }).pipe(map(res => {
-         if (res.length == 0) throw new NotFoundException('user not found')
-         else {
-            lastValueFrom(this.vitalsDb.findByIdandUpdate({ id: id.toString(), quries: vitalsDTO }))
-            
-         }
-
+        
       }))
-   }
+    // return this.statusDb.find({ customer_id: customer_id, scan_id: scan_id }).pipe(
+    //   switchMap((doc) => {
+    //     return doc
+    //   }),
+    //   map(doc => {
+    //     let data = new StatusDTO();
+    //     data.customer_id = doc.customer_id;
+    //     data.scan_id = doc.scan_id;
+    //     data.tenant_id = doc.tenant_id;
+    //     data.message = doc.message;
+    //     data.status = doc.status;
+    //     this.res.push(data);
+    //     return this.res;
+    //   })
+    // )
+  }
 
+
+  fetchRowDetails(customer_id: VitalsDTO, scan_id: VitalsDTO, apiKey) {
+    Logger.debug(`fetchRowDetails() cust_id:${customer_id},scan_id:${scan_id} }`, APP);
+
+    console.log("encryptXAPIKey", apiKey);
+
+    var decryptedId:any = this.decryptXAPIKey(apiKey)
+    console.log('d', decryptedId);
+
+    return this.organizationService.fetchOrganizationDetailsById(decryptedId.orgId)
+    .pipe(catchError(err => { throw new UnprocessableEntityException(err.message) }),
+      map(doc => {
+        if (doc.length == 0) {
+          throw new NotFoundException('data not found')
+        }
+        else {
+          return doc
+        }
+      }))
+    // map(), org data
+    // catch error
+    //   map(doc => {
+    //     return this.vitalsDb.find({ customer_id: customer_id, scan_id: scan_id }).pipe(
+    //       map(doc => {return doc})
+    //     )
+    //   })
+    // )
+    //       return this.vitalsDb.find({ customer_id: customer_id, scan_id: scan_id }).pipe(
+    //         map(ele => {
+    //           // this.decryptXAPIKey();
+    // // this.organizationService.fetchOrganizationDetailsById(1).pipe(map)
+    //         }),
+    //          map((doc) => {
+    //             return doc
+    //          }),)
+  }
+
+
+  updateVitalsData(id: number, vitalsDTO: VitalsDTO) {
+    Logger.debug(`updateVitalsData() id:${id} vitalsDTO: ${JSON.stringify(vitalsDTO)} `, APP);
+    return this.vitalsDb.find({ id: id }).pipe(map(res => {
+      if (res.length == 0) throw new NotFoundException('user not found')
+      else {
+        lastValueFrom(this.vitalsDb.findByIdandUpdate({ id: id.toString(), quries: vitalsDTO }))
+
+      }
+
+    }))
+  }
+
+
+  async encryptXAPIKey(encryptXAPIKey) {
+    const NodeRSA = require('node-rsa');
+    // const apiKey = "custid=1&orgid=10";
+    console.log(encryptXAPIKey, typeof (encryptXAPIKey));
+    let key_public = new NodeRSA(PUBLIC_KEY)
+    var encryptedString = await key_public.encrypt(encryptXAPIKey, 'base64')
+    console.log('result', encryptedString);
+    return JSON.stringify({ 'api-key': encryptedString })
+  }
+
+  decryptXAPIKey(apiKey) {
+    const NodeRSA = require('node-rsa');
+    // const encryptedString = "Ds6LUhvrqP/lvuWWIhh33hhOikq6g/lrzMp3gRHCiMjQ4byjOqq92M81tpl4GRykDr1iMQ1tmKtAPmjhszRlq7uigw3Rj/1jdbPWsvYQQF6HR9j2sUs9FcX9W2ty7p+qBSRW4WAzmJudQIho+4MU/+GPhuejVFEIrqo/3Ak7hUXXsk2BMkXKWjAJrn5XdpWiFhH9qFTbUxnwMrsTzX+KT8OIaJZXeHNaqsBh2bg25w/j0Bv07Pv9DXj+0rlLkYDaWtQqLqiT8YcPyJfRzKrOvwC2kkOvPBEruP3nRjYslLQxFFrbIfKYCv5EMswfviM0U9B+EfTD3opYHt9FFN1CZLWTCgrueJcsGT4soinqsMIK01SpQu3qZk3WbJy9mvZnOxnmz9tKIg0qj3400MXQZwztNpAI7Ek0Gg4b7oRofXgoxd3VRfIIL31Gwhgqy2jyGOZobaLsfvQGAb5Nu9J1d4EmlwT3AxiK34bF9uwjNZHgM6sqpnC7hxTkRMCf0xSSl5qB0S6zBdh21B9xKzUAGbSxXQ9y9o/k6/xJW+DevBi9Ovg7e+0xF3tkzO6uVAZAhhn5GTjQISl4Zj9M5bmYN/cvbRVfFhYZ8uEqoH+tC6l/QSvnwyitcmngA3sS3xlmZGDlZW7fLTkLhdzI5cxxW59U/wc1KZtzVEvv8hB89aMtf/HET75pQ89iudYOrZQfZcTRjiajE4cm1ipUkZ7CVGSs1PHzZfpljZvTYHLXv1yN0m6+kZacpueNpK9J6tdrtwekG3znZeLT91+ql5ft0IoS8Rx3P4E2te+T/xBYLDoL91GAglmTXBZDhQFUlK1zpqzL2UfgfYBKAFA9hfvXOddD0X6PPXDs120G6Y2ad3Qys2mHbgl603aFTp0naKS6cTQVYpzQ76VnMm6o8KsmIdZKr7cLXC9pWdd4WLl+kCFuFVdKutIf6EPdMwKCNhsp4VmrC29AbU0Hq8nzBhoWtdhXnaWYbgSU39ZZb7cRmLSD6fXD9RU0Rvmalk6DrgkLNPabtxb9DFlA+m7UwzaQ9VNyJn55xSmY0dPsxf0A2D2u8v61HWvQ0pAMHhsc0qJtLIQnNhKcq8IcqKZrMkqz7NWI8JQ+c1nwsEvRlo2Q8KFuTHtrVUlmJvkNp5Nuax8FGH1SrI5QDBomF9IP0udSCRScyHdFdHqSTajZTt/QWSiXhv47uHZpiLEjRXsztdfr10Db2WgxQ7nZeHtLjAyrKnhTuHmN1qe/GGAUWwuzL/P65Lt8YvqZpwxrOLvq8OJKXrscQtjIkopPukkwHRIpc2bhn7JB+asKnFH09BiOyLrdL6a4mPzJPH165icZXjmnccAPpimN2bj/gyL8eA8lhg==";
+    // const encryptedString="e0TYgxfHba8byhFZxtGaMtAS2q/S5HVu58cqRbZD80P6f7F8IzjN2bTazBCbc3UnLO4XQ7vhGSs6pKWxVlwAZjGmESgWcjfvuWsrvqsTU4EFppDPlvc0tsga2I/JGXYIkl2TUUtvp9lmSYDbuXL4sXMDpv2ryUmEvThHbAJtYHNh8cJDkjszcS9zI55ORcWbs/Ox6dBx7KyRYta56wAUzfxc3HiHjcufvz1gr0yZ4hL0d34Uva5y6B5oNfdP5/fG88w1x7fR7inIwrHEjRi4fHmgGB5fOUK6G85iWzYIUEYIHsZEfck/2WaYfBjKFDTx9+3SOsGxz382os8XKmlLERMs3Y/rrOwx4iMzR8Uw7yxuBeF+nZur/Lnwdn7teFEJklpK54+p3CLGATl1PPUwhi+kZFvfVmYa/LPI3TiIaiLZSbSWuXH7XkhnqwK7gARpFTl9m9unrFcaZnkit0eV359oUHrp21E6JqjvcBL34L0EBMcSuLDoMz+Td+A1uePIvVSGgpaBdPx0rcfRZFj0fe9FeROOJIPuE4YVG/23hEDcfP7qa1rbyI9Wt3b2LqNRWj8Gp0pdE1RUpMpn/gkW80ny8egU3exAuZxBFGcLMR8R2ANQLDGn2kkCDXHoYvos0Hf7+1nVFdK7WR51ejlncyuQoP/7c69aLGnn5vZi1TA68A/5QlV17kRmnR/tf2pYkWByrAIJtm7uSoeXDHJ39TC7XiltJx4yWrkXTXSV3Db+FohDzdLBK1OzjHlPxRo3tzv159Gn2xu+8YZoQVYk0UJRlMg8Cshxr8EWGdY8OlrdupKDLLrMy8A7lwCNpPMGTImPKNptpV59373MvUXWCSouwbI6+vx0vVkd/wND2nZThx+x4EMwpLcI/nQ8Ow59XX3gYiBkNMABUckMBNUFNrizkT8RYqiGGUDYA00cywoT8nkpCd2cJrSBqMcU3Drb773yCRoLQcsqONvLipccReDaFXQah3+E4bc8iRZvSNfrWGCPBNNlD3+KDmOyG7UUYK62AWPLsW49DbaJXamwz6T8yVZZQo4W8QrlY2PpdxzzmlTe6R5IYVSpXDkYOCo0VktgPFMO5+CiVZhT2ESYwsLfbLzO72lXhpQ7JDhLgiNSWC+xQuf1XozMeLrOGY1TADW7uD5RlxWbuIxPIjdd3PTlp4FBdY8wX9EOLIOVQAk2LPPJbgisBwGsYeLln9VatWDyoz85gGTchELA06x1vIlYYAIXQKor/fVJUpjL0Rr8cOzuQ9C+Q+L7JLqmEW4JD2UC0PlfiH7iGkiX1wUN00srgSORLrcQ1QoKgBJbbpcZwQ+tnl9EnwodsaLTLsFO3cVXep56tJgUzxk+5AExSw==";
+    let key_public = new NodeRSA(PRIVATE_KEY)
+    var decryptedString = key_public.decrypt(apiKey, 'utf8')
+    console.log(decryptedString.split('&'));
+    console.log(typeof (decryptedString));
+    var keyValueArray = decryptedString.split("&");
+    var keyValueObject = {};
+    for (var i = 0; i < keyValueArray.length; i++) {
+      var pair = keyValueArray[i].split("=");
+      var key = pair[0];
+      var value = pair[1];
+      keyValueObject[key] = value;
+      console.log(keyValueObject);
+    }
+    return keyValueObject;
+  }
 
 
 }
