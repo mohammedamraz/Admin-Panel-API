@@ -112,7 +112,7 @@ export class DatabaseService<T> implements DatabaseInterface<T> {
     const variables: Array<string> = [];
     Object.entries(findByIDAndupdateparams.quries).map((_, index1) => { values.push((`${_[0]}=$${index1 + 1}`)), variables.push(_[1]) });
     const values$ = JSON.stringify(values).replace("[", "").replace("]", "").replace(/"/g, "");
-    const query = `UPDATE ${this.tableName} SET ${values$} WHERE id = $${values.length + 1}`;
+    const query = `UPDATE ${this.tableName} SET ${values$} WHERE id = $${values.length + 1} `;
     variables.push(findByIDAndupdateparams.id);
 
     // let temp = JSON.stringify(findByIDAndupdateparams.update).replace("{", "").replace("}", "").replace(/:/g, "=").replace(/"/g, "");

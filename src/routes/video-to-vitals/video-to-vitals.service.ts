@@ -19,6 +19,7 @@ import { UsersService } from './users.service';
 import { OrganisationDTO, StatusDTO, VitalsDTO } from './dto/vitals-dto';
 import { ConfigService } from 'src/lib/config/config.service';
 import { decryptXAPIKey, encryptXAPIKey } from 'src/constants/helper';
+import { OrgProductJunctionService } from '../org-product-junction/org-product-junction.service';
 
 const APP = 'VideoToVitalsService'
 
@@ -50,6 +51,7 @@ export class VideoToVitalsService {
     private readonly vitalsDb: DatabaseService<VitalsDTO>,
     @DatabaseTable('vitals_table')
     private readonly con: DatabaseService<VitalsDTO>,
+    private readonly orgProductJunctionService: OrgProductJunctionService
 
   ) { }
 
@@ -814,65 +816,63 @@ export class VideoToVitalsService {
 
 
 
-  findAllVitalsDetails(vitalsDto: VitalsDTO) {
-    Logger.debug(`findAllVitalsDetails() data:${vitalsDto}}`);
-    return this.vitalsDb.fetchAll().pipe(
+  findAllVitalsDetails(org_id: VitalsDTO) {
+    Logger.debug(`findAllVitalsDetails() org_id:${org_id}}`,APP);
+    return this.vitalsDb.find({ org_id: org_id})
+    .pipe(catchError(err => { throw new UnprocessableEntityException(err.message) }),
+    map(doc=>{
+          if (doc.length == 0) { throw new NotFoundException(); }
+          return doc[0];
+    }))
+  }
+  
+  saveToStatusDb(statusDTO: StatusDTO) {
+    Logger.debug(`saveToStatusDb() data:${statusDTO}}`);
+    return this.statusDb.save(statusDTO).pipe(
       catchError(err => { throw new UnprocessableEntityException(err.message) }),
       map(doc => {
-        if (doc.length == 0) {
-          throw new NotFoundException('No user Found')
-        }
-        else {
-          return doc
-        }
+       return doc
       }),
     );;
   }
 
-  saveToStatusDb(statusDTO: StatusDTO) {
-    Logger.debug(`saveToStatusDb() data:${statusDTO}}`);
-    return this.statusDb.save(statusDTO);
+  calculatePilotDuration(doc) {
+    let now = new Date().getTime();
+    var date1 = new Date();
+    var date2 = new Date(doc[0].end_date);
+    var difference_In_Time = date2.getTime() - date1.getTime();
+    var difference_In_Days = difference_In_Time / (1000 * 3600 * 24);
+    console.log(difference_In_Days);
+    return difference_In_Days
   }
 
-  //  saveToOrgDb(orgDTO:OrganisationDTO){
-  //   Logger.debug(`saveToStatusDb() data:${orgDTO}}`);
-  //   return this.statusDb.save(orgDTO);
-  //  }
-
-  fetchCustomerIdAndScanId(customer_id: StatusDTO, scan_id: StatusDTO,apiKey) {
+  fetchCustomerIdAndScanId(customer_id: StatusDTO, scan_id: StatusDTO, apiKey) {
     Logger.debug(`fetchCustomerIdAndScanId() cust_id:${customer_id},scan_id:${scan_id} }`, APP);
-    var decryptedId:any = this.decryptXAPIKey(apiKey)
-    console.log('d', decryptedId);
-    return this.organizationService.fetchOrganizationDetailsById(decryptedId.orgId)
-    .pipe(catchError(err => { throw new UnprocessableEntityException(err.message) }),
-      map(doc => {
-        
-        
-          // console.log(doc);
-          //  return doc
+    var decryptedId: any = this.decryptXAPIKey(apiKey)
+    return this.orgProductJunctionService.fetchOrgDetailsByOrgProductJunctionId(decryptedId.orgId)
+      .pipe(catchError(err => { throw new NotFoundException() }),
+        map(doc => {
+          let difference_In_Days = this.calculatePilotDuration(doc);
+          if (difference_In_Days < 0) {
+            throw new UnprocessableEntityException({ 'error': 'Contact Fedo' })
+          }
+          return doc;
+        }),
+        switchMap(doc => {
           return this.statusDb.find({ customer_id: customer_id, scan_id: scan_id }).pipe(
-              map((doc) => {
-                console.log(doc);
-                return doc
-              }))
-
-        
-      }))
-    // return this.statusDb.find({ customer_id: customer_id, scan_id: scan_id }).pipe(
-    //   switchMap((doc) => {
-    //     return doc
-    //   }),
-    //   map(doc => {
-    //     let data = new StatusDTO();
-    //     data.customer_id = doc.customer_id;
-    //     data.scan_id = doc.scan_id;
-    //     data.tenant_id = doc.tenant_id;
-    //     data.message = doc.message;
-    //     data.status = doc.status;
-    //     this.res.push(data);
-    //     return this.res;
-    //   })
-    // )
+            map((doc) => {
+              if (doc.length == 0) { throw new NotFoundException(); }
+              let data = new StatusDTO();
+              data.customer_id = doc[0].customer_id;
+              data.scan_id = doc[0].scan_id;
+              data.tenant_id = doc[0].tenant_id;
+              data.message = doc[0].message;
+              data.status = doc[0].status;
+              this.res.push(data);
+              return this.res[0];
+            }))
+        })
+      )
   }
 
 
@@ -881,48 +881,48 @@ export class VideoToVitalsService {
 
     console.log("encryptXAPIKey", apiKey);
 
-    var decryptedId:any = this.decryptXAPIKey(apiKey)
+    var decryptedId: any = this.decryptXAPIKey(apiKey)
     console.log('d', decryptedId);
 
-    return this.organizationService.fetchOrganizationDetailsById(decryptedId.orgId)
-    .pipe(catchError(err => { throw new UnprocessableEntityException(err.message) }),
-      map(doc => {
-        if (doc.length == 0) {
-          throw new NotFoundException('data not found')
-        }
-        else {
-          return doc
-        }
-      }))
-    // map(), org data
-    // catch error
-    //   map(doc => {
-    //     return this.vitalsDb.find({ customer_id: customer_id, scan_id: scan_id }).pipe(
-    //       map(doc => {return doc})
-    //     )
-    //   })
-    // )
-    //       return this.vitalsDb.find({ customer_id: customer_id, scan_id: scan_id }).pipe(
-    //         map(ele => {
-    //           // this.decryptXAPIKey();
-    // // this.organizationService.fetchOrganizationDetailsById(1).pipe(map)
-    //         }),
-    //          map((doc) => {
-    //             return doc
-    //          }),)
+    return this.orgProductJunctionService.fetchOrgDetailsByOrgProductJunctionId(decryptedId.orgId)
+      .pipe(catchError(err => { throw new NotFoundException() }),
+        map(doc => {
+          let difference_In_Days = this.calculatePilotDuration(doc);
+          if (difference_In_Days < 0) {
+            throw new UnprocessableEntityException({ 'error': 'Contact Fedo' })
+          }
+          return doc;
+        }),
+        switchMap(doc => {
+          return this.vitalsDb.find({ customer_id: customer_id, scan_id: scan_id }).pipe(
+            map(doc => {
+              if (doc.length == 0) { throw new NotFoundException(); }
+              return doc[0];
+            })
+          )
+        }))
+
   }
 
 
   updateVitalsData(id: number, vitalsDTO: VitalsDTO) {
     Logger.debug(`updateVitalsData() id:${id} vitalsDTO: ${JSON.stringify(vitalsDTO)} `, APP);
-    return this.vitalsDb.find({ id: id }).pipe(map(res => {
-      if (res.length == 0) throw new NotFoundException('user not found')
-      else {
-        lastValueFrom(this.vitalsDb.findByIdandUpdate({ id: id.toString(), quries: vitalsDTO }))
-
-      }
-
-    }))
+    return this.vitalsDb.find({ id: id }).pipe(
+      map(res => {
+        if (res.length == 0) throw new NotFoundException()
+        else {
+          return this.vitalsDb.findByIdandUpdate({ id: id.toString(), quries: vitalsDTO }).pipe(
+            map(doc => {
+            console.log(doc)
+          }),
+          catchError(err => { throw new NotFoundException() })
+          )
+        }
+      }),
+      switchMap(doc => {
+        return this.vitalsDb.find({ id: id }).pipe(map(doc => {return doc[0]}))
+      })
+      )
   }
 
 
@@ -937,23 +937,26 @@ export class VideoToVitalsService {
   }
 
   decryptXAPIKey(apiKey) {
-    const NodeRSA = require('node-rsa');
-    // const encryptedString = "Ds6LUhvrqP/lvuWWIhh33hhOikq6g/lrzMp3gRHCiMjQ4byjOqq92M81tpl4GRykDr1iMQ1tmKtAPmjhszRlq7uigw3Rj/1jdbPWsvYQQF6HR9j2sUs9FcX9W2ty7p+qBSRW4WAzmJudQIho+4MU/+GPhuejVFEIrqo/3Ak7hUXXsk2BMkXKWjAJrn5XdpWiFhH9qFTbUxnwMrsTzX+KT8OIaJZXeHNaqsBh2bg25w/j0Bv07Pv9DXj+0rlLkYDaWtQqLqiT8YcPyJfRzKrOvwC2kkOvPBEruP3nRjYslLQxFFrbIfKYCv5EMswfviM0U9B+EfTD3opYHt9FFN1CZLWTCgrueJcsGT4soinqsMIK01SpQu3qZk3WbJy9mvZnOxnmz9tKIg0qj3400MXQZwztNpAI7Ek0Gg4b7oRofXgoxd3VRfIIL31Gwhgqy2jyGOZobaLsfvQGAb5Nu9J1d4EmlwT3AxiK34bF9uwjNZHgM6sqpnC7hxTkRMCf0xSSl5qB0S6zBdh21B9xKzUAGbSxXQ9y9o/k6/xJW+DevBi9Ovg7e+0xF3tkzO6uVAZAhhn5GTjQISl4Zj9M5bmYN/cvbRVfFhYZ8uEqoH+tC6l/QSvnwyitcmngA3sS3xlmZGDlZW7fLTkLhdzI5cxxW59U/wc1KZtzVEvv8hB89aMtf/HET75pQ89iudYOrZQfZcTRjiajE4cm1ipUkZ7CVGSs1PHzZfpljZvTYHLXv1yN0m6+kZacpueNpK9J6tdrtwekG3znZeLT91+ql5ft0IoS8Rx3P4E2te+T/xBYLDoL91GAglmTXBZDhQFUlK1zpqzL2UfgfYBKAFA9hfvXOddD0X6PPXDs120G6Y2ad3Qys2mHbgl603aFTp0naKS6cTQVYpzQ76VnMm6o8KsmIdZKr7cLXC9pWdd4WLl+kCFuFVdKutIf6EPdMwKCNhsp4VmrC29AbU0Hq8nzBhoWtdhXnaWYbgSU39ZZb7cRmLSD6fXD9RU0Rvmalk6DrgkLNPabtxb9DFlA+m7UwzaQ9VNyJn55xSmY0dPsxf0A2D2u8v61HWvQ0pAMHhsc0qJtLIQnNhKcq8IcqKZrMkqz7NWI8JQ+c1nwsEvRlo2Q8KFuTHtrVUlmJvkNp5Nuax8FGH1SrI5QDBomF9IP0udSCRScyHdFdHqSTajZTt/QWSiXhv47uHZpiLEjRXsztdfr10Db2WgxQ7nZeHtLjAyrKnhTuHmN1qe/GGAUWwuzL/P65Lt8YvqZpwxrOLvq8OJKXrscQtjIkopPukkwHRIpc2bhn7JB+asKnFH09BiOyLrdL6a4mPzJPH165icZXjmnccAPpimN2bj/gyL8eA8lhg==";
-    // const encryptedString="e0TYgxfHba8byhFZxtGaMtAS2q/S5HVu58cqRbZD80P6f7F8IzjN2bTazBCbc3UnLO4XQ7vhGSs6pKWxVlwAZjGmESgWcjfvuWsrvqsTU4EFppDPlvc0tsga2I/JGXYIkl2TUUtvp9lmSYDbuXL4sXMDpv2ryUmEvThHbAJtYHNh8cJDkjszcS9zI55ORcWbs/Ox6dBx7KyRYta56wAUzfxc3HiHjcufvz1gr0yZ4hL0d34Uva5y6B5oNfdP5/fG88w1x7fR7inIwrHEjRi4fHmgGB5fOUK6G85iWzYIUEYIHsZEfck/2WaYfBjKFDTx9+3SOsGxz382os8XKmlLERMs3Y/rrOwx4iMzR8Uw7yxuBeF+nZur/Lnwdn7teFEJklpK54+p3CLGATl1PPUwhi+kZFvfVmYa/LPI3TiIaiLZSbSWuXH7XkhnqwK7gARpFTl9m9unrFcaZnkit0eV359oUHrp21E6JqjvcBL34L0EBMcSuLDoMz+Td+A1uePIvVSGgpaBdPx0rcfRZFj0fe9FeROOJIPuE4YVG/23hEDcfP7qa1rbyI9Wt3b2LqNRWj8Gp0pdE1RUpMpn/gkW80ny8egU3exAuZxBFGcLMR8R2ANQLDGn2kkCDXHoYvos0Hf7+1nVFdK7WR51ejlncyuQoP/7c69aLGnn5vZi1TA68A/5QlV17kRmnR/tf2pYkWByrAIJtm7uSoeXDHJ39TC7XiltJx4yWrkXTXSV3Db+FohDzdLBK1OzjHlPxRo3tzv159Gn2xu+8YZoQVYk0UJRlMg8Cshxr8EWGdY8OlrdupKDLLrMy8A7lwCNpPMGTImPKNptpV59373MvUXWCSouwbI6+vx0vVkd/wND2nZThx+x4EMwpLcI/nQ8Ow59XX3gYiBkNMABUckMBNUFNrizkT8RYqiGGUDYA00cywoT8nkpCd2cJrSBqMcU3Drb773yCRoLQcsqONvLipccReDaFXQah3+E4bc8iRZvSNfrWGCPBNNlD3+KDmOyG7UUYK62AWPLsW49DbaJXamwz6T8yVZZQo4W8QrlY2PpdxzzmlTe6R5IYVSpXDkYOCo0VktgPFMO5+CiVZhT2ESYwsLfbLzO72lXhpQ7JDhLgiNSWC+xQuf1XozMeLrOGY1TADW7uD5RlxWbuIxPIjdd3PTlp4FBdY8wX9EOLIOVQAk2LPPJbgisBwGsYeLln9VatWDyoz85gGTchELA06x1vIlYYAIXQKor/fVJUpjL0Rr8cOzuQ9C+Q+L7JLqmEW4JD2UC0PlfiH7iGkiX1wUN00srgSORLrcQ1QoKgBJbbpcZwQ+tnl9EnwodsaLTLsFO3cVXep56tJgUzxk+5AExSw==";
-    let key_public = new NodeRSA(PRIVATE_KEY)
-    var decryptedString = key_public.decrypt(apiKey, 'utf8')
-    console.log(decryptedString.split('&'));
-    console.log(typeof (decryptedString));
-    var keyValueArray = decryptedString.split("&");
-    var keyValueObject = {};
-    for (var i = 0; i < keyValueArray.length; i++) {
-      var pair = keyValueArray[i].split("=");
-      var key = pair[0];
-      var value = pair[1];
-      keyValueObject[key] = value;
-      console.log(keyValueObject);
+    try {
+      const NodeRSA = require('node-rsa');
+      let key_public = new NodeRSA(PRIVATE_KEY)
+      var decryptedString = key_public.decrypt(apiKey, 'utf8')
+      console.log(decryptedString.split('&'));
+      console.log(typeof (decryptedString));
+      var keyValueArray = decryptedString.split("&");
+      var keyValueObject = {};
+      for (var i = 0; i < keyValueArray.length; i++) {
+        var pair = keyValueArray[i].split("=");
+        var key = pair[0];
+        var value = pair[1];
+        keyValueObject[key] = value;
+        console.log(keyValueObject);
+      }
+      return keyValueObject;
     }
-    return keyValueObject;
+    catch (e) {
+      throw new BadRequestException();
+    }
   }
 
 

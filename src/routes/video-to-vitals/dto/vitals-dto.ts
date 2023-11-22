@@ -52,6 +52,8 @@ respiration_rate:number;
 systolic:number;
 diastolic:number;
 blood_oxygen:number;
+age:string;
+gender:string;
 
 constructor(v?: Partial<VitalsDTO>){
     this.status = v?.status || 0;
@@ -67,6 +69,8 @@ constructor(v?: Partial<VitalsDTO>){
     this.systolic = v?.systolic || 0;
     this.diastolic = v?.diastolic || 0;
     this.blood_oxygen = v?.blood_oxygen || 0;
+    this.age = v?.age || '' ;
+    this.gender = v?.gender || '';
    
 }
 }

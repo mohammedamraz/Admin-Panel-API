@@ -24,6 +24,13 @@ export class VideoToVitalsController {
     private readonly usersService: UsersService,
   ) { }
 
+  @Get('status')
+  fetchStatus(@Headers('x-api-key') apiKey: string, @Query('cust_id') cust_id: StatusDTO, @Query('scan_id') scan_id: StatusDTO) {
+    Logger.debug(`fetchCustomerIdAndScanId() customer_id:${cust_id} scan_id:${scan_id}`, APP);
+    console.log("APIKey", apiKey)
+    return this.videoToVitalsService.fetchCustomerIdAndScanId(cust_id, scan_id, apiKey);
+  }
+
   @Post('org')
   @UsePipes(new JoiValidationPipe())
   @UseInterceptors(FileInterceptor('file'))
@@ -165,7 +172,7 @@ export class VideoToVitalsController {
   }
 
   @Get(':id')
-  fetchAllVitalsPilot(@Param('id',ParseIntPipe) id: number, @Query() queryParamsDto: QueryParamsDto ) {
+  fetchAllVitalsPilot(@Param('id', ParseIntPipe) id: number, @Query() queryParamsDto: QueryParamsDto) {
     Logger.debug(`fetchAllVitalsPilot() product_id:${id} queryParamsDto:${JSON.stringify(queryParamsDto)}`, APP);
 
     return this.videoToVitalsService.fetchAllVitalsPilot(id, queryParamsDto)
@@ -193,7 +200,7 @@ export class VideoToVitalsController {
 
     return this.videoToVitalsService.addUserAndDirectRegister(userDTO)
   }
-  
+
   @Get('junction/domain/:url')
   fetchOrgByUrlFromJunction(@Param('url') url: string) {
     Logger.debug(`fetchOrgByUrlFromJunction()`, APP);
@@ -235,7 +242,7 @@ export class VideoToVitalsController {
     Logger.debug(`fetchUserProductDetailsById()`, APP);
 
     return this.videoToVitalsService.fetchUserProductDetailsById(id)
-  } 
+  }
 
 
   @Delete('users/:id')
@@ -348,10 +355,10 @@ export class VideoToVitalsController {
 
 
   @Cron('30 6 0 * * *', { timeZone: 'Asia/Kolkata', })
-  fetchOrgDetailsByExpiryDateOrgExpired(@Query() params: ZQueryParamsDto){
+  fetchOrgDetailsByExpiryDateOrgExpired(@Query() params: ZQueryParamsDto) {
     Logger.debug(`fetchOrgDetailsByExpiryDateOrgExpired() params:${params}} `, APP);
 
-   return this.organizationService.fetchOrgDetailsByExpiryDateOrgExpired(params)
+    return this.organizationService.fetchOrgDetailsByExpiryDateOrgExpired(params)
   }
 
   @Post('delete/last_org_row')
@@ -384,46 +391,46 @@ export class VideoToVitalsController {
 
   @Post('pre_signed/video/save')
   @UseInterceptors(FileInterceptor('file'))
-  uploadVideoTOPresignedUrl(@UploadedFile() file, @Query('policy_number') policy_number : any) {
+  uploadVideoTOPresignedUrl(@UploadedFile() file, @Query('policy_number') policy_number: any) {
     Logger.debug(`uploadVideoTOPresignedUrl()`, APP);
 
-    return this.organizationService.uploadVideoTOPresignedUrl( file , policy_number);
+    return this.organizationService.uploadVideoTOPresignedUrl(file, policy_number);
   }
 
   @Post('pre_signed/pdf/save')
-  uploadPDFTOPresignedUrl(@Body() body:sendEmailOnCreationOfOrgAndUser) {
+  uploadPDFTOPresignedUrl(@Body() body: sendEmailOnCreationOfOrgAndUser) {
     Logger.debug(`uploadPDFTOPresignedUrl()`, APP);
 
     return this.organizationService.uploadPDFTOPresignedUrl(body);
   }
 
-  @Get('fetchAll/vitals-details')
-  
-  findAllVitalsDetails(@Body() vitalsDTO: VitalsDTO) {
-    Logger.debug(`findAllVitalsDetails() VitalsDTO:${JSON.stringify(vitalsDTO)} `);
+  // @Get('fetchAll/vitals-details')
 
-    return this.videoToVitalsService.findAllVitalsDetails(vitalsDTO);
-  }
-  @Get('status/fetch')
-  fetchCustomerIdAndScanId(@Headers('x-api-key') apiKey:string,@Query('cust_id') cust_id: StatusDTO,@Query('scan_id') scan_id: StatusDTO) {
-    Logger.debug(`fetchCustomerId() customer_id:${cust_id}`, APP);
-    Logger.debug(`fetchScanId() scan_id:${scan_id}`, APP);
-    console.log("APIKey",apiKey)
-    return this.videoToVitalsService.fetchCustomerIdAndScanId(cust_id,scan_id,apiKey);
+  // fetchAllVitalScans(@Body() vitalsDTO: VitalsDTO) {
+  //   Logger.debug(`findAllVitalsDetails() VitalsDTO:${JSON.stringify(vitalsDTO)} `);
+
+  //   return this.videoToVitalsService.findAllVitalsDetails(vitalsDTO);
+  // }
+
+  @Get('fetchAll/vitals-details/:org_id')
+
+  fetchAllVitalScans(@Param('org_id') org_id, @Body() vitalsDTO: VitalsDTO) {
+    Logger.debug(`fetchAllVitalScans()  org_id:${org_id},`,APP);
+    return this.videoToVitalsService.findAllVitalsDetails(org_id);
   }
 
-  @Get('header/fetch')
-  fetchRowDetails(@Headers('x-api-key') apiKey:string,@Query('cust_id') cust_id: VitalsDTO,@Query('scan_id') scan_id: VitalsDTO){
-    Logger.debug(`fetchCustomerById() customer_id:${cust_id}`,`APIKey`,apiKey, APP);
+
+  @Get('')
+  fetchVitals(@Headers('x-api-key') apiKey: string, @Query('cust_id') cust_id: VitalsDTO, @Query('scan_id') scan_id: VitalsDTO) {
+    Logger.debug(`fetchCustomerById() customer_id:${cust_id}`, `APIKey`, apiKey, APP);
     Logger.debug(`fetchScanById() scan_id:${scan_id}`, APP);
 
-    console.log("APIKey",apiKey)
-    return this.videoToVitalsService.fetchRowDetails(cust_id,scan_id, apiKey);
+    console.log("APIKey", apiKey)
+    return this.videoToVitalsService.fetchRowDetails(cust_id, scan_id, apiKey);
     // return 'API Key:${api-key}';
   }
 
-  @Post('statusDTO/status')
-  
+  @Post('status')
   saveToStatusDb(@Body() statusDTO: StatusDTO) {
     Logger.debug(`saveToStatusDb() StatusDTO:${JSON.stringify(statusDTO)} `);
 
@@ -431,16 +438,14 @@ export class VideoToVitalsController {
   }
 
   @Patch('update-info/:id')
-  updateVitalsData(@Param('id') id: number, @Body() vitalsDTO: VitalsDTO){
+  updateVitalsData(@Param('id') id: number, @Body() vitalsDTO: VitalsDTO) {
     Logger.debug(`updateVitalsData() id:${id} vitalsDTO: ${JSON.stringify(vitalsDTO)} `, APP);
     return this.videoToVitalsService.updateVitalsData(id, vitalsDTO);
   }
 
   @Post('org/enc')
-  encryptApiKey(@Body() organizationDTO: OrganisationDTO){
+  encryptApiKey(@Body() organizationDTO: OrganisationDTO) {
     console.log(organizationDTO['data']);
-    // Logger.debug(`orgDTO org_id:${org_id} vitalsDTO: ${JSON.stringify(OrgDTO)} `, APP);
-    //return this.videoToVitalsService.saveToOrgDb(orgDTO);
     return this.videoToVitalsService.encryptXAPIKey(organizationDTO['data']);
   }
 
