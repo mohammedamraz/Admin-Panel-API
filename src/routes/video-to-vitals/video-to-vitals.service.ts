@@ -875,7 +875,7 @@ export class VideoToVitalsService {
                 data.client_id = doc[0].client_id;
                 this.res.push(data);
                 Logger.debug(`data : ${data}, doc:${doc[0]} }`, APP);
-                return this.res[0];
+                return data;
               }
             }))
         })
