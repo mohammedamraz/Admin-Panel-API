@@ -1,16 +1,16 @@
-import { Module } from '@nestjs/common';
-import { SendEmailService } from './send-email.service';
-import { SendEmailController } from './send-email.controller';
-import { TemplateService } from 'src/constants/template.service';
-import { ProductTestsService } from '../product_tests/product_tests/product_tests.service';
-import { DatabaseModule } from 'src/lib/database/database.module';
-import { UsersService } from '../video-to-vitals/users.service';
-import { ProductService } from '../product/product.service';
-import { UserProductJunctionService } from '../user-product-junction/user-product-junction.service';
-import { VideoToVitalsService } from '../video-to-vitals/video-to-vitals.service';
-import { OrgProductJunctionService } from '../org-product-junction/org-product-junction.service';
-import { OrganizationService } from '../video-to-vitals/organization.service';
 import { HttpModule } from '@nestjs/axios';
+import { Module } from '@nestjs/common';
+import { TemplateService } from 'src/constants/template.service';
+import { DatabaseModule } from 'src/lib/database/database.module';
+import { OrgProductJunctionService } from '../org-product-junction/org-product-junction.service';
+import { ProductService } from '../product/product.service';
+import { ProductTestsService } from '../product_tests/product_tests/product_tests.service';
+import { UserProductJunctionService } from '../user-product-junction/user-product-junction.service';
+import { OrganizationService } from '../video-to-vitals/organization.service';
+import { UsersService } from '../video-to-vitals/users.service';
+import { VideoToVitalsService } from '../video-to-vitals/video-to-vitals.service';
+import { SendEmailController } from './send-email.controller';
+import { SendEmailService } from './send-email.service';
 
 @Module({
 imports:[
@@ -22,6 +22,8 @@ imports:[
   DatabaseModule.forFeature({ tableName: 'user_profile_info' }),
   DatabaseModule.forFeature({ tableName: 'product' }),
   DatabaseModule.forFeature({ tableName: 'vitals_table' }),
+  DatabaseModule.forFeature({ tableName: 'test_status' }),
+
   HttpModule.register({
     timeout: 10000,
     maxRedirects: 5

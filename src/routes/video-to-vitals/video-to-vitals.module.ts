@@ -1,17 +1,17 @@
+import { HttpModule } from '@nestjs/axios';
 import { Module } from '@nestjs/common';
-import { VideoToVitalsService } from './video-to-vitals.service';
-import { VideoToVitalsController } from './video-to-vitals.controller';
+import { TemplateService } from 'src/constants/template.service';
 import { DatabaseModule } from 'src/lib/database/database.module';
 import { ProductService } from '../product/product.service';
 import { UserProductJunctionService } from '../user-product-junction/user-product-junction.service';
-import { TemplateService } from 'src/constants/template.service';
-import { HttpModule, HttpService } from '@nestjs/axios';
+import { VideoToVitalsController } from './video-to-vitals.controller';
+import { VideoToVitalsService } from './video-to-vitals.service';
 // import { HttpModule } from '@nestjs/axios';
-import { OrganizationService } from './organization.service';
 import { OrgProductJunctionService } from '../org-product-junction/org-product-junction.service';
-import { SendEmailService } from '../send-email/send-email.service';
-import { UsersService } from './users.service';
 import { ProductTestsService } from '../product_tests/product_tests/product_tests.service';
+import { SendEmailService } from '../send-email/send-email.service';
+import { OrganizationService } from './organization.service';
+import { UsersService } from './users.service';
 
 @Module({
   imports: [
@@ -25,6 +25,7 @@ import { ProductTestsService } from '../product_tests/product_tests/product_test
     DatabaseModule.forFeature({ tableName: 'user_product_junction' }),
     DatabaseModule.forFeature({ tableName: 'vitals_table' }),
     DatabaseModule.forFeature({ tableName: 'product_tests' }),
+    DatabaseModule.forFeature({ tableName: 'test_status' }),
     
   
     HttpModule.register({

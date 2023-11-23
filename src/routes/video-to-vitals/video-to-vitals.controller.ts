@@ -1,18 +1,15 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Logger, ParseIntPipe, UseInterceptors, UploadedFile, Query, UsePipes } from '@nestjs/common';
-import { VideoToVitalsService } from './video-to-vitals.service';
-import { CreateOrganizationDto, LoginUserDTO, LoginUserPasswordCheckDTO, OrgDTO, ProductDto, QueryParamsDto, RegisterUserDTO, UpdateOrganizationDto, UpdateUserDTO, UpdateWholeOrganizationDto, UserDTO, UserParamDto, VitalUserDTO } from './dto/create-video-to-vital.dto';
+import { Body, Controller, Delete, Get, Headers, Logger, Param, ParseIntPipe, Patch, Post, Query, UploadedFile, UseInterceptors, UsePipes } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { EncryptUrlDTO, PasswordResetDTO, sendEmailOnCreationOfOrgAndUser } from '../admin/dto/create-admin.dto';
-import { ConfirmForgotPasswordDTO, ForgotPasswordDTO } from '../admin/dto/login.dto';
-import { OrganizationService } from './organization.service';
-import { UsersService } from './users.service';
-import { LoggingInterceptor } from 'src/interceptors/interceptor';
-import { ZQueryParamsDto } from '../org-product-junction/dto/create-org-product-junction.dto';
 import { Cron } from '@nestjs/schedule';
 import { JoiValidationPipe } from 'src/constants/pipes';
-import { url } from 'inspector';
-import { OrganisationDTO, StatusDTO, VitalsDTO } from './dto/vitals-dto';
-import { Headers } from '@nestjs/common';
+import { EncryptUrlDTO, PasswordResetDTO, sendEmailOnCreationOfOrgAndUser } from '../admin/dto/create-admin.dto';
+import { ConfirmForgotPasswordDTO, ForgotPasswordDTO } from '../admin/dto/login.dto';
+import { ZQueryParamsDto } from '../org-product-junction/dto/create-org-product-junction.dto';
+import { CreateOrganizationDto, LoginUserDTO, LoginUserPasswordCheckDTO, OrgDTO, ProductDto, QueryParamsDto, RegisterUserDTO, UpdateOrganizationDto, UpdateUserDTO, UpdateWholeOrganizationDto, UserDTO, UserParamDto } from './dto/create-video-to-vital.dto';
+import { OrganisationDTO, StatusDTO, VitalsDTO, XAPIKey } from './dto/vitals-dto';
+import { OrganizationService } from './organization.service';
+import { UsersService } from './users.service';
+import { VideoToVitalsService } from './video-to-vitals.service';
 
 
 const APP = "VideoToVitalsController"
@@ -27,7 +24,6 @@ export class VideoToVitalsController {
   @Get('status')
   fetchStatus(@Headers('x-api-key') apiKey: string, @Query('cust_id') cust_id: StatusDTO, @Query('scan_id') scan_id: StatusDTO) {
     Logger.debug(`fetchCustomerIdAndScanId() customer_id:${cust_id} scan_id:${scan_id}`, APP);
-    console.log("APIKey", apiKey)
     return this.videoToVitalsService.fetchCustomerIdAndScanId(cust_id, scan_id, apiKey);
   }
 
@@ -421,14 +417,13 @@ export class VideoToVitalsController {
 
 
   @Get('')
-  fetchVitals(@Headers('x-api-key') apiKey: string, @Query('cust_id') cust_id: VitalsDTO, @Query('scan_id') scan_id: VitalsDTO) {
+  fetchVitals(@Headers('x-api-key') apiKey: XAPIKey, @Query('cust_id') cust_id: VitalsDTO, @Query('scan_id') scan_id: VitalsDTO) {
     Logger.debug(`fetchCustomerById() customer_id:${cust_id}`, `APIKey`, apiKey, APP);
     Logger.debug(`fetchScanById() scan_id:${scan_id}`, APP);
 
-    console.log("APIKey", apiKey)
     return this.videoToVitalsService.fetchRowDetails(cust_id, scan_id, apiKey);
-    // return 'API Key:${api-key}';
   }
+
 
   @Post('status')
   saveToStatusDb(@Body() statusDTO: StatusDTO) {

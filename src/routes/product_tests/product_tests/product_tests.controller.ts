@@ -1,8 +1,7 @@
-import { Body, Controller, Get, Logger, Param, Patch, Post, Query, UploadedFile, UseInterceptors } from '@nestjs/common';
+import { Body, Controller, Get, Logger, Patch, Post, Query, UploadedFile, UseInterceptors } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ProductTestsDto } from './dto/create-product_tests.dto';
 import { ProductTestsService } from './product_tests.service';
-import { Cron } from '@nestjs/schedule';
 const APP = "VideoToVitalsController"
 
 @Controller()
@@ -51,6 +50,7 @@ export class ProductTestsController {
 
     return this.ProductTestsService.saveTestsToProductTests(body)
   }
+
 
   @Post('video/save')
   @UseInterceptors(FileInterceptor('file'))

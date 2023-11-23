@@ -1,8 +1,12 @@
-import { Optional } from "@nestjs/common";
 import { IsNotEmpty } from "class-validator";
 
 
 
+
+export class XAPIKey {
+    @IsNotEmpty()
+    'x-api-key': string;
+}
 
 
 export class StatusDTO{
@@ -52,8 +56,32 @@ respiration_rate:number;
 systolic:number;
 diastolic:number;
 blood_oxygen:number;
-age:string;
+age_range:string;
 gender:string;
+org_id:number;
+user_id:number;
+product_id:number;
+event_mode:boolean;
+name:string;
+city:string;
+username:string;
+for_whom:string;
+ecg_url:string;
+app_name:string;
+media_name:string;
+viu_user;string;
+pdf_location:string;
+fedo_score_id:string;
+facial_precision:string;
+mobile:string;
+test_time:string;
+version_id:number;
+video_location:string;
+client_id:string;
+tenant_id:string;
+tests:number;
+
+
 
 constructor(v?: Partial<VitalsDTO>){
     this.status = v?.status || 0;
@@ -69,7 +97,7 @@ constructor(v?: Partial<VitalsDTO>){
     this.systolic = v?.systolic || 0;
     this.diastolic = v?.diastolic || 0;
     this.blood_oxygen = v?.blood_oxygen || 0;
-    this.age = v?.age || '' ;
+    this.age_range = v?.age_range || '' ;
     this.gender = v?.gender || '';
    
 }

@@ -1,25 +1,22 @@
+import { HttpService } from '@nestjs/axios';
 import { BadRequestException, ConflictException, Injectable, Logger, NotFoundException, UnauthorizedException, UnprocessableEntityException } from '@nestjs/common';
-import { catchError, concatMap, from, lastValueFrom, map, of, switchMap, throwError } from 'rxjs';
+import { AxiosResponse } from 'axios';
+import { catchError, concatMap, from, lastValueFrom, map, switchMap, throwError } from 'rxjs';
+import { AWS_COGNITO_USER_CREATION_URL_SIT, AWS_COGNITO_USER_CREATION_URL_SIT_ADMIN_PANEL, FEDO_USER_ADMIN_PANEL_POOL_NAME, PRIVATE_KEY, PUBLIC_KEY } from 'src/constants';
 import { DatabaseTable } from 'src/lib/database/database.decorator';
 import { DatabaseService } from 'src/lib/database/database.service';
-import { PasswordResetDTO } from '../admin/dto/create-admin.dto';
-import { ProductService } from '../product/product.service';
-import { UserProductJunctionService } from '../user-product-junction/user-product-junction.service';
-import { AWS_COGNITO_USER_CREATION_URL_SIT, AWS_COGNITO_USER_CREATION_URL_SIT_ADMIN_PANEL, FEDO_APP, FEDO_USER_ADMIN_PANEL_POOL_NAME, PRIVATE_KEY, PUBLIC_KEY } from 'src/constants';
-import { HttpService } from '@nestjs/axios';
-import { AxiosResponse } from 'axios';
-import { ConfirmForgotPasswordDTO, ForgotPasswordDTO } from '../admin/dto/login.dto';
-import { CreateOrganizationDto, LoginUserDTO, LoginUserPasswordCheckDTO, OrgDTO, CONVERTINNUMBER, ProductDto, RegisterUserDTO, UpdateOrganizationDto, UpdateUserDTO, UserDTO, UserProfileDTO, VitalUserDTO, CONVERTINACTIVE, QueryParamsDto, UserParamDto, CONVERTPILOTSTATUS, format_user, format_user_update } from './dto/create-video-to-vital.dto';
 import { v4 as uuidv4 } from 'uuid';
-import { CreateUserProductJunctionDto } from '../user-product-junction/dto/create-user-product-junction.dto';
-import { OrganizationService } from './organization.service';
-import { CreateProductDto } from '../product/dto/create-product.dto';
-import { SendEmailService } from '../send-email/send-email.service';
-import { UsersService } from './users.service';
-import { OrganisationDTO, StatusDTO, VitalsDTO } from './dto/vitals-dto';
-import { ConfigService } from 'src/lib/config/config.service';
-import { decryptXAPIKey, encryptXAPIKey } from 'src/constants/helper';
+import { PasswordResetDTO } from '../admin/dto/create-admin.dto';
+import { ConfirmForgotPasswordDTO, ForgotPasswordDTO } from '../admin/dto/login.dto';
 import { OrgProductJunctionService } from '../org-product-junction/org-product-junction.service';
+import { ProductService } from '../product/product.service';
+import { SendEmailService } from '../send-email/send-email.service';
+import { CreateUserProductJunctionDto } from '../user-product-junction/dto/create-user-product-junction.dto';
+import { UserProductJunctionService } from '../user-product-junction/user-product-junction.service';
+import { CONVERTINACTIVE, CONVERTINNUMBER, CONVERTPILOTSTATUS, CreateOrganizationDto, LoginUserDTO, LoginUserPasswordCheckDTO, ProductDto, QueryParamsDto, RegisterUserDTO, UpdateUserDTO, UserDTO, UserProfileDTO, format_user, format_user_update } from './dto/create-video-to-vital.dto';
+import { StatusDTO, VitalsDTO } from './dto/vitals-dto';
+import { OrganizationService } from './organization.service';
+import { UsersService } from './users.service';
 
 const APP = 'VideoToVitalsService'
 
@@ -51,7 +48,11 @@ export class VideoToVitalsService {
     private readonly vitalsDb: DatabaseService<VitalsDTO>,
     @DatabaseTable('vitals_table')
     private readonly con: DatabaseService<VitalsDTO>,
-    private readonly orgProductJunctionService: OrgProductJunctionService
+    private readonly orgProductJunctionService: OrgProductJunctionService,
+    @DatabaseTable('product_tests')
+    private readonly productTestsService: DatabaseService<VitalsDTO>,
+    @DatabaseTable('test_status')
+    private readonly testStatusService: DatabaseService<StatusDTO>
 
   ) { }
 
@@ -817,24 +818,25 @@ export class VideoToVitalsService {
 
 
   findAllVitalsDetails(org_id: VitalsDTO) {
-    Logger.debug(`findAllVitalsDetails() org_id:${org_id}}`,APP);
-    return this.vitalsDb.find({ org_id: org_id})
-    .pipe(catchError(err => { throw new UnprocessableEntityException(err.message) }),
-    map(doc=>{
+    Logger.debug(`findAllVitalsDetails() org_id:${org_id}}`, APP);
+    return this.vitalsDb.find({ org_id: org_id })
+      .pipe(catchError(err => { throw new UnprocessableEntityException(err.message) }),
+        map(doc => {
           if (doc.length == 0) { throw new NotFoundException(); }
           return doc[0];
-    }))
+        }))
   }
-  
+
   saveToStatusDb(statusDTO: StatusDTO) {
     Logger.debug(`saveToStatusDb() data:${statusDTO}}`);
-    return this.statusDb.save(statusDTO).pipe(
+    return this.testStatusService.save(statusDTO).pipe(
       catchError(err => { throw new UnprocessableEntityException(err.message) }),
       map(doc => {
-       return doc
+        return doc
       }),
     );;
   }
+
 
   calculatePilotDuration(doc) {
     let now = new Date().getTime();
@@ -849,6 +851,8 @@ export class VideoToVitalsService {
   fetchCustomerIdAndScanId(customer_id: StatusDTO, scan_id: StatusDTO, apiKey) {
     Logger.debug(`fetchCustomerIdAndScanId() cust_id:${customer_id},scan_id:${scan_id} }`, APP);
     var decryptedId: any = this.decryptXAPIKey(apiKey)
+
+   
     return this.orgProductJunctionService.fetchOrgDetailsByOrgProductJunctionId(decryptedId.orgId)
       .pipe(catchError(err => { throw new NotFoundException() }),
         map(doc => {
@@ -859,7 +863,7 @@ export class VideoToVitalsService {
           return doc;
         }),
         switchMap(doc => {
-          return this.statusDb.find({ customer_id: customer_id, scan_id: scan_id }).pipe(
+          return this.testStatusService.find({ customer_id: customer_id, scan_id: scan_id }).pipe(
             map((doc) => {
               if (doc.length == 0) { throw new NotFoundException(); }
               let data = new StatusDTO();
@@ -875,16 +879,40 @@ export class VideoToVitalsService {
       )
   }
 
+  deleteKeys(doc) {
+    delete doc[0].app_name
+    delete doc[0].city
+    delete doc[0].ecg_url
+    delete doc[0].event_mode
+    delete doc[0].facial_precision
+    delete doc[0].fedo_score_id
+    delete doc[0].for_whom
+    delete doc[0].media_name
+    delete doc[0].mobile
+    delete doc[0].name
+    delete doc[0].org_id
+    delete doc[0].pdf_location
+    delete doc[0].product_id
+    delete doc[0].test_time
+    delete doc[0].version_id
+    delete doc[0].username
+    delete doc[0].video_location
+    delete doc[0].viu_user
+    delete doc[0].tests
+    delete doc[0].id;
+    doc[0]['scan_id'] = doc[0]['vitals_id'];
+    delete doc[0]['vitals_id'];
+    doc[0]['customer_id'] = doc[0]['policy_number'];
+    delete doc[0]['policy_number'];
+    return doc
+  }
+
 
   fetchRowDetails(customer_id: VitalsDTO, scan_id: VitalsDTO, apiKey) {
     Logger.debug(`fetchRowDetails() cust_id:${customer_id},scan_id:${scan_id} }`, APP);
 
-    console.log("encryptXAPIKey", apiKey);
-
-    var decryptedId: any = this.decryptXAPIKey(apiKey)
-    console.log('d', decryptedId);
-
-    return this.orgProductJunctionService.fetchOrgDetailsByOrgProductJunctionId(decryptedId.orgId)
+    var decryptedString: any = this.decryptXAPIKey(apiKey)
+    return this.orgProductJunctionService.fetchOrgDetailsByOrgProductJunctionId(decryptedString.orgId)
       .pipe(catchError(err => { throw new NotFoundException() }),
         map(doc => {
           let difference_In_Days = this.calculatePilotDuration(doc);
@@ -894,10 +922,10 @@ export class VideoToVitalsService {
           return doc;
         }),
         switchMap(doc => {
-          return this.vitalsDb.find({ customer_id: customer_id, scan_id: scan_id }).pipe(
+          return this.productTestsService.find({ policy_number: customer_id, vitals_id: scan_id }).pipe(
             map(doc => {
-              if (doc.length == 0) { throw new NotFoundException(); }
-              return doc[0];
+              let result = this.deleteKeys(doc);
+        return result[0];
             })
           )
         }))
@@ -907,22 +935,22 @@ export class VideoToVitalsService {
 
   updateVitalsData(id: number, vitalsDTO: VitalsDTO) {
     Logger.debug(`updateVitalsData() id:${id} vitalsDTO: ${JSON.stringify(vitalsDTO)} `, APP);
-    return this.vitalsDb.find({ id: id }).pipe(
+    return this.testStatusService.find({ id: id }).pipe(
       map(res => {
         if (res.length == 0) throw new NotFoundException()
         else {
-          return this.vitalsDb.findByIdandUpdate({ id: id.toString(), quries: vitalsDTO }).pipe(
+          return this.testStatusService.findByIdandUpdate({ id: id.toString(), quries: vitalsDTO }).pipe(
             map(doc => {
-            console.log(doc)
-          }),
-          catchError(err => { throw new NotFoundException() })
+              console.log(doc)
+            }),
+            catchError(err => { throw new NotFoundException() })
           )
         }
       }),
       switchMap(doc => {
-        return this.vitalsDb.find({ id: id }).pipe(map(doc => {return doc[0]}))
+        return this.testStatusService.find({ id: id }).pipe(map(doc => { return doc[0] }))
       })
-      )
+    )
   }
 
 
