@@ -42,12 +42,6 @@ export class VideoToVitalsService {
     private readonly usersService: UsersService,
     private http: HttpService,
     private readonly productService: ProductService,
-    @DatabaseTable('vitals_table')
-    private readonly statusDb: DatabaseService<StatusDTO>,
-    @DatabaseTable('vitals_table')
-    private readonly vitalsDb: DatabaseService<VitalsDTO>,
-    @DatabaseTable('vitals_table')
-    private readonly con: DatabaseService<VitalsDTO>,
     private readonly orgProductJunctionService: OrgProductJunctionService,
     @DatabaseTable('product_tests')
     private readonly productTestsService: DatabaseService<VitalsDTO>,
@@ -819,20 +813,25 @@ export class VideoToVitalsService {
 
   findAllVitalsDetails(org_id: VitalsDTO) {
     Logger.debug(`findAllVitalsDetails() org_id:${org_id}}`, APP);
-    return this.vitalsDb.find({ org_id: org_id })
-      .pipe(catchError(err => { throw new UnprocessableEntityException(err.message) }),
-        map(doc => {
-          if (doc.length == 0) { throw new NotFoundException(); }
-          return doc[0];
-        }))
+    // return this.vitalsDb.find({ org_id: org_id })
+    //   .pipe(catchError(err => { throw new UnprocessableEntityException(err.message) }),
+    //     map(doc => {
+    //       if (doc.length == 0) { throw new NotFoundException(); }
+    //       return doc[0];
+    //     }))
   }
 
   saveToStatusDb(statusDTO: StatusDTO) {
     Logger.debug(`saveToStatusDb() data:${statusDTO}}`);
+    const date = new Date();
+
+    const options: any = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric', second: 'numeric', timeZoneName: 'short', hour12: true };
+    statusDTO['test_time'] = date.toLocaleString('en-IN', options);
     return this.testStatusService.save(statusDTO).pipe(
       catchError(err => { throw new UnprocessableEntityException(err.message) }),
       map(doc => {
-        return doc
+        console.log(doc);
+        return doc[0]
       }),
     );;
   }
@@ -852,7 +851,7 @@ export class VideoToVitalsService {
     Logger.debug(`fetchCustomerIdAndScanId() cust_id:${customer_id},scan_id:${scan_id} }`, APP);
     var decryptedId: any = this.decryptXAPIKey(apiKey)
 
-   
+
     return this.orgProductJunctionService.fetchOrgDetailsByOrgProductJunctionId(decryptedId.orgId)
       .pipe(catchError(err => { throw new NotFoundException() }),
         map(doc => {
@@ -867,11 +866,12 @@ export class VideoToVitalsService {
             map((doc) => {
               if (doc.length == 0) { throw new NotFoundException(); }
               let data = new StatusDTO();
+              delete data.tenant_id;
               data.customer_id = doc[0].customer_id;
               data.scan_id = doc[0].scan_id;
-              data.tenant_id = doc[0].tenant_id;
               data.message = doc[0].message;
               data.status = doc[0].status;
+              data.client_id = doc[0].client_id;
               this.res.push(data);
               return this.res[0];
             }))
@@ -924,8 +924,11 @@ export class VideoToVitalsService {
         switchMap(doc => {
           return this.productTestsService.find({ policy_number: customer_id, vitals_id: scan_id }).pipe(
             map(doc => {
+              if (doc.length == 0) {
+                throw new NotFoundException()
+              }
               let result = this.deleteKeys(doc);
-        return result[0];
+              return result[0];
             })
           )
         }))
