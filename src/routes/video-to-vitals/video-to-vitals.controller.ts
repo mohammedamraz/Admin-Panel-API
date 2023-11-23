@@ -27,6 +27,25 @@ export class VideoToVitalsController {
     return this.videoToVitalsService.fetchCustomerIdAndScanId(cust_id, scan_id, apiKey);
   }
 
+  @Post('message/status')
+  saveToStatusDb(@Body() statusDTO: StatusDTO) {
+    Logger.debug(`saveToStatusDb() StatusDTO:${JSON.stringify(statusDTO)} `);
+
+    return this.videoToVitalsService.saveToStatusDb(statusDTO);
+  }
+
+  @Patch('update-info/:id')
+  updateVitalsData(@Param('id') id: number, @Body() vitalsDTO: VitalsDTO) {
+    Logger.debug(`updateVitalsData() id:${id} vitalsDTO: ${JSON.stringify(vitalsDTO)} `, APP);
+    return this.videoToVitalsService.updateVitalsData(id, vitalsDTO);
+  }
+
+  @Post('org/enc')
+  encryptApiKey(@Body() organizationDTO: OrganisationDTO) {
+    console.log(organizationDTO['data']);
+    return this.videoToVitalsService.encryptXAPIKey(organizationDTO['data']);
+  }
+
   @Post('org')
   @UsePipes(new JoiValidationPipe())
   @UseInterceptors(FileInterceptor('file'))
@@ -425,24 +444,7 @@ export class VideoToVitalsController {
   }
 
 
-  @Post('message/status')
-  saveToStatusDb(@Body() statusDTO: StatusDTO) {
-    Logger.debug(`saveToStatusDb() StatusDTO:${JSON.stringify(statusDTO)} `);
-
-    return this.videoToVitalsService.saveToStatusDb(statusDTO);
-  }
-
-  @Patch('update-info/:id')
-  updateVitalsData(@Param('id') id: number, @Body() vitalsDTO: VitalsDTO) {
-    Logger.debug(`updateVitalsData() id:${id} vitalsDTO: ${JSON.stringify(vitalsDTO)} `, APP);
-    return this.videoToVitalsService.updateVitalsData(id, vitalsDTO);
-  }
-
-  @Post('org/enc')
-  encryptApiKey(@Body() organizationDTO: OrganisationDTO) {
-    console.log(organizationDTO['data']);
-    return this.videoToVitalsService.encryptXAPIKey(organizationDTO['data']);
-  }
+  
 
 
 }
