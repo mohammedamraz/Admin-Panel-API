@@ -27,7 +27,7 @@ export class VideoToVitalsController {
     return this.videoToVitalsService.fetchCustomerIdAndScanId(cust_id, scan_id, apiKey);
   }
 
-  @Post('message/status')
+  @Post('message/post-status')
   saveToStatusDb(@Body() statusDTO: StatusDTO) {
     Logger.debug(`saveToStatusDb() StatusDTO:${JSON.stringify(statusDTO)} `);
 
