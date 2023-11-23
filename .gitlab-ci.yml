@@ -48,15 +48,15 @@ Deploy:
   before_script:
     - !reference [.global, before_script]
   script:
-    # - if [[ $CI_COMMIT_TITLE =~ "build" || $CI_COMMIT_TITLE =~ "alpha" ||  $CI_COMMIT_TITLE =~ "beta" ||  $CI_COMMIT_TITLE =~ "rc" ]]; then
-    # -     npm install -g nexe
-    # -     nexe dist/src/main.js -o $TAGGED_APP_VERSION -t x64-14.15.3
-    # -     tar -czf $TAGGED_APP_VERSION.tar $TAGGED_APP_VERSION
-    # -     chmod 400 $SSH_PRIVATE_KEY_SALES
-    # -     echo "Deploying to DEV"
-    # -     scp -i $SSH_PRIVATE_KEY_SALES -o StrictHostKeyChecking=no $TAGGED_APP_VERSION.tar ubuntu@uat.admin.fedo.health:~
-    # -     ssh -i $SSH_PRIVATE_KEY_SALES -o StrictHostKeyChecking=no ubuntu@uat.admin.fedo.health "sudo systemctl stop dev.$SERVICE_NAME;$AS_FEDO bash -c \"cp $TAGGED_APP_VERSION.tar $RELEASE_LOCATION; cd $DEPLOY_LOCATION_DEV; pwd; unlink $SERVICE_NAME; rm -rf *; tar -xzf $RELEASE_LOCATION/$TAGGED_APP_VERSION.tar;ln -s $DEPLOY_LOCATION_DEV/$TAGGED_APP_VERSION $DEPLOY_LOCATION_DEV/dev-$SERVICE_NAME\"; cd; rm -f $TAGGED_APP_VERSION.tar; sudo systemctl start dev.$SERVICE_NAME;"
-    # - fi
+    - if [[ $CI_COMMIT_TITLE =~ "build" || $CI_COMMIT_TITLE =~ "alpha" ||  $CI_COMMIT_TITLE =~ "beta" ||  $CI_COMMIT_TITLE =~ "rc" ]]; then
+    -     npm install -g nexe
+    -     nexe dist/src/main.js -o $TAGGED_APP_VERSION -t x64-14.15.3
+    -     tar -czf $TAGGED_APP_VERSION.tar $TAGGED_APP_VERSION
+    -     chmod 400 $FEDO_GCP_KEY
+    -     echo "Deploying to DEV"
+    -     scp -i $FEDO_GCP_KEY -o StrictHostKeyChecking=no $TAGGED_APP_VERSION.tar ubuntu@uat.admin.fedo.health:~
+    -     ssh -i $FEDO_GCP_KEY -o StrictHostKeyChecking=no ubuntu@uat.admin.fedo.health "sudo systemctl stop dev.$SERVICE_NAME;$AS_FEDO bash -c \"cp $TAGGED_APP_VERSION.tar $RELEASE_LOCATION; cd $DEPLOY_LOCATION_DEV; pwd; unlink $SERVICE_NAME; rm -rf *; tar -xzf $RELEASE_LOCATION/$TAGGED_APP_VERSION.tar;ln -s $DEPLOY_LOCATION_DEV/$TAGGED_APP_VERSION $DEPLOY_LOCATION_DEV/dev-$SERVICE_NAME\"; cd; rm -f $TAGGED_APP_VERSION.tar; sudo systemctl start dev.$SERVICE_NAME;"
+    - fi
     # - if [[ $CI_COMMIT_TITLE =~ "alpha" ||  $CI_COMMIT_TITLE =~ "beta" ||  $CI_COMMIT_TITLE =~ "rc" ]]; then
     # -     echo "Deploying to SIT"
     # -     ssh -i $FEDO_SALES_NON_PROD -o StrictHostKeyChecking=no ubuntu@sit.fedo.ai "sudo systemctl stop sit.$SERVICE_NAME;$AS_FEDO bash -c \"cp $TAGGED_APP_VERSION.tar $RELEASE_LOCATION; cd $DEPLOY_LOCATION_SIT; unlink sit-$SERVICE_NAME;rm -rf *; tar -xzf $RELEASE_LOCATION/$TAGGED_APP_VERSION.tar;ln -s $DEPLOY_LOCATION_SIT/$TAGGED_APP_VERSION $DEPLOY_LOCATION_SIT/sit-$SERVICE_NAME\"; cd; rm -f $TAGGED_APP_VERSION.tar; sudo systemctl start sit.$SERVICE_NAME;"
@@ -65,15 +65,15 @@ Deploy:
     # -     echo "Deploying to UAT / demo"
     # -     ssh -i $FEDO_SALES_NON_PROD -o StrictHostKeyChecking=no ubuntu@uat.fedo.ai "sudo systemctl stop uat.$SERVICE_NAME;$AS_FEDO bash -c \"cp $TAGGED_APP_VERSION.tar $RELEASE_LOCATION; cd $DEPLOY_LOCATION_UAT; unlink uat-$SERVICE_NAME;rm -rf *; tar -xzf $RELEASE_LOCATION/$TAGGED_APP_VERSION.tar; ln -s $DEPLOY_LOCATION_UAT/$TAGGED_APP_VERSION $DEPLOY_LOCATION_UAT/uat-$SERVICE_NAME\"; cd; rm -f $TAGGED_APP_VERSION.tar; sudo systemctl start uat.$SERVICE_NAME;"
     # - fi
-    - if [[ $CI_COMMIT_TITLE =~ "rc" ]]; then
-    -     npm install -g nexe
-    -     nexe dist/src/main.js -o $TAGGED_APP_VERSION -t x64-14.15.3
-    -     tar -czf $TAGGED_APP_VERSION.tar $TAGGED_APP_VERSION
-    -     chmod 400 $FEDO_AI_NEW_HEALTH_WEBSITE
-    -     echo "Deploying to PROD"
-    -     scp -i $FEDO_AI_NEW_HEALTH_WEBSITE -o StrictHostKeyChecking=no $TAGGED_APP_VERSION.tar ubuntu@fedo.ai:~
-    -     ssh -i $FEDO_AI_NEW_HEALTH_WEBSITE -o StrictHostKeyChecking=no ubuntu@fedo.ai "sudo systemctl stop $SERVICE_NAME;$AS_FEDO_PROD bash -c \"cp $TAGGED_APP_VERSION.tar $RELEASE_LOCATION_PROD; cd $DEPLOY_LOCATION_PROD; pwd; unlink $SERVICE_NAME; rm -rf *; tar -xzf $RELEASE_LOCATION_PROD/$TAGGED_APP_VERSION.tar;ln -s $DEPLOY_LOCATION_PROD/$TAGGED_APP_VERSION $DEPLOY_LOCATION_PROD/$SERVICE_NAME\"; cd; rm -f $TAGGED_APP_VERSION.tar; sudo systemctl start $SERVICE_NAME;"
-    - fi
+    # - if [[ $CI_COMMIT_TITLE =~ "rc" ]]; then
+    # -     npm install -g nexe
+    # -     nexe dist/src/main.js -o $TAGGED_APP_VERSION -t x64-14.15.3
+    # -     tar -czf $TAGGED_APP_VERSION.tar $TAGGED_APP_VERSION
+    # -     chmod 400 $FEDO_AI_NEW_HEALTH_WEBSITE
+    # -     echo "Deploying to PROD"
+    # -     scp -i $FEDO_AI_NEW_HEALTH_WEBSITE -o StrictHostKeyChecking=no $TAGGED_APP_VERSION.tar ubuntu@fedo.ai:~
+    # -     ssh -i $FEDO_AI_NEW_HEALTH_WEBSITE -o StrictHostKeyChecking=no ubuntu@fedo.ai "sudo systemctl stop $SERVICE_NAME;$AS_FEDO_PROD bash -c \"cp $TAGGED_APP_VERSION.tar $RELEASE_LOCATION_PROD; cd $DEPLOY_LOCATION_PROD; pwd; unlink $SERVICE_NAME; rm -rf *; tar -xzf $RELEASE_LOCATION_PROD/$TAGGED_APP_VERSION.tar;ln -s $DEPLOY_LOCATION_PROD/$TAGGED_APP_VERSION $DEPLOY_LOCATION_PROD/$SERVICE_NAME\"; cd; rm -f $TAGGED_APP_VERSION.tar; sudo systemctl start $SERVICE_NAME;"
+    # - fi
     - cd
     - rm -f $TAGGED_APP_VERSION.tar
 
