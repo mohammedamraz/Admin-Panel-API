@@ -865,7 +865,7 @@ export class VideoToVitalsService {
           return this.testStatusService.find({ customer_id: customer_id, scan_id: scan_id }).pipe(
             map((doc) => {
               if (doc.length == 0) { throw new NotFoundException(); }
-              let data:any
+              let data:any = {};
               delete data.tenant_id;
               data.customer_id = doc[0].customer_id;
               data.scan_id = doc[0].scan_id;
