@@ -425,7 +425,7 @@ export class VideoToVitalsController {
   }
 
 
-  @Post('save/status')
+  @Post('message/status')
   saveToStatusDb(@Body() statusDTO: StatusDTO) {
     Logger.debug(`saveToStatusDb() StatusDTO:${JSON.stringify(statusDTO)} `);
 
