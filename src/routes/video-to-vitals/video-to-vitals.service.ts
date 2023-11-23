@@ -865,15 +865,18 @@ export class VideoToVitalsService {
           return this.testStatusService.find({ customer_id: customer_id, scan_id: scan_id }).pipe(
             map((doc) => {
               if (doc.length == 0) { throw new NotFoundException(); }
-              let data:any = {};
-              delete data.tenant_id;
-              data.customer_id = doc[0].customer_id;
-              data.scan_id = doc[0].scan_id;
-              data.message = doc[0].message;
-              data.status = doc[0].status;
-              data.client_id = doc[0].client_id;
-              this.res.push(data);
-              return this.res[0];
+              else{
+                let data: any = {};
+                delete data.tenant_id;
+                data.customer_id = doc[0].customer_id;
+                data.scan_id = doc[0].scan_id;
+                data.message = doc[0].message;
+                data.status = doc[0].status;
+                data.client_id = doc[0].client_id;
+                this.res.push(data);
+                Logger.debug(`data : ${data}, doc:${doc[0]} }`, APP);
+                return this.res[0];
+              }
             }))
         })
       )
