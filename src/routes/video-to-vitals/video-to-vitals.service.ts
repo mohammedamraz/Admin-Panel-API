@@ -821,20 +821,58 @@ export class VideoToVitalsService {
     //     }))
   }
 
-  saveToStatusDb(statusDTO: StatusDTO) {
-    Logger.debug(`saveToStatusDb() data:${statusDTO}}`);
+  saveToStatusDb(statusDto: StatusDTO) {
+    Logger.debug(`fetchCustomerIdAndScanId() cust_id:${statusDto.customer_id},scan_id:${statusDto.scan_id} }`, APP);
     const date = new Date();
 
     const options: any = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric', second: 'numeric', timeZoneName: 'short', hour12: true };
-    statusDTO['test_time'] = date.toLocaleString('en-IN', options);
-    return this.testStatusService.save(statusDTO).pipe(
-      catchError(err => { throw new UnprocessableEntityException(err.message) }),
+    statusDto['test_time'] = date.toLocaleString('en-IN', options);
+    return this.testStatusService.find({ customer_id: statusDto.customer_id, scan_id: statusDto.scan_id }).pipe(
       map(doc => {
-        console.log(doc);
-        return doc[0]
+        if (doc.length != 0) {
+          this.testStatusService.findByIdandUpdate({ id: doc[doc.length - 1].id.toString(), quries: statusDto }).pipe(
+            catchError(err => { throw new NotFoundException() })
+          )
+        }
+        return doc;
       }),
-    );;
+      switchMap((doc: any) => {
+        return this.testStatusService.find({ id: doc[doc.length - 1].id }).pipe(map(doc => { return doc[0] }))
+      })
+    )
   }
+  //patch
+  //    return this.testStatusService.findByCustomerIdAndScanId({ columnName: 'customer_id', columnvalue: , quries: UpdateCustomerInsightsDTO }).pipe(
+  //     map(doc => {
+  //       // doc will be the row, a unique id will bw there
+  //       console.log(doc)
+  //       return doc
+  //     }),
+  //     catchError(err => { throw new NotFoundException() })
+  //   )
+  // }
+  // else {
+  //   //save
+  //   return this.testStatusService.save(statusDto).pipe(
+  //     map(doc =>{
+  //       return doc[0]
+  //     })
+  //   )
+  // }
+
+  // statusDTO['test_time'] = date.toLocaleString('en-IN', options);
+  // return this.productTestsService.save(statusDTO).pipe(
+  //   catchError(err => { throw new UnprocessableEntityException(err.message) }),
+  //   map(doc => { if (doc.length == 0) throw new NotFoundException('user not found')
+  //     else { return this.testStatusService.find({ policy_number: customer_id,vitals_id:scan_id}).pipe(
+  //       map(doc => {
+  //         console.log(doc)
+  //         return doc[0]
+  //       }))}
+
+  //   }),
+  // );;
+
 
 
   calculatePilotDuration(doc) {
@@ -865,7 +903,7 @@ export class VideoToVitalsService {
           return this.testStatusService.find({ customer_id: customer_id, scan_id: scan_id }).pipe(
             map((doc) => {
               if (doc.length == 0) { throw new NotFoundException(); }
-              else{
+              else {
                 let data: any = {};
                 delete data.tenant_id;
                 data.customer_id = doc[0].customer_id;
@@ -930,8 +968,22 @@ export class VideoToVitalsService {
               if (doc.length == 0) {
                 throw new NotFoundException()
               }
+
+              if (doc[0].status_code == 404) {
+                let result: any = {};
+                result.status_code = doc[0].status_code;
+                result.client_id = doc[0].client_id;
+                result.scan_id = doc[0].vitals_id;
+                result.customer_id = doc[0].policy_number;
+
+                this.res.push(result);
+                return result;
+
+              }
+
               let result = this.deleteKeys(doc);
               return result[0];
+
             })
           )
         }))

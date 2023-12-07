@@ -629,5 +629,46 @@ export class DatabaseService<T> implements DatabaseInterface<T> {
     return this.runQuery(query)
 
   }
+  findByCustomerIdAndScanId(findAndUpdateParams: findAndUpdateParams): Observable<T[]> {
+    // Logger.debug(`findByCustomerIdAndScanId()`, APP);
+    //  const query = `SELECT * FROM ${this.tableName} WHERE scan_id="1" and customer_id="1" `
+    // // const query = `SELECT * FROM vitals_table`;
+    // return this.runQuery(query)
+    // Logger.debug(`findByCustomerIdAndScanId(): query ${[JSON.stringify(cust_id)]}`, APP);
+    // Logger.debug(`findByCustomerIdAndScanId(): query ${[JSON.stringify(scan_id)]}`, APP);
+    let variables = [];
+    let values = []
+    let findbyConditionParams = [];
+    let params = findbyConditionParams
+    Object.values(params).map((params, index) => { variables.push(params), values.push((`$${index + 1}`)) }) 
+    const query = `UPDATE ${this.tableName} SET ${values} WHERE cust_id = ${values[0]} AND scan_id = ${values[1]}`
+    return this.runQuery(query, variables);
+    // const values: Array<string> = [];
+    // const variables: Array<string> = [];
+    // Object.entries(findByIDAndupdateparams.quries).map((_, index1) => { values.push((`${_[0]}=$${index1 + 1}`)), variables.push(_[1]) });
+    // const values$ = JSON.stringify(values).replace("[", "").replace("]", "").replace(/"/g, "");
+    // const query = `UPDATE ${this.tableName} SET ${values$} WHERE cust_id = $${values.length + 1} AND scan_id = $${values.length + 1}  `;
+    // variables.push(findByIDAndupdateparams.id);
+    // // return this.runQuery(query, variables);
+    // let variables: Array<string> = [];
+    // variables.push(cust_id,scan_id)
+    // const query = ` UPDATE ${this.tableName} SET ${variables} WHERE scan_id="1" and customer_id="1" `;
+
+    // return this.runQuery(query, variables);
+  }
+
+  // findByIdandUpdate(findByIDAndupdateparams: findByIDAndUpdateParams): Observable<T[]> {
+  //   Logger.debug(`findByIdandUpdate(): params ${[JSON.stringify(findByIDAndupdateparams)]}`, APP);
+
+  //   const values: Array<string> = [];
+  //   const variables: Array<string> = [];
+  //   Object.entries(findByIDAndupdateparams.quries).map((_, index1) => { values.push((`${_[0]}=$${index1 + 1}`)), variables.push(_[1]) });
+  //   const values$ = JSON.stringify(values).replace("[", "").replace("]", "").replace(/"/g, "");
+  //   const query = `UPDATE ${this.tableName} SET ${values$} WHERE id = $${values.length + 1} `;
+  //   variables.push(findByIDAndupdateparams.id);
+
+  //   // let temp = JSON.stringify(findByIDAndupdateparams.update).replace("{", "").replace("}", "").replace(/:/g, "=").replace(/"/g, "");
+  //   return this.runQuery(query, variables);
+  // }
 
 }

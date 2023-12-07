@@ -12,7 +12,7 @@ export class XAPIKey {
 export class StatusDTO{
     id:number;
     // @IsNotEmpty()
-    customer_id:string;
+    customer_id:any;
     // @IsNotEmpty()
     tenant_id:number;
     // @IsNotEmpty()
@@ -82,6 +82,9 @@ video_location:string;
 client_id:string;
 tenant_id:string;
 tests:number;
+status_code:number;
+vitals_id: string;
+policy_number:string;
 
 
 

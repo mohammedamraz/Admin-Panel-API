@@ -29,7 +29,7 @@ export class VideoToVitalsController {
 
   @Post('message/post-status')
   saveToStatusDb(@Body() statusDTO: StatusDTO) {
-    Logger.debug(`saveToStatusDb() StatusDTO:${JSON.stringify(statusDTO)} `);
+    Logger.debug(`fetchCustomerIdAndScanId() customer_id:${statusDTO.customer_id} scan_id:${statusDTO.scan_id}`, APP);
 
     return this.videoToVitalsService.saveToStatusDb(statusDTO);
   }
@@ -436,7 +436,7 @@ export class VideoToVitalsController {
 
 
   @Get('')
-  fetchVitals(@Headers('x-api-key') apiKey: XAPIKey, @Query('cust_id') cust_id: VitalsDTO, @Query('scan_id') scan_id: VitalsDTO) {
+  fetchVitals(@Headers('x-api-key') apiKey: XAPIKey, @Query('cust-id') cust_id: VitalsDTO, @Query('scan-id') scan_id: VitalsDTO) {
     Logger.debug(`fetchCustomerById() customer_id:${cust_id}`, `APIKey`, apiKey, APP);
     Logger.debug(`fetchScanById() scan_id:${scan_id}`, APP);
 
