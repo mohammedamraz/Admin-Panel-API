@@ -21,6 +21,7 @@ export class StatusDTO{
     // @Optional()
     status:number;
     client_id:string;
+    test_time:string;
    
 
     constructor(s?: Partial<StatusDTO>){
@@ -29,7 +30,8 @@ export class StatusDTO{
         this.scan_id= s?.scan_id || '';
         this.message= s?.message || '';
         this.status= s?.status || 0;
-        this.client_id = s?.client_id || ''
+        this.client_id = s?.client_id || '';
+        this.test_time = s?.client_id || '';
        
     }
 }

@@ -911,6 +911,7 @@ export class VideoToVitalsService {
                 data.message = doc[0].message;
                 data.status = doc[0].status;
                 data.client_id = doc[0].client_id;
+                
                 this.res.push(data);
                 Logger.debug(`data : ${data}, doc:${doc[0]} }`, APP);
                 return data;
@@ -1011,6 +1012,26 @@ export class VideoToVitalsService {
     )
   }
 
+  findAllStatusDetails(statusDto:StatusDTO){
+
+    Logger.debug(`findAllStatusDetails()`, APP);
+    return this.testStatusService.fetchAll().pipe(
+      catchError(err => { throw new UnprocessableEntityException(err.message) }),
+      map(doc => {
+         if (doc.length == 0) {
+            throw new NotFoundException('No user Found')
+         }
+         else {
+            doc.map(ele => {
+              delete ele.id;
+            })
+            return doc
+         }
+      }),
+   );;
+
+
+  }
 
   async encryptXAPIKey(encryptXAPIKey) {
     const NodeRSA = require('node-rsa');

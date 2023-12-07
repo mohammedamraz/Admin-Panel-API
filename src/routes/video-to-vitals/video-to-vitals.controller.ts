@@ -443,6 +443,11 @@ export class VideoToVitalsController {
     return this.videoToVitalsService.fetchRowDetails(cust_id, scan_id, apiKey);
   }
 
+  @Get('fetchAll/status-details/')
+  fetchAllStatusScans(@Body() statusDto:StatusDTO){
+    Logger.debug(`fetchAllStatusScans()`,APP);
+    return this.videoToVitalsService.findAllStatusDetails(statusDto);
+  }
 
   
 
