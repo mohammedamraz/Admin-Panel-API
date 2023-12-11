@@ -22,6 +22,10 @@ export class StatusDTO{
     status:number;
     client_id:string;
     test_time:string;
+    test_date:string;
+    org_id:number;
+    // date: string;
+    // d:string;
    
 
     constructor(s?: Partial<StatusDTO>){
@@ -31,7 +35,9 @@ export class StatusDTO{
         this.message= s?.message || '';
         this.status= s?.status || 0;
         this.client_id = s?.client_id || '';
-        this.test_time = s?.client_id || '';
+        this.test_time = s?.test_time || '';
+        this.test_date=s?.test_date || '';
+        this.org_id= s?.org_id || 0;
        
     }
 }

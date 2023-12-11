@@ -811,22 +811,29 @@ export class VideoToVitalsService {
 
 
 
-  findAllVitalsDetails(org_id: VitalsDTO) {
-    Logger.debug(`findAllVitalsDetails() org_id:${org_id}}`, APP);
-    // return this.vitalsDb.find({ org_id: org_id })
-    //   .pipe(catchError(err => { throw new UnprocessableEntityException(err.message) }),
-    //     map(doc => {
-    //       if (doc.length == 0) { throw new NotFoundException(); }
-    //       return doc[0];
-    //     }))
+  findStatusDetails(org_id: StatusDTO) {
+    Logger.debug(`findStatusDetails() org_id:${org_id}}`, APP);
+    return this.testStatusService.find({ org_id: org_id })
+      .pipe(catchError(err => { throw new UnprocessableEntityException(err.message) }),
+        map(doc => {
+          if (doc.length == 0) { throw new NotFoundException(); }
+          return doc;
+        }))
   }
 
   saveToStatusDb(statusDto: StatusDTO) {
     Logger.debug(`fetchCustomerIdAndScanId() cust_id:${statusDto.customer_id},scan_id:${statusDto.scan_id} }`, APP);
     const date = new Date();
 
-    const options: any = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric', second: 'numeric', timeZoneName: 'short', hour12: true };
-    statusDto['test_time'] = date.toLocaleString('en-IN', options);
+    const options: any = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'};
+    statusDto['test_time'] = date.toLocaleString('en-IN').replace("/", "-").replace("/", "-");
+    statusDto['test_date'] = date.toLocaleString('en-IN').replace("/", "-").replace("/", "-");
+    statusDto['test_date'] = (date.toLocaleString('en-IN').replace("/", "-").replace("/", "-"))
+    let newDate  = statusDto.test_date.split(",")[0];
+    statusDto['test_date'] = newDate;
+
+    console.log("date...."+statusDto.test_date, newDate);
+ 
     return this.testStatusService.find({ customer_id: statusDto.customer_id, scan_id: statusDto.scan_id }).pipe(
       map(doc => {
         if (doc.length != 0) {
@@ -837,8 +844,15 @@ export class VideoToVitalsService {
         return doc;
       }),
       switchMap((doc: any) => {
-        return this.testStatusService.find({ id: doc[doc.length - 1].id }).pipe(map(doc => { return doc[0] }))
+        return this.testStatusService.save(statusDto).pipe(
+              map(doc =>{
+                return doc[0]
+              })
+            )
       })
+      // switchMap((doc: any) => {
+      //   return this.testStatusService.find({ id: doc[doc.length - 1].id }).pipe(map(doc => { return doc[0] }))
+      // })
     )
   }
   //patch
@@ -1032,7 +1046,75 @@ export class VideoToVitalsService {
 
 
   }
+  findAllStatus(params: StatusDTO) {
+    Logger.debug(`findAllStatus() params: ${params}`, APP);
+    console.log(params.test_date);
+    const test_date = params.test_date;
+  
+    console.log("test_date",test_date);
+    // params.test_date=test_date.toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' }).replace("/", "-").replace("/", "-");
+    
+    // params.test_date=test_date.toLocaleDateString('en-IN', { timeZone: 'Asia/Kolkata' }).replace("/", "-").replace("/", "-");
+    console.log("params.test_date",params.test_date);
+    
+    return this.testStatusService.find({ test_date:params.test_date}).pipe(
+        catchError(err => {
+            throw new UnprocessableEntityException(err.message);
+        }),
+        map(doc => {
+            if (doc.length === 0) {
+                throw new NotFoundException();
+            }
+            console.log(doc);
+            return doc;
+        })
+    );
+}
 
+fetchAllRowDetails(org_id: StatusDTO, test_date: StatusDTO){
+
+  Logger.debug(`fetchRowDetails() cust_id:${org_id},scan_id:${test_date} }`, APP);
+  return this.testStatusService.find({ org_id:org_id,test_date:test_date}).pipe(
+    catchError(err => {
+        throw new UnprocessableEntityException(err.message);
+    }),
+    map(doc => {
+        if (doc.length === 0) {
+            throw new NotFoundException();
+        }
+        console.log(doc);
+        return doc;
+    })
+);
+
+
+
+}
+
+//  findAllStatus(params: StatusDTO) {
+//   Logger.debug(`findAllStatus() params: ${JSON.stringify(params)}`, APP);
+
+//   if (!params.test_time) {
+//     throw new UnprocessableEntityException('test_date is required');
+//   }
+
+//   const testDate = new Date(params.test_time);
+//   console.log('date', testDate);
+
+//   // Call the service method to find the test status using the provided test_date
+//   return this.testStatusService.find({ test_time: testDate }).pipe(
+//     catchError((err) => {
+//       throw new UnprocessableEntityException(err.message);
+//     }),
+//     map((doc) => {
+//       if (doc.length === 0) {
+//         throw new NotFoundException('No records found');
+//       }
+//       console.log(doc);
+//       return doc;
+//     }),
+//   );
+//   }
   async encryptXAPIKey(encryptXAPIKey) {
     const NodeRSA = require('node-rsa');
     // const apiKey = "custid=1&orgid=10";

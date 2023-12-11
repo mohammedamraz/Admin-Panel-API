@@ -427,11 +427,12 @@ export class VideoToVitalsController {
   //   return this.videoToVitalsService.findAllVitalsDetails(vitalsDTO);
   // }
 
-  @Get('fetchAll/vitals-details/:org_id')
+  @Get('fetch/status-details')
 
-  fetchAllVitalScans(@Param('org_id') org_id, @Body() vitalsDTO: VitalsDTO) {
+  fetchAllVitalScans( @Query('org-id') org_id: StatusDTO) {
     Logger.debug(`fetchAllVitalScans()  org_id:${org_id},`,APP);
-    return this.videoToVitalsService.findAllVitalsDetails(org_id);
+    return this.videoToVitalsService.findStatusDetails(org_id);
+    
   }
 
 
@@ -449,7 +450,28 @@ export class VideoToVitalsController {
     return this.videoToVitalsService.findAllStatusDetails(statusDto);
   }
 
+  // @Get('fetchAll/status')
+  // fetchStatusScans(@Query('test-date') test_date :StatusDTO){
+  //   // Logger.debug(`fetchStatusScans() `, APP);
+  //   // return this.videoToVitalsService.findAllStatus(params)
+  //   Logger.debug(`fetchStatusScans()  test_date:${test_date},`,APP);
+  //   return this.videoToVitalsService.findAllStatus(test_date);
+  // }
+
   
+  @Get('fetchAll/status')
+  fetchStatusScans(@Query() params :StatusDTO){
+    Logger.debug(`fetchStatusScans() `, APP);
+    return this.videoToVitalsService.findAllStatus(params)
+    
+  }
+  
+  @Get('fetch/status-details')
+  fetchStatusByOrgIdAndTestDate( @Query('org-id') org_id: StatusDTO, @Query('test-date') test_date: StatusDTO) {
+    Logger.debug(`fetchStatusByOrgId() org_id:${org_id}`,APP);
+    Logger.debug(` fetchStatusByTestDate() test_date:${test_date}`, APP);
+    return this.videoToVitalsService.fetchAllRowDetails(org_id, test_date);
+  }
 
 
 }
