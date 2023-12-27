@@ -151,6 +151,72 @@ export class ThirdpartyOrganizationService {
 
   }
 
+  authUrlEncryptionVitalsUrl(params : ParamsDto, body: any) {
+    Logger.debug(`authUrlEncryption() createProductDto: ${body}}`, APP);
+
+    return this.tpaJunctionDB.find({ org_id: params.org_id, id: params.id }).pipe(
+      switchMap(async doc => {
+        const url = doc[0].auth_url;
+        const secondUrl = doc[0].api_url_vitals;
+        const username = doc[0].header.username;
+        const password = doc[0].header.password;
+        try {
+          // const params = new URLSearchParams();
+          // params.append('grant_type', grantType);
+
+          const firstResponse = await axios.post(url, {userid : username , password : password});
+
+          // delete body.policy_number;
+          const accessToken = firstResponse.data.token;
+          const secondResponse = await axios.post(secondUrl, body, {
+            headers: {
+              'token': accessToken
+            },
+          });
+
+          return secondResponse.data;
+
+        } catch (error) {
+          throw new BadRequestException({ status: error.response.status, message: error.response.statusText })
+        }
+      })
+    )
+
+  }
+
+  authUrlEncryptionStatusUrl(params : ParamsDto, body: any) {
+    Logger.debug(`authUrlEncryption() createProductDto: ${body}}`, APP);
+
+    return this.tpaJunctionDB.find({ org_id: params.org_id, id: params.id }).pipe(
+      switchMap(async doc => {
+        const url = doc[0].auth_url;
+        const secondUrl = doc[0].api_url_status;
+        const username = doc[0].header.username;
+        const password = doc[0].header.password;
+        try {
+          // const params = new URLSearchParams();
+          // params.append('grant_type', grantType);
+
+          const firstResponse = await axios.post(url, {userid : username , password : password});
+
+          // delete body.policy_number;
+          const accessToken = firstResponse.data.token;
+          const secondResponse = await axios.post(secondUrl, body, {
+            headers: {
+              'token': accessToken
+            },
+          });
+
+          return secondResponse.data;
+
+        } catch (error) {
+          throw new BadRequestException({ status: error.response.status, message: error.response.statusText })
+        }
+      })
+    )
+
+  }
+
   sampleUrlForAuth(body : RequestToAPIDto){
     Logger.debug('sampleUrlForAuth',APP);
 

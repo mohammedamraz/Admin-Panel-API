@@ -200,11 +200,20 @@ export class SendEmailService {
     return this.productTestDB.findandUpdate({ columnName: 'vitals_id', columnvalue: body.scan_id, quries: format_mobilesave(doc,body.organisation_admin_mobile,datetime) });
   }
 
+  async savePdfWithVitalsDataInGcp(body: sendEmailOnCreationOfOrgAndUser) {
+    Logger.debug(`savePdfWithVitalsDataInGcp() body: [${JSON.stringify(body)}]`, APP);
+
+    var currentdate = new Date();
+    var datetime = currentdate.toLocaleString('en-US', { hour: 'numeric', minute: 'numeric', second: 'numeric', hour12: true });
+    const doc = await this.templateService.savePdfWithVitalsDataInGcp(body);
+    return this.productTestDB.findandUpdate({ columnName: 'vitals_id', columnvalue: body.scan_id, quries: format_mobilesave(doc,body.organisation_admin_mobile,datetime) });
+  }
+
   async sendEmailToKioskUserWithVitalsData(body: sendEmailOnCreationOfOrgAndUser) {
     Logger.debug(`sendEmailToKioskUserWithVitalsData() body: [${JSON.stringify(body)}]`, APP);
 
     const doc = await this.templateService.sendEmailToKioskUserWithVitalsData(body);
-    return this.productTestDB.findandUpdate({ columnName: 'vitals_id', columnvalue: body.scan_id, quries: { pdf_location: doc } });
+    // return this.productTestDB.findandUpdate({ columnName: 'vitals_id', columnvalue: body.scan_id, quries: { pdf_location: doc } });
   }
 
   sendEmailOnWebSocketFailure(body: sendEmailOnCreationOfOrgAndUser) {

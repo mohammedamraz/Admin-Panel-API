@@ -397,6 +397,13 @@ export class VideoToVitalsController {
     return this.organizationService.generateEncryptedUrlForCanara(EncryptUrlDTO)
   }
 
+  @Post('generateScanLinkPurpleGrid')
+  generateEncryptedUrlForPurpleGrid(@Body() EncryptUrlDTO: EncryptUrlDTO) {
+    Logger.debug(`generateEncryptedUrlForPurpleGrid()  EncryptUrlDTO:${JSON.stringify(EncryptUrlDTO)} `, APP);
+
+    return this.organizationService.generateEncryptedUrlForPurpleGrid(EncryptUrlDTO)
+  }
+  
   @Post('generateEncryptedScanLink')
   generateEncryptedUrlForHealthIndia(@Body() EncryptUrlDTO: EncryptUrlDTO) {
     Logger.debug(`generateEncryptedUrlForHealthIndia()  EncryptUrlDTO:${JSON.stringify(EncryptUrlDTO)} `, APP);

@@ -50,6 +50,7 @@ export class UpdateThirdPartyOrganizationJunctionDto {
     is_batchprocess? : boolean;
     x_api_key? : any;
     header? : any;
+    auth_url?: any;
 }
 
 // export class CreateThirdPartyOrganizationDto {

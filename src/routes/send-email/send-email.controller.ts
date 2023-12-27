@@ -152,6 +152,14 @@ export class SendEmailController {
         return this.sendEmailService.savePdfWithVitalsData(body)
   }
 
+  @Post('pdfsave/gcp')
+    // @UseInterceptors(FileInterceptor('file'))
+    savePdfWithVitalsDataInGcp(@Body() body:sendEmailOnCreationOfOrgAndUser) {
+        Logger.debug(`savePdfWithVitalsData() body: [${JSON.stringify(body)}]`, APP);
+    
+        return this.sendEmailService.savePdfWithVitalsDataInGcp(body)
+  }
+
   @Post('pdfcopy/kiosk/email')
   sendEmailToKioskUserWithVitalsData(@Body() body:sendEmailOnCreationOfOrgAndUser) {
     Logger.debug(`sendEmailToKioskUserWithVitalsData() body: [${JSON.stringify(body)}]`, APP);

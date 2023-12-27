@@ -55,6 +55,20 @@ export class ThirdpartyOrganizationController {
         return this.thirdpartyOrganizationService.authUrlEncryption(org_id,body);
     }
 
+    @Post('auth_vitals/:org_id/:id')
+    authUrlEncryptionVitalsUrl(@Param() params : ParamsDto , @Body() body : any ) {
+        Logger.debug(`authUrlEncryptionVitalsUrl() createProductDto:${body }`, APP);
+
+        return this.thirdpartyOrganizationService.authUrlEncryptionVitalsUrl(params,body);
+    }
+
+    @Post('auth_status/:org_id/:id')
+    authUrlEncryptionStatusUrl(@Param() params : ParamsDto , @Body() body : any ) {
+        Logger.debug(`authUrlEncryptionStatusUrl() createProductDto:${body }`, APP);
+
+        return this.thirdpartyOrganizationService.authUrlEncryptionStatusUrl(params,body);
+    }
+
     @Post('auth_sample_url')
     sampleUrlForAuth(@Body() body : RequestToAPIDto) {
         Logger.debug(`sampleUrlForAuth() }`, APP);

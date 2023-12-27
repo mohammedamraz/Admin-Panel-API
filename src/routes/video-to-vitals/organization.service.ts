@@ -971,6 +971,17 @@ export class OrganizationService {
         return url;
     }
 
+    generateEncryptedUrlForPurpleGrid(EncryptUrlDTO : EncryptUrlDTO){
+      Logger.debug(`generateEncryptedUrlForPurpleGrid,APP`,APP);
+
+      EncryptUrlDTO.orgId = '107';
+      EncryptUrlDTO.userId = '643';
+      EncryptUrlDTO.tenantId = '89';
+        const str = this.createQueryString(EncryptUrlDTO);
+        const url = 'https://fedo.ai/products/vitals/webapp/vitals?' + str;
+        return url;
+    }
+
     generateEncryptedUrlForHealthIndia(EncryptUrlDTO : EncryptUrlDTO){
       Logger.debug(`generateEncryptedUrlForHealthIndia,APP`,APP);
 
