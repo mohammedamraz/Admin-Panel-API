@@ -2,13 +2,13 @@ import { HttpService } from '@nestjs/axios';
 import { BadRequestException, Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { catchError, map, switchMap } from 'rxjs';
 // import { DatabaseService } from 'firebase-admin/lib/database/database';
+import axios from 'axios';
 import { DatabaseTable } from 'src/lib/database/database.decorator';
 import { DatabaseService } from 'src/lib/database/database.service';
+import { URLSearchParams } from 'url';
 import { ZQueryParamsDto } from '../sales/dto/create-sale.dto';
 import { OrganizationService } from '../video-to-vitals/organization.service';
 import { AuthAPIDto, CreateThirdPartyOrganizationDto, ParamsDto, RequestToAPIDto, UpdateThirdPartyOrganizationJunctionDto } from './dto/create-third-party.dto';
-import axios from 'axios';
-import { URLSearchParams } from 'url';
 const APP = 'ThirdpartyOrganizationService'
 
 @Injectable()
@@ -74,16 +74,13 @@ export class ThirdpartyOrganizationService {
     let api_response : any;
     return this.tpaJunctionDB.find({ org_id: params.org_id, id: params.id }).pipe(
       switchMap(async doc => {
-        if(doc[0].header){
-        api_response = await axios.post(doc[0].api_url_status, body, {
-          headers: doc[0].header
-        });
-      }
-      else if(doc[0].auth_url){
+        console.log(doc)  
+       if(doc[0].auth_url){
         const url = doc[0].auth_url;
         const secondUrl = doc[0].api_url_status;
         const username = doc[0].header.username;
         const password = doc[0].header.password;
+      console.log("alishflashf")
         try {
           // const params = new URLSearchParams();
           // params.append('grant_type', grantType);
@@ -103,7 +100,7 @@ export class ThirdpartyOrganizationService {
           });
 
           console.log("secod response",secondResponse);
-          console.log("the body sending",body);
+          console.log("the body sendinggggg",body);
           
           return secondResponse.data;
 
@@ -111,6 +108,11 @@ export class ThirdpartyOrganizationService {
           throw new BadRequestException({ status: error.response.status, message: error.response.statusText })
         }
       // }
+      }
+      else if(doc[0].header){
+        api_response = await axios.post(doc[0].api_url_status, body, {
+          headers: doc[0].header
+        });
       }
       else {
         api_response = await axios.post(doc[0].api_url_status, body);
