@@ -163,17 +163,23 @@ export class ThirdpartyOrganizationService {
         try {
           // const params = new URLSearchParams();
           // params.append('grant_type', grantType);
+          const user_data = {userid : username , password : password};
+          console.log("the user data",user_data);
 
           const firstResponse = await axios.post(url, {userid : username , password : password});
 
           // delete body.policy_number;
+          console.log("the response",firstResponse);
           const accessToken = firstResponse.data.token;
+          console.log("the access token",accessToken)
           const secondResponse = await axios.post(secondUrl, body, {
             headers: {
               'token': accessToken
             },
           });
 
+          console.log("secod response",secondResponse);
+          console.log("the body sending",body);
           return secondResponse.data;
 
         } catch (error) {
@@ -196,17 +202,24 @@ export class ThirdpartyOrganizationService {
         try {
           // const params = new URLSearchParams();
           // params.append('grant_type', grantType);
+          const user_data = {userid : username , password : password};
+          console.log("the user data",user_data);
 
           const firstResponse = await axios.post(url, {userid : username , password : password});
 
           // delete body.policy_number;
+          console.log("the response",firstResponse);
           const accessToken = firstResponse.data.token;
+          console.log("the access token",accessToken)
           const secondResponse = await axios.post(secondUrl, body, {
             headers: {
               'token': accessToken
             },
           });
 
+          console.log("secod response",secondResponse);
+          console.log("the body sending",body);
+          
           return secondResponse.data;
 
         } catch (error) {
