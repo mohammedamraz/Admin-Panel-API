@@ -825,15 +825,15 @@ export class VideoToVitalsService {
     Logger.debug(`fetchCustomerIdAndScanId() cust_id:${statusDto.customer_id},scan_id:${statusDto.scan_id} }`, APP);
     const date = new Date();
 
-    const options: any = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'};
+    const options: any = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
     statusDto['test_time'] = date.toLocaleString('en-IN').replace("/", "-").replace("/", "-");
     statusDto['test_date'] = date.toLocaleString('en-IN').replace("/", "-").replace("/", "-");
     statusDto['test_date'] = (date.toLocaleString('en-IN').replace("/", "-").replace("/", "-"))
-    let newDate  = statusDto.test_date.split(",")[0];
+    let newDate = statusDto.test_date.split(",")[0];
     statusDto['test_date'] = newDate;
 
-    console.log("date...."+statusDto.test_date, newDate);
- 
+    console.log("date...." + statusDto.test_date, newDate);
+
     return this.testStatusService.find({ customer_id: statusDto.customer_id, scan_id: statusDto.scan_id }).pipe(
       map(doc => {
         if (doc.length != 0) {
@@ -845,10 +845,10 @@ export class VideoToVitalsService {
       }),
       switchMap((doc: any) => {
         return this.testStatusService.save(statusDto).pipe(
-              map(doc =>{
-                return doc[0]
-              })
-            )
+          map(doc => {
+            return doc[0]
+          })
+        )
       })
       // switchMap((doc: any) => {
       //   return this.testStatusService.find({ id: doc[doc.length - 1].id }).pipe(map(doc => { return doc[0] }))
@@ -904,7 +904,7 @@ export class VideoToVitalsService {
     var decryptedId: any = this.decryptXAPIKey(apiKey)
 
 
-    return this.orgProductJunctionService.fetchOrgDetailsByOrgProductJunctionId(decryptedId.orgId)
+    return this.orgProductJunctionService.fetchOrgProductJunctionDataByOrgId(decryptedId.orgId)
       .pipe(catchError(err => { throw new NotFoundException() }),
         map(doc => {
           let difference_In_Days = this.calculatePilotDuration(doc);
@@ -925,7 +925,7 @@ export class VideoToVitalsService {
                 data.message = doc[0].message;
                 data.status = doc[0].status;
                 data.client_id = doc[0].client_id;
-                
+
                 this.res.push(data);
                 Logger.debug(`data : ${data}, doc:${doc[0]} }`, APP);
                 return data;
@@ -963,25 +963,30 @@ export class VideoToVitalsService {
     return doc
   }
 
-
   fetchRowDetails(customer_id: VitalsDTO, scan_id: VitalsDTO, apiKey) {
     Logger.debug(`fetchRowDetails() cust_id:${customer_id},scan_id:${scan_id} }`, APP);
 
-    var decryptedString: any = this.decryptXAPIKey(apiKey)
-    return this.orgProductJunctionService.fetchOrgDetailsByOrgProductJunctionId(decryptedString.orgId)
-      .pipe(catchError(err => { throw new NotFoundException() }),
+    var decryptedString: any = this.decryptXAPIKey(apiKey);
+
+    return this.orgProductJunctionService.fetchOrgProductJunctionDataByOrgId(decryptedString.orgId)
+      .pipe(
+        catchError(err => {
+          throw new NotFoundException();
+        }),
         map(doc => {
           let difference_In_Days = this.calculatePilotDuration(doc);
+
           if (difference_In_Days < 0) {
-            throw new UnprocessableEntityException({ 'error': 'Contact Fedo' })
+            throw new UnprocessableEntityException({ 'error': 'Contact Fedo' });
           }
+
           return doc;
         }),
-        switchMap(doc => {
+        map(doc => {
           return this.productTestsService.find({ policy_number: customer_id, vitals_id: scan_id }).pipe(
-            map(doc => {
+            switchMap(doc => {
               if (doc.length == 0) {
-                throw new NotFoundException()
+                throw new NotFoundException();
               }
 
               if (doc[0].status_code == 404) {
@@ -993,18 +998,80 @@ export class VideoToVitalsService {
 
                 this.res.push(result);
                 return result;
-
               }
 
               let result = this.deleteKeys(doc);
               return result[0];
-
             })
-          )
-        }))
+          );
+        }
+        ),
+        switchMap(doc => {
+          return this.productTestsService.find({ policy_number: customer_id, vitals_id: scan_id }).pipe(
+            map(docs => {
+              if (docs.length != 0) {
+                let is_payment_successfull = true
+                this.productTestsService.findByIdandUpdate({ id: docs[0].id.toString(), quries: { is_payment_successfull: true } }).pipe(
+                  catchError(err => { throw new NotFoundException() }),
+                  map((doc) => { return docs[0] })
+                )
+              }
+              
+                let data: any = {};
+                delete data.id;
+                delete data.org_id;
+                delete data.user_id;
+                delete data.event_mode;
+                delete data.tests;
+                delete data.test_date;
+                delete data.name;
+                delete data.city;
+                delete data.username;
+                delete data.for_whom;
+                delete data.bp_status;
+                delete data.ecg_url;
+                delete data.app_name;
+                delete data.media_name;
+                delete data.viu_user;
+                delete data.pdf_location;
+                delete data.fedo_score_id;
+                delete data.facial_precision;
+                delete data.mobile;
+                delete data.test_time;
+                delete data.version_id;
+                delete data.video_location;
+                delete data.tenant_id;
+                delete data.is_payment_successfull;
+                
+                data.product_id = docs[0].product_id;
+                data.age = docs[0].age;
+                data.gender = docs[0].gender;
+                data.heart_rate = docs[0].heart_rate;
+                data.systolic = docs[0].systolic;
+                data.diastolic = docs[0].diastolic;
+                data.stress= docs[0].stress;
+                data.haemoglobin = docs[0].haemoglobin;
+                data.respiration = docs[0].respiration;
+                data.spo2 = docs[0].spo2;
+                data.hrv = docs[0].hrv;
+                data.bmi = docs[0].bmi;
+                data.smoker_accuracy = docs[0].smoker_accuracy;
+                data.vitals_id = docs[0].vitals_id;
+                data.policy_number = docs[0].policy_number;
+                data.rbs = docs[0].rbs; 
+                data.status_code = docs[0].status_code;  
+                data.client_id=docs[0].client_id;
+              
+                this.res.push(data);
+                Logger.debug(`data : ${data}, doc:${docs[0]} }`, APP);
+                return data;
+              
+            })
+          );
+        }),
 
+      );
   }
-
 
   updateVitalsData(id: number, vitalsDTO: VitalsDTO) {
     Logger.debug(`updateVitalsData() id:${id} vitalsDTO: ${JSON.stringify(vitalsDTO)} `, APP);
@@ -1026,23 +1093,23 @@ export class VideoToVitalsService {
     )
   }
 
-  findAllStatusDetails(statusDto:StatusDTO){
+  findAllStatusDetails(statusDto: StatusDTO) {
 
     Logger.debug(`findAllStatusDetails()`, APP);
     return this.testStatusService.fetchAll().pipe(
       catchError(err => { throw new UnprocessableEntityException(err.message) }),
       map(doc => {
-         if (doc.length == 0) {
-            throw new NotFoundException('No user Found')
-         }
-         else {
-            doc.map(ele => {
-              delete ele.id;
-            })
-            return doc
-         }
+        if (doc.length == 0) {
+          throw new NotFoundException('No user Found')
+        }
+        else {
+          doc.map(ele => {
+            delete ele.id;
+          })
+          return doc
+        }
       }),
-   );;
+    );;
 
 
   }
@@ -1050,71 +1117,46 @@ export class VideoToVitalsService {
     Logger.debug(`findAllStatus() params: ${params}`, APP);
     console.log(params.test_date);
     const test_date = params.test_date;
-  
-    console.log("test_date",test_date);
+
+    console.log("test_date", test_date);
     // params.test_date=test_date.toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' }).replace("/", "-").replace("/", "-");
-    
+
     // params.test_date=test_date.toLocaleDateString('en-IN', { timeZone: 'Asia/Kolkata' }).replace("/", "-").replace("/", "-");
-    console.log("params.test_date",params.test_date);
-    
-    return this.testStatusService.find({ test_date:params.test_date}).pipe(
-        catchError(err => {
-            throw new UnprocessableEntityException(err.message);
-        }),
-        map(doc => {
-            if (doc.length === 0) {
-                throw new NotFoundException();
-            }
-            console.log(doc);
-            return doc;
-        })
-    );
-}
+    console.log("params.test_date", params.test_date);
 
-fetchAllRowDetails(org_id: StatusDTO, test_date: StatusDTO){
-
-  Logger.debug(`fetchRowDetails() cust_id:${org_id},scan_id:${test_date} }`, APP);
-  return this.testStatusService.find({ org_id:org_id,test_date:test_date}).pipe(
-    catchError(err => {
+    return this.testStatusService.find({ test_date: params.test_date }).pipe(
+      catchError(err => {
         throw new UnprocessableEntityException(err.message);
-    }),
-    map(doc => {
+      }),
+      map(doc => {
         if (doc.length === 0) {
-            throw new NotFoundException();
+          throw new NotFoundException();
         }
         console.log(doc);
         return doc;
-    })
-);
+      })
+    );
+  }
 
+  fetchAllRowDetails(org_id: StatusDTO, test_date: StatusDTO) {
 
+    Logger.debug(`fetchRowDetails() cust_id:${org_id},scan_id:${test_date} }`, APP);
+    return this.testStatusService.find({ org_id: org_id, test_date: test_date }).pipe(
+      catchError(err => {
+        throw new UnprocessableEntityException(err.message);
+      }),
+      map(doc => {
+        if (doc.length === 0) {
+          throw new NotFoundException();
+        }
+        console.log(doc);
+        return doc;
+      })
+    );
 
-}
+  }
 
-//  findAllStatus(params: StatusDTO) {
-//   Logger.debug(`findAllStatus() params: ${JSON.stringify(params)}`, APP);
-
-//   if (!params.test_time) {
-//     throw new UnprocessableEntityException('test_date is required');
-//   }
-
-//   const testDate = new Date(params.test_time);
-//   console.log('date', testDate);
-
-//   // Call the service method to find the test status using the provided test_date
-//   return this.testStatusService.find({ test_time: testDate }).pipe(
-//     catchError((err) => {
-//       throw new UnprocessableEntityException(err.message);
-//     }),
-//     map((doc) => {
-//       if (doc.length === 0) {
-//         throw new NotFoundException('No records found');
-//       }
-//       console.log(doc);
-//       return doc;
-//     }),
-//   );
-//   }
+  
   async encryptXAPIKey(encryptXAPIKey) {
     const NodeRSA = require('node-rsa');
     // const apiKey = "custid=1&orgid=10";

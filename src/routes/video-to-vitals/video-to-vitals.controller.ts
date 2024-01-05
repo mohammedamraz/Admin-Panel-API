@@ -22,7 +22,7 @@ export class VideoToVitalsController {
   ) { }
 
   @Get('status')
-  fetchStatus(@Headers('x-api-key') apiKey: string, @Query('cust_id') cust_id: StatusDTO, @Query('scan_id') scan_id: StatusDTO) {
+  fetchStatus(@Headers('x-api-key') apiKey: string, @Query('cust-id') cust_id: StatusDTO, @Query('scan-id') scan_id: StatusDTO) {
     Logger.debug(`fetchCustomerIdAndScanId() customer_id:${cust_id} scan_id:${scan_id}`, APP);
     return this.videoToVitalsService.fetchCustomerIdAndScanId(cust_id, scan_id, apiKey);
   }
