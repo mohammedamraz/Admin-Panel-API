@@ -1129,7 +1129,7 @@ export class VideoToVitalsService {
         throw new UnprocessableEntityException(err.message);
       }),
       map(doc => {
-        if (doc.length === 0) {
+        if (doc.length == 0) {
           throw new NotFoundException();
         }
         console.log(doc);
@@ -1140,12 +1140,12 @@ export class VideoToVitalsService {
 
   fetchAllRowDetails(org_id: StatusDTO, test_date: StatusDTO) {
 
-    Logger.debug(`fetchRowDetails() cust_id:${org_id},scan_id:${test_date} }`, APP);
+    Logger.debug(`fetchRowDetails() org_id:${org_id}, test_date:${test_date}`, APP);
     return this.testStatusService.find({ org_id: org_id, test_date: test_date }).pipe(
       catchError(err => {
         throw new UnprocessableEntityException(err.message);
       }),
-      map(doc => {
+      map((doc) => {
         if (doc.length === 0) {
           throw new NotFoundException();
         }
@@ -1153,7 +1153,7 @@ export class VideoToVitalsService {
         return doc;
       })
     );
-
+  
   }
 
   
