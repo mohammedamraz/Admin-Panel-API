@@ -22,7 +22,7 @@ export class VideoToVitalsController {
   ) { }
 
   @Get('status')
-  fetchStatus(@Headers('x-api-key') apiKey: string, @Query('cust_id') cust_id: StatusDTO, @Query('scan_id') scan_id: StatusDTO) {
+  fetchStatus(@Headers('x-api-key') apiKey: string, @Query('cust-id') cust_id: StatusDTO, @Query('scan-id') scan_id: StatusDTO) {
     Logger.debug(`fetchCustomerIdAndScanId() customer_id:${cust_id} scan_id:${scan_id}`, APP);
     return this.videoToVitalsService.fetchCustomerIdAndScanId(cust_id, scan_id, apiKey);
   }
@@ -456,15 +456,6 @@ export class VideoToVitalsController {
     Logger.debug(`fetchAllStatusScans()`,APP);
     return this.videoToVitalsService.findAllStatusDetails(statusDto);
   }
-
-  // @Get('fetchAll/status')
-  // fetchStatusScans(@Query('test-date') test_date :StatusDTO){
-  //   // Logger.debug(`fetchStatusScans() `, APP);
-  //   // return this.videoToVitalsService.findAllStatus(params)
-  //   Logger.debug(`fetchStatusScans()  test_date:${test_date},`,APP);
-  //   return this.videoToVitalsService.findAllStatus(test_date);
-  // }
-
   
   @Get('fetchAll/status')
   fetchStatusScans(@Query() params :StatusDTO){
@@ -473,13 +464,11 @@ export class VideoToVitalsController {
     
   }
   
-  @Get('fetch/status-details')
+  @Get('fetch/status')
   fetchStatusByOrgIdAndTestDate( @Query('org-id') org_id: StatusDTO, @Query('test-date') test_date: StatusDTO) {
-    Logger.debug(`fetchStatusByOrgId() org_id:${org_id}`,APP);
-    Logger.debug(` fetchStatusByTestDate() test_date:${test_date}`, APP);
+    Logger.debug(`fetchStatusByOrgId() org_id:${org_id}, test_date:${test_date}`,APP);
     return this.videoToVitalsService.fetchAllRowDetails(org_id, test_date);
   }
-
 
 }
 

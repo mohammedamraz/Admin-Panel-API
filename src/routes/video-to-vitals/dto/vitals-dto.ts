@@ -55,18 +55,18 @@ id:number;
 status:number;
 message:string;
 // @Optional()
-heart_rate:number;
+heart_rate:string;
 rbs:number;
-hemoglobin:number;
-stress_level:number;
+haemoglobin:string;
+stress:string;
 bmi:number;
-smoker:string;
-hrv_sdnn:number;
-respiration_rate:number;
-systolic:number;
-diastolic:number;
-blood_oxygen:number;
-age_range:string;
+smoker_accuracy:string;
+hrv:string;
+respiration:string;
+systolic:string;
+diastolic:string;
+spo2: string;
+age:string;
 gender:string;
 org_id:number;
 user_id:number;
@@ -79,10 +79,10 @@ for_whom:string;
 ecg_url:string;
 app_name:string;
 media_name:string;
-viu_user;string;
+viu_user:string;
 pdf_location:string;
-fedo_score_id:string;
-facial_precision:string;
+fedo_score_id:number;
+facial_precision:number;
 mobile:string;
 test_time:string;
 version_id:number;
@@ -93,25 +93,25 @@ tests:number;
 status_code:number;
 vitals_id: string;
 policy_number:string;
-
-
+is_payment_successfull:boolean;
 
 constructor(v?: Partial<VitalsDTO>){
     this.status = v?.status || 0;
     this.message = v?.message || '';
-    this.heart_rate = v?.heart_rate || 0;
+    this.heart_rate = v?.heart_rate || '';
     this.rbs = v?.rbs || 0;
-    this.hemoglobin = v?.hemoglobin || 0;
-    this.stress_level = v?.stress_level || 0;
+    this.haemoglobin = v?.haemoglobin || '';
+    this.stress = v?.stress || '';
     this.bmi = v?.bmi || 0;
-    this.smoker = v?.smoker || '';
-    this.hrv_sdnn = v?.hrv_sdnn || 0;
-    this.respiration_rate = v?.respiration_rate || 0;
-    this.systolic = v?.systolic || 0;
-    this.diastolic = v?.diastolic || 0;
-    this.blood_oxygen = v?.blood_oxygen || 0;
-    this.age_range = v?.age_range || '' ;
+    this.smoker_accuracy = v?.smoker_accuracy || '';
+    this.hrv = v?.hrv || '';
+    this.respiration = v?.respiration || '';
+    this.systolic = v?.systolic || '';
+    this.diastolic = v?.diastolic || '';
+    this.spo2 = v?.spo2 || '';
+    this.age = v?.age || '' ;
     this.gender = v?.gender || '';
+    
    
 }
 }
