@@ -76,11 +76,42 @@ export class ThirdpartyOrganizationService {
       switchMap(async doc => {
         console.log(doc)  
        if(doc[0].auth_url){
+        if(doc[0].header.organization){
+
+          const url = doc[0].auth_url;
+        const secondUrl = doc[0].api_url_status;
+        const username = doc[0].header.username;
+        const password = doc[0].header.password;
+        const basicAuthHeader = `Basic ${Buffer.from(`${username}:${password}`).toString('base64')}`;
+        try {
+
+          const firstResponse = await axios.post(url, body , {
+            headers: {
+              'Authorization': basicAuthHeader
+            },
+          });
+          const accessToken = firstResponse.data.access_token;
+          console.log("the access token",accessToken)
+          const secondResponse = await axios.post(secondUrl, body, {
+            headers: {
+              'Authorization': `Bearer ${accessToken}`
+            },
+          });
+          
+          return secondResponse.data;
+
+        } catch (error) {
+          throw new BadRequestException({ status: error.response.status, message: error.response.statusText })
+        }
+
+        }
+        else{
+          console.log('not inside an organization')
+
         const url = doc[0].auth_url;
         const secondUrl = doc[0].api_url_status;
         const username = doc[0].header.username;
         const password = doc[0].header.password;
-      console.log("alishflashf")
         try {
           // const params = new URLSearchParams();
           // params.append('grant_type', grantType);
@@ -109,6 +140,7 @@ export class ThirdpartyOrganizationService {
         }
       // }
       }
+    }
       else if(doc[0].header){
         api_response = await axios.post(doc[0].api_url_status, body, {
           headers: doc[0].header
@@ -191,34 +223,69 @@ export class ThirdpartyOrganizationService {
 
     return this.tpaJunctionDB.find({ org_id: params.org_id, id: params.id }).pipe(
       switchMap(async doc => {
-        const url = doc[0].auth_url;
+        if(doc[0].auth_url){
+          if(doc[0].header.organization){
+
+            const url = doc[0].auth_url;
         const secondUrl = doc[0].api_url_vitals;
         const username = doc[0].header.username;
         const password = doc[0].header.password;
+        const basicAuthHeader = `Basic ${Buffer.from(`${username}:${password}`).toString('base64')}`;
         try {
-          // const params = new URLSearchParams();
-          // params.append('grant_type', grantType);
-          const user_data = {userid : username , password : password};
-          console.log("the user data",user_data);
 
-          const firstResponse = await axios.post(url, {userid : username , password : password});
-
-          // delete body.policy_number;
-          console.log("the response",firstResponse);
-          const accessToken = firstResponse.data.token;
+          const firstResponse = await axios.post(url, body , {
+            headers: {
+              'Authorization': basicAuthHeader
+            },
+          });
+          const accessToken = firstResponse.data.access_token;
           console.log("the access token",accessToken)
           const secondResponse = await axios.post(secondUrl, body, {
             headers: {
-              'token': accessToken
+              'Authorization': `Bearer ${accessToken}`
             },
           });
-
-          console.log("secod response",secondResponse);
-          console.log("the body sending",body);
+          
           return secondResponse.data;
 
         } catch (error) {
           throw new BadRequestException({ status: error.response.status, message: error.response.statusText })
+        }
+
+          }
+          else {
+            console.log("coming outside the organization flow")
+
+            const url = doc[0].auth_url;
+            const secondUrl = doc[0].api_url_vitals;
+            const username = doc[0].header.username;
+            const password = doc[0].header.password;
+            try {
+              // const params = new URLSearchParams();
+              // params.append('grant_type', grantType);
+              const user_data = {userid : username , password : password};
+              console.log("the user data",user_data);
+    
+              const firstResponse = await axios.post(url, {userid : username , password : password});
+    
+              // delete body.policy_number;
+              console.log("the response",firstResponse);
+              const accessToken = firstResponse.data.token;
+              console.log("the access token",accessToken)
+              const secondResponse = await axios.post(secondUrl, body, {
+                headers: {
+                  'token': accessToken
+                },
+              });
+    
+              console.log("secod response",secondResponse);
+              console.log("the body sending",body);
+              return secondResponse.data;
+    
+            } catch (error) {
+              throw new BadRequestException({ status: error.response.status, message: error.response.statusText })
+            }
+          }
         }
       })
     )
