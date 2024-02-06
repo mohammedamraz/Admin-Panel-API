@@ -10,6 +10,7 @@ import { DatabaseModuleOptions } from './interfaces/database-options.interface';
 import { DatabaseFeatureOptions } from './interfaces/database.interface';
 
 export function createDatabasePoolConnection(): Provider {
+  console.log("this is loading initailly")
   return {
     provide: DATABASE_POOL,
     useFactory: async (options: DatabaseModuleOptions) => {

@@ -20,6 +20,7 @@ export class DatabaseService<T> implements DatabaseInterface<T> {
   }
 
   private runQuery(query: string, params = []): Observable<any> {
+    console.log("what is the value in pool", this.pool)
     Logger.debug(`runQuery(): query ${[JSON.stringify(query), params]}`, APP);
 
     return from(this.pool.query(query, params).then(_ => _.rows));
